@@ -78,7 +78,11 @@ export const copy = {
     discardDone: '따끈하게 구웠어요',
     madeCount: (n: number) => `${n}번 만들었어요`,
     costSuffix: (g: number) => `르방 ${g}g`,
-    bakeConfirm: (name: string, g: number) => `${name}을(를) 구울까요? 르방 ${g}g을 써요`,
+    bakeConfirm: (name: string, g: number) => {
+      const last = name.charCodeAt(name.length - 1);
+      const hasBatchim = last >= 0xac00 && last <= 0xd7a3 && (last - 0xac00) % 28 !== 0;
+      return `${name}${hasBatchim ? '을' : '를'} 구울까요? 르방 ${g}g을 써요`;
+    },
     grades: { best: '최고예요', good: '잘 구웠어요', flat: '조금 납작해요. 그래도 맛있어요' },
     names: {
       pancake: '팬케이크', cracker: '크래커', scone: '스콘',

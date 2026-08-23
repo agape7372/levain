@@ -29,10 +29,10 @@
 - 데이터 공유: 없음
 - 모든 데이터는 기기 내 저장, 앱 삭제 시 함께 삭제
 
-## 준비된 자산
-- 앱 아이콘 1024×1024: `assets/icon.png` (512는 리사이즈)
-- 스크린샷: 에뮬 캡처본 (온보딩·홈·레시피) — 실기기 캡처로 교체 권장
-- 피처 그래픽 1024×500: 미제작 — 아이콘 확장 배치로 제작 필요
+## 준비된 자산 (전부 제작 완료)
+- 앱 아이콘: `assets/icon.png`(1024) · `assets/icon-512.png`(Play 제출용)
+- 피처 그래픽 1024×500: `assets/feature-graphic.png`
+- 스크린샷: `docs/screenshot-home.png` · `docs/screenshot-recipes.png` (에뮬 — 실기기 캡처로 교체 권장)
 
 ## 남은 것 (사용자 작업)
 1. 개인정보처리방침 웹 게시 (docs/PRIVACY.md → URL)

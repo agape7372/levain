@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
+  <!-- Play 피처 그래픽 — 베이지 그라디언트 + 병 + 타이틀 -->
+  <defs>
+    <radialGradient id="bg" cx="38%" cy="45%" r="90%">
+      <stop offset="0%" stop-color="#F2E6D3"/>
+      <stop offset="60%" stop-color="#E8D9C4"/>
+      <stop offset="100%" stop-color="#E0CFB5"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="500" fill="url(#bg)"/>
+
+  <!-- 병 (좌측) -->
+  <g transform="translate(150,88)">
+    <rect x="-22" y="0" width="284" height="44" rx="22" fill="#FBF6EA"/>
+    <rect x="0" y="44" width="240" height="288" rx="34" fill="#FBF6EA"/>
+    <path d="M0 172 q30 -34 69 -25 q33 -28 67 -9 q39 -16 63 10 q31 -6 41 24 l0 254 q0 34 -34 34 l-172 0 q-34 0 -34 -34 z"
+          transform="scale(1,0.62) translate(0,110)" fill="#F0DFB8"/>
+    <circle cx="75" cy="235" r="13" fill="#E2CD9E"/>
+    <circle cx="148" cy="272" r="9" fill="#E2CD9E"/>
+    <circle cx="183" cy="228" r="7" fill="#E2CD9E"/>
+    <rect x="-15" y="176" width="270" height="24" rx="12" fill="#C4784A"/>
+  </g>
+
+  <!-- 타이틀 (우측) -->
+  <text x="480" y="240" font-family="'Pretendard Variable', Pretendard, sans-serif" font-size="96" font-weight="700" fill="#4A3220">르방이</text>
+  <text x="484" y="308" font-family="'Pretendard Variable', Pretendard, sans-serif" font-size="34" font-weight="400" fill="#6B5340">실제 시간으로 키우는 사워도우</text>
+  <text x="484" y="356" font-family="'Pretendard Variable', Pretendard, sans-serif" font-size="34" font-weight="400" fill="#8A6A4A">하루 한두 번, 밥 주는 시간</text>
+</svg>
