@@ -102,9 +102,10 @@ html {
 .screen--solid { background: var(--bg); }
 
 /* ── 홈 HUD ──────────────────────────────────────────── */
+/* 인셋: 구형 WebView는 Capacitor가 네이티브 패딩으로 처리(env 0), 신형은 env() 실값 — 이중 패딩 금지 */
 .hud-top {
   position: absolute;
-  top: calc(14px + env(safe-area-inset-top));
+  top: calc(14px + env(safe-area-inset-top, 0px));
   left: 16px; right: 16px;
   display: flex;
   flex-direction: column;
@@ -125,7 +126,7 @@ html {
 
 .hud-corner {
   position: absolute;
-  top: calc(12px + env(safe-area-inset-top));
+  top: calc(12px + env(safe-area-inset-top, 0px));
   right: 12px;
   display: flex;
   gap: 8px;
@@ -279,7 +280,7 @@ html {
 .toast.show { opacity: 1; transform: translateY(0); }
 
 /* ── 레시피 도감 ─────────────────────────────────────── */
-.recipes-wrap { padding: calc(16px + env(safe-area-inset-top)) 16px 24px; }
+.recipes-wrap { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 24px; }
 .recipes-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 .recipes-title { font-size: 19px; font-weight: 600; color: var(--ink); margin: 0; }
 .recipe-grid {

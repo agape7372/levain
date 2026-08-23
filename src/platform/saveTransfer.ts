@@ -1,7 +1,9 @@
 // 기록 내보내기/불러오기 — 기기 이전 대비 (ARCHITECTURE §3).
-// 네이티브: Filesystem+Share(가능하면), 폴백/웹: 파일 다운로드·업로드.
+// 네이티브: Filesystem+Share, 웹: 파일 다운로드·업로드.
+import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 import type { SaveEnvelope } from '../store/persistence';
-import { isNative, loadPlugin } from './native';
+import { isNative } from './native';
 
 const FILE_NAME = 'levain-save.json';
 
@@ -10,26 +12,17 @@ export async function exportEnvelope(env: SaveEnvelope): Promise<void> {
 
   if (isNative()) {
     try {
-      const fsMod = await loadPlugin<{
-        Filesystem: {
-          writeFile(o: { path: string; data: string; directory: string; encoding: string }): Promise<{ uri: string }>;
-        };
-        Directory: { Cache: string };
-        Encoding: { UTF8: string };
-      }>('@capacitor/filesystem');
-      const shareMod = await loadPlugin<{ Share: { share(o: { url: string }): Promise<unknown> } }>('@capacitor/share');
-      if (fsMod && shareMod) {
-        const { uri } = await fsMod.Filesystem.writeFile({
-          path: FILE_NAME,
-          data: json,
-          directory: fsMod.Directory.Cache,
-          encoding: fsMod.Encoding.UTF8,
-        });
-        await shareMod.Share.share({ url: uri });
-        return;
-      }
+      const { uri } = await Filesystem.writeFile({
+        path: FILE_NAME,
+        data: json,
+        directory: Directory.Cache,
+        encoding: Encoding.UTF8,
+      });
+      await Share.share({ url: uri });
+      return;
     } catch {
-      // 폴백으로 진행
+      // 공유 시트 취소 포함 — 웹 다운로드 폴백으로 진행하지 않고 조용히 끝낸다
+      return;
     }
   }
 
@@ -42,7 +35,7 @@ export async function exportEnvelope(env: SaveEnvelope): Promise<void> {
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
-/** 파일 선택 → 텍스트 반환 (취소 시 null). 검증은 호출자(persistence.validateAndClamp) 몫 */
+/** 파일 선택 → 텍스트 반환 (취소 시 미해결로 남을 수 있음 — 호출부는 모달 없이 대기). 검증은 persistence 몫 */
 export function pickImportFile(): Promise<string | null> {
   return new Promise((resolve) => {
     const input = document.createElement('input');
@@ -56,7 +49,6 @@ export function pickImportFile(): Promise<string | null> {
       reader.onerror = () => resolve(null);
       reader.readAsText(f);
     });
-    // 취소는 이벤트가 안 온다 — focus 복귀로 근사하지 않고 그냥 미해결로 둬도 무해(모달 없음)
     input.click();
   });
 }

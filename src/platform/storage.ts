@@ -1,6 +1,7 @@
 // 저장 포트 — 주 localStorage(동기) + Capacitor Preferences 미러 (ARCHITECTURE §3).
 // 직렬화·검증은 store/persistence.ts 소관. 여기는 바이트를 넣고 빼는 일만 한다.
-import { loadPlugin } from './native';
+import { Preferences } from '@capacitor/preferences';
+import { isNative } from './native';
 
 export const SAVE_KEY = 'levain:save';
 
@@ -13,13 +14,6 @@ export interface StorageAdapter {
   mirror(json: string): void;
   /** 미러 원문 — 복구 사다리 2단 */
   loadMirror(): Promise<string | null>;
-}
-
-interface PreferencesPlugin {
-  Preferences: {
-    set(options: { key: string; value: string }): Promise<void>;
-    get(options: { key: string }): Promise<{ value: string | null }>;
-  };
 }
 
 /** 모듈 최상위에서 localStorage를 만지지 않는다 — node(vitest)·스토리지 차단 WebView 모두에서 죽는다 */
@@ -54,16 +48,14 @@ export function createStorage(key: string = SAVE_KEY): StorageAdapter {
 
     mirror(json: string): void {
       // SharedPreferences는 WebView 스토리지 evict 대상이 아니라 보험이 된다 (ARCHITECTURE §3).
-      void loadPlugin<PreferencesPlugin>('@capacitor/preferences')
-        .then((mod) => mod?.Preferences.set({ key, value: json }))
-        .catch(() => undefined);
+      if (!isNative()) return;
+      void Preferences.set({ key, value: json }).catch(() => undefined);
     },
 
     async loadMirror(): Promise<string | null> {
-      const mod = await loadPlugin<PreferencesPlugin>('@capacitor/preferences');
-      if (!mod) return null;
+      if (!isNative()) return null;
       try {
-        const res = await mod.Preferences.get({ key });
+        const res = await Preferences.get({ key });
         return res?.value ?? null;
       } catch {
         return null;

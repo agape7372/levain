@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- 르방이 런처 아이콘 — 플랫: 병 + 반죽 + 고무줄. 어댑티브 세이프존(중앙 66%) 준수 -->
+  <rect width="1024" height="1024" fill="#E8D9C4"/>
+  <!-- 병 립 -->
+  <rect x="330" y="252" width="364" height="56" rx="28" fill="#FBF6EA"/>
+  <!-- 병 몸통 -->
+  <rect x="352" y="308" width="320" height="452" rx="44" fill="#FBF6EA"/>
+  <!-- 반죽 (병 하부) -->
+  <path d="M352 560
+           q 40 -46 92 -34 q 44 -38 90 -12 q 52 -22 84 14 q 42 -8 54 32
+           l 0 156 q 0 44 -44 44 l -232 0 q -44 0 -44 -44 z" fill="#F0DFB8"/>
+  <!-- 기포 -->
+  <circle cx="452" cy="620" r="17" fill="#E2CD9E"/>
+  <circle cx="548" cy="672" r="12" fill="#E2CD9E"/>
+  <circle cx="596" cy="600" r="9" fill="#E2CD9E"/>
+  <!-- 고무줄 마커 -->
+  <rect x="332" y="536" width="360" height="30" rx="15" fill="#C4784A"/>
+</svg>

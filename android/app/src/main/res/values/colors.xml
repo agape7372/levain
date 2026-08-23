@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#C4784A</color>
+    <color name="colorPrimaryDark">#A95F38</color>
+    <color name="colorAccent">#C4784A</color>
+    <color name="levainBg">#E8D9C4</color>
+</resources>

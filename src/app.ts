@@ -7,9 +7,11 @@ import { validateAndClamp, migrate, save } from './store/persistence';
 import { createStorage } from './platform/storage';
 import { systemClock } from './platform/clock';
 import { createNotifier } from './platform/notifications';
+import { App as CapApp } from '@capacitor/app';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { onLifecycle } from './platform/lifecycle';
 import { haptic, setHapticsEnabled } from './platform/haptics';
-import { isNative, loadPlugin } from './platform/native';
+import { isNative } from './platform/native';
 import { exportEnvelope, pickImportFile } from './platform/saveTransfer';
 import { setMuted, sfxBubble, sfxFed, sfxRevived, sfxUnlock, suspendAudio, resumeAudio, unlockAudio } from './audio/sounds';
 import { copy } from './ui/copy';
@@ -94,11 +96,8 @@ export async function startApp(): Promise<void> {
   // ── 화면·탭 ──
   const router = new Router(uiRoot, {
     onRootBack: () => {
-      if (isNative()) {
-        void loadPlugin<{ App: { minimizeApp(): Promise<void> } }>('@capacitor/app').then((m) =>
-          m?.App.minimizeApp(),
-        );
-      }
+      // 루트에서 백 = 최소화(종료 아님 — 다마고치는 백그라운드 생존이 자연)
+      if (isNative()) void CapApp.minimizeApp().catch(() => undefined);
     },
     trySkipSequence: () => scene.skipSequence(),
   });
@@ -194,11 +193,11 @@ export async function startApp(): Promise<void> {
   });
   store.startTicking();
 
-  // ── Android 하드웨어 백 ──
+  // ── Android 하드웨어 백 + 상태바 ──
   if (isNative()) {
-    void loadPlugin<{
-      App: { addListener(ev: 'backButton', cb: () => void): Promise<unknown> };
-    }>('@capacitor/app').then((m) => m?.App.addListener('backButton', () => router.handleBack()));
+    void CapApp.addListener('backButton', () => router.handleBack()).catch(() => undefined);
+    // Style.Light = 밝은 배경용 어두운 콘텐츠. 상태바 배경은 MainActivity decor 베이지가 담당
+    void StatusBar.setStyle({ style: Style.Light }).catch(() => undefined);
   }
 
   // ── 오디오 언락 (첫 제스처) ──

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 단색 스플래시: 첫 화면(#E8D9C4)과 연속. 밀도별 비트맵은 삭제 (docs/RELEASE.md §4) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/levainBg" />
+</shape>
