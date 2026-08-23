@@ -87,7 +87,7 @@ export function createRecipesScreen(
             );
             return;
           }
-          openResultModal(recipe.id, '따끈하게 구웠어요');
+          openResultModal(recipe.id, copy.recipes.discardDone);
         },
       });
       return;
@@ -130,9 +130,9 @@ export function createRecipesScreen(
       meta.textContent = copy.recipes.lockedHint(copy.stage.names[recipe.stage]);
     } else if (!entry) {
       const flavor = copy.recipes.flavor[recipe.id];
-      meta.textContent = recipe.kind === 'bread' ? `${flavor} · 르방 ${recipe.cost}g` : flavor;
+      meta.textContent = recipe.kind === 'bread' ? `${flavor} · ${copy.recipes.costSuffix(recipe.cost)}` : flavor;
     } else if (entry.bestGrade === null) {
-      meta.textContent = `${entry.count}번 만들었어요`;
+      meta.textContent = copy.recipes.madeCount(entry.count);
     } else {
       const gradeSpan = document.createElement('span');
       gradeSpan.className = 'grade';

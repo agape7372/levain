@@ -60,16 +60,26 @@ npx @capacitor/assets generate --android \
 (아이콘 mipmap은 유지, `drawable-{land,port}*`·`drawable-night`만 제거 — podoal과 같은 정리).
 아이콘 원본은 `assets/icon/`에 버전관리.
 
-## 5. 서명·키스토어
+## 5. 서명·키스토어 (2026-08-23 완료)
 
-- keystore **신규 생성 `D:\keys\levain`** — podoal 키 재사용 금지. 커밋 금지.
-- `keytool -genkeypair -v -keystore D:\keys\levain\levain.keystore -alias levain -keyalg RSA -keysize 2048 -validity 10000`
-- Play App Signing 사용(업로드 키 분리) 권장.
+- keystore: `D:\keys\levain\levain.keystore` (alias `levain`), 자격증명 = `D:\keys\levain\credentials.txt`.
+- gradle 서명: `android/key.properties`(gitignore) — 분실 시 credentials.txt 값으로 재작성.
+- 릴리스: `cd android && JAVA_HOME="D:/android-toolchain/jdk21" ./gradlew bundleRelease`
+  → `android/app/build/outputs/bundle/release/app-release.aab`
+- Play App Signing 사용(업로드 키 분리) 권장. **키 분실 = Play 업데이트 불가.**
 
-## 6. appId — 되돌릴 수 없는 결정
+## 6. appId (확정: 2026-08-23)
 
-`capacitor.config.ts`의 `appId`는 **Play 등록 후 변경 불가**. M6 진입 시 사용자 확정 1회.
-제안: `com.zaballgam.levain`. 확정 전까지 코드에는 자리값 유지, `cap add android`는 확정 후.
+`com.zaballgam.levain` — 사용자 확정. **Play 등록 후 변경 불가.**
+
+## 6-1. 빌드 함정 (실측)
+
+- **한글 경로**: AGP가 거부 → `android/gradle.properties`의 `android.overridePathCheck=true` (적용됨).
+- **aapt/adb는 한글 경로 못 읽음** → APK를 ASCII 경로로 복사 후 조작.
+- **Capacitor 플러그인은 정적 import 필수** — `import('@capacitor/x')` 동적 bare-import는
+  WebView가 해석 못 해 조용히 null (알림·햅틱 전부 무음 실패). `src/platform/native.ts` 주석 참조.
+- key.properties의 storePassword/keyPassword 둘 다 채울 것 — 하나라도 비면
+  "Given final block not properly padded".
 
 ## 7. Play Console 내부테스트 제출물 체크리스트
 

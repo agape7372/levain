@@ -22,7 +22,10 @@ function toScheduled(slot: NotifySlot): LocalNotificationSchema {
     channelId: CHANNEL_ID,
     title: copy.notify[slot.copyKey],
     body: '', // 제목 한 줄이 전부 — 담백하게 (GDD §10)
-    // allowWhileIdle 미사용 = inexact 알람. SCHEDULE_EXACT_ALARM 권한은 manifest에서 제거됨.
+    // ★ isExactNotification 기본값이 true라서, 끄지 않으면 권한 없을 때 플러그인이
+    // schedule마다 시스템 "Alarms & reminders" 설정 화면을 강제로 연다 (에뮬 실측).
+    // 밥 리마인더에 분 단위 정밀도는 불필요 — 명시적 inexact (GDD §7).
+    isExactNotification: false,
     schedule: slot.weekly
       ? { at: new Date(slot.at), every: 'week', repeats: true }
       : { at: new Date(slot.at) },

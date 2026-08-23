@@ -75,6 +75,9 @@ export const copy = {
     lockedHint: (stageName: string) => `${stageName} 단계가 되면 열려요`,
     discardCooldown: '다음 밥을 준 뒤에 또 만들 수 있어요',
     needMass: '르방이 조금 부족해요. 밥을 주고 불려 보세요',
+    discardDone: '따끈하게 구웠어요',
+    madeCount: (n: number) => `${n}번 만들었어요`,
+    costSuffix: (g: number) => `르방 ${g}g`,
     bakeConfirm: (name: string, g: number) => `${name}을(를) 구울까요? 르방 ${g}g을 써요`,
     grades: { best: '최고예요', good: '잘 구웠어요', flat: '조금 납작해요. 그래도 맛있어요' },
     names: {

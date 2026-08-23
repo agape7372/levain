@@ -63,10 +63,11 @@ function cracker(): SVGElement[] {
 }
 
 function scone(): SVGElement[] {
+  // 둥근 웨지 한 조각 — 윗면 크림 결
   return [
-    path('M32 8 L54 40 Q52 42 50 40 L32 12 L14 40 Q12 42 10 40 Z', CRUST_LIGHT),
-    path('M32 8 L44 28 L20 28 Z', CREAM),
-    line(32, 8, 32, 26, DETAIL, 1),
+    path('M32 10 L52 38 Q42 44 32 44 Q22 44 12 38 Z', CRUST_LIGHT),
+    path('M32 10 L44 27 Q38 30 32 30 Q26 30 20 27 Z', CREAM),
+    line(24, 36, 40, 36, DETAIL, 1.2),
   ];
 }
 
