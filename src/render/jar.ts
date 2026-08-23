@@ -8,32 +8,44 @@ export const JAR_HEIGHT = 1.9;
 const glassVert = /* glsl */ `
   varying vec3 vNormal;
   varying vec3 vViewDir;
+  varying vec3 vLocal;
   void main() {
     vNormal = normalize(normalMatrix * normal);
+    vLocal = position;
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
     vViewDir = normalize(-mv.xyz);
     gl_Position = projectionMatrix * mv;
   }
 `;
 
-// 뒷면: 은은한 내벽 톤
+// 뒷면: 은은한 내벽 톤 + 하단으로 갈수록 두꺼워지는 유리 암시
 const glassBackFrag = /* glsl */ `
   precision mediump float;
+  varying vec3 vLocal;
   void main() {
-    gl_FragColor = vec4(0.98, 0.94, 0.88, 0.06);
+    float yn = clamp((vLocal.y + 0.95) / 1.9, 0.0, 1.0);
+    float alpha = 0.10 + 0.06 * (1.0 - yn);
+    gl_FragColor = vec4(0.98, 0.94, 0.88, alpha);
   }
 `;
 
-// 앞면: 프레넬 림 하이라이트만.
+// 앞면: 프레넬 림 + 수직 하이라이트 스트릭 2줄(키라이트 방위 정렬).
 // (절차 눈금은 저각에서 얼룩 아티팩트로 번져 제거 — 부피 표시는 고무줄 마커가 정본.
 //  눈금 재도입은 M3에서 각도 보정과 함께 재설계. implementation-notes Deviations 참조)
 const glassFrontFrag = /* glsl */ `
   precision mediump float;
   varying vec3 vNormal;
   varying vec3 vViewDir;
+  varying vec3 vLocal;
   void main() {
-    float fresnel = pow(1.0 - max(0.0, dot(normalize(vNormal), normalize(vViewDir))), 3.0);
-    float alpha = 0.05 + 0.30 * fresnel;
+    float fresnel = pow(1.0 - max(0.0, dot(normalize(vNormal), normalize(vViewDir))), 2.0);
+    float alpha = 0.08 + 0.45 * fresnel;
+    // 수직 스트릭 — 씬 키라이트(좌상단) 방위 부근 2줄, 상하 페이드
+    float az = atan(vLocal.x, vLocal.z);
+    float band = exp(-pow((az - 2.30) * 3.0, 2.0)) + 0.6 * exp(-pow((az + 0.85) * 3.5, 2.0));
+    float yn = clamp((vLocal.y + 0.95) / 1.9, 0.0, 1.0);
+    float vfade = smoothstep(0.03, 0.28, yn) * (1.0 - smoothstep(0.72, 0.97, yn));
+    alpha += 0.10 * band * vfade;
     gl_FragColor = vec4(1.0, 0.965, 0.91, alpha); // #FFF6E8
   }
 `;
@@ -103,7 +115,7 @@ export function createJar(): Jar {
   // 입구 립 — 살짝 벌어진 유리 테
   const lip = new THREE.Mesh(
     new THREE.TorusGeometry(JAR_RADIUS + 0.02, 0.018, 10, 48),
-    new THREE.MeshPhysicalMaterial({ color: 0xfff6e8, roughness: 0.25, metalness: 0, transparent: true, opacity: 0.35 }),
+    new THREE.MeshPhysicalMaterial({ color: 0xfff6e8, roughness: 0.25, metalness: 0, transparent: true, opacity: 0.5 }),
   );
   lip.rotation.x = Math.PI / 2;
   lip.position.y = JAR_HEIGHT;

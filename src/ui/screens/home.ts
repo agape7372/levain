@@ -7,11 +7,10 @@ import { openSettings } from '../components/settingsModal';
 import { toast } from '../components/toast';
 import type { GameApi } from '../gameApi';
 import type { FeedRatio, Location, Snapshot } from '../../sim';
-import { RATIOS } from '../../sim';
+import { RATIOS, FRIDGE_STAGE } from '../../sim';
 import type { Screen } from '../router';
 
 const LOCATIONS: Location[] = ['room', 'window', 'fridge'];
-const FRIDGE_STAGE = 3;
 
 export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot): void } {
   const el = document.createElement('div');

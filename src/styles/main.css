@@ -264,7 +264,8 @@ html {
 .toast-container {
   position: absolute;
   left: 0; right: 0;
-  bottom: calc(52px + 18px + env(safe-area-inset-bottom));
+  /* hud-bottom(위치 세그먼트+밥 버튼 ≈110px) 위로 — 버튼과 겹치면 조작을 가린다 */
+  bottom: calc(52px + 140px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;

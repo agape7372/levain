@@ -7,7 +7,7 @@ import type { RenderParams } from '../renderParams';
 import { BubbleSystem } from '../bubbles';
 
 const BASE_Y = 0.5;
-const XZ_SCALE = 1.3;
+export const XZ_SCALE = 1.3; // 월드→오브젝트 XZ 변환에 입력층이 사용
 const Y_SCALE = 0.78;
 const R = 0.62; // 지오메트리 반지름
 
@@ -19,6 +19,8 @@ export class DoughMesh {
 
   /** 현재 적용 중인 파라미터 (스무딩 완료값) */
   private params: RenderParams | null = null;
+  private lastT = -1;
+  private pokeAge = Infinity; // 탭 눌림 경과(s) — Infinity = 비활성
 
   constructor() {
     const bumpPos = Array.from({ length: 8 }, () => new THREE.Vector2());
@@ -55,6 +57,12 @@ export class DoughMesh {
     u.uCrust.value = p.crust;
   }
 
+  /** 탭 눌림 — 오브젝트 공간 XZ. damped spring으로 복귀(VISUAL §5) */
+  pokeAt(x: number, z: number): void {
+    (this.material.uniforms.uPokePos.value as THREE.Vector2).set(x, z);
+    this.pokeAge = 0;
+  }
+
   /** 반죽 꼭대기 월드 y — hooch 층·고무줄 배치용. 바닥 고정 피벗 기준 */
   topY(): number {
     const fill = this.params?.fillY ?? 1;
@@ -81,7 +89,19 @@ export class DoughMesh {
     (u.uBumpK.value as Float32Array).set(this.bubbles.k);
 
     u.uTime.value = t;
-    this.wobble.multiplyScalar(0.9);
+    const dt = this.lastT < 0 ? 1 / 60 : Math.min(t - this.lastT, 0.1);
+    this.lastT = t;
+    // 프레임률 독립 감쇠 — 60fps 기준 ×0.9/frame과 등가(e^{-6·1/60}≈0.905)
+    this.wobble.multiplyScalar(Math.exp(-6 * dt));
     (u.uWobble.value as THREE.Vector2).copy(this.wobble);
+
+    // 탭 눌림 스프링 복귀 e^(-5t)·cos(12t) — 눌렸다 살짝 되튀고 정착
+    if (this.pokeAge < 1.1) {
+      this.pokeAge += dt;
+      const a = this.pokeAge;
+      u.uPokeAmt.value = a >= 1.1 ? 0 : 0.06 * Math.exp(-5 * a) * Math.cos(12 * a);
+    } else if ((u.uPokeAmt.value as number) !== 0) {
+      u.uPokeAmt.value = 0;
+    }
   }
 }
