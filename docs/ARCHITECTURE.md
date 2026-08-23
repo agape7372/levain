@@ -1,0 +1,201 @@
+# 르방이 — 아키텍처 (계약·구조 정본)
+
+> **정본 선언**: 코드 계약·레이어링·저장·플랫폼 통합은 이 문서가 정본.
+> 게임 규칙·수치는 [GDD.md](GDD.md), 씬·uniform은 [VISUAL.md](VISUAL.md)가 정본.
+
+스택: TypeScript(strict) + Vite + three.js(npm) + vitest + Capacitor 8 (Android, 로컬 번들 셸).
+백엔드 0, 완전 로컬, CI 없음(검증 전부 로컬: vitest + vite build + Gradle).
+
+## 0. 프로토타입 판정 — 살릴 것 / 버릴 것
+
+**살린다**: 반죽 셰이더 전체(버텍스 가우시안 범프 + 프래그먼트 아날리틱 노멀 재구성 — 제품의 얼굴),
+라이팅(키 0xffe2b0 1.4 + 앰비언트 0xfff0dc 0.55), 베이지 팔레트, 포인터→평면 레이캐스트→wobble 감쇠(×0.9) 입력 모델,
+병 토러스(→ 고무줄 마커로 전용).
+
+**버린다**: unpkg importmap(오프라인 앱에서 죽은 코드 → npm three), `#recipe[style*="block"]` CSS 핵,
+`?tab=` URL 라우팅, 전역 변수 스크립트 구조, rAF 시계를 게임 시간으로 쓰는 구조(게임 시간 = wall-clock),
+탑다운 90° 카메라(→ 55° 틸트, VISUAL.md §1).
+
+## 1. 디렉터리·모듈 구조
+
+```
+levain/
+├─ index.html  vite.config.ts  tsconfig.json  vitest.config.ts  capacitor.config.ts
+├─ src/
+│  ├─ main.ts                  # 부트스트랩: 저장 로드 → catch-up → 조립
+│  ├─ app.ts                   # 오케스트레이터 — 층을 배선하는 유일한 곳
+│  ├─ sim/                     # ★순수 코어: three/DOM/Capacitor/Date.now import 0
+│  │  ├─ types.ts              # SimState·Action·SimEvent·Snapshot
+│  │  ├─ constants.ts          # 튜닝 상수 전부 한 곳 (GDD §3 수치)
+│  │  ├─ advance.ts            # advance(state, now) — 닫힌 함수 catch-up + 재정박
+│  │  ├─ actions.ts            # applyAction(state, action, now) → {state, events}
+│  │  ├─ derive.ts             # deriveSnapshot(state, now) → Snapshot
+│  │  ├─ recipes.ts            # 레시피 데이터·해금·판정 (순수 데이터+함수)
+│  │  └─ notifyPlan.ts         # planNotifications(state, now) → NotifyPlan
+│  ├─ render/                  # three 전용. sim을 모른다 — RenderParams만
+│  │  ├─ SceneHost.ts          # renderer·scene·camera 수명주기, ResizeObserver, 컨텍스트 유실 복구
+│  │  ├─ dough/ DoughMesh.ts dough.vert.glsl dough.frag.glsl   # ?raw 임포트
+│  │  ├─ jar.ts                # 병 3패스 + 고무줄 마커 + hooch 층
+│  │  ├─ background.ts         # 라디얼 그라디언트 + 베이크드 소프트 섀도
+│  │  ├─ particles.ts          # 공용 InstancedMesh 풀 256
+│  │  ├─ bubbles.ts            # uBump 배열 CPU 생명주기
+│  │  ├─ renderParams.ts       # toRenderParams(snap) + 지수 스무딩
+│  │  ├─ effects.ts            # 밥주기·굽기·부활 시퀀스
+│  │  └─ input.ts              # poke·wobble·롱프레스
+│  ├─ ui/                      # vanilla TS + DOM 오버레이. sim 직접 접근 금지 — store 경유
+│  │  ├─ router.ts             # 화면 스택 + Android backButton 계약 (§5)
+│  │  ├─ screens/ home.ts recipes.ts bake.ts onboarding.ts
+│  │  ├─ components/ modal.ts toast.ts observeCard.ts settingsModal.ts
+│  │  ├─ copy.ts               # 전체 한국어 문구 사전 (한 파일 — 전수 감수용)
+│  │  └─ format.ts             # 시간·수치 한국어 포맷
+│  ├─ audio/sounds.ts          # WebAudio 합성 3종 + 마스터 게인·음소거
+│  ├─ platform/                # 부수효과 전담 포트. 웹/네이티브 분기는 전부 여기서 끝
+│  │  ├─ clock.ts              # Clock { now(): number } + systemClock / FakeClock
+│  │  ├─ storage.ts            # StorageAdapter: localStorage 주 + Preferences 미러
+│  │  ├─ notifications.ts      # NotifierPort: LocalNotifications 래퍼 (웹 no-op)
+│  │  ├─ lifecycle.ts          # visibilitychange + App pause/resume 통합
+│  │  ├─ haptics.ts            # Haptics 래퍼 (웹 no-op)
+│  │  └─ native.ts             # Capacitor 감지·플러그인 lazy import
+│  ├─ store/
+│  │  ├─ gameStore.ts          # 단일 진실 소스: state·dispatch·tick·subscribe
+│  │  └─ persistence.ts        # envelope 직렬화·버전·복구
+│  └─ styles/main.css          # 색 토큰·세이프에어리어·Pretendard 번들
+├─ tests/                      # curves neglect clock persistence recipes notifyPlan renderParams
+├─ public/fonts/               # Pretendard Variable (번들 — CDN 금지)
+├─ android/                    # cap add android 산출물 — 레포 안 (번들 모드라 셸 분리 불필요)
+└─ docs/                       # GDD ARCHITECTURE VISUAL RELEASE QA + design/(원문)
+```
+
+**의존 방향(ESLint `no-restricted-imports`로 잠금)**: `sim` ← `store` ← (`ui`, `render`).
+`platform`은 `app.ts`가 주입. sim은 아무것도 import하지 않는다.
+
+## 2. 시뮬레이션 코어 계약
+
+```ts
+// 전부 순수. Date.now() 절대 호출 금지 — now는 항상 인자.
+export function advance(state: SimState, now: number): SimState;
+export function applyAction(state: SimState, action: Action, now: number): { state: SimState; events: SimEvent[] };
+export function deriveSnapshot(state: SimState, now: number): Snapshot;
+export function planNotifications(state: SimState, now: number): NotifyPlan;
+export function initialState(now: number): SimState;
+
+export type Action =
+  | { type: 'feed'; ratio: FeedRatio }
+  | { type: 'setLocation'; to: Location }
+  | { type: 'bake'; recipeId: string }          // 빵: mass 차감 + 판정. 커밋은 여기서
+  | { type: 'bakeDiscard'; recipeId: string };  // discard: 쿨다운 갱신만
+// 젓기·관찰·띄워보기는 액션이 아님 — 상태 무변형(젓기=코스메틱, 관찰·띄워보기=derive 읽기)
+```
+
+- **닫힌 함수**: `advance`는 시계 역행 재정박(GDD §3-8)과 60일 클램프만 수행하고 `lastSimulatedAt`을 갱신.
+  나머지는 전부 `deriveSnapshot`의 파생 — advance에 적분 루프 없음.
+  (예외적으로 acidity만 누적값: advance가 구간별 요율로 갱신 — 구간 경계는 닫힌 식으로 산출, 루프 없음.)
+- **액션 순서 불변식**: `dispatch(action)` = `tick(now)` 선행 → `applyAction`. gameStore 파이프라인에 계약으로 박는다.
+- **SimEvent** (`'peaked' | 'becameHungry' | 'wentDormant' | 'recipeUnlocked' | 'stageUp' | 'revived'` …):
+  반환값으로만 흘린다 — 상태에 넣지 않음. UI 토스트·연출 트리거용.
+- **결정론 테스트**: 닫힌 함수라 "파생값이 저장·tick 시점과 무관"을 검증
+  (임의 시점에 advance를 몇 번 끼워 넣어도 같은 now의 Snapshot이 동일).
+
+### 시간 소스
+
+- `Clock { now(): number }` — gameStore.tick만 clock 접근. sim은 Clock조차 모른다.
+- 포그라운드 tick: **5초 setInterval** (rAF 아님 — 백그라운드에서 멈추는 rAF에 게임 시간을 태우지 않는다).
+- rAF는 렌더 전용, **홈 화면 + visible일 때만** 구동.
+- 렌더 `uTime`은 `performance.now()` 기반 — rAF 델타 누적 금지.
+
+## 3. 저장
+
+```ts
+interface SaveEnvelope {
+  schemaVersion: number;   // 1부터. sim은 버전을 모른다
+  savedAt: number;
+  sim: SimState;
+  settings: { muted: boolean; haptics: boolean; notifyEnabled: boolean };
+  flags: { onboarded: boolean; pendingBake: { recipeId: string; grade: string } | null };
+}
+```
+
+- **주 = localStorage** `levain:save` (동기 — 부트 대기·깜빡임 0, 액션 직후 동기 저장으로 유실 창 0).
+- **미러 = Capacitor Preferences** (네이티브만, 저장 성공 후 fire-and-forget — Android WebView 스토리지
+  evict 보험. SharedPreferences는 evict 대상 아님). 웹에서는 no-op.
+- 저장 시점 4종: 모든 액션 직후 / `visibilitychange hidden` / `App.pause` / 포그라운드 60초.
+  전부 같은 `persistence.save()` 하나.
+- **복구 사다리(2계층)**: 주 파싱+범위 가드 → 실패 시 미러 → 실패 시 새 게임 + 담백한 안내.
+  가드는 손으로 쓴 타입·범위 검사(필드 12개 — 라이브러리 불필요). **NaN·범위 밖은 버리지 말고 clamp로 살린다.**
+- **마이그레이션**: `schemaVersion` + 순차 체인 자리만 스캐폴드. 픽스처 테스트는 첫 실제 마이그레이션부터.
+- **기기 이전**: 설정 "기록 내보내기/불러오기" — envelope JSON을 `@capacitor/filesystem` + 공유 시트
+  (웹은 파일 다운로드/업로드). `android:allowBackup="true"` 유지 — 재설치 복원은 QA.md에서 실검증.
+
+## 4. 렌더러 계약
+
+```
+SimState → deriveSnapshot(state, now) → Snapshot → toRenderParams(snap) → RenderParams → uniforms
+   (sim)         (sim, 순수)                          (render, 순수 — vitest 대상)      (rAF 스무딩)
+```
+
+- 이 체인이 **유일한 sim→render 이음새**. uniform 목록·값 범위는 VISUAL.md §3이 정본.
+- 스무딩: rAF마다 `v += (target − v) × (1 − exp(−dt/τ))`, τ≈1.2s.
+- **전환 정책**: 앱 오픈 catch-up 결과는 **즉시 스냅**(몇 시간 치를 애니메이션 재생하지 않는다 —
+  "돌아와 보니 이렇게 되어 있었다"가 다마고치 문법). 라이브 중엔 지수 lerp.
+- SceneHost: `mount / setParams / start / stop / dispose`. 컨텍스트 유실 = **전체 재구축**
+  (`webglcontextlost` preventDefault→stop, `restored`→dispose→mount→마지막 params 재주입→start.
+  씬이 작아 1프레임 미만 — 부분 복구 로직의 버그 표면을 사지 않는다).
+- resize: `#stage`에 ResizeObserver. DPR = `min(devicePixelRatio, 2)` 고정.
+
+## 5. UI 계약 — 2탭 4화면
+
+- 탭: **르방 / 레시피**(=도감+띄워보기+굽기 진입). 설정 = 홈 구석 아이콘 → 중앙 모달. 관찰 카드 = 병 탭.
+- 화면: home / recipes / bake(스택) / onboarding. 프레임워크 없음 —
+  `gameStore.subscribe(snap => screen.update(snap))`로 각 화면이 자기 DOM만 갱신.
+- **모달 = 중앙 팝업 고정** (`components/modal.ts` 하나로 강제. 바닥 시트 금지 — 사용자 규칙, 되돌림 방지 주석 필수).
+- **Android backButton 계약**: `@capacitor/app` backButton 리스너 —
+  ① 열린 모달 있으면 닫기 ② router depth>0면 back() ③ 루트면 `App.minimizeApp()` (종료 아님 —
+  다마고치는 백그라운드 생존이 자연). 연출 중엔 백 = 연출 스킵. 웹은 no-op.
+- 세로 고정(`android:screenOrientation="portrait"`), `env(safe-area-inset-top/bottom)`.
+
+## 6. Capacitor 통합 (로컬 번들 셸 — podoal과 반대 구성)
+
+```ts
+// capacitor.config.ts
+export default {
+  appId: '<M6에서 사용자 확정 — 제안 com.zaballgam.levain>',  // Play 등록 후 변경 불가
+  appName: '르방이',
+  webDir: 'dist',
+  // server.url 없음 — 번들 모드. 웹 배포 개념 자체가 없다.
+};
+```
+
+- `android/`는 레포 안. 릴리스: `npm run build && npx cap sync android` → Gradle.
+- **podoal에서 절차만 재사용**: JDK21 Gradle 경로, 에뮬 함정 6종(README·RELEASE.md에 이식),
+  `@capacitor/assets --iconBackgroundColor "#E8D9C4"` + 밀도별 스플래시 비트맵 삭제→단색 windowSplashScreen,
+  WebView CDP 디버깅. **재사용 안 함**: FCM·push-notifications·google-services.json·AdMob·딥링크·OAuth.
+- keystore **신규 `D:\keys\levain`** (podoal 키 재사용 금지). Play App Signing 권장.
+- StatusBar `style: Dark`(베이지 위 어두운 아이콘 — 기본 흰 아이콘은 비가시) + edge-to-edge(targetSdk 35) +
+  스플래시 단색 #E8D9C4 연속성.
+- **LocalNotifications**: `@capacitor/local-notifications` (push 아님 — 혼동 주의). 채널 1개 "르방이 돌보기".
+  inexact 알람. 고정 id 슬롯 cancel→schedule (GDD §7). 냉장 슬롯은 `every:'week'` 반복.
+  M6 실기기 판정 2건: ① 재부팅 후 예약 생존(안 되면 resume 재예약으로 커버되는지)
+  ② manifest merge가 EXACT_ALARM 권한을 끌고 오면 override 제거.
+- resume 흐름: `App.resume`/visible → `tick(now)` catch-up → 스냅 반영 → 알림 재계산·재예약.
+
+## 7. 테스트 전략
+
+vitest (`environment: 'node'` — sim에 DOM 불필요), FakeClock으로 시간 완전 제어.
+
+| 파일 | 검증 |
+|---|---|
+| `curves.test.ts` | 밥→잠복→피크→하강 곡선, 비율·온도별 피크 시각이 notifyPlan과 정합 |
+| `neglect.test.ts` | 2주 방치 → 휴면, 전 필드 NaN 0·유계, 부활 의식 완주 → 활발 복귀, maturity 보존 |
+| `clock.test.ts` | 역행 → 전 타임스탬프 재정박(상대 간격 보존), 60일 클램프, 저장시점 무관성 |
+| `persistence.test.ts` | envelope 왕복, 손상 → clamp 회수 → 미러 폴백 → 새 게임, pendingBake 재노출 |
+| `recipes.test.ts` | 단계·mass 경계 해금, 씨앗 60g 보존, 판정 등급 경계, discard 쿨다운 |
+| `notifyPlan.test.ts` | 상태별 슬롯, 냉장 주간 전환, 휴면 침묵, revive 분기, 조용시간 클램프 |
+| `renderParams.test.ts` | Snapshot→RenderParams 앵커 값(VISUAL §2-3 표), 범위 클램프 |
+
+렌더·UI는 수동 QA(QA.md).
+
+## 8. 마일스톤
+
+plan 파일 §5와 동일 — M-docs → M0(스캐폴드+씬 재구축) → M1(sim, M0과 병렬 가능) → M2(저장) →
+M3(상태→시각) → M4(UI) → M5(레시피·굽기·연출·사운드) → M6(Capacitor) → M7(QA·제출물).
+위임: [기계적] = Opus 5/Sonnet 5 서브에이전트 + 본 세션 전량 리뷰 / [판단] = 본 세션 직접.
