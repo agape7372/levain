@@ -9,7 +9,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "thumbs": "node scripts/bake-thumbs.mjs",
-    "check-budget": "node scripts/check-budget.mjs"
+    "check-budget": "node scripts/check-budget.mjs",
+    "ota:release": "node scripts/ota-release.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
@@ -22,6 +23,7 @@
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/share": "^8.0.1",
     "@capacitor/status-bar": "^8.0.3",
+    "@capgo/capacitor-updater": "^8.51.14",
     "three": "^0.185.1"
   },
   "devDependencies": {

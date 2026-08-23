@@ -1,7 +1,8 @@
 # 르방이 — 빌드·릴리스 절차
 
 > podoal 셸(`D:\podoal-shell-spike\README.md`)에서 절차만 이식. 르방이는 **로컬 번들 셸**이라
-> 원격 URL·FCM·Firebase·AdMob·딥링크 관련 절차는 전부 해당 없음.
+> `server.url` 라이브 리로드·FCM·Firebase·AdMob·딥링크 관련 절차는 전부 해당 없음.
+> (OTA 정적 배포처는 별개 — §8.)
 
 ## 1. 로컬 검증 (CI 없음 — GitHub Actions 비활성, 전부 로컬)
 
@@ -95,6 +96,50 @@ npx @capacitor/assets generate --android \
 - [ ] 내부테스트 트랙 테스터 이메일 등록
 - [ ] targetSdk 35 (Android 15) — 신규 앱 요건
 
-## 8. 릴리스 게이트
+## 8. OTA(웹 번들 갱신)
+
+`@capgo/capacitor-updater` — 정적 호스팅(`https://levain-ota.vercel.app`, `manifest.json` + `bundles/*.zip`
+두 파일뿐, 서버 로직 없음). 앱이 부팅 시 매니페스트를 읽어 새 버전이면 백그라운드로 받아 두고,
+**다음 앱 시작 때** 적용한다(세션 중 화면이 갈아끼워지지 않는다). 계약·구현은
+[ARCHITECTURE.md §6](ARCHITECTURE.md)·`src/platform/ota.ts` 참조.
+
+**OTA로 되는 것 / 안 되는 것**
+
+| 되는 것 (웹 자산, `dist/`에 들어가는 전부) | 안 되는 것 (APK/AAB 재배포 필요) |
+|---|---|
+| JS/CSS 번들 | 네이티브 플러그인 추가·변경 |
+| 이미지·폰트·GLB 등 정적 자산 | Android 권한 |
+| three.js 셰이더(.glsl) | `capacitor.config.ts`의 appId |
+| UI 문구(`ui/copy.ts`) | 아이콘·스플래시 등 네이티브 리소스 |
+| 게임 밸런스 상수(`sim/constants.ts`) | versionCode·versionName, AndroidManifest.xml |
+
+**릴리스 절차**
+
+```bash
+npm run ota:release -- <version>          # 예: 1.1.0 — build → zip → sha256 체크섬 → ota/ 산출물
+# 신규 네이티브 플러그인을 전제로 한 번들이면 최소 네이티브 버전을 명시:
+npm run ota:release -- <version> --min-native=<x.y>
+npm run ota:release -- <version> --dry-run   # 파일 쓰기 없이 빌드·zip·체크섬만 확인
+
+cd ota && npx vercel --prod --scope jirings-projects   # 실제 배포는 이 한 줄
+```
+
+`scripts/ota-release.mjs`가 `ota/manifest.json`(현재 배포 버전)과 `ota/history.json`(발행 이력 누적)을
+같이 갱신하고, `ota/bundles/`에는 최근 4개 버전만 남기고 자동 정리한다.
+
+**롤백**: `ota/history.json`에서 되돌릴 버전의 항목(version/url/checksum)을 찾아 그대로
+`ota/manifest.json`에 덮어쓰고 다시 `cd ota && npx vercel --prod --scope jirings-projects`로 배포한다.
+앱은 다음 시작 때 그 버전을 받는다. **주의**: `bundles/*.zip`은 1년 immutable 캐시로 서빙되므로
+같은 파일명을 새로 쓰지 않는다 — 롤백은 기존 zip을 다시 가리키기만 할 뿐 파일을 교체하지 않는다.
+4개보다 오래된 버전은 zip 자체가 정리되어 없을 수 있으니 history.json으로 존재를 먼저 확인.
+
+**안전장치**: 앱은 부팅 즉시 `notifyAppReady()`를 호출한다(`src/platform/ota.ts`). 이걸 받지 못하면
+(크래시 등으로 부팅이 안 끝나면) 플러그인이 "깨진 번들"로 판단해 다음 실행에 자동으로 이전 번들로
+되돌아간다 — 별도 조치 불필요. 번들 적용 자체도 항상 다음 앱 시작에만 일어난다(세션 중 무적용).
+
+**Play 정책**: 웹 자산(JS/HTML/CSS 등) 무선 갱신은 허용 범위. 네이티브 코드·권한 교체는 금지 —
+이 구조는 전자만 다루므로 해당 없음. 위 표의 "안 되는 것"이 필요해지면 통상 절차(§2~§6)로 AAB 재배포.
+
+## 9. 릴리스 게이트
 
 [QA.md](QA.md) 전항 통과 + vitest green + `vite build` 경고 0 이 릴리스 조건.

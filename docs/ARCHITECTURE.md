@@ -58,7 +58,8 @@ levain/
 │  │  ├─ notifications.ts      # NotifierPort: LocalNotifications 래퍼 (웹 no-op)
 │  │  ├─ lifecycle.ts          # visibilitychange + App pause/resume 통합
 │  │  ├─ haptics.ts            # Haptics 래퍼 (웹 no-op)
-│  │  └─ native.ts             # Capacitor 감지·플러그인 lazy import
+│  │  ├─ native.ts             # Capacitor 감지·플러그인 lazy import
+│  │  └─ ota.ts                # OTA 확인·다운로드·적용(다음 시작에). app.ts가 부팅 시 1회 호출
 │  ├─ store/
 │  │  ├─ gameStore.ts          # 단일 진실 소스: state·dispatch·tick·subscribe
 │  │  └─ persistence.ts        # envelope 직렬화·버전·복구
@@ -66,8 +67,10 @@ levain/
 ├─ tests/                      # curves neglect clock persistence recipes notifyPlan renderParams
 ├─ public/fonts/               # Pretendard Variable (번들 — CDN 금지)
 ├─ public/breads/               # 빵 GLB 10종 + thumbs/ 베이크 PNG 썸네일 (런타임 로드 경로)
-├─ scripts/                    # bake-thumbs.mjs(썸네일 베이커) · check-budget.mjs(GLB 용량·tri 예산 검사)
+├─ scripts/                    # bake-thumbs.mjs(썸네일 베이커) · check-budget.mjs(GLB 용량·tri 예산 검사) ·
+│                                 ota-release.mjs(OTA 릴리스 패키저 — build→zip→checksum→ota/ 산출물)
 ├─ android/                    # cap add android 산출물 — 레포 안 (번들 모드라 셸 분리 불필요)
+├─ ota/                        # OTA 정적 배포처 산출물(Vercel 배포) — manifest.json·history.json·bundles/*.zip
 └─ docs/                       # GDD ARCHITECTURE VISUAL RELEASE QA + design/(원문)
 ```
 
@@ -177,13 +180,27 @@ SimState → deriveSnapshot(state, now) → Snapshot → toRenderParams(snap) �
 ```ts
 // capacitor.config.ts
 export default {
-  appId: '<M6에서 사용자 확정 — 제안 com.zaballgam.levain>',  // Play 등록 후 변경 불가
+  appId: 'com.zaballgam.levain',  // 확정: 2026-08-23. Play 등록 후 변경 불가
   appName: '르방이',
   webDir: 'dist',
-  // server.url 없음 — 번들 모드. 웹 배포 개념 자체가 없다.
+  // server.url 없음 — 라이브 리로드용 원격 서버는 여전히 없다. 초기 웹 빌드는 APK에 실려 배포되고,
+  // 이후 웹 자산만 CapacitorUpdater(OTA)로 무선 교체한다. 아래 OTA 계약 참조.
+  plugins: {
+    // updateUrl·statsUrl·channelUrl은 빈 문자열 — 기본값이 Capgo 클라우드로 향한다(방침 위반).
+    // 업데이트 확인은 ota.ts가 자체 정적 manifest를 GET할 뿐이다.
+    CapacitorUpdater: {
+      autoUpdate: 'off', updateUrl: '', statsUrl: '', channelUrl: '',
+      resetWhenUpdate: true, appReadyTimeout: 10000,
+      autoDeleteFailed: true, autoDeletePrevious: true,
+    },
+  },
 };
 ```
 
+- **OTA(웹 번들 갱신)**: `src/platform/ota.ts`(부팅 시 확인·다운로드·다음 시작에 적용 — `app.ts`가 1회 호출)·
+  `scripts/ota-release.mjs`(릴리스 패키저)·`ota/`(정적 배포처 산출물: manifest.json·history.json·bundles/)
+  세 곳에만 산다. **sim·store는 OTA의 존재를 모른다** — platform 층 밖으로 새지 않는다(§0 의존 방향과 동일
+  원칙). 무엇이 OTA로 되고 안 되는지·릴리스 절차·롤백은 [RELEASE.md §8](RELEASE.md)이 정본.
 - `android/`는 레포 안. 릴리스: `npm run build && npx cap sync android` → Gradle.
 - **podoal에서 절차만 재사용**: JDK21 Gradle 경로, 에뮬 함정 6종(README·RELEASE.md에 이식),
   `@capacitor/assets --iconBackgroundColor "#E8D9C4"` + 밀도별 스플래시 비트맵 삭제→단색 windowSplashScreen,

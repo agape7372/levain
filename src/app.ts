@@ -12,6 +12,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { onLifecycle } from './platform/lifecycle';
 import { haptic, setHapticsEnabled } from './platform/haptics';
 import { isNative } from './platform/native';
+import { initOta } from './platform/ota';
 import { exportEnvelope, pickImportFile } from './platform/saveTransfer';
 import {
   setMuted, sfxBubble, sfxFed, sfxRevived, sfxUnlock, suspendAudio, resumeAudio, unlockAudio,
@@ -31,6 +32,10 @@ import type { GameApi } from './ui/gameApi';
 import type { BakeGrade, SimEvent } from './sim';
 
 export async function startApp(): Promise<void> {
+  // OTA는 가장 먼저 — 롤백 방지 신호(notifyAppReady)가 늦으면 정상 번들도 되돌려진다.
+  // 확인·다운로드는 내부에서 뒤로 미루므로 부팅을 막지 않는다 (platform/ota.ts 계약).
+  initOta();
+
   const canvas = document.getElementById('c') as HTMLCanvasElement;
   const stage = document.getElementById('stage') as HTMLElement;
   const uiRoot = document.getElementById('ui-root') as HTMLElement;
