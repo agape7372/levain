@@ -12,7 +12,7 @@ export interface RenderParams {
   bubbleScale: number;     // 0.5~1.5
   specStr: number;         // 0.1~1.2
   crust: number;           // 0~1 (휴면 마른 껍질)
-  fillY: number;           // 0.6~1.6 (고무줄 기준)
+  fillY: number;           // 0.6~1.6 (급여 시점=1.0 기준)
   hoochAmt: number;        // 0~1
   wet: number;             // 0~1 급여 직후 젖은 광 → 마르면 무광 페이스트
   ripe: number;            // 0~1 피크 돔 + crackle

@@ -313,7 +313,7 @@ export class SceneHost {
           );
           dough.wobble.set(Math.cos(ang) * 0.06, Math.sin(ang) * 0.06);
         }
-        // 정착 — 눌림 스프링 + 기포 + 밀가루 퍼프 + 고무줄 슬라이드
+        // 정착 — 눌림 스프링 + 기포 + 밀가루 퍼프
         if (fs >= 2.4) {
           const sp = Math.min((fs - 2.4) / 0.4, 1);
           dough.mesh.scale.y *= 1 - 0.05 * Math.sin(Math.PI * sp);

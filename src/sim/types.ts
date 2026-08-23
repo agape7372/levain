@@ -98,7 +98,7 @@ export interface Snapshot {
   sourness: number;
   /** 휴면 깊이 0~1 */
   dormancy: number;
-  /** 반죽 높이 — 고무줄(마지막 밥 시점) 기준 1.0, 범위 0.6~1.6 */
+  /** 반죽 높이 — 마지막 밥 시점 기준 1.0, 범위 0.6~1.6 */
   fill: number;
   /** 부유액 층 0~1 */
   hooch: number;

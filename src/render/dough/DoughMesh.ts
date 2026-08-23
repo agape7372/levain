@@ -119,7 +119,7 @@ export class DoughMesh {
     this.lastStirInputT = this.lastT;
   }
 
-  /** 반죽 꼭대기 월드 y — hooch 층·고무줄 배치용. 바닥 고정 피벗 기준 */
+  /** 반죽 꼭대기 월드 y — hooch 층 배치용. 바닥 고정 피벗 기준 */
   topY(): number {
     const fill = this.params?.fillY ?? 1;
     const h = R * Y_SCALE;

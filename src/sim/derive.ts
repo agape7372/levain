@@ -129,7 +129,7 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
   const stage = stageOf(state, now);
   const sf = stageFillFactor(state, now, stage);
 
-  // fill: 급여 시점(고무줄) = 1.0 기준, 피크에서 넘고 지치면 그 아래로 꺼진다
+  // fill: 급여 시점 = 1.0 기준, 피크에서 넘고 지치면 그 아래로 꺼진다
   let fill: number;
   const peakFill = 1.0 + FILL_PEAK_RISE * sf;
   if (effH < b.peakEnd) fill = 1.0 + FILL_PEAK_RISE * sf * activity;

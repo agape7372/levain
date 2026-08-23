@@ -1,4 +1,4 @@
-// 유리병 — 3패스 고정 renderOrder(굴절·transmission 금지) + 눈금 + 고무줄 마커.
+// 유리병 — 3패스 고정 renderOrder(굴절·transmission 금지) + hooch 층.
 // 정본: docs/VISUAL.md §1-2. 알파 소팅 오류를 renderOrder로 구조적으로 차단한다.
 import * as THREE from 'three';
 

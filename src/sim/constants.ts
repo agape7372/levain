@@ -116,7 +116,7 @@ export const NOTIFY_SLOT_FEED = 1;
 export const NOTIFY_SLOT_DORMANT = 2;
 export const NOTIFY_SLOT_MOLD = 3; // 곰팡이 임박 경고 — 정확히 1건
 
-/** 부피(fill) — 고무줄(급여 시점)=1.0 기준 */
+/** 부피(fill) — 급여 시점=1.0 기준 */
 export const FILL_MIN = 0.6;
 export const FILL_MAX = 1.6;
 export const FILL_PEAK_RISE = 0.6;   // 피크에서 1.0 + 0.6×stageFactor
