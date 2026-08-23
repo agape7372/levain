@@ -24,8 +24,12 @@ const glassBackFrag = /* glsl */ `
   varying vec3 vLocal;
   void main() {
     float yn = clamp((vLocal.y + 0.95) / 1.9, 0.0, 1.0);
-    float alpha = 0.10 + 0.06 * (1.0 - yn);
-    gl_FragColor = vec4(0.98, 0.94, 0.88, alpha);
+    // 림 바로 아래 내부 환형 — 원래 공식은 위로 갈수록 알파가 낮아져 배경색(#E8D9C4)이
+    // 그대로 비쳐 반죽 위에 뜬 베이지 링(#e8d5b8)으로 보임. 그 구간만 어둡게·덜 투명하게 덮는다.
+    float rim = smoothstep(0.75, 1.0, yn);
+    float alpha = 0.10 + 0.06 * (1.0 - yn) + 0.24 * rim;
+    vec3 tint = mix(vec3(0.98, 0.94, 0.88), vec3(0.28, 0.21, 0.14), rim);
+    gl_FragColor = vec4(tint, alpha);
   }
 `;
 
