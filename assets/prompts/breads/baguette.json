@@ -1,0 +1,24 @@
+{
+  "id": "baguette",
+  "version": 1,
+  "name_ko": "바게트",
+  "subject": "a long slender baguette loaf",
+  "geometry": {
+    "silhouette": "a long, thin cylinder tapered to a point at both ends, an extreme length-to-diameter ratio far longer than any other loaf",
+    "crust": [
+      "deep golden brown surface #A9713F along the entire length",
+      "3 to 5 diagonal overlapping slash scores cut along the top",
+      "each slash opened into a raised ridge line (an 'ear') where the crust has burst upward",
+      "cream-colored crumb #F4EAD4 visible inside each open slash"
+    ]
+  },
+  "style_ref": "shared-style-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid #F2E6D3, no props, no floor texture",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows",
+  "negative": ["face", "eyes", "mouth", "character", "text", "watermark", "plate", "board", "hands", "photorealism", "glossy plastic", "people"],
+  "views": ["three-quarter top-front", "front elevation", "top-down"],
+  "output": { "aspect": "1:1", "size": 1024 },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a long slender baguette loaf. Geometry: a long, thin cylinder tapered to a point at both ends, with an extreme length-to-diameter ratio far longer than any other loaf. Crust: a deep golden brown surface (#A9713F) runs along the entire length; 3 to 5 diagonal overlapping slash scores are cut along the top, each opened into a raised ridge line (an 'ear') where the crust has burst upward, with cream-colored crumb (#F4EAD4) visible inside each open slash. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, rounded silhouette, stylized 3D render. Camera: three-quarter top-front view, object centered, 15% margin. Background: solid #F2E6D3, no props, no floor texture. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows. Generate the same object consistently across each requested view — three-quarter top-front, front elevation, and top-down — keeping identical proportions, colors, and surface details between views. Negative: no face, no eyes, no mouth, no character, no text, no watermark, no plate, no board, no hands, no photorealism, no glossy plastic, no people.",
+  "notes_ko": "사선으로 겹친 칼집과 그로 인해 벌어진 귀(ear) 라인이 없으면 그냥 막대 모양 빵으로만 보인다 — 바게트의 결정적 특징."
+}

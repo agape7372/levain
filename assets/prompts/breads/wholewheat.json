@@ -1,0 +1,23 @@
+{
+  "id": "wholewheat",
+  "version": 1,
+  "name_ko": "통밀빵",
+  "subject": "a round whole-wheat boule loaf",
+  "geometry": {
+    "silhouette": "a round boule with a smooth, rounded dome top, same silhouette family as a campagne boule",
+    "crust": [
+      "caramel brown surface #8C5A32, one full shade darker than a plain campagne crust so it never reads as white bread",
+      "spiral banneton ring markings pressed concentrically across the top surface",
+      "coarse, grainy surface speckling suggesting whole-grain flecks across the crust"
+    ]
+  },
+  "style_ref": "shared-style-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid #F2E6D3, no props, no floor texture",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows",
+  "negative": ["face", "eyes", "mouth", "character", "text", "watermark", "plate", "board", "hands", "photorealism", "glossy plastic", "people"],
+  "views": ["three-quarter top-front", "front elevation", "top-down"],
+  "output": { "aspect": "1:1", "size": 1024 },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a round whole-wheat boule loaf. Geometry: a round boule with a smooth, rounded dome top, the same silhouette family as a campagne boule. Crust: a caramel brown surface (#8C5A32), one full shade darker than a plain campagne crust so it never reads as white bread, covers the dome; spiral banneton ring markings are pressed concentrically across the top surface; coarse, grainy surface speckling suggests whole-grain flecks across the crust. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, rounded silhouette, stylized 3D render. Camera: three-quarter top-front view, object centered, 15% margin. Background: solid #F2E6D3, no props, no floor texture. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows. Generate the same object consistently across each requested view — three-quarter top-front, front elevation, and top-down — keeping identical proportions, colors, and surface details between views. Negative: no face, no eyes, no mouth, no character, no text, no watermark, no plate, no board, no hands, no photorealism, no glossy plastic, no people.",
+  "notes_ko": "깜빠뉴와 같은 불(boule) 실루엣이지만 한 톤 더 어두운 캐러멜 브라운이어야 한다 — 밝으면 백밀빵으로 오인된다."
+}

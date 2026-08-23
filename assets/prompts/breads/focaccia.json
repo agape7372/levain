@@ -1,0 +1,23 @@
+{
+  "id": "focaccia",
+  "version": 1,
+  "name_ko": "포카치아",
+  "subject": "a thin rectangular slab of focaccia bread",
+  "geometry": {
+    "silhouette": "a thin rectangular slab, flat top, low uniform height",
+    "crust": [
+      "golden surface #D9A552 with a subtle olive-oil sheen across the top",
+      "finger-dimple pits distributed evenly across the entire top surface, each dimple with a small pool of oil sheen inside it",
+      "scattered rosemary leaves, whole black olives, and coarse salt crystals pressed into the surface"
+    ]
+  },
+  "style_ref": "shared-style-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid #F2E6D3, no props, no floor texture",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows",
+  "negative": ["face", "eyes", "mouth", "character", "text", "watermark", "plate", "board", "hands", "photorealism", "glossy plastic", "people"],
+  "views": ["three-quarter top-front", "front elevation", "top-down"],
+  "output": { "aspect": "1:1", "size": 1024 },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a thin rectangular slab of focaccia bread. Geometry: a thin rectangular slab with a flat top and low uniform height. Crust: a golden surface (#D9A552) with a subtle olive-oil sheen covers the top; finger-dimple pits are distributed evenly across the entire top surface, each dimple holding a small pool of oil sheen; scattered rosemary leaves, whole black olives, and coarse salt crystals are pressed into the surface. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, rounded silhouette, stylized 3D render. Camera: three-quarter top-front view, object centered, 15% margin. Background: solid #F2E6D3, no props, no floor texture. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows. Generate the same object consistently across each requested view — three-quarter top-front, front elevation, and top-down — keeping identical proportions, colors, and surface details between views. Negative: no face, no eyes, no mouth, no character, no text, no watermark, no plate, no board, no hands, no photorealism, no glossy plastic, no people.",
+  "notes_ko": "손가락으로 누른 딤플이 전면에 고르게 퍼져 있고 그 안에 오일이 고여 있어야 포카치아다 — 없으면 그냥 빵판으로 보인다."
+}

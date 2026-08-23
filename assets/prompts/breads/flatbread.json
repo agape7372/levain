@@ -1,0 +1,23 @@
+{
+  "id": "flatbread",
+  "version": 1,
+  "name_ko": "플랫브레드",
+  "subject": "a single extremely thin round-to-oval flatbread",
+  "geometry": {
+    "silhouette": "an extremely thin, almost paper-flat round-to-oval disk with a loosely irregular hand-stretched edge",
+    "crust": [
+      "golden base surface #D9A552 across the top",
+      "irregular dark scorch and char spots scattered unevenly across the surface",
+      "raised puffed blister bubbles distributed across the top face"
+    ]
+  },
+  "style_ref": "shared-style-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid #F2E6D3, no props, no floor texture",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows",
+  "negative": ["face", "eyes", "mouth", "character", "text", "watermark", "plate", "board", "hands", "photorealism", "glossy plastic", "people"],
+  "views": ["three-quarter top-front", "front elevation", "top-down"],
+  "output": { "aspect": "1:1", "size": 1024 },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a single extremely thin round-to-oval flatbread. Geometry: an extremely thin, almost paper-flat round-to-oval disk with a loosely irregular hand-stretched edge. Crust: a golden base surface (#D9A552) covers the top, with irregular dark scorch and char spots scattered unevenly across the surface and raised puffed blister bubbles distributed across the top face. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, rounded silhouette, stylized 3D render. Camera: three-quarter top-front view, object centered, 15% margin. Background: solid #F2E6D3, no props, no floor texture. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows. Generate the same object consistently across each requested view — three-quarter top-front, front elevation, and top-down — keeping identical proportions, colors, and surface details between views. Negative: no face, no eyes, no mouth, no character, no text, no watermark, no plate, no board, no hands, no photorealism, no glossy plastic, no people.",
+  "notes_ko": "불규칙한 그을림 반점과 부푼 블리스터가 없으면 또띠아처럼 밋밋해 보인다 — 이 두 디테일이 플랫브레드의 정체성이다."
+}

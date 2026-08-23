@@ -1,0 +1,23 @@
+{
+  "id": "scone",
+  "version": 1,
+  "name_ko": "스콘",
+  "subject": "a single wedge-shaped scone",
+  "geometry": {
+    "silhouette": "a tall wedge (triangular prism), height clearly greater than width, taller impression than wide",
+    "crust": [
+      "top face only in pale golden brown #D6A15C",
+      "side faces left uncolored cream #F4EAD4, sharply contrasting with the top",
+      "shallow horizontal crack fissures running across the top surface"
+    ]
+  },
+  "style_ref": "shared-style-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid #F2E6D3, no props, no floor texture",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows",
+  "negative": ["face", "eyes", "mouth", "character", "text", "watermark", "plate", "board", "hands", "photorealism", "glossy plastic", "people"],
+  "views": ["three-quarter top-front", "front elevation", "top-down"],
+  "output": { "aspect": "1:1", "size": 1024 },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a single wedge-shaped scone. Geometry: a tall wedge (triangular prism) whose height is clearly greater than its width, giving a taller-than-wide impression. Crust: only the top face is colored pale golden brown (#D6A15C); the side faces are left uncolored cream (#F4EAD4), sharply contrasting with the top; shallow horizontal crack fissures run across the top surface. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, rounded silhouette, stylized 3D render. Camera: three-quarter top-front view, object centered, 15% margin. Background: solid #F2E6D3, no props, no floor texture. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows. Generate the same object consistently across each requested view — three-quarter top-front, front elevation, and top-down — keeping identical proportions, colors, and surface details between views. Negative: no face, no eyes, no mouth, no character, no text, no watermark, no plate, no board, no hands, no photorealism, no glossy plastic, no people.",
+  "notes_ko": "윗면만 착색되고 옆면은 무착색 크림색으로 남는 비대칭 착색이 핵심이다 — 옆면까지 다 착색되면 머핀으로 보인다."
+}
