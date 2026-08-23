@@ -1,0 +1,34 @@
+:root {
+  --bg:          #E8D9C4;  /* 배경 (현행) */
+  --bg-soft:     #F2E6D3;  /* 카드·모달 표면 */
+  --bg-deep:     #DCCAB0;  /* 탭바·구분면 */
+  --ink:         #4A3220;  /* 제목·활성 (현행) */
+  --ink-soft:    #6B5340;  /* 본문 (현행) */
+  --ink-faint:   #8A6A4A;  /* 캡션·비활성 (현행) */
+  --accent:      #C4784A;  /* 테라코타 — 버튼·고무줄·탭 인디케이터 (현행 병색) */
+  --accent-deep: #A95F38;  /* pressed */
+  --cream:       #F4EAD4;  /* 반죽색 — 게이지·강조면 */
+  --crust:       #A9713F;  /* 구운 빵·완료 뱃지 */
+  --hooch:       #9C927F;  /* 배고픔·휴면 정보 톤 (경고 아님) */
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+#stage {
+  position: absolute;
+  inset: 0;
+  /* 라디얼 그라디언트 배경 — 캔버스는 투명 (VISUAL §1-3) */
+  background: radial-gradient(120% 90% at 50% 42%, #f2e6d3 0%, #e8d9c4 55%, #e0cfb5 100%);
+}
+
+#c {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
