@@ -59,7 +59,8 @@ export function toRenderParams(s: Snapshot): RenderParams {
     noiseSpeed: moldy ? 0 : 0.1 + 1.5 * a,
     bubbleDensity: moldy ? 0 : clamp01(a * 0.9 * (1 - 0.85 * s.dormancy)),
     bubbleScale: 0.5 + 0.8 * a,
-    specStr: Math.min(1.2, Math.max(0.1, 0.15 + 1.05 * a - 0.4 * s.hunger - 0.6 * s.dormancy)),
+    // 피크에서도 무광 페이스트 — 과한 스펙은 플라스틱으로 읽힌다 (젖은 광은 uWet 소관)
+    specStr: Math.min(1.0, Math.max(0.1, 0.12 + 0.8 * a - 0.4 * s.hunger - 0.6 * s.dormancy)),
     crust: 0.8 * clamp01(Math.max(s.dormancy, moldy ? 1 : 0)),
     fillY: s.fill,
     hoochAmt: clamp01(s.hooch),
@@ -67,7 +68,8 @@ export function toRenderParams(s: Snapshot): RenderParams {
     wet: clamp01((1 - smooth(0.15, 0.8, a)) * (1 - smooth(0, 0.45, s.hunger)) * (1 - s.dormancy)),
     ripe: smooth(0.7, 0.95, a) * (1 - clamp01(s.dormancy)),
     collapse: smooth(0.45, 0.8, s.sourness) * (1 - clamp01(s.dormancy)),
-    mold: clamp01(s.mold01),
+    // spot 진입 직후 mold01≈0이라 반점이 안 보임 — 예고는 보여야 예고다 (바닥값 0.25)
+    mold: s.moldStage === 'none' ? 0 : Math.max(0.25, clamp01(s.mold01)),
     kahm: s.kahm ? 1 : 0,
   };
 }

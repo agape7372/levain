@@ -25,11 +25,18 @@ const base: Snapshot = {
 };
 
 describe('renderParams — 상태 앵커 (VISUAL §3-3)', () => {
-  it('activity 1·hunger 0·dormancy 0 → breatheAmp≈0.055, bubbleDensity≈0.9, specStr 1.2', () => {
+  it('activity 1·hunger 0·dormancy 0 → breatheAmp≈0.055, bubbleDensity≈0.9, specStr 0.92(무광 페이스트 상한)', () => {
     const rp = toRenderParams({ ...base, activity: 1, fill: 1.4 });
     expect(rp.breatheAmp).toBeCloseTo(0.055, 5);
     expect(rp.bubbleDensity).toBeCloseTo(0.9, 5);
-    expect(rp.specStr).toBeCloseTo(1.2, 5);
+    expect(rp.specStr).toBeCloseTo(0.92, 5);
+  });
+
+  it('moldStage spot + mold01 0.01 → mold 바닥값 0.25 (예고 가시성)', () => {
+    const rp = toRenderParams({ ...base, moldStage: 'spot', mold01: 0.01, dormancy: 1 });
+    expect(rp.mold).toBeCloseTo(0.25, 5);
+    const none = toRenderParams({ ...base, moldStage: 'none', mold01: 0 });
+    expect(none.mold).toBe(0);
   });
 
   it('dormancy 1 → breatheAmp≈0.006(>0, 완전 정지 금지), bubbleDensity≈0, crust 0.8', () => {

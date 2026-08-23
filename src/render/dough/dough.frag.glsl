@@ -113,8 +113,11 @@ void main() {
       m += gate * smoothstep(rr, rr * 0.3, length(vXZ - c));
     }
     m = min(m, 1.0) * (0.72 + 0.28 * (0.5 + 0.5 * fbm(vXZ * 18.0 + uMoldSeed * 7.0))); // 보풀 털
-    vec3 moldCol = mix(vec3(0.92, 0.93, 0.88), vec3(0.47, 0.53, 0.40), smoothstep(0.35, 1.0, uMold));
-    col = mix(col, moldCol, m * (0.45 + 0.55 * uMold));
+    // 저대비 수정: 반점 몸통은 어두운 녹회색(바랜 반죽 위에서도 읽힘) + 흰 솜털 중심
+    vec3 moldCol = mix(vec3(0.60, 0.63, 0.50), vec3(0.38, 0.44, 0.33), smoothstep(0.3, 1.0, uMold));
+    col = mix(col, moldCol, m * (0.55 + 0.45 * uMold));
+    float fuzzHi = smoothstep(0.5, 0.9, fbm(vXZ * 22.0 + uMoldSeed * 13.0));
+    col = mix(col, vec3(0.94, 0.95, 0.90), m * fuzzHi * 0.5);
   }
 
   gl_FragColor = vec4(col, 1.0);

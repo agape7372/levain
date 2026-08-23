@@ -59,8 +59,11 @@ export class Cloth {
       side: THREE.DoubleSide,
       depthWrite: false,
     });
-    this.mesh = new THREE.Mesh(new THREE.CircleGeometry(CLOTH_R, 48), this.mat);
-    this.mesh.rotation.x = -Math.PI / 2;
+    // 지오메트리를 로컬 XZ 평면으로 베이크 — CircleGeometry는 XY 평면이라 메시 회전으로 눕히면
+    // 셰이더의 vR(length(position.xz))·처짐(p.y)이 엉뚱한 축을 본다 (고무줄이 줄무늬가 되는 버그)
+    const geo = new THREE.CircleGeometry(CLOTH_R, 48);
+    geo.rotateX(-Math.PI / 2);
+    this.mesh = new THREE.Mesh(geo, this.mat);
     this.mesh.position.y = JAR_HEIGHT + 0.06;
     this.mesh.renderOrder = 4; // 유리 앞면(3)보다 위
     this.mesh.visible = false;
@@ -72,7 +75,8 @@ export class Cloth {
     this.openT0 = -1;
     this.mesh.visible = true;
     this.mesh.position.set(0, JAR_HEIGHT + 0.06, 0);
-    this.mesh.rotation.set(-Math.PI / 2, 0, 0);
+    this.mesh.rotation.set(0, 0, 0);
+    this.mesh.scale.setScalar(1);
     this.mat.uniforms.uFade.value = 1;
   }
 
@@ -86,7 +90,12 @@ export class Cloth {
 
   /** 프레임 구동 — SceneHost loop에서 호출 */
   tick(t: number): void {
-    if (this.openT0 === -1 || !this.mesh.visible) return;
+    if (this.openT0 === -1) {
+      // 자기 치유 — 걷힘 완료 후엔 어떤 경로로도 유령 메시가 남지 않게
+      if (!this.covering && this.mesh.visible) this.mesh.visible = false;
+      return;
+    }
+    if (!this.mesh.visible) return;
     if (this.openT0 === -2) this.openT0 = t;
     const u = Math.min(1, (t - this.openT0) / OPEN_DUR);
     // cubic-bezier(0.22,1,0.36,1) 근사 — easeOutQuint 계열
