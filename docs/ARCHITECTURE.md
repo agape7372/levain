@@ -31,17 +31,20 @@ levain/
 │  │  ├─ actions.ts            # applyAction(state, action, now) → {state, events}
 │  │  ├─ derive.ts             # deriveSnapshot(state, now) → Snapshot
 │  │  ├─ recipes.ts            # 레시피 데이터·해금·판정 (순수 데이터+함수)
-│  │  └─ notifyPlan.ts         # planNotifications(state, now) → NotifyPlan
+│  │  ├─ notifyPlan.ts         # planNotifications(state, now) → NotifyPlan
+│  │  └─ briefing.ts           # deriveBriefing(state, from, to) → BriefingKey[]
 │  ├─ render/                  # three 전용. sim을 모른다 — RenderParams만
 │  │  ├─ SceneHost.ts          # renderer·scene·camera 수명주기, ResizeObserver, 컨텍스트 유실 복구
 │  │  ├─ dough/ DoughMesh.ts dough.vert.glsl dough.frag.glsl   # ?raw 임포트
 │  │  ├─ jar.ts                # 병 3패스 + 고무줄 마커 + hooch 층
+│  │  ├─ cloth.ts              # 천 덮개 1메시(플릭·탭 걷기)
 │  │  ├─ background.ts         # 라디얼 그라디언트 + 베이크드 소프트 섀도
 │  │  ├─ particles.ts          # 공용 InstancedMesh 풀 256
 │  │  ├─ bubbles.ts            # uBump 배열 CPU 생명주기
 │  │  ├─ renderParams.ts       # toRenderParams(snap) + 지수 스무딩
+│  │  ├─ breadShowcase.ts      # GLB 로더(meshopt)+캐시+턴테이블 쇼케이스 그룹
 │  │  ├─ effects.ts            # 밥주기·굽기·부활 시퀀스
-│  │  └─ input.ts              # poke·wobble·롱프레스
+│  │  └─ input.ts              # poke·wobble·롱프레스(제스처 FSM)
 │  ├─ ui/                      # vanilla TS + DOM 오버레이. sim 직접 접근 금지 — store 경유
 │  │  ├─ router.ts             # 화면 스택 + Android backButton 계약 (§5)
 │  │  ├─ screens/ home.ts recipes.ts bake.ts onboarding.ts
@@ -62,6 +65,8 @@ levain/
 │  └─ styles/main.css          # 색 토큰·세이프에어리어·Pretendard 번들
 ├─ tests/                      # curves neglect clock persistence recipes notifyPlan renderParams
 ├─ public/fonts/               # Pretendard Variable (번들 — CDN 금지)
+├─ public/breads/               # 빵 GLB 10종 + thumbs/ 베이크 PNG 썸네일 (런타임 로드 경로)
+├─ scripts/                    # bake-thumbs.mjs(썸네일 베이커) · check-budget.mjs(GLB 용량·tri 예산 검사)
 ├─ android/                    # cap add android 산출물 — 레포 안 (번들 모드라 셸 분리 불필요)
 └─ docs/                       # GDD ARCHITECTURE VISUAL RELEASE QA + design/(원문)
 ```
@@ -78,12 +83,16 @@ export function applyAction(state: SimState, action: Action, now: number): { sta
 export function deriveSnapshot(state: SimState, now: number): Snapshot;
 export function planNotifications(state: SimState, now: number): NotifyPlan;
 export function initialState(now: number): SimState;
+export function deriveBriefing(state: SimState, from: number, to: number): BriefingKey[];
 
 export type Action =
   | { type: 'feed'; ratio: FeedRatio }
   | { type: 'setLocation'; to: Location }
   | { type: 'bake'; recipeId: string }          // 빵: mass 차감 + 판정. 커밋은 여기서
-  | { type: 'bakeDiscard'; recipeId: string };  // discard: 쿨다운 갱신만
+  | { type: 'bakeDiscard'; recipeId: string }   // discard: 쿨다운 갱신만
+  | { type: 'makeFlake' }                       // 플레이크 말리기: mass −20g, flake 기록 (GDD §5)
+  | { type: 'discardStarter' }                  // moldy 전용: 새 개체로 재시작
+  | { type: 'restoreFlake' };                   // moldy 전용: 플레이크로 복원, reviveProgress=1 경유
 // 젓기·관찰·띄워보기는 액션이 아님 — 상태 무변형(젓기=코스메틱, 관찰·띄워보기=derive 읽기)
 ```
 
@@ -95,6 +104,15 @@ export type Action =
   반환값으로만 흘린다 — 상태에 넣지 않음. UI 토스트·연출 트리거용.
 - **결정론 테스트**: 닫힌 함수라 "파생값이 저장·tick 시점과 무관"을 검증
   (임의 시점에 advance를 몇 번 끼워 넣어도 같은 now의 Snapshot이 동일).
+- **SimState**: `flake: { madeAt: number; maturity: number } | null` 필드 추가 — `flake.madeAt`은 시계 역행
+  재정박 대상(GDD §3-8).
+- **Phase**: `'active' | 'hungry' | 'sour' | 'dormant' | 'moldy'` — `moldy`는 종착(terminal, GDD §3-4-1).
+  moldy 중 허용 액션은 `discardStarter`/`restoreFlake` 뿐, 그 외는 전부 `moldBlocked` 이벤트로 거부하고
+  상태 불변.
+- **알림**: `planNotifications` 반환 슬롯이 2종에서 **3종**으로 확장(GDD §7) — 신규 슬롯 3(`moldWarn`, 곰팡이 예고).
+- **`MAX_CATCHUP_MS`**(constants.ts): 60일 유지. 근거 갱신 — 실온에서는 곰팡이 종착(≤15일)과 산미 포화가
+  고정점이라 그 이상은 상태 불변. 곰팡이 판정 자체는 파생이라 이 캡과 무관하며, 캡은 acidity 적분의
+  안전벨트일 뿐이다(GDD §3-8).
 
 ### 시간 소스
 
@@ -137,7 +155,8 @@ SimState → deriveSnapshot(state, now) → Snapshot → toRenderParams(snap) �
 - 스무딩: rAF마다 `v += (target − v) × (1 − exp(−dt/τ))`, τ≈1.2s.
 - **전환 정책**: 앱 오픈 catch-up 결과는 **즉시 스냅**(몇 시간 치를 애니메이션 재생하지 않는다 —
   "돌아와 보니 이렇게 되어 있었다"가 다마고치 문법). 라이브 중엔 지수 lerp.
-- SceneHost: `mount / setParams / start / stop / dispose`. 컨텍스트 유실 = **전체 재구축**
+- SceneHost: `mount / setParams / start / stop / dispose / enterShowcase(url) / exitShowcase()`.
+  컨텍스트 유실 = **전체 재구축**
   (`webglcontextlost` preventDefault→stop, `restored`→dispose→mount→마지막 params 재주입→start.
   씬이 작아 1프레임 미만 — 부분 복구 로직의 버그 표면을 사지 않는다).
 - resize: `#stage`에 ResizeObserver. DPR = `min(devicePixelRatio, 2)` 고정.
