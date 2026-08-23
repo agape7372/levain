@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>르방이</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #E8D9C4; overflow: hidden; }
+    #stage { position: absolute; top: 0; left: 0; right: 0; bottom: 52px; }
+    #c { display: block; width: 100%; height: 100%; touch-action: none; }
+    #tabs {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 52px;
+      display: flex; align-items: stretch; justify-content: center;
+      background: #E8D9C4; box-shadow: none;
+    }
+    #tabs button {
+      flex: 1; border: 0; background: transparent; color: #8a6a4a;
+      font: 15px/1 sans-serif; letter-spacing: 0.02em;
+    }
+    #tabs button.active { color: #4a3220; font-weight: 600; }
+    #recipe {
+      display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 52px;
+      background: #E8D9C4; color: #6b5340;
+      font: 16px/1.5 sans-serif;
+      align-items: center; justify-content: center;
+      text-align: center;
+    }
+    #recipe[style*="block"] { display: flex !important; }
+  </style>
+</head>
+<body>
+  <div id="stage">
+    <canvas id="c"></canvas>
+  </div>
+  <div id="recipe"></div>
+  <nav id="tabs">
+    <button type="button" id="tab-levain" class="active">르방</button>
+    <button type="button" id="tab-recipe">레시피</button>
+  </nav>
+  <script type="importmap">
+  { "imports": { "three": "https://unpkg.com/three@0.170.0/build/three.module.js" } }
+  </script>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
