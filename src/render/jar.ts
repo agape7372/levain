@@ -79,6 +79,18 @@ const hoochFrag = /* glsl */ `
   }
 `;
 
+// 병 바닥 그늘 — 중심 밝고 가장자리 어두운 라디얼 그라디언트. 배경 톤과 겹치지 않는 어두운 브라운.
+const floorFrag = /* glsl */ `
+  precision mediump float;
+  varying vec2 vUv;
+  void main() {
+    float d = length(vUv - 0.5) * 2.0;
+    vec3 center = vec3(0.235, 0.157, 0.098);
+    vec3 edge = vec3(0.145, 0.090, 0.050);
+    gl_FragColor = vec4(mix(center, edge, smoothstep(0.0, 1.0, d)), 1.0);
+  }
+`;
+
 export function createJar(): Jar {
   const group = new THREE.Group();
   const geo = new THREE.CylinderGeometry(JAR_RADIUS, JAR_RADIUS, JAR_HEIGHT, 48, 1, true);
@@ -119,6 +131,17 @@ export function createJar(): Jar {
   lip.position.y = JAR_HEIGHT;
   lip.renderOrder = 3;
   group.add(back, front, lip);
+
+  // 병 바닥 — 반죽이 병 반지름을 다 못 채울 때 그 틈으로 배경이 링으로 비치는 것 차단.
+  // 불투명 + 림보다 어두운 그늘 톤이라 배경(#E8D9C4)과 확실히 구분된다.
+  const floor = new THREE.Mesh(
+    new THREE.CircleGeometry(JAR_RADIUS, 40),
+    new THREE.ShaderMaterial({ vertexShader: hoochVert, fragmentShader: floorFrag }),
+  );
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.y = 0;
+  floor.renderOrder = 2;
+  group.add(floor);
 
   // 고무줄 마커는 제거(사용자 확정 2026-08-23) — 림 2개가 겹쳐 어수선.
   // 부피는 도우 fill 자체가 표현하고, 고무줄 문법은 천 덮개 착색에만 남긴다.

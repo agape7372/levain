@@ -68,5 +68,12 @@ void main() {
   p += normal * (n * 0.035 + silhouette + disp);
   p.x += uWobble.x * (0.12 + p.z * 0.04);
   p.z += uWobble.y * (0.12 + p.x * 0.04);
+
+  // 실루엣 반경 상한 — 오브젝트 공간. XZ_SCALE(1.3)×숨 최대(1.055) 곱해도
+  // JAR_RADIUS(0.92) 안쪽에 여유 있게 들어온다(0.63×1.3×1.055≈0.864). 유리 내벽 충돌 방지.
+  float rXZ = length(p.xz);
+  const float R_XZ_MAX = 0.63;
+  if (rXZ > R_XZ_MAX) p.xz *= R_XZ_MAX / rXZ;
+
   gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
 }
