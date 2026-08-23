@@ -42,7 +42,32 @@ export interface Jar {
   group: THREE.Group;
   /** 고무줄 마커 — 마지막 밥 시점 반죽 높이 표시 (부피 정보의 정본 표시 장치) */
   band: THREE.Mesh;
+  /** hooch(부유액) 층 — 방치 신호. setHooch(amt, y)로 구동 */
+  hooch: THREE.Mesh;
+  setHooch(amt: number, y: number, t: number): void;
 }
+
+const hoochVert = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const hoochFrag = /* glsl */ `
+  precision mediump float;
+  uniform float uAmt;
+  uniform float uTime;
+  varying vec2 vUv;
+  void main() {
+    vec2 c = vUv - 0.5;
+    float edge = 1.0 - smoothstep(0.42, 0.5, length(c));
+    float flow = 0.5 + 0.5 * sin(vUv.x * 9.0 + uTime * 0.3) * sin(vUv.y * 8.0 - uTime * 0.22);
+    float a = uAmt * (0.5 + 0.3 * uAmt) * edge * (0.8 + 0.2 * flow);
+    gl_FragColor = vec4(0.612, 0.573, 0.498, a); // #9C927F
+  }
+`;
 
 export function createJar(): Jar {
   const group = new THREE.Group();
@@ -91,9 +116,30 @@ export function createJar(): Jar {
     new THREE.MeshPhysicalMaterial({ color: 0xc4784a, roughness: 0.55, metalness: 0.05 }),
   );
   band.rotation.x = Math.PI / 2;
-  band.position.y = 0.98; // 급여 시점 반죽 꼭대기 높이 — M3에서 상태 연결
+  band.position.y = 0.98; // 급여 시점 반죽 꼭대기 높이 — SceneHost.setBandY로 상태 연결
   band.renderOrder = 0;
   group.add(band);
 
-  return { group, band };
+  // hooch(부유액) 층 — 반죽 윗면 위 얇은 반투명 디스크 (VISUAL §3-3)
+  const hoochMat = new THREE.ShaderMaterial({
+    vertexShader: hoochVert,
+    fragmentShader: hoochFrag,
+    uniforms: { uAmt: { value: 0 }, uTime: { value: 0 } },
+    transparent: true,
+    depthWrite: false,
+  });
+  const hooch = new THREE.Mesh(new THREE.CircleGeometry(0.8, 40), hoochMat);
+  hooch.rotation.x = -Math.PI / 2;
+  hooch.position.y = 1.0;
+  hooch.renderOrder = 2;
+  group.add(hooch);
+
+  const setHooch = (amt: number, y: number, t: number): void => {
+    hoochMat.uniforms.uAmt.value = amt;
+    hoochMat.uniforms.uTime.value = t;
+    hooch.position.y = y;
+    hooch.visible = amt > 0.01;
+  };
+
+  return { group, band, hooch, setHooch };
 }

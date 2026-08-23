@@ -2,9 +2,10 @@
 // 컨텍스트 유실 = 전체 재구축(부분 복구 로직의 버그 표면을 사지 않는다).
 import * as THREE from 'three';
 import { DoughMesh } from './dough/DoughMesh';
-import { createJar } from './jar';
+import { createJar, type Jar } from './jar';
 import { createGroundShadow } from './background';
 import { attachInput } from './input';
+import { smoothParams, type RenderParams } from './renderParams';
 
 // 세로폰(aspect ~0.46)에서 병 폭 ≈ 화면 70%, 병+헤드룸 55~65% 점유 (VISUAL §1-1 목표값 실측 보정)
 const VIEW_H = 5.4;
@@ -20,7 +21,11 @@ export class SceneHost {
   private detachInput: (() => void) | null = null;
 
   dough: DoughMesh | null = null;
+  private jar: Jar | null = null;
   private band: THREE.Mesh | null = null;
+  private current: RenderParams | null = null;
+  private target: RenderParams | null = null;
+  private lastT = 0;
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -53,6 +58,7 @@ export class SceneHost {
 
     const jar = createJar();
     this.scene.add(jar.group);
+    this.jar = jar;
     this.band = jar.band;
 
     this.dough = new DoughMesh();
@@ -81,9 +87,22 @@ export class SceneHost {
     if (wasRunning) this.start();
   };
 
-  /** 고무줄 마커 높이 — 마지막 밥 시점 반죽 높이 (M3에서 상태 연결) */
+  /** 고무줄 마커 높이 — 마지막 밥 시점 반죽 높이 */
   setBandY(y: number): void {
     if (this.band) this.band.position.y = y;
+  }
+
+  /** 라이브 목표 파라미터 — 프레임마다 지수 lerp로 따라간다 (τ≈1.2s) */
+  setTargetParams(p: RenderParams): void {
+    this.target = p;
+    if (!this.current) this.snapParams(p);
+  }
+
+  /** 앱 오픈 catch-up — 즉시 스냅, 경과를 재생하지 않는다 (다마고치 문법, ARCHITECTURE §4) */
+  snapParams(p: RenderParams): void {
+    this.current = p;
+    this.target = p;
+    this.dough?.applyParams(p);
   }
 
   private fit(): void {
@@ -107,7 +126,17 @@ export class SceneHost {
     const loop = (): void => {
       if (!this.running || !this.renderer) return;
       const t = performance.now() / 1000; // rAF 델타 누적 금지 — 단조 시계
+      const dt = this.lastT > 0 ? Math.min(0.1, t - this.lastT) : 0.016;
+      this.lastT = t;
+
+      if (this.current && this.target && this.current !== this.target) {
+        this.current = smoothParams(this.current, this.target, dt);
+        this.dough?.applyParams(this.current);
+      }
       this.dough?.tick(t);
+      if (this.dough && this.jar && this.current) {
+        this.jar.setHooch(this.current.hoochAmt, this.dough.topY() + 0.02, t);
+      }
       this.renderer.render(this.scene, this.camera);
       this.raf = requestAnimationFrame(loop);
     };
@@ -138,6 +167,7 @@ export class SceneHost {
     this.renderer?.dispose();
     this.renderer = null;
     this.dough = null;
+    this.jar = null;
     this.band = null;
   }
 }
