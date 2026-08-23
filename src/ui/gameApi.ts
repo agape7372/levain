@@ -14,6 +14,8 @@ export interface GameApi {
   lastFedAt(): number;
   labelText(): string | null;
   location(): Location;
+  /** 건조 플레이크 말린 시각 — 없으면 null (관찰 카드 표시용) */
+  flakeMadeAt(): number | null;
   dispatch(action: Action): SimEvent[];
   subscribe(fn: (snap: Snapshot, events: SimEvent[]) => void): () => void;
 

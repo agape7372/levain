@@ -17,6 +17,11 @@ const base: Snapshot = {
   nextFeedAt: 0,
   peakAt: 0,
   effSinceFeedMs: 0,
+  moldStage: 'none',
+  mold01: 0,
+  moldDeadAt: 0,
+  kahm: false,
+  hasFlake: false,
 };
 
 describe('renderParams — 상태 앵커 (VISUAL §3-3)', () => {

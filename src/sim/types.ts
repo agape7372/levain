@@ -3,9 +3,15 @@
 
 export type FeedRatio = '1:1:1' | '1:2:2' | '1:5:5';
 export type Location = 'room' | 'window' | 'fridge';
-export type Phase = 'active' | 'hungry' | 'sour' | 'dormant';
+export type Phase = 'active' | 'hungry' | 'sour' | 'dormant' | 'moldy';
+export type MoldStage = 'none' | 'spot' | 'spread' | 'dead';
 export type SmellBand = 'flour' | 'yogurt' | 'vinegar' | 'sharp' | 'acetone';
 export type BakeGrade = 'best' | 'good' | 'flat';
+
+/** 복귀 브리핑 항목 — 부재 중 넘은 경계, 시간순 (briefing.ts) */
+export type BriefingKey =
+  | 'peaked' | 'becameHungry' | 'hoochAppeared' | 'becameSour'
+  | 'wentDormant' | 'moldSpotted' | 'moldSpread' | 'moldDied';
 
 export interface CollectionEntry {
   /** 빵 레시피 최고 등급. discard 레시피는 판정이 없어 null */
@@ -43,6 +49,11 @@ export interface SimState {
   collection: Record<string, CollectionEntry>;
   /** 병 이름표 — 5단계 해금 보상 */
   label: string | null;
+  /**
+   * 건조 플레이크 백업(죽음 보험) 1슬롯 — 말린 시점 maturity 스냅.
+   * 곰팡이 사망 후 restoreFlake로 계보를 잇는다. madeAt은 재정박 목록(advance.reanchor).
+   */
+  flake: { madeAt: number; maturity: number } | null;
 }
 
 export type Action =
@@ -50,7 +61,10 @@ export type Action =
   | { type: 'setLocation'; to: Location }
   | { type: 'bake'; recipeId: string }
   | { type: 'bakeDiscard'; recipeId: string }
-  | { type: 'setLabel'; label: string }; // 병 이름표 — 5단계 해금 보상 (rename과 다름: 게이트드)
+  | { type: 'setLabel'; label: string } // 병 이름표 — 5단계 해금 보상 (rename과 다름: 게이트드)
+  | { type: 'makeFlake' }       // 얇게 펴 말리기 — 죽음 보험 (3단계 해금, 활발, -20g)
+  | { type: 'discardStarter' }  // 곰팡이 확정 후 폐기 — 새 개체 (도감·플레이크 보존)
+  | { type: 'restoreFlake' };   // 곰팡이 확정 후 플레이크 복원 — 같은 계보 (부활 의식 경유)
 
 export type SimEvent =
   | { type: 'fed'; ratio: FeedRatio; maturityGained: boolean }
@@ -66,7 +80,12 @@ export type SimEvent =
   | { type: 'bakedDiscard'; recipeId: string }
   | { type: 'bakeBlocked'; reason: 'mass' | 'stage' | 'cooldown' | 'unknownRecipe' }
   | { type: 'labeled' }
-  | { type: 'labelLocked' };
+  | { type: 'labelLocked' }
+  | { type: 'flakeMade' }
+  | { type: 'flakeBlocked'; reason: 'stage' | 'phase' | 'mass' }
+  | { type: 'starterDiscarded' }
+  | { type: 'flakeRestored' }
+  | { type: 'moldBlocked' }; // 곰팡이 확정 — 폐기·복원 외 전 액션 차단
 
 /** UI·렌더가 읽는 파생 뷰 — deriveSnapshot(state, now)의 반환. 전부 계산값 */
 export interface Snapshot {
@@ -92,13 +111,22 @@ export interface Snapshot {
   peakAt: number;
   /** 유효시간 기준 마지막 밥으로부터의 경과 ms */
   effSinceFeedMs: number;
+  /** 곰팡이 단계 (예고 2단 → 사망) */
+  moldStage: MoldStage;
+  /** 곰팡이 확산 연속값 0~1 — 렌더 전용 */
+  mold01: number;
+  /** 곰팡이 사망 확정 예측 wall-clock — 정직한 예고 */
+  moldDeadAt: number;
+  /** kahm 효모 막(무해 — 오판 유발) — 창가×시큼 구간 파생 */
+  kahm: boolean;
+  hasFlake: boolean;
 }
 
 export interface NotifySlot {
   id: number;
   at: number;
   /** copy.ts 키 — sim은 문구를 모른다 */
-  copyKey: 'feedTime' | 'fridgeWeek' | 'dormant' | 'reviveSecond';
+  copyKey: 'feedTime' | 'fridgeWeek' | 'dormant' | 'reviveSecond' | 'moldWarn';
   /** 냉장 주간 반복 여부 */
   weekly: boolean;
 }

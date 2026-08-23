@@ -1,10 +1,12 @@
 // planNotifications(state, now) — 알림 시각 계산(순수). 예약·취소는 platform 소관.
-// 정본: docs/GDD.md §7. 슬롯 2개 고정 id, 조용시간 22~08 고정 클램프, 하루 최대 2건.
+// 정본: docs/GDD.md §7. 슬롯 3개 고정 id, 조용시간 22~08 고정 클램프.
+// 완전 방치 시 총 3건(밥→휴면→곰팡이 경고) 후 침묵 — 사망 시점·사후 알림 0.
 import type { NotifyPlan, NotifySlot, SimState } from './types';
 import {
   HOUR,
   NOTIFY_SLOT_DORMANT,
   NOTIFY_SLOT_FEED,
+  NOTIFY_SLOT_MOLD,
   QUIET_END_H,
   QUIET_START_H,
   REVIVE_GAP_H,
@@ -38,10 +40,18 @@ export function planNotifications(state: SimState, now: number): NotifyPlan {
     return { slots };
   }
 
-  // 휴면 도달 후 — 완전 침묵 (죄책감 유발 금지)
-  if (phase === 'dormant') return { slots };
+  // 곰팡이 확정 — 완전 침묵. 죽음을 푸시로 통지하지 않는다
+  if (phase === 'moldy') return { slots };
 
-  // 냉장 — 주간 반복 슬롯 하나로 대체 (앱을 안 열어도 발화)
+  // 휴면 — 침묵하되 곰팡이 임박 경고 정확히 1건만 (예고 없는 죽음은 불공정)
+  if (phase === 'dormant') {
+    const spotAt = wallFor(b.moldSpot);
+    const at = clampQuiet(spotAt > now ? spotAt : wallFor(b.moldSpread));
+    if (at > now) slots.push({ id: NOTIFY_SLOT_MOLD, at, copyKey: 'moldWarn', weekly: false });
+    return { slots };
+  }
+
+  // 냉장 — 주간 반복 슬롯 하나로 대체 (앱을 안 열어도 발화). 곰팡이는 ≈175일이라 제외
   if (state.location === 'fridge') {
     const at = clampQuiet(wallFor(b.hungry));
     if (at > now) slots.push({ id: NOTIFY_SLOT_FEED, at, copyKey: 'fridgeWeek', weekly: true });
@@ -53,6 +63,10 @@ export function planNotifications(state: SimState, now: number): NotifyPlan {
 
   const dormantAt = clampQuiet(wallFor(b.dormant));
   if (dormantAt > now) slots.push({ id: NOTIFY_SLOT_DORMANT, at: dormantAt, copyKey: 'dormant', weekly: false });
+
+  // 곰팡이 임박 경고 — 완전 방치자의 마지막 재계획은 활발 상태에서 일어난다
+  const moldAt = clampQuiet(wallFor(b.moldSpot));
+  if (moldAt > now) slots.push({ id: NOTIFY_SLOT_MOLD, at: moldAt, copyKey: 'moldWarn', weekly: false });
 
   return { slots };
 }

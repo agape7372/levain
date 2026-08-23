@@ -153,7 +153,15 @@ function simOf(v: unknown): SimState | null {
     lastDiscardBakeAt: finite(v.lastDiscardBakeAt),
     collection: collectionOf(v.collection),
     label: typeof v.label === 'string' ? v.label : null,
+    flake: flakeOf(v.flake), // label 패턴 — 키 부재도 null. 구세이브(flake 이전)가 그대로 산다
   };
+}
+
+function flakeOf(v: unknown): SimState['flake'] {
+  if (!isObject(v)) return null;
+  const madeAt = finite(v.madeAt);
+  if (madeAt === null) return null; // 시각을 모르는 백업은 살릴 방법이 없다
+  return { madeAt, maturity: Math.round(num(v.maturity, 0, Number.MAX_SAFE_INTEGER, 0)) };
 }
 
 /**

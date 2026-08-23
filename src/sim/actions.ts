@@ -2,12 +2,16 @@
 // (액션 순서 불변식 — docs/ARCHITECTURE.md §2). 정본: docs/GDD.md §5·§6·§3-7.
 import type { Action, FeedRatio, SimEvent, SimState } from './types';
 import {
+  FLAKE_COST_G,
+  FLAKE_MATURITY_KEEP,
+  FLAKE_STAGE,
   FRIDGE_STAGE,
   HOUR,
   INITIAL_MASS,
   MATURITY_MIN_GAP_H,
   RATIOS,
   REVIVE_GAP_H,
+  SEED_G,
   TEMP_MULT,
 } from './constants';
 import { activityAt, clamp, effSinceFeedMs, phaseAt, stageOf } from './derive';
@@ -35,6 +39,7 @@ export function initialState(now: number): SimState {
     lastDiscardBakeAt: null,
     collection: {},
     label: null,
+    flake: null,
   };
 }
 
@@ -146,12 +151,63 @@ function setLabel(state: SimState, label: string, now: number): ActionResult {
   return { state: { ...state, label: trimmed }, events: [{ type: 'labeled' }] };
 }
 
+/** 얇게 펴 말리기 — 죽음 보험. 덮어쓰기 허용(최신 스냅이 더 낫다) */
+function makeFlake(state: SimState, now: number): ActionResult {
+  if (stageOf(state, now) < FLAKE_STAGE) return { state, events: [{ type: 'flakeBlocked', reason: 'stage' }] };
+  if (phaseAt(state, now) !== 'active') return { state, events: [{ type: 'flakeBlocked', reason: 'phase' }] };
+  if (state.mass < SEED_G + FLAKE_COST_G) return { state, events: [{ type: 'flakeBlocked', reason: 'mass' }] };
+  const next: SimState = {
+    ...state,
+    mass: state.mass - FLAKE_COST_G,
+    flake: { madeAt: now, maturity: state.maturity },
+  };
+  return { state: next, events: [{ type: 'flakeMade' }] };
+}
+
+/** 곰팡이 확정 후 폐기 — 새 개체로 다시 시작. 도감·플레이크는 사람의 기록이라 남는다 */
+function discardStarter(state: SimState, now: number): ActionResult {
+  if (phaseAt(state, now) !== 'moldy') return { state, events: [] }; // 살아있는 르방은 버릴 수 없다
+  const next: SimState = { ...initialState(now), collection: state.collection, flake: state.flake };
+  return { state: next, events: [{ type: 'starterDiscarded' }] };
+}
+
+/**
+ * 곰팡이 확정 후 플레이크 복원 — 같은 계보. createdAt·label·도감 보존(stageOf 일수
+ * 게이트 유지가 핵심), maturity ×0.6, 부활 의식(reviveProgress=1) 경유로 기존
+ * 2세션 부활 기계·문구·알림을 전량 재사용한다 ("며칠 만에 재활성" 실관행).
+ */
+function restoreFlake(state: SimState, now: number): ActionResult {
+  if (phaseAt(state, now) !== 'moldy' || state.flake === null) return { state, events: [] };
+  const next: SimState = {
+    ...state,
+    lastFedAt: now,
+    locAnchorAt: now,
+    effBaseMs: 0,
+    feedRatio: '1:1:1',
+    location: 'room',
+    acidity: 0,
+    mass: INITIAL_MASS,
+    maturity: Math.floor(state.flake.maturity * FLAKE_MATURITY_KEEP),
+    reviveProgress: 1,
+    lastDiscardBakeAt: null,
+    flake: null,
+  };
+  return { state: next, events: [{ type: 'flakeRestored' }] };
+}
+
 export function applyAction(state: SimState, action: Action, now: number): ActionResult {
+  // 곰팡이 확정 — 종결 2액션만 통과. 씨앗 불가침과 같은 결: 죽음 앞에서 다른 일은 없다
+  if (phaseAt(state, now) === 'moldy' && action.type !== 'discardStarter' && action.type !== 'restoreFlake') {
+    return { state, events: [{ type: 'moldBlocked' }] };
+  }
   switch (action.type) {
     case 'feed': return feed(state, action.ratio, now);
     case 'setLocation': return setLocation(state, action.to, now);
     case 'bake': return bake(state, action.recipeId, now);
     case 'bakeDiscard': return bakeDiscard(state, action.recipeId, now);
     case 'setLabel': return setLabel(state, action.label, now);
+    case 'makeFlake': return makeFlake(state, now);
+    case 'discardStarter': return discardStarter(state, now);
+    case 'restoreFlake': return restoreFlake(state, now);
   }
 }

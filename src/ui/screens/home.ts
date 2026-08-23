@@ -1,13 +1,14 @@
 // 홈 — 캔버스 위 HUD 오버레이. 상태 문구 탭 = 관찰 카드, 반죽 탭 = poke(게임필).
 import { copy } from '../copy';
 import { agoText, untilText } from '../format';
-import { openModal } from '../components/modal';
+import { confirmModal, openModal } from '../components/modal';
+import { openMoldModal } from '../components/moldModal';
 import { openObserveCard } from '../components/observeCard';
 import { openSettings } from '../components/settingsModal';
 import { toast } from '../components/toast';
 import type { GameApi } from '../gameApi';
 import type { FeedRatio, Location, Snapshot } from '../../sim';
-import { RATIOS, FRIDGE_STAGE } from '../../sim';
+import { RATIOS, FRIDGE_STAGE, FLAKE_STAGE, SEED_G, FLAKE_COST_G } from '../../sim';
 import type { Screen } from '../router';
 
 const LOCATIONS: Location[] = ['room', 'window', 'fridge'];
@@ -63,11 +64,32 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
   feedBtn.className = 'btn btn-primary btn-wide';
   feedBtn.addEventListener('click', () => onFeedTap());
 
-  bottom.append(seg, feedBtn);
+  // 말려두기 — 죽음 보험 보조 버튼 (3단계 노출, 활발+여유량에서만 활성)
+  const flakeBtn = document.createElement('button');
+  flakeBtn.className = 'btn btn-ghost btn-flake';
+  flakeBtn.textContent = copy.flake.action;
+  flakeBtn.addEventListener('click', () => {
+    confirmModal({
+      body: copy.flake.confirm,
+      confirmLabel: copy.flake.action,
+      cancelLabel: '다음에요',
+      onConfirm: () => void api.dispatch({ type: 'makeFlake' }),
+    });
+  });
+
+  const actionsRow = document.createElement('div');
+  actionsRow.className = 'hud-actions';
+  actionsRow.append(feedBtn, flakeBtn);
+
+  bottom.append(seg, actionsRow);
   el.append(top, corner, bottom);
 
   function onFeedTap(): void {
     const snap = api.getSnapshot();
+    if (snap.phase === 'moldy') {
+      openMoldModal(api);
+      return;
+    }
     if (snap.phase === 'dormant') {
       // 부활 의식 — 실온 확인 후 급여 (비율 선택 없이 기본 1:1:1, 의식은 담백하게)
       const events = api.dispatch({ type: 'feed', ratio: '1:1:1' });
@@ -120,8 +142,17 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     const handle = openModal(wrap, { title: copy.feed.ratioTitle });
   }
 
+  let lastStage = -1;
+
   function update(snap: Snapshot): void {
     const now = api.now();
+    // 단계 승급 — 칩 펄스 (한 번, 되돌아오는 팝)
+    if (lastStage >= 0 && snap.stage > lastStage) {
+      chip.classList.remove('pulse');
+      void chip.offsetWidth; // 재트리거용 리플로우
+      chip.classList.add('pulse');
+    }
+    lastStage = snap.stage;
     const phaseKey =
       snap.phase === 'active'
         ? snap.activity >= 0.85
@@ -141,7 +172,14 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     const label = api.labelText();
     chip.textContent = label ? `${label} · ${copy.stage.names[snap.stage]}` : copy.stage.names[snap.stage];
 
-    feedBtn.textContent = snap.phase === 'dormant' ? copy.actions.wake : copy.actions.feed;
+    feedBtn.textContent =
+      snap.phase === 'moldy' ? copy.actions.observe
+      : snap.phase === 'dormant' ? copy.actions.wake
+      : copy.actions.feed;
+
+    // 말려두기 — 3단계 전엔 숨김, 이후 옅은 비활성 규칙 (문구 대신 disabled)
+    flakeBtn.style.display = snap.stage >= FLAKE_STAGE ? '' : 'none';
+    flakeBtn.disabled = snap.phase !== 'active' || snap.mass < SEED_G + FLAKE_COST_G;
 
     // 위치 세그먼트 — 냉장은 3단계 해금 전 비활성 (문구 대신 옅은 비활성 — 사용자 규칙)
     const loc = api.location();

@@ -1,6 +1,6 @@
 // 닫힌 함수 파생 — 저장값(타임스탬프+누적)에서 모든 표시 상태를 계산한다.
 // 정본: docs/GDD.md §3. 순수 함수만.
-import type { Phase, SimState, SmellBand, Snapshot } from './types';
+import type { MoldStage, Phase, SimState, SmellBand, Snapshot } from './types';
 import {
   DAY,
   DORMANT_AFTER_HUNGRY_H,
@@ -13,6 +13,9 @@ import {
   FILL_SOUR,
   HOOCH_AFTER_HUNGRY_H,
   HOUR,
+  MOLD_DEAD_AFTER_HUNGRY_H,
+  MOLD_SPOT_AFTER_HUNGRY_H,
+  MOLD_SPREAD_AFTER_HUNGRY_H,
   RATIOS,
   SMELL_BANDS,
   SOUR_AFTER_HUNGRY_H,
@@ -39,6 +42,7 @@ export function effSinceFeedMs(state: SimState, now: number): number {
 export function boundariesH(state: SimState): {
   latent: number; peakStart: number; peakEnd: number;
   hungry: number; sour: number; dormant: number; hooch: number;
+  moldSpot: number; moldSpread: number; moldDead: number;
 } {
   const r = RATIOS[state.feedRatio];
   return {
@@ -49,17 +53,32 @@ export function boundariesH(state: SimState): {
     sour: r.hungryH + SOUR_AFTER_HUNGRY_H,
     dormant: r.hungryH + DORMANT_AFTER_HUNGRY_H,
     hooch: r.hungryH + HOOCH_AFTER_HUNGRY_H,
+    moldSpot: r.hungryH + MOLD_SPOT_AFTER_HUNGRY_H,
+    moldSpread: r.hungryH + MOLD_SPREAD_AFTER_HUNGRY_H,
+    moldDead: r.hungryH + MOLD_DEAD_AFTER_HUNGRY_H,
   };
 }
 
 export function phaseAt(state: SimState, now: number): Phase {
-  if (state.reviveProgress === 1) return 'dormant'; // 부활 의식 중 — 아직 잠에서 깨는 중
   const b = boundariesH(state);
   const effH = effSinceFeedMs(state, now) / HOUR;
+  // moldy 판정이 부활 의식 오버라이드보다 먼저 — 의식 1회차 후 방치해도 곰팡이는 온다
+  if (effH >= b.moldDead) return 'moldy';
+  if (state.reviveProgress === 1) return 'dormant'; // 부활 의식 중 — 아직 잠에서 깨는 중
   if (effH < b.hungry) return 'active';
   if (effH < b.sour) return 'hungry';
   if (effH < b.dormant) return 'sour';
   return 'dormant';
+}
+
+/** 곰팡이 단계 — 휴면의 파생 하위단계 2개(예고) + 사망 */
+export function moldStageAt(state: SimState, now: number): MoldStage {
+  const b = boundariesH(state);
+  const effH = effSinceFeedMs(state, now) / HOUR;
+  if (effH >= b.moldDead) return 'dead';
+  if (effH >= b.moldSpread) return 'spread';
+  if (effH >= b.moldSpot) return 'spot';
+  return 'none';
 }
 
 /** 활성 곡선 (GDD §3-2): 잠복 → 상승 → 피크 → 하강 → 잔불 */
@@ -129,6 +148,10 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
   const wallFor = (h: number): number =>
     state.locAnchorAt + Math.max(0, h * HOUR - state.effBaseMs) / mult;
 
+  const moldStage = moldStageAt(state, now);
+  // kahm 막 — 창가(더위)×시큼 이후, 곰팡이 반점 전. 무해하지만 곰팡이로 오판하기 쉬운 상태
+  const kahm = state.location === 'window' && effH >= b.sour && effH < b.moldSpot;
+
   return {
     phase,
     activity,
@@ -143,5 +166,10 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
     nextFeedAt: wallFor(b.hungry),
     peakAt: wallFor(b.peakStart),
     effSinceFeedMs: effMs,
+    moldStage,
+    mold01: smoothstep(b.moldSpot, b.moldDead, effH),
+    moldDeadAt: wallFor(b.moldDead),
+    kahm,
+    hasFlake: state.flake !== null,
   };
 }

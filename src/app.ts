@@ -13,13 +13,19 @@ import { onLifecycle } from './platform/lifecycle';
 import { haptic, setHapticsEnabled } from './platform/haptics';
 import { isNative } from './platform/native';
 import { exportEnvelope, pickImportFile } from './platform/saveTransfer';
-import { setMuted, sfxBubble, sfxFed, sfxRevived, sfxUnlock, suspendAudio, resumeAudio, unlockAudio } from './audio/sounds';
+import {
+  setMuted, sfxBubble, sfxFed, sfxRevived, sfxUnlock, suspendAudio, resumeAudio, unlockAudio,
+  sfxStirStart, sfxStirUpdate, sfxStirEnd, sfxCloth,
+} from './audio/sounds';
 import { copy } from './ui/copy';
 import { toast } from './ui/components/toast';
 import { openModal } from './ui/components/modal';
+import { openMoldModal } from './ui/components/moldModal';
+import { openBriefingCard } from './ui/components/briefingCard';
 import { Router } from './ui/router';
 import { createHomeScreen } from './ui/screens/home';
 import { createRecipesScreen } from './ui/screens/recipes';
+import { createShowcaseScreen } from './ui/screens/showcase';
 import { mountOnboarding } from './ui/screens/onboarding';
 import type { GameApi } from './ui/gameApi';
 import type { BakeGrade, SimEvent } from './sim';
@@ -31,7 +37,7 @@ export async function startApp(): Promise<void> {
 
   const storage = createStorage();
   const notifier = createNotifier();
-  const { store, isNew, loadSource } = await initGameStore({
+  const { store, isNew, loadSource, briefing } = await initGameStore({
     clock: systemClock,
     storage,
     onNotifyPlan: (plan) => void notifier.applyPlan(plan),
@@ -43,7 +49,26 @@ export async function startApp(): Promise<void> {
   scene.setBandY(0.98); // 고무줄 = 급여 시점 높이(fill 1.0) — 정의상 고정
   scene.snapParams(toRenderParams(store.getSnapshot())); // 앱 오픈 = 즉시 스냅
   scene.start();
-  scene.onBubblePop = () => sfxBubble();
+  scene.setMoldSeed(store.getEnvelope().sim.createdAt); // 반점 자리 = 개체 정체성
+
+  // 햅틱 예산: 젓기 세션당 첫 팝 1회만 — '희소' 규칙 (VISUAL §5 개정)
+  let stirHapticUsed = false;
+  scene.onBubblePop = () => {
+    sfxBubble();
+    const ag = scene.dough?.agitation ?? 0;
+    if (ag > 0.25) {
+      if (!stirHapticUsed) {
+        stirHapticUsed = true;
+        haptic('light');
+      }
+    } else {
+      stirHapticUsed = false;
+    }
+  };
+  scene.onClothOpen = () => sfxCloth();
+  scene.onStirStart = () => sfxStirStart();
+  scene.onStirMove = (s) => sfxStirUpdate(s);
+  scene.onStirEnd = () => sfxStirEnd();
 
   // ── 설정 반영 ──
   const applySettings = (): void => {
@@ -60,6 +85,7 @@ export async function startApp(): Promise<void> {
     lastFedAt: () => store.getEnvelope().sim.lastFedAt,
     labelText: () => store.getEnvelope().sim.label,
     location: () => store.getEnvelope().sim.location,
+    flakeMadeAt: () => store.getEnvelope().sim.flake?.madeAt ?? null,
     dispatch: (a) => store.dispatch(a),
     subscribe: (fn) => store.subscribe(fn),
     getSettings: () => ({ ...store.getEnvelope().settings }),
@@ -103,7 +129,37 @@ export async function startApp(): Promise<void> {
   });
 
   const home = createHomeScreen(api);
-  const recipes = createRecipesScreen(api, () => store.getEnvelope().sim.collection);
+
+  // 3D 쇼케이스 — Screen push로 단일 캔버스 재사용. GLB 미비(404)면 false → 카드 폴백
+  const restoreStage = (): void => {
+    const onLevain = tabLevain.classList.contains('active');
+    stage.style.visibility = onLevain ? 'visible' : 'hidden';
+    if (onLevain && !document.hidden) scene.start();
+    else scene.stop();
+  };
+  const openShowcase = async (recipeId: string, headline: string, large: boolean): Promise<boolean> => {
+    try {
+      await scene.enterShowcase(`/breads/${recipeId}.glb`);
+    } catch {
+      return false;
+    }
+    const screen = createShowcaseScreen(recipeId, headline, large, {
+      onShow: () => {
+        stage.style.visibility = 'visible';
+        scene.start();
+        scene.spawnSteam(); // 갓 구운 김
+      },
+      onExit: () => {
+        scene.exitShowcase();
+        restoreStage();
+      },
+      onClose: () => router.handleBack(),
+    });
+    router.push(screen);
+    return true;
+  };
+
+  const recipes = createRecipesScreen(api, () => store.getEnvelope().sim.collection, openShowcase);
 
   const tabs = document.createElement('nav');
   tabs.id = 'tabs';
@@ -139,6 +195,7 @@ export async function startApp(): Promise<void> {
         case 'stageUp':
           sfxUnlock();
           haptic('success');
+          scene.celebrate(); // 기포 3연속 팝 — 다이제틱 축하
           toast(copy.stage.up(copy.stage.names[e.stage] ?? ''));
           if (e.stage === 5) toast(copy.stage.labelUnlocked);
           break;
@@ -164,6 +221,24 @@ export async function startApp(): Promise<void> {
           store.setFlags({ pendingBake: { recipeId: e.recipeId, grade: e.grade } });
           setTimeout(() => store.setFlags({ pendingBake: null }), 3000);
           break;
+        case 'flakeMade':
+          haptic('light');
+          toast(copy.flake.made);
+          break;
+        case 'flakeBlocked':
+          toast(e.reason === 'mass' ? copy.flake.blockedMass : copy.flake.blockedPhase);
+          break;
+        case 'flakeRestored':
+          haptic('medium');
+          scene.playFeed(true); // 물을 주는 손길 — 따라내기 연출 재사용
+          break;
+        case 'starterDiscarded':
+          scene.snapParams(toRenderParams(store.getSnapshot())); // 새 반죽 — 즉시 스냅
+          scene.setMoldSeed(store.getEnvelope().sim.createdAt); // 새 개체 = 새 반점 자리
+          break;
+        case 'moldBlocked':
+          openMoldModal(api); // 다른 일은 없다 — 종결 모달로 되돌린다
+          break;
         default:
           break;
       }
@@ -176,15 +251,22 @@ export async function startApp(): Promise<void> {
   });
 
   // ── 수명주기 ──
+  let hiddenAt = 0;
+  const CLOTH_ABSENCE_MS = 30 * 60_000; // 30분 넘게 자리를 비우면 천이 덮여 있다
   onLifecycle((visible) => {
     if (visible) {
-      store.tick(); // catch-up
+      const resumeBriefing = store.resumeWithBriefing(); // catch-up + 부재 브리핑
       scene.snapParams(toRenderParams(store.getSnapshot())); // 복귀 = 즉시 스냅
       if (tabLevain.classList.contains('active')) scene.start();
       store.startTicking();
       store.replanNotifications();
       resumeAudio();
+      if (store.getEnvelope().flags.onboarded) {
+        if (hiddenAt > 0 && Date.now() - hiddenAt > CLOTH_ABSENCE_MS) scene.coverCloth();
+        openBriefingCard(resumeBriefing, () => openMoldModal(api));
+      }
     } else {
+      hiddenAt = Date.now();
       store.saveNow();
       store.stopTicking();
       scene.stop();
@@ -220,6 +302,12 @@ export async function startApp(): Promise<void> {
     });
   } else if (loadSource === 'mirror') {
     // 주 저장 손상 → 미러 복구 — 조용히 (사용자에게 시스템 사정 노출 금지)
+  }
+
+  // ── 부트 브리핑 → (필요시) 곰팡이 종결 모달 — 중앙 팝업 순차, 겹치지 않게 ──
+  if (!isNew && store.getEnvelope().flags.onboarded) {
+    scene.coverCloth(); // 콜드 스타트 = 천이 덮인 채 시작 — 걷는 게 첫 리추얼
+    openBriefingCard(briefing, () => openMoldModal(api));
   }
 
   // ── 미표시 굽기 결과 재노출 (강제종료 안전) ──

@@ -1,8 +1,8 @@
 // 단일 진실 소스 — state·dispatch·tick·subscribe (ARCHITECTURE §2).
 // 액션 순서 불변식: dispatch = advance(tick) 선행 → applyAction → 동기 저장 → 알림 재계획 → 통지 1회.
 // 통지는 마지막에 딱 한 번 — 중간 통지가 나가면 UI가 액션 전 상태를 한 프레임 그린다.
-import type { Action, NotifyPlan, SimEvent, Snapshot } from '../sim';
-import { advance, applyAction, deriveSnapshot, initialState, planNotifications } from '../sim';
+import type { Action, BriefingKey, NotifyPlan, SimEvent, Snapshot } from '../sim';
+import { advance, applyAction, deriveBriefing, deriveSnapshot, initialState, planNotifications } from '../sim';
 import type { Clock } from '../platform/clock';
 import type { StorageAdapter } from '../platform/storage';
 import type { LoadSource, SaveEnvelope, SaveFlags, SaveSettings } from './persistence';
@@ -24,6 +24,8 @@ export interface GameStoreDeps {
 export interface GameStore {
   /** 지금 시각으로 catch-up 후 스냅샷 재계산 + 통지 */
   tick(): Snapshot;
+  /** 복귀 catch-up + 부재 브리핑 — pre-advance 상태 기준(briefing.ts). 부재 8h 미만은 [] */
+  resumeWithBriefing(): BriefingKey[];
   dispatch(action: Action): SimEvent[];
   subscribe(fn: StoreListener): () => void;
   getSnapshot(): Snapshot;
@@ -93,6 +95,13 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
 
   return {
     tick: doTick,
+
+    resumeWithBriefing(): BriefingKey[] {
+      const pre = env.sim;
+      const briefing = deriveBriefing(pre, pre.lastSimulatedAt, clock.now());
+      doTick();
+      return briefing;
+    },
 
     dispatch(action: Action): SimEvent[] {
       const now = clock.now(); // 한 번만 캡처 — advance·applyAction·savedAt이 같은 시각을 본다
@@ -173,6 +182,8 @@ export interface InitResult {
   isNew: boolean;
   /** 새 게임이면 null */
   loadSource: LoadSource | null;
+  /** 부재 중 있었던 일 — 새 게임·짧은 부재면 [] */
+  briefing: BriefingKey[];
 }
 
 /**
@@ -183,8 +194,9 @@ export interface InitResult {
 export async function initGameStore(deps: GameStoreDeps): Promise<InitResult> {
   const loaded = await load(deps.storage);
   const store = createGameStore(deps, loaded?.envelope);
-  store.tick();
+  const briefing = loaded === null ? [] : store.resumeWithBriefing();
+  if (loaded === null) store.tick();
   store.saveNow();
   store.replanNotifications();
-  return { store, isNew: loaded === null, loadSource: loaded?.source ?? null };
+  return { store, isNew: loaded === null, loadSource: loaded?.source ?? null, briefing };
 }

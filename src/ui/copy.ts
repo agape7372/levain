@@ -13,6 +13,7 @@ export const copy = {
     sour: '조금 시큼해졌어요',
     dormant: '깊이 잠들어 있어요',
     reviving: '천천히 깨어나는 중이에요',
+    moldy: '곰팡이가 피었어요',
   },
 
   smell: {
@@ -20,7 +21,51 @@ export const copy = {
     yogurt: '요거트처럼 새콤한 냄새예요',
     vinegar: '식초 기운이 살짝 돌아요',
     sharp: '코가 찡한 시큼함이에요',
-    acetone: '아세톤 비슷한 냄새가 나요. 밥을 자주 주면 돌아와요',
+    acetone: '아세톤 비슷한 냄새가 나요. 배가 많이 고프다는 신호예요 — 넉넉한 밥이면 돌아와요',
+  },
+
+  // 진단 — 곰팡이로 오판하기 쉬운 무해 상태들 (실제 르방의 오판 1순위들)
+  diagnosis: {
+    kahm: '주름진 흰 막이 덮였어요. 곰팡이는 아니에요 — 밥을 주면 사라져요',
+    greySurface: '표면이 잿빛이에요. 겉모습만 그래요, 속은 자고 있어요',
+    moldSpot: '표면에 작은 반점이 생겼어요. 밥을 주면 아직 괜찮아요',
+    moldSpread: '반점이 번지고 있어요. 지금 밥을 주면 살릴 수 있어요',
+    moldDeadline: (at: string) => `이대로 두면 ${at}쯤 곰팡이가 펴요`,
+  },
+
+  // 곰팡이 사망 — 사실 서술 + 위로 한 문장. 원인 추궁·'~했더라면' 금지 (GDD §10)
+  mold: {
+    deadTitle: '보풀 같은 곰팡이가 피었어요. 이 아이는 여기까지예요',
+    comfort: '오래 키우다 보면 있는 일이에요',
+    hasFlake: '말려 둔 조각이 있어요. 며칠이면 다시 깨어날 수 있어요',
+    noFlake: '새 반죽으로 다시 시작할 수 있어요. 구운 빵의 기록은 남아요',
+    restore: '말린 조각으로 잇기',
+    discard: '보내주고 새로 시작하기',
+    restored: '말린 조각에 물을 주었어요. 천천히 깨어날 거예요',
+    discarded: '새 반죽을 시작했어요. 지난 기록은 도감에 남아 있어요',
+  },
+
+  // 건조 플레이크 — 죽음 보험 (실제 관행: 얇게 펴 말려 보관)
+  flake: {
+    action: '말려두기',
+    confirm: '얇게 펴서 말려둘까요? 르방 20g을 써요',
+    made: '얇게 펴 말려두었어요. 무슨 일이 생겨도 이 조각으로 돌아올 수 있어요',
+    hasOne: (ago: string) => `${ago} 전에 말려둔 조각이 있어요`,
+    blockedPhase: '활발할 때 말릴 수 있어요',
+    blockedMass: '르방이 조금 부족해요. 밥을 주고 불려 보세요',
+  },
+
+  // 복귀 브리핑 — 부재 중 있었던 일 (시간순)
+  briefing: {
+    title: '그동안 있었던 일',
+    peaked: '한껏 부풀었다가 가라앉았어요',
+    becameHungry: '배가 고파졌어요',
+    becameSour: '조금 시큼해졌어요',
+    hoochAppeared: '표면에 액체가 고였어요. 배고픔의 신호예요',
+    wentDormant: '깊이 잠들었어요',
+    moldSpotted: '표면에 반점이 생겼어요',
+    moldSpread: '반점이 번졌어요',
+    moldDied: '곰팡이가 피었어요',
   },
 
   actions: {
@@ -107,8 +152,9 @@ export const copy = {
     channel: '르방이 돌보기',
     feedTime: '밥 시간이에요',
     fridgeWeek: '일주일이 지났어요. 밥 줄 때가 됐어요',
-    dormant: '르방이 깊이 잠들었어요. 언제든 깨울 수 있어요',
+    dormant: '르방이 깊이 잠들었어요. 잊지 말고 깨워 주세요',
     reviveSecond: '다시 밥 줄 시간이에요',
+    moldWarn: '르방이 표면에 반점이 보여요. 아직 늦지 않았어요',
     permissionHint: '밥 시간을 알려드릴까요',
     permissionSettings: '알림은 시스템 설정에서 켤 수 있어요',
   },

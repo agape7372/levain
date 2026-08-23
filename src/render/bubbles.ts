@@ -1,13 +1,9 @@
-// 기포 생명주기 — 공유 uBump 배열의 동적 슬롯(4~7)을 CPU에서 구동 (VISUAL §2).
+// 기포 생명주기 — 공유 uBump 배열 8슬롯 전부를 CPU에서 구동 (VISUAL §2 개정).
+// 레거시 고정 혹(음수 진폭 4개)은 '라떼아트 얼룩'의 주범이라 폐기 — 정지 실루엣은 셰이더 FBM이 담당.
 // 부풀기(easeOut) → 정점 → "뽁" 터짐(80ms 음수 + 잔상) → 소멸. 밀도에 따라 스폰 간격 lerp(6s, 0.8s).
-export const LEGACY_BUMPS: ReadonlyArray<{ x: number; z: number; k: number }> = [
-  { x: 0.2, z: 0.04, k: 20 },
-  { x: -0.1, z: 0.2, k: 24 },
-  { x: 0.06, z: -0.18, k: 22 },
-  { x: -0.26, z: -0.06, k: 18 },
-];
+// agitation(젓는 세기 0~1): 스폰 간격 ÷(1+2a), 수명 ÷(1+a) — 젓는 동안 끓어오른다.
 
-const DYN_SLOTS = 4; // 슬롯 4~7
+const DYN_SLOTS = 8;
 const POP_SEC = 0.08;
 
 interface Bubble {
@@ -23,7 +19,7 @@ interface Bubble {
 }
 
 export class BubbleSystem {
-  /** 셰이더에 그대로 업로드되는 배열 — 슬롯 0~3 레거시 고정, 4~7 동적 */
+  /** 셰이더에 그대로 업로드되는 배열 — 8슬롯 전부 동적 */
   readonly pos = new Float32Array(16);
   readonly amp = new Float32Array(8);
   readonly k = new Float32Array(8);
@@ -34,20 +30,13 @@ export class BubbleSystem {
   private nextSpawnAt = 0;
 
   constructor() {
-    LEGACY_BUMPS.forEach((b, i) => {
-      this.pos[i * 2] = b.x;
-      this.pos[i * 2 + 1] = b.z;
-      this.amp[i] = -0.4; // 레거시 혹 = 프로토타입 원형 그대로
-      this.k[i] = b.k;
-    });
     for (let i = 0; i < DYN_SLOTS; i++) {
       this.bubbles.push({ active: false, x: 0, z: 0, k: 40, bornAt: 0, life: 0, maxAmp: 0, popped: false, poppedAt: 0 });
-      this.k[4 + i] = 40;
+      this.k[i] = 40;
     }
   }
 
-  /** 즉시 기포 하나 — 연출(밥 정착·부활 첫 숨)용 */
-  spawnNow(t: number, scale = 1): void {
+  private spawn(t: number, scale: number, lifeBase: number): void {
     const slot = this.bubbles.findIndex((b) => !b.active);
     if (slot < 0) return;
     const b = this.bubbles[slot];
@@ -56,69 +45,62 @@ export class BubbleSystem {
     b.active = true;
     b.x = Math.cos(th) * r;
     b.z = Math.sin(th) * r;
-    b.k = 16 + Math.random() * 10; // 레거시 혹(18~24)과 같은 부드러움 — 크면 금속성 스파이크
+    b.k = 16 + Math.random() * 10; // 완만한 돔 — 크면 금속성 스파이크
     b.bornAt = t;
-    b.life = 1.2 + Math.random() * 1.2;
+    b.life = lifeBase + Math.random() * lifeBase;
     b.maxAmp = (0.06 + Math.random() * 0.05) * scale;
     b.popped = false;
   }
 
-  /** t: 렌더 시계(초). density·scale: RenderParams. */
-  update(t: number, density: number, scale: number): void {
+  /** 즉시 기포 하나 — 연출(밥 정착·부활 첫 숨)용 */
+  spawnNow(t: number, scale = 1): void {
+    this.spawn(t, scale, 1.2);
+  }
+
+  /** t: 렌더 시계(초). density·scale: RenderParams. agitation: 젓는 세기 0~1 */
+  update(t: number, density: number, scale: number, agitation = 0): void {
     this.popsThisFrame = 0;
 
     if (density > 0.02 && t >= this.nextSpawnAt) {
-      const slot = this.bubbles.findIndex((b) => !b.active);
-      if (slot >= 0) {
-        const b = this.bubbles[slot];
-        const r = Math.sqrt(Math.random()) * 0.42;
-        const th = Math.random() * Math.PI * 2;
-        b.active = true;
-        b.x = Math.cos(th) * r;
-        b.z = Math.sin(th) * r;
-        b.k = 16 + Math.random() * 10;
-        b.bornAt = t;
-        b.life = 2 + Math.random() * 2;
-        b.maxAmp = (0.06 + Math.random() * 0.05) * scale;
-        b.popped = false;
-      }
-      const interval = 6 + (0.8 - 6) * Math.min(1, density);
+      this.spawn(t, scale, 2 / (1 + agitation));
+      const interval = (6 + (0.8 - 6) * Math.min(1, density)) / (1 + 2 * agitation);
       this.nextSpawnAt = t + interval * (0.7 + Math.random() * 0.6);
     }
 
     for (let i = 0; i < DYN_SLOTS; i++) {
       const b = this.bubbles[i];
-      const s = 4 + i;
       if (!b.active) {
-        this.amp[s] = 0;
+        this.amp[i] = 0;
         continue;
       }
       const age = t - b.bornAt;
       if (!b.popped) {
-        if (age >= b.life) {
+        // 젓는 동안 수명 가속 — 나이를 앞당기는 대신 남은 수명을 줄인다
+        const effLife = b.life / (1 + agitation);
+        if (age >= effLife) {
           b.popped = true;
           b.poppedAt = t;
           this.popsThisFrame++;
         } else {
-          const u = Math.min(1, age / (b.life * 0.55));
+          const u = Math.min(1, age / (effLife * 0.55));
           const ease = 1 - Math.pow(1 - u, 3); // easeOutCubic 부풀기
-          this.amp[s] = b.maxAmp * ease;
+          this.amp[i] = b.maxAmp * ease;
         }
       }
       if (b.popped) {
         const pa = t - b.poppedAt;
         if (pa >= POP_SEC * 2.5) {
           b.active = false;
-          this.amp[s] = 0;
+          this.amp[i] = 0;
         } else if (pa < POP_SEC) {
-          this.amp[s] = -0.3 * b.maxAmp * (pa / POP_SEC); // "뽁" — 순간 함몰
+          this.amp[i] = -0.3 * b.maxAmp * (pa / POP_SEC); // "뽁" — 순간 함몰
         } else {
-          this.amp[s] = -0.3 * b.maxAmp * (1 - (pa - POP_SEC) / (POP_SEC * 1.5));
+          this.amp[i] = -0.3 * b.maxAmp * (1 - (pa - POP_SEC) / (POP_SEC * 1.5));
         }
       }
-      this.pos[s * 2] = b.x;
-      this.pos[s * 2 + 1] = b.z;
-      this.k[s] = b.k;
+      this.pos[i * 2] = b.x;
+      this.pos[i * 2 + 1] = b.z;
+      this.k[i] = b.k;
     }
   }
 }

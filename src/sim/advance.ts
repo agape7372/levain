@@ -25,6 +25,7 @@ function reanchor(state: SimState, delta: number): SimState {
     lastSimulatedAt: state.lastSimulatedAt - delta,
     locAnchorAt: state.locAnchorAt - delta,
     lastDiscardBakeAt: state.lastDiscardBakeAt === null ? null : state.lastDiscardBakeAt - delta,
+    flake: state.flake === null ? null : { ...state.flake, madeAt: state.flake.madeAt - delta },
     collection,
   };
 }

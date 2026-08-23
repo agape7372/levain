@@ -86,3 +86,89 @@ export function sfxRevived(): void {
   sfxBubble();
   setTimeout(() => sfxFed(), 160);
 }
+
+// ── 젓기 squelch + 천 사락 — 절차 노이즈 버퍼 1개 재사용 (에셋 0 유지, v1 5종 개정) ──
+
+let noiseBuf: AudioBuffer | null = null;
+function ensureNoise(): AudioBuffer | null {
+  if (!ctx) return null;
+  if (!noiseBuf) {
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  return noiseBuf;
+}
+
+let stirSrc: AudioBufferSourceNode | null = null;
+let stirGain: GainNode | null = null;
+let stirFilter: BiquadFilterNode | null = null;
+
+/** 젓기 시작 — 밴드패스 노이즈 루프 (게인 0에서 대기, update가 속도 추종) */
+export function sfxStirStart(): void {
+  if (muted || !ensureCtx() || !ctx || !master) return;
+  if (stirSrc) return;
+  const buf = ensureNoise();
+  if (!buf) return;
+  stirSrc = ctx.createBufferSource();
+  stirSrc.buffer = buf;
+  stirSrc.loop = true;
+  stirFilter = ctx.createBiquadFilter();
+  stirFilter.type = 'bandpass';
+  stirFilter.frequency.value = 450;
+  stirFilter.Q.value = 1.6;
+  stirGain = ctx.createGain();
+  stirGain.gain.value = 0;
+  stirSrc.connect(stirFilter).connect(stirGain).connect(master);
+  stirSrc.start();
+}
+
+/** 젓는 속도(0~1) 추종 — 게인·중심 주파수 */
+export function sfxStirUpdate(speed: number): void {
+  if (!ctx || !stirGain || !stirFilter) return;
+  const t = ctx.currentTime;
+  stirGain.gain.setTargetAtTime(0.16 * Math.min(1, speed), t, 0.06);
+  stirFilter.frequency.setTargetAtTime(300 + 600 * Math.min(1, speed), t, 0.08);
+}
+
+export function sfxStirEnd(): void {
+  if (!ctx || !stirSrc || !stirGain) {
+    stirSrc = null;
+    stirGain = null;
+    stirFilter = null;
+    return;
+  }
+  const src = stirSrc;
+  stirGain.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.08);
+  setTimeout(() => {
+    try {
+      src.stop();
+    } catch {
+      /* 이미 정지 */
+    }
+  }, 300);
+  stirSrc = null;
+  stirGain = null;
+  stirFilter = null;
+}
+
+/** 천 덮개 사락 — 하이패스 노이즈 버스트 0.25s (마스터 LPF 3kHz와 만나 1.2~3k 대역) */
+export function sfxCloth(): void {
+  if (muted || !ensureCtx() || !ctx || !master) return;
+  const buf = ensureNoise();
+  if (!buf) return;
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  src.playbackRate.value = 0.9 + Math.random() * 0.2;
+  const hpf = ctx.createBiquadFilter();
+  hpf.type = 'highpass';
+  hpf.frequency.value = 1200;
+  const g = ctx.createGain();
+  const t = ctx.currentTime;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.22, t + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0004, t + 0.25);
+  src.connect(hpf).connect(g).connect(master);
+  src.start(t);
+  src.stop(t + 0.3);
+}

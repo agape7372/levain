@@ -14,8 +14,9 @@ import type { SimState } from '../src/sim';
 const t0 = 1_700_000_000_000;
 
 describe('neglect — 장기 방치·휴면·부활 (GDD §3-4·§3-7)', () => {
-  it('2주 방치(advance 1회 catch-up): phase dormant, Snapshot 전 필드 NaN 없음·문서 범위 내, acidity ≤ 100', () => {
-    const now = t0 + 14 * DAY;
+  it('10일 방치(advance 1회 catch-up): phase dormant, Snapshot 전 필드 NaN 없음·문서 범위 내, acidity ≤ 100', () => {
+    // 14일(336h)은 곰팡이 사망 경계와 정확히 겹쳐 phase가 moldy로 넘어간다 — dormant만 보려면 10일(240h)
+    const now = t0 + 10 * DAY;
     const advanced = advance(initialState(t0), now);
     const snap = deriveSnapshot(advanced, now);
 

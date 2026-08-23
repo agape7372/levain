@@ -14,6 +14,11 @@ export interface RenderParams {
   crust: number;           // 0~1 (휴면 마른 껍질)
   fillY: number;           // 0.6~1.6 (고무줄 기준)
   hoochAmt: number;        // 0~1
+  wet: number;             // 0~1 급여 직후 젖은 광 → 마르면 무광 페이스트
+  ripe: number;            // 0~1 피크 돔 + crackle
+  collapse: number;        // 0~1 과숙 크레이터 함몰
+  mold: number;            // 0~1 곰팡이 확산 (Snapshot.mold01)
+  kahm: number;            // 0~1 kahm 효모 막
 }
 
 type RGB = [number, number, number];
@@ -34,25 +39,36 @@ const CREAM = hex(0xf4ead4);
 const HUNGRY_TONE = hex(0xdcd2c0);
 const SOUR_TONE = hex(0xcbbda2);
 const DORMANT_TONE = hex(0xe4dccc);
+// 곰팡이 확정 — 잿빛이 도는 바랜 톤. 경고는 다이제틱(반점) 소관, 빨강 시맨틱 없음 (VISUAL §7-1)
+const MOLDY_TONE = hex(0xd8d0be);
 
 export function toRenderParams(s: Snapshot): RenderParams {
   const a = clamp01(s.activity);
+  const moldy = s.phase === 'moldy';
 
   let color = mix(CREAM, HUNGRY_TONE, clamp01(s.hunger));
   color = mix(color, SOUR_TONE, smooth(0.25, 0.6, s.sourness));
   color = mix(color, DORMANT_TONE, clamp01(s.dormancy));
+  if (moldy) color = mix(color, MOLDY_TONE, 0.7);
 
   return {
     color,
-    breatheAmp: 0.006 + (0.055 - 0.006) * a,
+    // moldy = 유일하게 숨이 완전히 멎는 상태 (휴면의 '완전 정지 금지'는 죽음 오인 방지책이었다)
+    breatheAmp: moldy ? 0 : 0.006 + (0.055 - 0.006) * a,
     breathePeriod: 2.6 + (7.0 - 2.6) * Math.pow(1 - a, 1.5),
-    noiseSpeed: 0.1 + 1.5 * a,
-    bubbleDensity: clamp01(a * 0.9 * (1 - 0.85 * s.dormancy)),
+    noiseSpeed: moldy ? 0 : 0.1 + 1.5 * a,
+    bubbleDensity: moldy ? 0 : clamp01(a * 0.9 * (1 - 0.85 * s.dormancy)),
     bubbleScale: 0.5 + 0.8 * a,
     specStr: Math.min(1.2, Math.max(0.1, 0.15 + 1.05 * a - 0.4 * s.hunger - 0.6 * s.dormancy)),
-    crust: 0.8 * clamp01(s.dormancy),
+    crust: 0.8 * clamp01(Math.max(s.dormancy, moldy ? 1 : 0)),
     fillY: s.fill,
     hoochAmt: clamp01(s.hooch),
+    // 급여 직후 젖은 광 — 활성이 오르고 배고파질수록 마른다
+    wet: clamp01((1 - smooth(0.15, 0.8, a)) * (1 - smooth(0, 0.45, s.hunger)) * (1 - s.dormancy)),
+    ripe: smooth(0.7, 0.95, a) * (1 - clamp01(s.dormancy)),
+    collapse: smooth(0.45, 0.8, s.sourness) * (1 - clamp01(s.dormancy)),
+    mold: clamp01(s.mold01),
+    kahm: s.kahm ? 1 : 0,
   };
 }
 
@@ -71,5 +87,10 @@ export function smoothParams(cur: RenderParams, target: RenderParams, dtSec: num
     crust: n(cur.crust, target.crust),
     fillY: n(cur.fillY, target.fillY),
     hoochAmt: n(cur.hoochAmt, target.hoochAmt),
+    wet: n(cur.wet, target.wet),
+    ripe: n(cur.ripe, target.ripe),
+    collapse: n(cur.collapse, target.collapse),
+    mold: n(cur.mold, target.mold),
+    kahm: n(cur.kahm, target.kahm),
   };
 }

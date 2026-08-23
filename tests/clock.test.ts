@@ -14,6 +14,7 @@ function populatedState(): SimState {
     locAnchorAt: t0 - 2 * HOUR,
     lastDiscardBakeAt: t0 - 1 * HOUR,
     collection: { pancake: { bestGrade: null, count: 2, firstAt: t0 - 3 * DAY } },
+    flake: { madeAt: t0 - 4 * HOUR, maturity: 3 },
   };
 }
 
@@ -30,6 +31,8 @@ describe('clock — 시계 방어 (GDD §3-8)', () => {
     expect(result.locAnchorAt).toBe(s.locAnchorAt - delta);
     expect(result.lastDiscardBakeAt).toBe((s.lastDiscardBakeAt as number) - delta);
     expect(result.collection.pancake.firstAt).toBe(s.collection.pancake.firstAt - delta);
+    expect(result.flake!.madeAt).toBe(s.flake!.madeAt - delta);
+    expect(result.flake!.maturity).toBe(s.flake!.maturity); // maturity는 시계값이 아니라 재정박 대상 아님
 
     // 상대 간격 보존
     expect(result.lastFedAt - result.createdAt).toBe(s.lastFedAt - s.createdAt);

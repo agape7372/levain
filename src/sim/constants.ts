@@ -38,6 +38,23 @@ export const DORMANT_AFTER_HUNGRY_H = 106;
 /** hooch(부유액) 시작: 배고픔 +34h (1:1:1이면 급여 후 48h) */
 export const HOOCH_AFTER_HUNGRY_H = 34;
 
+/**
+ * 곰팡이 — 유일한 진짜 실패. 배고픔 기준 오프셋, 1:1:1 실온이면 급여 후 7일 반점 →
+ * 10일 확산 → 14일 사망. 결정론(PRNG 금지) — 재정박이 간격을 보존해 시계 조작으로
+ * 회피 불가. 창가는 더 이르고(더위가 곰팡이를 부른다), 냉장은 ≈175일로 밀린다.
+ */
+export const MOLD_SPOT_AFTER_HUNGRY_H = 154;   // 급여 후 168h = 7일 (휴면 +48h)
+export const MOLD_SPREAD_AFTER_HUNGRY_H = 226; // 급여 후 240h = 10일 (휴면 +120h)
+export const MOLD_DEAD_AFTER_HUNGRY_H = 322;   // 급여 후 336h = 14일 (휴면 +216h)
+
+/** 건조 플레이크(죽음 보험): 3단계 해금, 활발 상태에서 -20g, 복원 시 maturity ×0.6 */
+export const FLAKE_STAGE = 3;
+export const FLAKE_COST_G = 20;
+export const FLAKE_MATURITY_KEEP = 0.6;
+
+/** 복귀 브리핑 최소 부재(wall-clock h) — 앱 전환 스팸 방지 */
+export const BRIEFING_MIN_ABSENCE_H = 8;
+
 /** 산미 누적 (유효시간당) */
 export const ACID_RATE = { active: 0.3, hungry: 1.5, sour: 2.5, dormant: 0.5 } as const;
 export const ACID_MAX = 100;
@@ -86,13 +103,18 @@ export const FLOAT_OK_ACTIVITY = 0.7;
 
 /** 시계 방어 */
 export const REWIND_TOLERANCE_MS = 5 * 60_000; // 5분 이내 역행은 무시(0 경과 취급)
-export const MAX_CATCHUP_MS = 60 * DAY;        // 휴면+산미 포화 고정점 — 안전벨트
+/**
+ * catch-up 상한 — 실온 곰팡이 종착(≤15일)+산미 포화가 고정점이라 그 이상은 관측 불변.
+ * 곰팡이·phase는 파생이라 이 캡과 무관 — 캡은 acidity 적분의 안전벨트일 뿐.
+ */
+export const MAX_CATCHUP_MS = 60 * DAY;
 
 /** 알림 */
 export const QUIET_START_H = 22; // 로컬 시각 — 클램프 전용
 export const QUIET_END_H = 8;
 export const NOTIFY_SLOT_FEED = 1;
 export const NOTIFY_SLOT_DORMANT = 2;
+export const NOTIFY_SLOT_MOLD = 3; // 곰팡이 임박 경고 — 정확히 1건
 
 /** 부피(fill) — 고무줄(급여 시점)=1.0 기준 */
 export const FILL_MIN = 0.6;

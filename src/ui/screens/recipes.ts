@@ -12,6 +12,8 @@ import type { Screen } from '../router';
 export function createRecipesScreen(
   api: GameApi,
   getCollection: () => Record<string, CollectionEntry>,
+  /** 3D 쇼케이스 열기 — GLB 없으면 false를 돌려주고 카드 리절트로 폴백 */
+  openShowcase?: (recipeId: string, headline: string, large: boolean) => Promise<boolean>,
 ): Screen {
   const el = document.createElement('div');
   el.className = 'screen screen--solid';
@@ -60,6 +62,17 @@ export function createRecipesScreen(
     openModal(body, { title: copy.recipes.names[recipeId] });
   }
 
+  /** 결과 표시 — 3D 쇼케이스 우선, GLB 미비 시 카드 리절트 폴백 */
+  function showResult(recipeId: string, headline: string, large = false): void {
+    if (!openShowcase) {
+      openResultModal(recipeId, headline, large);
+      return;
+    }
+    void openShowcase(recipeId, headline, large).then((ok) => {
+      if (!ok) openResultModal(recipeId, headline, large);
+    });
+  }
+
   function onCardTap(recipe: RecipeDef): void {
     const snap = api.getSnapshot();
     const name = copy.recipes.names[recipe.id];
@@ -87,7 +100,7 @@ export function createRecipesScreen(
             );
             return;
           }
-          openResultModal(recipe.id, copy.recipes.discardDone);
+          showResult(recipe.id, copy.recipes.discardDone);
         },
       });
       return;
@@ -118,7 +131,7 @@ export function createRecipesScreen(
         const baked = events.find(
           (e): e is Extract<SimEvent, { type: 'baked' }> => e.type === 'baked',
         );
-        if (baked) openResultModal(recipe.id, copy.recipes.grades[baked.grade], true);
+        if (baked) showResult(recipe.id, copy.recipes.grades[baked.grade], true);
       },
     });
   }
@@ -150,7 +163,15 @@ export function createRecipesScreen(
 
     const art = document.createElement('div');
     art.className = 'art';
-    art.appendChild(breadArt(recipe.id));
+    // GLB 베이크 썸네일 우선 — 아직 없으면 절차 아트 폴백 (에셋은 사용자 게이트)
+    const img = document.createElement('img');
+    img.src = `/breads/thumbs/${recipe.id}.png`;
+    img.alt = '';
+    img.addEventListener('error', () => {
+      img.remove();
+      art.appendChild(breadArt(recipe.id));
+    });
+    art.appendChild(img);
 
     const name = document.createElement('div');
     name.className = 'name';
@@ -163,11 +184,18 @@ export function createRecipesScreen(
     return card;
   }
 
+  let lastStage = -1;
+
   function renderGrid(snap: Snapshot): void {
     const collection = getCollection();
+    const justUnlocked = lastStage >= 0 && snap.stage > lastStage ? snap.stage : -1;
+    lastStage = snap.stage;
     grid.innerHTML = '';
     for (const recipe of RECIPES) {
-      grid.appendChild(buildCard(recipe, snap, collection));
+      const card = buildCard(recipe, snap, collection);
+      // 방금 해금된 카드 — 크림→컬러 wipe 0.5s (VISUAL §7-2)
+      if (justUnlocked >= 0 && recipe.stage === justUnlocked) card.classList.add('just-unlocked');
+      grid.appendChild(card);
     }
   }
 

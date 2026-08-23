@@ -39,16 +39,18 @@ describe('clampQuiet — 조용시간 22~08 고정 클램프 (GDD §7)', () => {
 });
 
 describe('planNotifications — 상태별 슬롯 (GDD §7)', () => {
-  it('실온 활발: feedTime + dormant 슬롯 2개, wallFor+clampQuiet 정합', () => {
+  it('실온 활발: feedTime + dormant + moldWarn 슬롯 3개, wallFor+clampQuiet 정합', () => {
     const t0 = local(2024, 0, 15, 6, 0); // 조용시간 밖에서 시작
     const s = initialState(t0);
     const plan = planNotifications(s, t0);
-    expect(plan.slots.length).toBe(2);
+    expect(plan.slots.length).toBe(3);
 
     const feedSlot = plan.slots.find((sl) => sl.copyKey === 'feedTime');
     const dormantSlot = plan.slots.find((sl) => sl.copyKey === 'dormant');
+    const moldSlot = plan.slots.find((sl) => sl.copyKey === 'moldWarn');
     expect(feedSlot).toBeDefined();
     expect(dormantSlot).toBeDefined();
+    expect(moldSlot).toBeDefined();
 
     expect(feedSlot!.id).toBe(1); // GDD §7 슬롯 1
     expect(feedSlot!.weekly).toBe(false);
@@ -57,9 +59,13 @@ describe('planNotifications — 상태별 슬롯 (GDD §7)', () => {
     expect(dormantSlot!.id).toBe(2); // GDD §7 슬롯 2
     expect(dormantSlot!.weekly).toBe(false);
     expect(dormantSlot!.at).toBe(clampQuiet(t0 + 120 * HOUR));
+
+    expect(moldSlot!.id).toBe(3); // NOTIFY_SLOT_MOLD
+    expect(moldSlot!.weekly).toBe(false);
+    expect(moldSlot!.at).toBe(clampQuiet(t0 + 168 * HOUR)); // moldSpot
   });
 
-  it('냉장: fridgeWeek 슬롯 1개, weekly true (슬롯 1 재사용)', () => {
+  it('냉장: fridgeWeek 슬롯 1개, weekly true (슬롯 1 재사용), moldWarn 없음(≈175일이라 제외)', () => {
     const t0 = local(2024, 0, 15, 6, 0);
     const stage3: SimState = { ...initialState(t0), maturity: 12, createdAt: t0 - 9 * DAY };
     const fridge = applyAction(stage3, { type: 'setLocation', to: 'fridge' }, t0).state;
@@ -69,9 +75,10 @@ describe('planNotifications — 상태별 슬롯 (GDD §7)', () => {
     expect(plan.slots[0].copyKey).toBe('fridgeWeek');
     expect(plan.slots[0].weekly).toBe(true);
     expect(plan.slots[0].id).toBe(1);
+    expect(plan.slots.some((sl) => sl.copyKey === 'moldWarn')).toBe(false);
   });
 
-  it('휴면(reviveProgress 0): 슬롯 0개 — 완전 침묵', () => {
+  it('휴면(reviveProgress 0), spot 전: moldWarn 슬롯 1개(id 3), at = spot 시각 클램프', () => {
     const t0 = local(2024, 0, 15, 6, 0);
     const dormant: SimState = {
       ...initialState(t0),
@@ -79,7 +86,50 @@ describe('planNotifications — 상태별 슬롯 (GDD §7)', () => {
       locAnchorAt: t0 - 130 * HOUR,
     };
     expect(phaseAt(dormant, t0)).toBe('dormant');
+    const plan = planNotifications(dormant, t0);
+    expect(plan.slots.length).toBe(1);
+    expect(plan.slots[0].id).toBe(3);
+    expect(plan.slots[0].copyKey).toBe('moldWarn');
+    expect(plan.slots[0].weekly).toBe(false);
+    // moldSpot(168h) - 경과(130h) = 남은 38h
+    expect(plan.slots[0].at).toBe(clampQuiet(t0 + 38 * HOUR));
+  });
+
+  it('휴면, spot 이미 경과(200h): moldWarn at = spread 시각으로 대체', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const dormant: SimState = {
+      ...initialState(t0),
+      lastFedAt: t0 - 200 * HOUR,
+      locAnchorAt: t0 - 200 * HOUR,
+    };
+    expect(phaseAt(dormant, t0)).toBe('dormant');
+    const plan = planNotifications(dormant, t0);
+    expect(plan.slots.length).toBe(1);
+    expect(plan.slots[0].copyKey).toBe('moldWarn');
+    // moldSpread(240h) - 경과(200h) = 남은 40h
+    expect(plan.slots[0].at).toBe(clampQuiet(t0 + 40 * HOUR));
+  });
+
+  it('휴면, spread도 이미 경과(300h): 슬롯 0개 — 예고 시각이 지나면 조용히 침묵', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const dormant: SimState = {
+      ...initialState(t0),
+      lastFedAt: t0 - 300 * HOUR,
+      locAnchorAt: t0 - 300 * HOUR,
+    };
+    expect(phaseAt(dormant, t0)).toBe('dormant');
     expect(planNotifications(dormant, t0).slots.length).toBe(0);
+  });
+
+  it('moldy: 슬롯 0개 — 죽음을 푸시로 통지하지 않는다', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const moldy: SimState = {
+      ...initialState(t0),
+      lastFedAt: t0 - 337 * HOUR,
+      locAnchorAt: t0 - 337 * HOUR,
+    };
+    expect(phaseAt(moldy, t0)).toBe('moldy');
+    expect(planNotifications(moldy, t0).slots.length).toBe(0);
   });
 
   it('reviveProgress 1: reviveSecond 슬롯 1개, at = lastFedAt+8h(클램프 적용)', () => {

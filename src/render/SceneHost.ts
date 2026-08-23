@@ -5,6 +5,8 @@ import { DoughMesh } from './dough/DoughMesh';
 import { createJar, type Jar } from './jar';
 import { createGroundShadow } from './background';
 import { attachInput } from './input';
+import { Cloth } from './cloth';
+import { BreadShowcase } from './breadShowcase';
 import { ParticlePool } from './particles';
 import { smoothParams, type RenderParams } from './renderParams';
 
@@ -24,7 +26,18 @@ export class SceneHost {
   dough: DoughMesh | null = null;
   /** 기포가 터진 프레임에 호출 — 사운드 트리거 (배선은 app.ts) */
   onBubblePop: (() => void) | null = null;
+  /** 천 덮개 걷기 시작 시 호출 — 사락 사운드 트리거 (배선은 app.ts) */
+  onClothOpen: (() => void) | null = null;
+  /** 젓기 사운드 훅 (배선은 app.ts — squelch) */
+  onStirStart: (() => void) | null = null;
+  onStirMove: ((speed01: number) => void) | null = null;
+  onStirEnd: (() => void) | null = null;
+  private cloth: Cloth | null = null;
   private jar: Jar | null = null;
+  private showcase: BreadShowcase | null = null;
+  /** 홈 씬 오브젝트 — 쇼케이스 진입 시 통째로 숨긴다 */
+  private homeGroup: THREE.Object3D[] = [];
+  private showcaseDrag: { detach: () => void } | null = null;
   private band: THREE.Mesh | null = null;
   private current: RenderParams | null = null;
   private target: RenderParams | null = null;
@@ -75,7 +88,21 @@ export class SceneHost {
     this.particles = new ParticlePool();
     this.scene.add(this.particles.mesh);
 
-    this.detachInput = attachInput(this.canvas, this.camera, this.dough);
+    this.cloth = new Cloth();
+    this.scene.add(this.cloth.mesh);
+
+    this.showcase = new BreadShowcase();
+    this.scene.add(this.showcase.group);
+    // 파티클 풀은 홈·쇼케이스 공용(김) — homeGroup에서 제외
+    this.homeGroup = [jar.group, this.dough.mesh, this.cloth.mesh];
+
+    this.detachInput = attachInput(this.canvas, this.camera, this.dough, {
+      isCovered: () => this.cloth?.covering ?? false,
+      onUncover: () => this.uncover(),
+      onStirStart: () => this.onStirStart?.(),
+      onStirMove: (s) => this.onStirMove?.(s),
+      onStirEnd: () => this.onStirEnd?.(),
+    });
 
     this.resizeObserver = new ResizeObserver(() => this.fit());
     this.resizeObserver.observe(this.stage);
@@ -144,13 +171,99 @@ export class SceneHost {
     return true;
   }
 
+  /** 곰팡이 반점 시드 — 개체 정체성. 배선은 app.ts (createdAt) */
+  setMoldSeed(seed: number): void {
+    this.dough?.setMoldSeed(seed);
+  }
+
+  /** 천 덮개 덮기 — 콜드 스타트·오랜 부재 복귀 (조건 판단은 app.ts) */
+  coverCloth(): void {
+    this.cloth?.cover();
+  }
+
+  isClothCovering(): boolean {
+    return this.cloth?.covering ?? false;
+  }
+
+  /** 덮개 걷기 — 플릭/탭 제스처에서 호출. 밀가루 모트 6 + 사락 */
+  private uncover(): void {
+    if (!this.cloth?.covering) return;
+    this.onClothOpen?.();
+    this.cloth.open(() => {
+      if (this.dough) this.particles?.spawnFlour(6, this.dough.topY());
+    });
+  }
+
+  /** 쇼케이스 진입 — 홈 씬 숨기고 GLB 턴테이블. 로드 실패는 reject (호출자 폴백) */
+  async enterShowcase(url: string): Promise<void> {
+    if (!this.showcase) throw new Error('scene not mounted');
+    await this.showcase.load(url);
+    for (const o of this.homeGroup) o.visible = false;
+    this.showcase.show();
+    // 드래그 회전 — 쇼케이스 전용 임시 리스너 (반죽 입력과 분리)
+    let lastX: number | null = null;
+    const onDown = (e: PointerEvent): void => {
+      lastX = e.clientX;
+    };
+    const onMove = (e: PointerEvent): void => {
+      if (lastX === null) return;
+      this.showcase?.drag(e.clientX - lastX);
+      lastX = e.clientX;
+    };
+    const onUp = (): void => {
+      lastX = null;
+      this.showcase?.endDrag();
+    };
+    this.canvas.addEventListener('pointerdown', onDown);
+    this.canvas.addEventListener('pointermove', onMove);
+    this.canvas.addEventListener('pointerup', onUp);
+    this.canvas.addEventListener('pointercancel', onUp);
+    this.showcaseDrag = {
+      detach: () => {
+        this.canvas.removeEventListener('pointerdown', onDown);
+        this.canvas.removeEventListener('pointermove', onMove);
+        this.canvas.removeEventListener('pointerup', onUp);
+        this.canvas.removeEventListener('pointercancel', onUp);
+      },
+    };
+  }
+
+  exitShowcase(): void {
+    this.showcaseDrag?.detach();
+    this.showcaseDrag = null;
+    this.showcase?.hide();
+    for (const o of this.homeGroup) o.visible = true;
+    // 덮개는 걷힌 상태가 기본 — cover()가 아닌 한 다시 나타나지 않게
+    if (this.cloth && !this.cloth.covering) this.cloth.mesh.visible = false;
+  }
+
+  isShowcasing(): boolean {
+    return this.showcase?.group.visible ?? false;
+  }
+
+  /** 갓 구운 김 — 쇼케이스 빵 위로 (배선은 app.ts) */
+  spawnSteam(): void {
+    this.particles?.spawnSteam(8, 1.7);
+  }
+
+  /** 단계 승급 축하 — 기포 3연속 팝 (다이제틱: 이펙트가 아니라 르방이 반긴다) */
+  celebrate(): void {
+    const spawnAt = (delayMs: number): void => {
+      setTimeout(() => {
+        if (this.dough) this.dough.bubbles.spawnNow(performance.now() / 1000, 1.2);
+      }, delayMs);
+    };
+    spawnAt(0);
+    spawnAt(180);
+    spawnAt(380);
+  }
+
   private endFeedSeq(): void {
     if (!this.feedSeq) return;
     this.feedSeq = null;
     if (this.dough) {
-      const u = this.dough.material.uniforms;
-      u.uFlourDust.value = 0;
-      u.uStir.value = 0;
+      this.dough.material.uniforms.uFlourDust.value = 0;
+      // 젓기 시어장은 입력이 끊기면 스스로 damped spring 복귀 — 강제 리셋 불필요
     }
     if (this.jar) this.jar.group.rotation.z = 0;
     this.setBandY(0.98);
@@ -190,16 +303,20 @@ export class SceneHost {
         u.uFlourDust.value = fs < 0.6 ? fs / 0.6 : fs < 1.2 ? 1 : fs < 2.4 ? Math.max(0, 1 - (fs - 1.2) / 1.2) : 0;
         // 물기 — 광 상승 (물 리본 컷 — VISUAL §4-1)
         if (fs > 0.5 && fs < 1.4) u.uSpecStr.value = Math.min(1.2, (u.uSpecStr.value as number) + 0.5 * Math.sin(Math.PI * (fs - 0.5) / 0.9));
-        // 젓기 소용돌이 + 원형 wobble
+        // 젓기 — 나무 숟가락이 원을 그리듯 시어장을 원형 구동 + 원형 wobble
         if (fs >= 1.2 && fs < 2.4) {
           const sp = (fs - 1.2) / 1.2;
-          u.uStir.value = Math.sin(Math.PI * sp);
-          const ang = sp * Math.PI * 2;
+          const env = Math.sin(Math.PI * sp); // 시작·끝은 부드럽게
+          const ang = sp * Math.PI * 2 * 1.5; // 한 바퀴 반
+          dough.setStirInput(
+            Math.cos(ang) * 0.28,
+            Math.sin(ang) * 0.28,
+            -Math.sin(ang) * 2.2 * env,
+            Math.cos(ang) * 2.2 * env,
+          );
           dough.wobble.set(Math.cos(ang) * 0.06, Math.sin(ang) * 0.06);
-        } else {
-          u.uStir.value = 0;
         }
-        // 정착 — 눌림 스프링 + 기포 + 고무줄 슬라이드
+        // 정착 — 눌림 스프링 + 기포 + 밀가루 퍼프 + 고무줄 슬라이드
         if (fs >= 2.4) {
           const sp = Math.min((fs - 2.4) / 0.4, 1);
           dough.mesh.scale.y *= 1 - 0.05 * Math.sin(Math.PI * sp);
@@ -207,6 +324,7 @@ export class SceneHost {
             s.bubblesDone = true;
             dough.bubbles.spawnNow(t);
             dough.bubbles.spawnNow(t + 0.001);
+            this.particles?.spawnFlour(6, dough.topY());
           }
           const ease = 1 - Math.pow(1 - sp, 3);
           this.setBandY(s.bandFrom + (0.98 - s.bandFrom) * ease);
@@ -264,6 +382,8 @@ export class SceneHost {
       }
       this.dough?.tick(t);
       this.driveSequences(t);
+      this.cloth?.tick(t);
+      this.showcase?.tick(dt);
       this.particles?.update(dt);
       if (this.dough && this.dough.bubbles.popsThisFrame > 0) this.onBubblePop?.();
       if (this.dough && this.jar && this.current) {
@@ -302,6 +422,12 @@ export class SceneHost {
     this.jar = null;
     this.band = null;
     this.particles = null;
+    this.cloth = null;
+    this.showcaseDrag?.detach();
+    this.showcaseDrag = null;
+    this.showcase?.dispose();
+    this.showcase = null;
+    this.homeGroup = [];
     this.feedSeq = null;
     this.watchSeq = null;
   }
