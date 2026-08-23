@@ -65,14 +65,14 @@ export const copy = {
 
   stage: {
     names: ['갓 반죽', '잠잠기', '첫 기포', '어린 르방', '성숙 르방', '노포'] as const,
-    up: (name: string) => `${name}이 되었어요`,
+    up: (name: string) => `${name} 단계가 되었어요`,
     fakeRise: '크게 부풀었어요. 곧 조용해질 거예요, 정상이에요',
     quietWeek: '이 시기는 원래 조용해요',
     labelUnlocked: '병에 이름표를 붙일 수 있어요',
   },
 
   recipes: {
-    lockedHint: (stageName: string) => `${stageName}이 되면 열려요`,
+    lockedHint: (stageName: string) => `${stageName} 단계가 되면 열려요`,
     discardCooldown: '다음 밥을 준 뒤에 또 만들 수 있어요',
     needMass: '르방이 조금 부족해요. 밥을 주고 불려 보세요',
     bakeConfirm: (name: string, g: number) => `${name}을(를) 구울까요? 르방 ${g}g을 써요`,

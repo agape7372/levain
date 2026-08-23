@@ -46,6 +46,23 @@ export class BubbleSystem {
     }
   }
 
+  /** 즉시 기포 하나 — 연출(밥 정착·부활 첫 숨)용 */
+  spawnNow(t: number, scale = 1): void {
+    const slot = this.bubbles.findIndex((b) => !b.active);
+    if (slot < 0) return;
+    const b = this.bubbles[slot];
+    const r = Math.sqrt(Math.random()) * 0.42;
+    const th = Math.random() * Math.PI * 2;
+    b.active = true;
+    b.x = Math.cos(th) * r;
+    b.z = Math.sin(th) * r;
+    b.k = 16 + Math.random() * 10; // 레거시 혹(18~24)과 같은 부드러움 — 크면 금속성 스파이크
+    b.bornAt = t;
+    b.life = 1.2 + Math.random() * 1.2;
+    b.maxAmp = (0.06 + Math.random() * 0.05) * scale;
+    b.popped = false;
+  }
+
   /** t: 렌더 시계(초). density·scale: RenderParams. */
   update(t: number, density: number, scale: number): void {
     this.popsThisFrame = 0;
@@ -59,7 +76,7 @@ export class BubbleSystem {
         b.active = true;
         b.x = Math.cos(th) * r;
         b.z = Math.sin(th) * r;
-        b.k = 16 + Math.random() * 10; // 레거시 혹(18~24)과 같은 부드러움 — 크면 금속성 스파이크
+        b.k = 16 + Math.random() * 10;
         b.bornAt = t;
         b.life = 2 + Math.random() * 2;
         b.maxAmp = (0.06 + Math.random() * 0.05) * scale;

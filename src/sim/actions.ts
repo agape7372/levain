@@ -139,11 +139,19 @@ function bakeDiscard(state: SimState, recipeId: string, now: number): ActionResu
   return { state: next, events: [{ type: 'bakedDiscard', recipeId }] };
 }
 
+function setLabel(state: SimState, label: string, now: number): ActionResult {
+  if (stageOf(state, now) < 5) return { state, events: [{ type: 'labelLocked' }] };
+  const trimmed = label.trim().slice(0, 12);
+  if (!trimmed) return { state, events: [] };
+  return { state: { ...state, label: trimmed }, events: [{ type: 'labeled' }] };
+}
+
 export function applyAction(state: SimState, action: Action, now: number): ActionResult {
   switch (action.type) {
     case 'feed': return feed(state, action.ratio, now);
     case 'setLocation': return setLocation(state, action.to, now);
     case 'bake': return bake(state, action.recipeId, now);
     case 'bakeDiscard': return bakeDiscard(state, action.recipeId, now);
+    case 'setLabel': return setLabel(state, action.label, now);
   }
 }

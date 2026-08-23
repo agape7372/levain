@@ -49,7 +49,8 @@ export type Action =
   | { type: 'feed'; ratio: FeedRatio }
   | { type: 'setLocation'; to: Location }
   | { type: 'bake'; recipeId: string }
-  | { type: 'bakeDiscard'; recipeId: string };
+  | { type: 'bakeDiscard'; recipeId: string }
+  | { type: 'setLabel'; label: string }; // 병 이름표 — 5단계 해금 보상 (rename과 다름: 게이트드)
 
 export type SimEvent =
   | { type: 'fed'; ratio: FeedRatio; maturityGained: boolean }
@@ -63,7 +64,9 @@ export type SimEvent =
   | { type: 'locationLocked' }  // 냉장 미해금
   | { type: 'baked'; recipeId: string; grade: BakeGrade }
   | { type: 'bakedDiscard'; recipeId: string }
-  | { type: 'bakeBlocked'; reason: 'mass' | 'stage' | 'cooldown' | 'unknownRecipe' };
+  | { type: 'bakeBlocked'; reason: 'mass' | 'stage' | 'cooldown' | 'unknownRecipe' }
+  | { type: 'labeled' }
+  | { type: 'labelLocked' };
 
 /** UI·렌더가 읽는 파생 뷰 — deriveSnapshot(state, now)의 반환. 전부 계산값 */
 export interface Snapshot {
