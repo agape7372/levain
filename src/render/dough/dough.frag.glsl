@@ -55,7 +55,7 @@ void main() {
   float ndl = max(0.0, dot(nrm, L));
 
   // ── 2로브 스펙: 상시 광폭 시트(무광 페이스트의 은은한 결) + 급여 직후 젖은 광 ──
-  float spec = pow(ndl, 6.0) * 0.10 + pow(ndl, 40.0) * 0.50 * uWet;
+  float spec = pow(ndl, 6.0) * 0.06 + pow(ndl, 40.0) * 0.50 * uWet;
   float slope = length(nrm.xz);
 
   // 알베도 모틀링 ±3% — 균일 플라스틱 탈피
@@ -64,10 +64,11 @@ void main() {
   // 틸트 뷰 명도 보정(프로토 0.62+0.48) + 따뜻한 키라이트 색(씬 0xffe2b0과 톤 일치)
   vec3 col = base * (0.70 + 0.44 * ndl) * vec3(1.04, 0.985, 0.915);
   col += vec3(0.28, 0.16, 0.08) * spec * uSpecStr;
-  col -= vec3(0.06, 0.045, 0.03) * slope; // 0.14 → 0.06: 함몰 경사 회색 얼룩 제거
+  // 경사 페널티 최소화 — 크면 기포가 '어두운 얼룩(오물)'로 읽힌다. 입체감은 ndl이 담당
+  col -= vec3(0.03, 0.022, 0.015) * slope;
 
   // 표면 포어 — 발효 기공 핀홀 (활성도 따라 밀도 변조)
-  float pore = smoothstep(0.55, 0.78, fbm(vXZ * 14.0 + 3.0)) * uPoreDensity;
+  float pore = smoothstep(0.35, 0.65, fbm(vXZ * 14.0 + 3.0)) * uPoreDensity;
   col -= vec3(0.10, 0.085, 0.06) * pore;
 
   // 피크 crackle — 표면이 당겨지며 갈라지는 미세 스트리크 (윗면 중심부만)

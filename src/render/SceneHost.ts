@@ -35,16 +35,16 @@ export class SceneHost {
   private cloth: Cloth | null = null;
   private jar: Jar | null = null;
   private showcase: BreadShowcase | null = null;
+  // 고무줄 마커 제거(사용자 확정) — setBandY 계열 전부 삭제됨
   /** 홈 씬 오브젝트 — 쇼케이스 진입 시 통째로 숨긴다 */
   private homeGroup: THREE.Object3D[] = [];
   private showcaseDrag: { detach: () => void } | null = null;
-  private band: THREE.Mesh | null = null;
   private current: RenderParams | null = null;
   private target: RenderParams | null = null;
   private lastT = 0;
   private particles: ParticlePool | null = null;
   /** 밥주기 연출 (VISUAL §4-1) — pour=부활 따라내기 선행 */
-  private feedSeq: { t0: number; pour: boolean; flourDone: boolean; bubblesDone: boolean; bandFrom: number } | null = null;
+  private feedSeq: { t0: number; pour: boolean; flourDone: boolean; bubblesDone: boolean } | null = null;
   /** 부활 2회차 "지켜보기" — 12% 줌인 (VISUAL §4-3) */
   private watchSeq: { t0: number } | null = null;
 
@@ -80,7 +80,6 @@ export class SceneHost {
     const jar = createJar();
     this.scene.add(jar.group);
     this.jar = jar;
-    this.band = jar.band;
 
     this.dough = new DoughMesh();
     this.scene.add(this.dough.mesh);
@@ -111,6 +110,11 @@ export class SceneHost {
     // 컨텍스트 유실 — 전체 재구축 전략
     this.canvas.addEventListener('webglcontextlost', this.onContextLost);
     this.canvas.addEventListener('webglcontextrestored', this.onContextRestored);
+
+    // dev 전용 계기판 — 촉감·draw call 검증용 (프로덕션 번들 제외)
+    if (import.meta.env.DEV) {
+      (window as unknown as Record<string, unknown>).__levainScene = this;
+    }
   }
 
   private onContextLost = (e: Event): void => {
@@ -124,11 +128,6 @@ export class SceneHost {
     this.mount();
     if (wasRunning) this.start();
   };
-
-  /** 고무줄 마커 높이 — 마지막 밥 시점 반죽 높이 */
-  setBandY(y: number): void {
-    if (this.band) this.band.position.y = y;
-  }
 
   /** 라이브 목표 파라미터 — 프레임마다 지수 lerp로 따라간다 (τ≈1.2s) */
   setTargetParams(p: RenderParams): void {
@@ -150,7 +149,6 @@ export class SceneHost {
       pour,
       flourDone: false,
       bubblesDone: false,
-      bandFrom: this.dough?.topY() ?? 0.98,
     };
   }
 
@@ -266,7 +264,6 @@ export class SceneHost {
       // 젓기 시어장은 입력이 끊기면 스스로 damped spring 복귀 — 강제 리셋 불필요
     }
     if (this.jar) this.jar.group.rotation.z = 0;
-    this.setBandY(0.98);
   }
 
   private endWatchSeq(): void {
@@ -326,8 +323,6 @@ export class SceneHost {
             dough.bubbles.spawnNow(t + 0.001);
             this.particles?.spawnFlour(6, dough.topY());
           }
-          const ease = 1 - Math.pow(1 - sp, 3);
-          this.setBandY(s.bandFrom + (0.98 - s.bandFrom) * ease);
         }
       }
 
@@ -420,7 +415,6 @@ export class SceneHost {
     this.renderer = null;
     this.dough = null;
     this.jar = null;
-    this.band = null;
     this.particles = null;
     this.cloth = null;
     this.showcaseDrag?.detach();

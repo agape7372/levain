@@ -37,7 +37,6 @@ if (q.has('demo')) {
     if (acid !== null) state = { ...state, acidity: Number(acid) };
 
     scene.snapParams(toRenderParams(sim.deriveSnapshot(state, now)));
-    scene.setBandY(0.98);
     setInterval(() => {
       state = sim.advance(state, Date.now());
       scene.setTargetParams(toRenderParams(sim.deriveSnapshot(state, Date.now())));

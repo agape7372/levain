@@ -46,7 +46,6 @@ export async function startApp(): Promise<void> {
   // ── 씬 ──
   const scene = new SceneHost(canvas, stage);
   scene.mount();
-  scene.setBandY(0.98); // 고무줄 = 급여 시점 높이(fill 1.0) — 정의상 고정
   scene.snapParams(toRenderParams(store.getSnapshot())); // 앱 오픈 = 즉시 스냅
   scene.start();
   scene.setMoldSeed(store.getEnvelope().sim.createdAt); // 반점 자리 = 개체 정체성

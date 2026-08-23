@@ -52,8 +52,6 @@ const glassFrontFrag = /* glsl */ `
 
 export interface Jar {
   group: THREE.Group;
-  /** 고무줄 마커 — 마지막 밥 시점 반죽 높이 표시 (부피 정보의 정본 표시 장치) */
-  band: THREE.Mesh;
   /** hooch(부유액) 층 — 방치 신호. setHooch(amt, y)로 구동 */
   hooch: THREE.Mesh;
   setHooch(amt: number, y: number, t: number): void;
@@ -122,15 +120,8 @@ export function createJar(): Jar {
   lip.renderOrder = 3;
   group.add(back, front, lip);
 
-  // 고무줄 마커 — 프로토타입 토러스의 재해석 (테라코타 #C4784A)
-  const band = new THREE.Mesh(
-    new THREE.TorusGeometry(JAR_RADIUS + 0.035, 0.025, 12, 48),
-    new THREE.MeshPhysicalMaterial({ color: 0xc4784a, roughness: 0.55, metalness: 0.05 }),
-  );
-  band.rotation.x = Math.PI / 2;
-  band.position.y = 0.98; // 급여 시점 반죽 꼭대기 높이 — SceneHost.setBandY로 상태 연결
-  band.renderOrder = 0;
-  group.add(band);
+  // 고무줄 마커는 제거(사용자 확정 2026-08-23) — 림 2개가 겹쳐 어수선.
+  // 부피는 도우 fill 자체가 표현하고, 고무줄 문법은 천 덮개 착색에만 남긴다.
 
   // hooch(부유액) 층 — 반죽 윗면 위 얇은 반투명 디스크 (VISUAL §3-3)
   const hoochMat = new THREE.ShaderMaterial({
@@ -153,5 +144,5 @@ export function createJar(): Jar {
     hooch.visible = amt > 0.01;
   };
 
-  return { group, band, hooch, setHooch };
+  return { group, hooch, setHooch };
 }
