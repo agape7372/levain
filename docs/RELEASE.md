@@ -100,7 +100,8 @@ npx @capacitor/assets generate --android \
 
 `@capgo/capacitor-updater` — 정적 호스팅(`https://levain-ota.vercel.app`, `manifest.json` + `bundles/*.zip`
 두 파일뿐, 서버 로직 없음). 앱이 부팅 시 매니페스트를 읽어 새 버전이면 백그라운드로 받아 두고,
-**다음 앱 시작 때** 적용한다(세션 중 화면이 갈아끼워지지 않는다). 계약·구현은
+**앱을 백그라운드로 보냈다 다시 열 때** 적용한다(세션 중 화면이 갈아끼워지지 않는다).
+실측 주의: 완전 종료 후 재시작만으로는 적용되지 않는다 — 홈으로 나갔다 돌아오는 전환이 트리거다. 계약·구현은
 [ARCHITECTURE.md §6](ARCHITECTURE.md)·`src/platform/ota.ts` 참조.
 
 **OTA로 되는 것 / 안 되는 것**
@@ -129,13 +130,17 @@ cd ota && npx vercel --prod --scope jirings-projects   # 실제 배포는 이 �
 
 **롤백**: `ota/history.json`에서 되돌릴 버전의 항목(version/url/checksum)을 찾아 그대로
 `ota/manifest.json`에 덮어쓰고 다시 `cd ota && npx vercel --prod --scope jirings-projects`로 배포한다.
-앱은 다음 시작 때 그 버전을 받는다. **주의**: `bundles/*.zip`은 1년 immutable 캐시로 서빙되므로
+앱은 다음 확인 때 그 버전을 받는다. **주의**: `bundles/*.zip`은 1년 immutable 캐시로 서빙되므로
 같은 파일명을 새로 쓰지 않는다 — 롤백은 기존 zip을 다시 가리키기만 할 뿐 파일을 교체하지 않는다.
 4개보다 오래된 버전은 zip 자체가 정리되어 없을 수 있으니 history.json으로 존재를 먼저 확인.
+**zip은 커밋하지 않는다**(`.gitignore`의 `ota/bundles/` — 개당 5MB대). 따라서 과거 번들의 실체는
+① 지금 배포돼 있는 Vercel 프로젝트와 ② 릴리스를 돌린 이 PC의 `ota/bundles/` 두 곳에만 있다.
+다른 PC에서 `vercel --prod`를 돌리면 로컬에 없는 과거 zip이 배포본에서 사라져 롤백 URL이 404가 된다 —
+새 PC에서 배포하기 전에 `ota/bundles/`를 함께 옮길 것.
 
 **안전장치**: 앱은 부팅 즉시 `notifyAppReady()`를 호출한다(`src/platform/ota.ts`). 이걸 받지 못하면
 (크래시 등으로 부팅이 안 끝나면) 플러그인이 "깨진 번들"로 판단해 다음 실행에 자동으로 이전 번들로
-되돌아간다 — 별도 조치 불필요. 번들 적용 자체도 항상 다음 앱 시작에만 일어난다(세션 중 무적용).
+되돌아간다 — 별도 조치 불필요. 번들 적용은 백그라운드 전환 후 복귀에만 일어난다(세션 중 무적용).
 
 **Play 정책**: 웹 자산(JS/HTML/CSS 등) 무선 갱신은 허용 범위. 네이티브 코드·권한 교체는 금지 —
 이 구조는 전자만 다루므로 해당 없음. 위 표의 "안 되는 것"이 필요해지면 통상 절차(§2~§6)로 AAB 재배포.
