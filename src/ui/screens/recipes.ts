@@ -309,6 +309,8 @@ export function createRecipesScreen(
       });
       chips.appendChild(b);
     }
+    // 세그먼트-필터 칩은 붙고(한 덩어리), 칩-카드 그리드는 뗀다 (사용자 확정 2026-08-24)
+    chips.style.marginBottom = '14px';
     content.appendChild(chips);
 
     const grid = document.createElement('div');
