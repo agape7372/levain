@@ -66,7 +66,9 @@ export interface SimState {
 export type Action =
   | { type: 'feed'; ratio: FeedRatio; flour?: Flour } // flour 생략 = 이전 것 유지
   | { type: 'setLocation'; to: Location }
-  | { type: 'bake'; recipeId: string }
+  // variantId(§8-2) = 도감 기록 키 패스스루 — sim은 해석하지 않는다(재료 sim 무영향).
+  // 재료 검증·차감은 store 소관 (gameStore.bakeVariant)
+  | { type: 'bake'; recipeId: string; variantId?: string }
   | { type: 'bakeDiscard'; recipeId: string }
   | { type: 'makeFlake' }       // 얇게 펴 말리기 — 죽음 보험 (3단계 해금, 활발, -20g)
   | { type: 'discardStarter' }  // 곰팡이 확정 후 폐기 — 새 개체 (도감은 전역이라 자동 보존)
@@ -82,9 +84,9 @@ export type SimEvent =
   | { type: 'ratioLocked'; ratio: FeedRatio }
   | { type: 'moved'; to: Location }
   | { type: 'locationLocked' }  // 냉장 미해금
-  | { type: 'baked'; recipeId: string; grade: BakeGrade }
+  | { type: 'baked'; recipeId: string; grade: BakeGrade; variantId?: string }
   | { type: 'bakedDiscard'; recipeId: string }
-  | { type: 'bakeBlocked'; reason: 'mass' | 'stage' | 'cooldown' | 'unknownRecipe' }
+  | { type: 'bakeBlocked'; reason: 'mass' | 'stage' | 'cooldown' | 'unknownRecipe' | 'ingredient' }
   | { type: 'labeled' }
   | { type: 'labelLocked' }
   | { type: 'flakeMade' }

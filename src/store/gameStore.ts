@@ -5,16 +5,18 @@
 // v2(확장기획 §5): envelope는 starters[]를 담지만 sim은 여전히 "르방 1개의 물리"다.
 // 멀티는 전부 이 층에서 — 활성 르방만 advance/dispatch하고, 비활성은 닫힌 함수 모델
 // 덕분에 그냥 둔다(전환 시 advance 1회면 정산 끝). 백그라운드 시뮬 0.
-import type { Action, BriefingKey, CollectionEntry, NotifyPlan, SimEvent, SimState, Snapshot } from '../sim';
+import type {
+  Action, BriefingKey, CollectionEntry, IngredientId, NotifyPlan, SimEvent, SimState, Snapshot,
+} from '../sim';
 import {
   LABEL_STAGE, REWIND_TOLERANCE_MS, STARTER_SLOTS_FREE,
   advance, applyAction, betterGrade, deriveBriefing, deriveSnapshot, initialState,
-  planNotificationsAll, reanchor, stageOf,
+  isPlayable, planNotificationsAll, reanchor, ruleByVariantId, stageOf,
 } from '../sim';
 import type { Clock } from '../platform/clock';
 import type { StorageAdapter } from '../platform/storage';
 import type { LoadSource, SaveEnvelope, SaveFlags, SaveSettings, StarterRecord } from './persistence';
-import { SCHEMA_VERSION, defaultFlags, defaultSettings, load, save } from './persistence';
+import { SCHEMA_VERSION, defaultFlags, defaultSettings, emptyInventory, load, save } from './persistence';
 
 /** 포그라운드 tick 주기 — rAF 아님. 게임 시간은 wall-clock이다 (ARCHITECTURE §2) */
 const TICK_MS = 5_000;
@@ -47,6 +49,16 @@ export interface GameStore {
   getActiveStarter(): StarterRecord;
   /** 전역 도감 (집의 기록 — 르방 폐기·삭제에도 남는다) */
   getCollection(): Record<string, CollectionEntry>;
+  /** 재료함 (§8-2 — 전역, 재료 단위 수량) */
+  getInventory(): Record<IngredientId, number>;
+  /** 재료 지급 — 획득 경로는 Phase 7(미션·교환), 지금은 Levain Lab 전용 진입로 */
+  grantIngredient(id: IngredientId, count: number): void;
+  /**
+   * 변형 굽기 (§8-2 해금 공식) — 원자적: 첫 굽기 = 재료 1 차감 + 도감 발견이 같은
+   * dispatch(persist 1회) 안에서 커밋. 발견된 변형 재굽기는 재료 재소비 없음(mass만).
+   * 무효 조합(카탈로그 밖·v1 미노출)·재료 부족은 **시도 전 차단** — 소비 0, sim 무변경.
+   */
+  bakeVariant(variantId: string): SimEvent[];
   /**
    * 활성 르방 이름 짓기 — 게이트·규칙은 v1 setLabel과 동일(5단계·trim·12자).
    * Phase 3에서 자유화 예정(확장기획 §5-3). labeled/labelLocked 이벤트로 통지.
@@ -78,7 +90,7 @@ export function newEnvelope(now: number): SaveEnvelope {
     starters: [{ id: 's1', name: null, ordinal: 1, sim: initialState(now) }],
     activeStarterId: 's1',
     nextStarterOrdinal: 2,
-    shared: { collection: {} },
+    shared: { collection: {}, inventory: emptyInventory() },
     settings: defaultSettings(),
     flags: defaultFlags(),
   };
@@ -131,11 +143,14 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     snap = deriveSnapshot(activeSim(), now);
   }
 
-  /** 도감(전역) 갱신 — v1에서 sim이 하던 집계를 이벤트로 이어받는다 (규칙 동일) */
+  /** 도감(전역) 갱신 — v1에서 sim이 하던 집계를 이벤트로 이어받는다 (규칙 동일).
+   *  변형(baked.variantId)은 변형 id로 기록하고, **첫 발견 시 재료 1을 같은 갱신에서 차감**
+   *  (§8-2 원자성 — persist는 dispatch가 마지막에 1회). */
   function applyBakeEvents(events: SimEvent[], now: number): void {
     for (const e of events) {
       if (e.type !== 'baked' && e.type !== 'bakedDiscard') continue;
-      const prev = env.shared.collection[e.recipeId];
+      const key = e.type === 'baked' && e.variantId ? e.variantId : e.recipeId;
+      const prev = env.shared.collection[key];
       const grade = e.type === 'baked' ? e.grade : null;
       const entry: CollectionEntry = prev
         ? {
@@ -144,9 +159,21 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
             count: prev.count + 1,
           }
         : { bestGrade: grade, count: 1, firstAt: now, starterId: env.activeStarterId };
+
+      let inventory = env.shared.inventory;
+      if (e.type === 'baked' && e.variantId && !prev) {
+        const rule = ruleByVariantId(e.variantId);
+        if (rule) {
+          // 재고는 bakeVariant가 dispatch 전에 확인했다 — 여기선 차감만 (음수 방어 max 0)
+          inventory = {
+            ...inventory,
+            [rule.ingredientId]: Math.max(0, (inventory[rule.ingredientId] ?? 0) - 1),
+          };
+        }
+      }
       env = {
         ...env,
-        shared: { ...env.shared, collection: { ...env.shared.collection, [e.recipeId]: entry } },
+        shared: { ...env.shared, inventory, collection: { ...env.shared.collection, [key]: entry } },
       };
     }
   }
@@ -176,6 +203,19 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     return snap;
   }
 
+  function doDispatch(action: Action): SimEvent[] {
+    const now = clock.now(); // 한 번만 캡처 — advance·applyAction·savedAt이 같은 시각을 본다
+    advanceTo(now);
+    const res = applyAction(activeSim(), action, now);
+    setActiveSim(res.state);
+    applyBakeEvents(res.events, now);
+    snap = deriveSnapshot(activeSim(), now);
+    persist(now);
+    replan(now);
+    emit(res.events);
+    return res.events;
+  }
+
   return {
     tick: doTick,
 
@@ -186,18 +226,7 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
       return briefing;
     },
 
-    dispatch(action: Action): SimEvent[] {
-      const now = clock.now(); // 한 번만 캡처 — advance·applyAction·savedAt이 같은 시각을 본다
-      advanceTo(now);
-      const res = applyAction(activeSim(), action, now);
-      setActiveSim(res.state);
-      applyBakeEvents(res.events, now);
-      snap = deriveSnapshot(activeSim(), now);
-      persist(now);
-      replan(now);
-      emit(res.events);
-      return res.events;
-    },
+    dispatch: doDispatch,
 
     subscribe(fn: StoreListener): () => void {
       listeners.add(fn);
@@ -210,6 +239,39 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     getEnvelope: () => env,
     getActiveStarter: () => activeRecord(),
     getCollection: () => env.shared.collection,
+    getInventory: () => env.shared.inventory,
+
+    grantIngredient(id: IngredientId, count: number): void {
+      const cur = env.shared.inventory[id] ?? 0;
+      env = {
+        ...env,
+        shared: {
+          ...env.shared,
+          inventory: { ...env.shared.inventory, [id]: Math.max(0, Math.min(999, cur + count)) },
+        },
+      };
+      persist(clock.now());
+      emit([]);
+    },
+
+    bakeVariant(variantId: string): SimEvent[] {
+      const rule = ruleByVariantId(variantId);
+      // 카탈로그 밖·미노출(experimental/blocked) = 무효 조합 — 시도 전 차단, 소비 0 (§8-2)
+      if (!rule || !isPlayable(rule)) {
+        const events: SimEvent[] = [{ type: 'bakeBlocked', reason: 'unknownRecipe' }];
+        emit(events);
+        return events;
+      }
+      const discovered = env.shared.collection[variantId] !== undefined;
+      if (!discovered && (env.shared.inventory[rule.ingredientId] ?? 0) < 1) {
+        const events: SimEvent[] = [{ type: 'bakeBlocked', reason: 'ingredient' }];
+        emit(events);
+        return events;
+      }
+      // sim 게이트(stage·mass)·판정은 베이스 그대로 — 실패 시 baked 이벤트가 없어
+      // applyBakeEvents가 아무것도 안 건드린다(차감 0)
+      return doDispatch({ type: 'bake', recipeId: rule.baseRecipeId, variantId });
+    },
 
     renameActive(name: string): void {
       const now = clock.now();

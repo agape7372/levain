@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { initialState, applyAction, phaseAt, HOUR, DAY } from '../src/sim';
 import type { SimState } from '../src/sim';
 import type { StorageAdapter } from '../src/platform/storage';
-import { SCHEMA_VERSION, load, save, validateAndClamp, type SaveEnvelope } from '../src/store/persistence';
+import { SCHEMA_VERSION, emptyInventory, load, save, validateAndClamp, type SaveEnvelope } from '../src/store/persistence';
 
 const t0 = 1_700_000_000_000;
 
@@ -132,9 +132,9 @@ function envelopeAt(now = t0): SaveEnvelope {
     starters: [{ id: 's1', name: null, ordinal: 1, sim: initialState(now) }],
     activeStarterId: 's1',
     nextStarterOrdinal: 2,
-    shared: { collection: {} },
+    shared: { collection: {}, inventory: emptyInventory() },
     settings: { muted: true, haptics: false, notifyEnabled: true },
-    flags: { onboarded: true, pendingBake: null },
+    flags: { onboarded: true, pendingBake: null, retapHints: 0 },
   };
 }
 

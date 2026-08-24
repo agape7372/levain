@@ -1,5 +1,5 @@
 // UI ↔ store 결합 절단면 — 화면은 이 인터페이스만 안다. 배선은 app.ts (ARCHITECTURE §5).
-import type { Action, Location, SimEvent, Snapshot } from '../sim';
+import type { Action, IngredientId, Location, SimEvent, Snapshot } from '../sim';
 
 export interface GameSettings {
   muted: boolean;
@@ -25,6 +25,13 @@ export interface GameApi {
   flakeMadeAt(): number | null;
   dispatch(action: Action): SimEvent[];
   subscribe(fn: (snap: Snapshot, events: SimEvent[]) => void): () => void;
+
+  /** 재료함 (§8-2 — 전역 수량) */
+  inventory(): Record<IngredientId, number>;
+  /** 변형 굽기 — 원자 해금·차단 규칙은 store가 판정 (gameStore.bakeVariant 주석) */
+  bakeVariant(variantId: string): SimEvent[];
+  /** 활성 르방 표시명 — starterId로 도감 기록의 "사용 르방" 표기용. 미지 id는 null */
+  starterNameOf(id: string): string | null;
 
   getSettings(): GameSettings;
   setSettings(patch: Partial<GameSettings>): void;

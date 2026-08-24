@@ -9,6 +9,7 @@ import {
   save,
   validateAndClamp,
   type SaveEnvelope,
+  emptyInventory,
 } from '../src/store/persistence';
 
 const T0 = 1_700_000_000_000;
@@ -20,9 +21,9 @@ function envelopeAt(now = T0): SaveEnvelope {
     starters: [{ id: 's1', name: null, ordinal: 1, sim: initialState(now) }],
     activeStarterId: 's1',
     nextStarterOrdinal: 2,
-    shared: { collection: {} },
+    shared: { collection: {}, inventory: emptyInventory() },
     settings: { muted: true, haptics: false, notifyEnabled: true },
-    flags: { onboarded: true, pendingBake: { recipeId: 'loaf', grade: 'best' } },
+    flags: { onboarded: true, pendingBake: { recipeId: 'loaf', grade: 'best' }, retapHints: 0 },
   };
 }
 
@@ -41,7 +42,7 @@ function v1EnvelopeAt(now = T0): Record<string, unknown> {
       flake: { madeAt: now - 2000, maturity: 7 },
     },
     settings: { muted: true, haptics: false, notifyEnabled: true },
-    flags: { onboarded: true, pendingBake: null },
+    flags: { onboarded: true, pendingBake: null, retapHints: 0 },
   };
 }
 
@@ -143,8 +144,8 @@ describe('validateAndClamp — 있는데 불량이면 살린다', () => {
       starters: base.starters,
     });
     expect(env?.settings).toEqual({ muted: false, haptics: true, notifyEnabled: true });
-    expect(env?.flags).toEqual({ onboarded: false, pendingBake: null });
-    expect(env?.shared).toEqual({ collection: {} });
+    expect(env?.flags).toEqual({ onboarded: false, pendingBake: null, retapHints: 0 });
+    expect(env?.shared).toEqual({ collection: {}, inventory: emptyInventory() });
     expect(env?.activeStarterId).toBe('s1'); // 없는 activeStarterId → 첫 르방
     expect(env?.nextStarterOrdinal).toBe(2); // max(ordinal)+1 바닥
   });

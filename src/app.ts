@@ -121,6 +121,12 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     flakeMadeAt: () => store.getActiveStarter().sim.flake?.madeAt ?? null,
     dispatch: (a) => store.dispatch(a),
     subscribe: (fn) => store.subscribe(fn),
+    inventory: () => store.getInventory(),
+    bakeVariant: (variantId) => store.bakeVariant(variantId),
+    starterNameOf: (id) => {
+      const rec = store.getEnvelope().starters.find((r) => r.id === id);
+      return rec ? rec.name ?? copy.starter.defaultName(rec.ordinal) : null;
+    },
     getSettings: () => ({ ...store.getEnvelope().settings }),
     setSettings: (patch) => {
       store.setSettings(patch);
@@ -209,7 +215,11 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     return true;
   };
 
-  const recipes = createRecipesScreen(api, () => store.getCollection(), openShowcase, () => showTab('levain'));
+  const recipes = createRecipesScreen(api, () => store.getCollection(), {
+    openShowcase,
+    onBack: () => showTab('levain'),
+    pushScreen: (screen) => router.push(screen),
+  });
 
   const tabs = document.createElement('nav');
   tabs.id = 'tabs';
@@ -231,7 +241,24 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     stage.style.visibility = which === 'levain' ? 'visible' : 'hidden';
   };
   tabLevain.addEventListener('click', () => showTab('levain'));
-  tabRecipes.addEventListener('click', () => showTab('recipes'));
+  tabRecipes.addEventListener('click', () => {
+    // 재탭 상태 전이 (§8-1 표): 루트에서 재탭 = 레시피 ↔ 재료함 토글, 하위 상세에선 루트 복귀
+    if (currentTab === 'recipes') {
+      if (router.current()?.id !== 'recipes') {
+        showTab('recipes'); // setRoot가 스택을 루트 하나로 되돌린다
+        return;
+      }
+      recipes.cycleSegment();
+      return;
+    }
+    showTab('recipes');
+    // 첫 2~3회 힌트 — "한 번 더 누르면 재료함" (발견 가능성 보조)
+    const hints = store.getEnvelope().flags.retapHints;
+    if (hints < 3) {
+      toast(copy.recipes.retapHint);
+      store.setFlags({ retapHints: hints + 1 });
+    }
+  });
   showTab('levain');
 
   // ── 이벤트 → 사운드·햅틱·토스트 ──

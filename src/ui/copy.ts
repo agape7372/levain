@@ -171,6 +171,48 @@ export const copy = {
       rye: '시큼함이 오히려 맛이 되는 빵',
       wholewheat: '통밀의 구수함을 담은 깜빠뉴',
     } as Record<string, string>,
+    // ── Phase 6 — 세그먼트·재료함·빵 도감·변형 (§8) ──
+    segments: { recipes: '레시피', pantry: '재료함', gallery: '빵 도감' },
+    retapHint: '레시피 탭을 한 번 더 누르면 재료함이 열려요',
+    pantryEmpty: '아직 재료가 없어요. 르방이를 돌보다 보면 생길 거예요',
+    ingredientNames: {
+      olive: '올리브', choco: '초콜릿', strawberry: '딸기', chestnut: '밤',
+    } as Record<string, string>,
+    formNames: {
+      flesh: '과육', slice: '슬라이스', oil: '오일', brine: '브라인',
+      chip: '초코칩', cocoa: '코코아', filling: '초코 필링',
+      fresh: '생과', roasted: '구운 과일', freezedried: '동결건조', jam: '잼',
+      piece: '구운 조각', flour: '밤가루', puree: '퓌레',
+    } as Record<string, string>,
+    /** 변형 표시명 — 같은 재료의 형태끼리 표시가 겹치지 않아야 한다 (과육/슬라이스, 생과/구운) */
+    variantName: (ingredientName: string, formName: string, baseName: string) => {
+      const formFirst = ['초코칩', '코코아', '초코 필링', '밤가루'];
+      if (formFirst.includes(formName)) return `${formName} ${baseName}`;
+      switch (formName) {
+        case '잼': return `${ingredientName} 스월 ${baseName}`;
+        case '오일': return `${ingredientName}유 ${baseName}`;
+        case '슬라이스': return `${ingredientName} 슬라이스 ${baseName}`;
+        case '브라인': return `${ingredientName} 브라인 ${baseName}`;
+        case '구운 과일': return `구운 ${ingredientName} ${baseName}`;
+        case '동결건조': return `동결건조 ${ingredientName} ${baseName}`;
+        case '퓌레': return `${ingredientName} 퓌레 ${baseName}`;
+        default: return `${ingredientName} ${baseName}`; // 과육·생과·구운 조각 = 대표 형태
+      }
+    },
+    ingredientCount: (n: number) => `${n}개`,
+    needIngredient: (name: string) => `${name}이(가) 있으면 만들 수 있어요`,
+    variantConfirm: (name: string, ingredientName: string, g: number) =>
+      `${name}, 처음 만들어 봐요. ${ingredientName} 1개와 르방 ${g}g을 써요`,
+    variantHint: '재료가 생기면 새로운 빵을 만들 수 있어요',
+    // 빵 도감 (§8-3)
+    galleryFilters: { all: '전체', bakeable: '지금 만들 수 있어요', done: '완성' },
+    galleryEmpty: '아직 구운 빵이 없어요',
+    detailFirstAt: (d: string) => `${d}에 처음 구웠어요`,
+    detailBy: (name: string) => `${name}(이)랑 같이 만들었어요`,
+    detailNotYet: '아직 안 구워 봤어요',
+    view3d: '3D로 보기',
+    bakeAgain: '다시 만들기',
+    variantsTitle: '이런 것도 만들 수 있어요',
   },
 
   notify: {

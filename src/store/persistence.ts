@@ -8,6 +8,8 @@ import { RATIOS, TEMP_MULT } from '../sim';
 // MASS_MAX·ACID_MAX는 sim/index.ts가 재수출하지 않는데 sim/**는 M2 범위 밖(수정 금지)이다.
 // 범위 수치를 여기에 하드코딩하지 않기 위해(CLAUDE.md 규칙 9) constants에서 직접 가져온다.
 import { ACID_MAX, MASS_MAX, SEED_G } from '../sim/constants';
+import { INGREDIENTS } from '../sim/ingredients';
+import type { IngredientId } from '../sim/ingredients';
 import type { StorageAdapter } from '../platform/storage';
 
 /** v2: 멀티 르방 — starters[] + 전역 도감(shared). 확장기획 2026-08-24 §5 */
@@ -28,6 +30,8 @@ export interface SaveFlags {
   onboarded: boolean;
   /** 굽기 연출 도중 앱이 죽어도 결과를 다시 보여주기 위한 자리 */
   pendingBake: PendingBake | null;
+  /** 레시피 탭 재탭 힌트 노출 횟수 (§8-1 — 3회까지만). 키 부재 = 0 (v2 무버전 추가 키) */
+  retapHints: number;
 }
 
 /**
@@ -46,6 +50,8 @@ export interface StarterRecord {
 /** 집(계정) 소유 — 특정 르방이 죽거나 삭제돼도 남는 기록 */
 export interface SharedState {
   collection: Record<string, CollectionEntry>;
+  /** 재료함 (§8-2) — 전역, 형태 무관 재료 단위 수량. 키 부재 = {} (v2 내 무버전 추가 키) */
+  inventory: Record<IngredientId, number>;
 }
 
 export interface SaveEnvelope {
@@ -72,7 +78,7 @@ export const defaultSettings = (): SaveSettings => ({
   notifyEnabled: true,
 });
 
-export const defaultFlags = (): SaveFlags => ({ onboarded: false, pendingBake: null });
+export const defaultFlags = (): SaveFlags => ({ onboarded: false, pendingBake: null, retapHints: 0 });
 
 // ── 가드 원자 ────────────────────────────────────────────────────────────────
 // 규칙 두 줄: 키가 없으면 복구 불가(null) / 있는데 불량이면 clamp·기본값.
@@ -116,10 +122,22 @@ function collectionOf(v: unknown): Record<string, CollectionEntry> {
   return out;
 }
 
-/** 전역(집) 소유 상태 — 하위 키가 없으면 기본값. Phase 6~7의 inventory 등이 무이행 착륙하게 */
+export const emptyInventory = (): Record<IngredientId, number> =>
+  Object.fromEntries(INGREDIENTS.map((i) => [i.id, 0])) as Record<IngredientId, number>;
+
+function inventoryOf(v: unknown): Record<IngredientId, number> {
+  const out = emptyInventory();
+  if (!isObject(v)) return out;
+  for (const ing of INGREDIENTS) {
+    out[ing.id] = Math.round(num(v[ing.id], 0, 999, 0)); // 소프트캡 9는 경제(Phase 7) 소관 — 저장은 관대
+  }
+  return out;
+}
+
+/** 전역(집) 소유 상태 — 하위 키가 없으면 기본값 (inventory가 예고대로 무이행 착륙, flour 패턴) */
 function sharedOf(v: unknown): SharedState {
-  if (!isObject(v)) return { collection: {} };
-  return { collection: collectionOf(v.collection) };
+  if (!isObject(v)) return { collection: {}, inventory: emptyInventory() };
+  return { collection: collectionOf(v.collection), inventory: inventoryOf(v.inventory) };
 }
 
 function settingsOf(v: unknown): SaveSettings {
@@ -142,6 +160,7 @@ function flagsOf(v: unknown): SaveFlags {
       isObject(pb) && typeof pb.recipeId === 'string' && typeof pb.grade === 'string'
         ? { recipeId: pb.recipeId, grade: pb.grade }
         : null,
+    retapHints: Math.round(num(v.retapHints, 0, 9, 0)),
   };
 }
 

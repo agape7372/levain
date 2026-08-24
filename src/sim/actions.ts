@@ -102,7 +102,7 @@ function setLocation(state: SimState, to: SimState['location'], now: number): Ac
   return { state: next, events: [{ type: 'moved', to }] };
 }
 
-function bake(state: SimState, recipeId: string, now: number): ActionResult {
+function bake(state: SimState, recipeId: string, now: number, variantId?: string): ActionResult {
   const recipe = recipeById(recipeId);
   if (!recipe || recipe.kind !== 'bread') {
     return { state, events: [{ type: 'bakeBlocked', reason: 'unknownRecipe' }] };
@@ -113,7 +113,7 @@ function bake(state: SimState, recipeId: string, now: number): ActionResult {
   // 도감 기록은 전역(집의 기록) — store가 baked 이벤트로 갱신한다 (확장기획 §5-4)
   const grade = gradeOf(bakeScore(recipe, activityAt(state, now), state.acidity, state.flour));
   const next: SimState = { ...state, mass: state.mass - recipe.cost };
-  return { state: next, events: [{ type: 'baked', recipeId, grade }] };
+  return { state: next, events: [{ type: 'baked', recipeId, grade, ...(variantId ? { variantId } : {}) }] };
 }
 
 function bakeDiscard(state: SimState, recipeId: string, now: number): ActionResult {
@@ -185,7 +185,7 @@ export function applyAction(state: SimState, action: Action, now: number): Actio
   switch (action.type) {
     case 'feed': return feed(state, action.ratio, action.flour ?? state.flour, now);
     case 'setLocation': return setLocation(state, action.to, now);
-    case 'bake': return bake(state, action.recipeId, now);
+    case 'bake': return bake(state, action.recipeId, now, action.variantId);
     case 'bakeDiscard': return bakeDiscard(state, action.recipeId, now);
     case 'makeFlake': return makeFlake(state, now);
     case 'discardStarter': return discardStarter(state, now);

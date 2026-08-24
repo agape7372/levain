@@ -3,17 +3,17 @@
 //   저장 = `levain:lab-save` (정식 `levain:save` 절대 불가침) / 시계 = 오프셋 FakeClock.
 // 기능: 시나리오 픽스처(타임스탬프 역산) 단일·멀티 설치, 시간 이동(역행 포함),
 //       알림 플랜 덤프(planNotificationsAll 검증기), v1→v2 마이그레이션 미리보기.
-// 재료·레시피 지급은 해당 시스템(Phase 6~7)이 생기면 추가 — 지금은 소비자가 없다.
+// 재료 지급 버튼은 Phase 6에서 추가됨(§6 예고분) — 변형 해금 QA 진입로.
 import '../src/styles/main.css';
 import { startApp } from '../src/app';
 import { createStorage } from '../src/platform/storage';
 import type { Clock } from '../src/platform/clock';
 import type { GameStore } from '../src/store/gameStore';
 import {
-  SCHEMA_VERSION, migrate, save, validateAndClamp, type SaveEnvelope,
+  SCHEMA_VERSION, emptyInventory, migrate, save, validateAndClamp, type SaveEnvelope,
 } from '../src/store/persistence';
 import {
-  DAY, HOUR, advance, deriveSnapshot, initialState, planNotificationsAll,
+  DAY, HOUR, INGREDIENTS, advance, deriveSnapshot, initialState, planNotificationsAll,
 } from '../src/sim';
 import type { SimState } from '../src/sim';
 
@@ -71,9 +71,9 @@ function envelopeOf(fixes: Fixture[], now: number): SaveEnvelope {
     })),
     activeStarterId: 's1',
     nextStarterOrdinal: fixes.length + 1,
-    shared: { collection: {} },
+    shared: { collection: {}, inventory: emptyInventory() },
     settings: { muted: true, haptics: false, notifyEnabled: true },
-    flags: { onboarded: true, pendingBake: null },
+    flags: { onboarded: true, pendingBake: null, retapHints: 0 },
   };
 }
 
@@ -154,6 +154,18 @@ multiActions.appendChild(
 );
 multiActions.appendChild(btn('전 단계 5종', () => install(FIXTURES.filter((f) => ['born', 'quiet', 'rising', 'peak', 'hungry'].includes(f.key)))));
 panel.appendChild(multiActions);
+
+// 2b) 재료 지급 (Phase 6 — 프로덕션 획득 경로는 Phase 7. Lab 특권 진입로)
+panel.appendChild(h3('재료 지급 (+3씩 — 변형 해금 QA)'));
+const grant = row();
+const ING_LABEL: Record<string, string> = { olive: '올리브', choco: '초콜릿', strawberry: '딸기', chestnut: '밤' };
+for (const ing of INGREDIENTS) {
+  grant.appendChild(btn(`${ING_LABEL[ing.id]} +3`, () => {
+    store.grantIngredient(ing.id, 3);
+    refreshDump();
+  }));
+}
+panel.appendChild(grant);
 
 // 3) 시간 이동 — FakeClock 오프셋 (역행 = 재정박 실검증)
 panel.appendChild(h3('시간 이동 (오프셋 저장 — 리로드 생존)'));

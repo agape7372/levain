@@ -1,39 +1,51 @@
-// 레시피 도감 + 굽기 화면. 정본: docs/GDD.md §6·§10, docs/VISUAL.md §7.
+// 레시피 탭 — 세그먼트 3분할: 레시피 | 재료함 | 빵 도감 (§8-1 B안).
+// 정본: docs/GDD.md §6·§10, docs/VISUAL.md §7, 확장기획 §8.
 import { copy } from '../copy';
 import { toast } from '../components/toast';
 import { openModal, confirmModal } from '../components/modal';
 import { untilText } from '../format';
 import { breadArt } from './breadArt';
+import { createBreadDetailScreen } from './breadDetail';
 import type { GameApi } from '../gameApi';
 import type { CollectionEntry, RecipeDef, SimEvent, Snapshot } from '../../sim';
-import { RECIPES, SEED_G, FLOAT_OK_ACTIVITY } from '../../sim';
+import { INGREDIENTS, RECIPES, SEED_G, FLOAT_OK_ACTIVITY, rulesForBase, variantIdOf } from '../../sim';
 import type { Screen } from '../router';
+
+export type RecipesSegment = 'recipes' | 'pantry' | 'gallery';
+type GalleryFilter = 'all' | 'bakeable' | 'done';
+
+export interface RecipesScreenDeps {
+  /** 3D 쇼케이스 열기 — GLB 없으면 false를 돌려주고 카드 리절트로 폴백 */
+  openShowcase?: (recipeId: string, headline: string, large: boolean) => Promise<boolean>;
+  /** 뒤로(르방이 탭 복귀) — 헤더 백버튼 */
+  onBack?: () => void;
+  /** 상세 화면 push (§8-3) — 라우터는 app.ts 소유 */
+  pushScreen?: (screen: Screen) => void;
+}
 
 export function createRecipesScreen(
   api: GameApi,
   getCollection: () => Record<string, CollectionEntry>,
-  /** 3D 쇼케이스 열기 — GLB 없으면 false를 돌려주고 카드 리절트로 폴백 */
-  openShowcase?: (recipeId: string, headline: string, large: boolean) => Promise<boolean>,
-  /** 뒤로(르방이 탭 복귀) — 헤더 백버튼 (사용자 지시 2026-08-24: 탭만으론 돌아갈 길이 안 보임) */
-  onBack?: () => void,
-): Screen {
+  deps: RecipesScreenDeps = {},
+): Screen & { cycleSegment(): RecipesSegment } {
   const el = document.createElement('div');
   el.className = 'screen screen--solid';
 
   const wrap = document.createElement('div');
   wrap.className = 'recipes-wrap';
 
+  // ── 헤더 ──
   const head = document.createElement('div');
   head.className = 'recipes-head';
   const titleGroup = document.createElement('div');
   titleGroup.className = 'recipes-title-group';
-  if (onBack) {
+  if (deps.onBack) {
     const backBtn = document.createElement('button');
     backBtn.type = 'button';
     backBtn.className = 'btn btn-ghost recipes-back';
     backBtn.textContent = '←';
     backBtn.setAttribute('aria-label', '뒤로');
-    backBtn.addEventListener('click', onBack);
+    backBtn.addEventListener('click', deps.onBack);
     titleGroup.appendChild(backBtn);
   }
   const title = document.createElement('h1');
@@ -47,11 +59,29 @@ export function createRecipesScreen(
   floatBtn.addEventListener('click', onFloatTest);
   head.append(titleGroup, floatBtn);
 
-  const grid = document.createElement('div');
-  grid.className = 'recipe-grid';
+  // ── 세그먼트: 레시피 | 재료함 | 빵 도감 (§8-1 — 항상 보이는 명시 진입) ──
+  let segment: RecipesSegment = 'recipes';
+  const segRow = document.createElement('div');
+  segRow.className = 'seg';
+  const segBtns = new Map<RecipesSegment, HTMLButtonElement>();
+  for (const seg of ['recipes', 'pantry', 'gallery'] as RecipesSegment[]) {
+    const b = document.createElement('button');
+    b.textContent = copy.recipes.segments[seg];
+    b.addEventListener('click', () => setSegment(seg));
+    segBtns.set(seg, b);
+    segRow.appendChild(b);
+  }
 
-  wrap.append(head, grid);
+  const content = document.createElement('div');
+
+  wrap.append(head, segRow, content);
   el.appendChild(wrap);
+
+  function setSegment(seg: RecipesSegment): void {
+    segment = seg;
+    segBtns.forEach((b, key) => b.classList.toggle('active', key === seg));
+    render(api.getSnapshot());
+  }
 
   function onFloatTest(): void {
     const snap = api.getSnapshot();
@@ -78,13 +108,22 @@ export function createRecipesScreen(
 
   /** 결과 표시 — 3D 쇼케이스 우선, GLB 미비 시 카드 리절트 폴백 */
   function showResult(recipeId: string, headline: string, large = false): void {
-    if (!openShowcase) {
+    if (!deps.openShowcase) {
       openResultModal(recipeId, headline, large);
       return;
     }
-    void openShowcase(recipeId, headline, large).then((ok) => {
+    void deps.openShowcase(recipeId, headline, large).then((ok) => {
       if (!ok) openResultModal(recipeId, headline, large);
     });
+  }
+
+  /** 상세 화면 열기 (§8-3) — pushScreen 미주입(테스트 등)이면 무시 */
+  function openDetail(recipe: RecipeDef): void {
+    deps.pushScreen?.(createBreadDetailScreen(recipe, api, {
+      openShowcase: deps.openShowcase,
+      showResult,
+      getCollection,
+    }));
   }
 
   function onCardTap(recipe: RecipeDef): void {
@@ -93,6 +132,12 @@ export function createRecipesScreen(
 
     if (snap.stage < recipe.stage) {
       toast(copy.recipes.lockedHint(copy.stage.names[recipe.stage]));
+      return;
+    }
+
+    // 완성한 빵 카드 = 상세 화면 (감상 경로, §8-3). 미완성은 바로 굽기 flow 유지
+    if (recipe.kind === 'bread' && getCollection()[recipe.id] && deps.pushScreen) {
+      openDetail(recipe);
       return;
     }
 
@@ -200,29 +245,147 @@ export function createRecipesScreen(
 
   let lastStage = -1;
 
-  function renderGrid(snap: Snapshot): void {
+  function renderRecipes(snap: Snapshot): void {
     const collection = getCollection();
     const justUnlocked = lastStage >= 0 && snap.stage > lastStage ? snap.stage : -1;
     lastStage = snap.stage;
-    grid.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = 'recipe-grid';
     for (const recipe of RECIPES) {
       const card = buildCard(recipe, snap, collection);
       // 방금 해금된 카드 — 크림→컬러 wipe 0.5s (VISUAL §7-2)
       if (justUnlocked >= 0 && recipe.stage === justUnlocked) card.classList.add('just-unlocked');
       grid.appendChild(card);
     }
+    content.appendChild(grid);
   }
 
-  const unsub = api.subscribe((snap) => renderGrid(snap));
+  // ── 재료함 (§8-2 — 전역, 형태는 설명으로만. 획득 경로는 Phase 7) ──
+  function renderPantry(): void {
+    const inv = api.inventory();
+    const total = INGREDIENTS.reduce((n, i) => n + (inv[i.id] ?? 0), 0);
+    if (total === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'meta';
+      empty.style.cssText = 'text-align:center;margin-top:24px';
+      empty.textContent = copy.recipes.pantryEmpty;
+      content.appendChild(empty);
+      return;
+    }
+    const grid = document.createElement('div');
+    grid.className = 'recipe-grid';
+    for (const ing of INGREDIENTS) {
+      const count = inv[ing.id] ?? 0;
+      const card = document.createElement('div');
+      card.className = count > 0 ? 'recipe-card' : 'recipe-card locked';
+      const name = document.createElement('div');
+      name.className = 'name';
+      name.textContent = `${copy.recipes.ingredientNames[ing.id]} · ${copy.recipes.ingredientCount(count)}`;
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = ing.forms.map((f) => copy.recipes.formNames[f]).join(' · ');
+      card.append(name, meta);
+      grid.appendChild(card);
+    }
+    content.appendChild(grid);
+  }
+
+  // ── 빵 도감 (§8-3 — 필터 칩 + 상세 진입. 잠긴 빵은 해금 힌트만, 결제 유도 0) ──
+  let filter: GalleryFilter = 'all';
+
+  function renderGallery(snap: Snapshot): void {
+    const collection = getCollection();
+
+    const chips = document.createElement('div');
+    chips.className = 'seg';
+    for (const f of ['all', 'bakeable', 'done'] as GalleryFilter[]) {
+      const b = document.createElement('button');
+      b.textContent = copy.recipes.galleryFilters[f];
+      b.classList.toggle('active', f === filter);
+      b.addEventListener('click', () => {
+        filter = f;
+        render(api.getSnapshot());
+      });
+      chips.appendChild(b);
+    }
+    content.appendChild(chips);
+
+    const grid = document.createElement('div');
+    grid.className = 'recipe-grid';
+    let shown = 0;
+    for (const recipe of RECIPES) {
+      const entry = collection[recipe.id];
+      const locked = snap.stage < recipe.stage;
+      const bakeable = !locked
+        && (recipe.kind === 'discard' || snap.mass >= recipe.cost + SEED_G);
+      if (filter === 'done' && !entry) continue;
+      if (filter === 'bakeable' && !bakeable) continue;
+      const card = buildCard(recipe, snap, collection);
+      grid.appendChild(card);
+      shown += 1;
+
+      // 발견한 변형은 베이스 카드 뒤에 이어 붙인다 (§8-2 — 발견 = 도감 항목)
+      for (const rule of rulesForBase(recipe.id)) {
+        const vid = variantIdOf(rule);
+        const vEntry = collection[vid];
+        if (!vEntry) continue;
+        if (filter === 'bakeable' && !bakeable) continue;
+        const vCard = document.createElement('button');
+        vCard.type = 'button';
+        vCard.className = 'recipe-card';
+        const name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = copy.recipes.variantName(
+          copy.recipes.ingredientNames[rule.ingredientId],
+          copy.recipes.formNames[rule.form],
+          copy.recipes.names[recipe.id],
+        );
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.textContent = vEntry.bestGrade
+          ? `${copy.recipes.grades[vEntry.bestGrade]} · ${vEntry.count}번`
+          : copy.recipes.madeCount(vEntry.count);
+        vCard.append(name, meta);
+        vCard.addEventListener('click', () => openDetail(recipe));
+        grid.appendChild(vCard);
+        shown += 1;
+      }
+    }
+    if (shown === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'meta';
+      empty.style.cssText = 'text-align:center;margin-top:24px';
+      empty.textContent = copy.recipes.galleryEmpty;
+      content.appendChild(empty);
+      return;
+    }
+    content.appendChild(grid);
+  }
+
+  function render(snap: Snapshot): void {
+    content.innerHTML = '';
+    if (segment === 'recipes') renderRecipes(snap);
+    else if (segment === 'pantry') renderPantry();
+    else renderGallery(snap);
+  }
+
+  const unsub = api.subscribe((snap) => render(snap));
+
+  setSegment('recipes');
 
   return {
     id: 'recipes',
     el,
     onShow() {
-      renderGrid(api.getSnapshot());
+      render(api.getSnapshot());
     },
     onHide() {
       void unsub; // 도감은 탭 화면 — 실제 해제는 앱 종료 시 (home.ts와 동일 패턴)
+    },
+    /** 탭 재탭 상태 전이 (§8-1 표) — 레시피 ↔ 재료함 토글. 반환 = 전이 후 세그먼트 */
+    cycleSegment(): RecipesSegment {
+      setSegment(segment === 'recipes' ? 'pantry' : 'recipes');
+      return segment;
     },
   };
 }

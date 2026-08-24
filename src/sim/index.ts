@@ -5,6 +5,7 @@ export { applyAction, initialState } from './actions';
 export { deriveSnapshot, effSinceFeedMs, activityAt, phaseAt, stageOf, boundariesH, moldStageAt, clamp, smoothstep, rateMult } from './derive';
 export { planNotifications, planNotificationsAll, clampQuiet } from './notifyPlan';
 export { deriveBriefing } from './briefing';
+export * from './ingredients';
 export {
   RECIPES, recipeById, sourFit, bakeScore, gradeOf, betterGrade, canBakeBread, canBakeDiscard,
 } from './recipes';
