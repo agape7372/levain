@@ -1,0 +1,42 @@
+<!doctype html>
+<!-- breadlab — 빵 절차 모델링 하네스 (dev 전용, vite dev로 서빙. 앱 번들과 무관)
+     사용법·URL 파라미터는 scripts/breadlab.ts 머리 주석 참조 -->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>breadlab</title>
+    <style>
+      html, body { margin: 0; background: #dfeae0; font: 13px/1.5 system-ui, sans-serif; color: #3a3a33; }
+      #layout { display: flex; gap: 12px; padding: 12px; align-items: flex-start; }
+      #stage { position: relative; width: 512px; height: 512px; flex: none; }
+      canvas#c { display: block; width: 512px; height: 512px; }
+      #overlay-img { position: absolute; inset: 0; width: 512px; height: 512px; object-fit: contain; pointer-events: none; }
+      #panel { display: flex; flex-direction: column; gap: 8px; max-width: 560px; }
+      #refs { display: flex; gap: 6px; flex-wrap: wrap; }
+      #refs img { width: 176px; height: 176px; object-fit: contain; background: #dfeae0; border: 1px solid #c8d6ca; }
+      #stats { font-family: ui-monospace, monospace; white-space: pre; background: #f4ead4; padding: 8px 10px; border-radius: 8px; }
+      #stats.over { background: #e8c8b8; }
+      #controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+      body.shot #panel, body.shot #overlay-img { display: none; }
+      /* compare 모드: 레퍼런스(좌) + 렌더(우) 콜라주 — 1024×512 컨테이너 통짜 캡처 */
+      body.compare #layout { display: block; padding: 0; }
+      body.compare #panel { display: none; }
+      #cmp { display: flex; width: 1024px; height: 512px; }
+      #cmp img { width: 512px; height: 512px; object-fit: contain; background: #dfeae0; }
+    </style>
+  </head>
+  <body>
+    <div id="layout">
+      <div id="stage">
+        <canvas id="c" width="512" height="512"></canvas>
+        <img id="overlay-img" alt="" hidden />
+      </div>
+      <div id="panel">
+        <div id="controls"></div>
+        <div id="stats">…</div>
+        <div id="refs"></div>
+      </div>
+    </div>
+    <script type="module" src="/scripts/breadlab.ts"></script>
+  </body>
+</html>

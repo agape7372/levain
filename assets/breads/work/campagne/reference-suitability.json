@@ -1,0 +1,21 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": [
+    "assets/breads/src/campagne.png (three-quarter top-front)",
+    "assets/breads/src/campagne-2.png (front elevation)",
+    "assets/breads/src/campagne-3.png (top-down)"
+  ],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "objectOccupiesEnoughOfFrame": "foregroundCoverage 0.4883, largestComponentFraction 1.0 (check_reference_admission)",
+    "strongSilhouette": "low wide dome in front elevation; near-circular ring-textured disk in top-down",
+    "majorMaterialsVisible": "single matte crust in a light-to-dark gradient plus a lighter crumb exposed at the slash",
+    "hiddenSideInferable": "radial symmetry of the dome body; only the flat unseen base is hidden and it never faces any turntable camera above the horizon",
+    "procedurallyApproximable": "one continuous revolved dome with profile-modulated concentric ring grooves plus a sector-masked cross-slash trench; no smoke, liquid, glass or lace anywhere"
+  },
+  "notConditional": "three orthogonal-ish views are supplied, so the single-view rotational-symmetry caveat does not apply",
+  "stylizationLevel": "low-poly faceted matte clay - same style family as pancake, campagne is the second bread through the pipeline",
+  "complexity": "simple",
+  "askForBetterInput": "not needed"
+}

@@ -1,0 +1,21 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": [
+    "assets/breads/src/loaf.png (three-quarter top-front)",
+    "assets/breads/src/loaf-2.png (front elevation)",
+    "assets/breads/src/loaf-3.png (top-down)"
+  ],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "objectOccupiesEnoughOfFrame": "single loaf fills the frame with clear margin in all three views",
+    "strongSilhouette": "unambiguous rounded-box-with-ridge-dome silhouette in all three views, mutually consistent",
+    "majorMaterialsVisible": "single matte dielectric crust in two tonal zones (dome vs everything else)",
+    "hiddenSideInferable": "underside flat and occluded by ground plane in every turntable azimuth above the horizon",
+    "procedurallyApproximable": "prism extrusion along the length axis with a tapered arch cross-section; no smoke, liquid, glass or lace anywhere"
+  },
+  "notConditional": "three views supplied, mutually consistent proportions",
+  "stylizationLevel": "low-poly faceted matte clay - explicitly the requested target",
+  "complexity": "simple",
+  "askForBetterInput": "not needed"
+}

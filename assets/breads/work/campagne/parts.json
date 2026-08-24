@@ -1,0 +1,8 @@
+{
+  "note": "Parts as the builder constructs them, BEFORE the mandatory final mergeByMaterial. scripts/breads/campagne.ts adds one named mesh per leaf component (dome crust body, dome-slash-crumb); mergeByMaterial then fuses them into 2 meshes because the consumer caps a bread at 2 materials/2 meshes (scripts/breads/types.ts sections 1-2). Unlike pancake's ring-sliced split, campagne's crust/crumb boundary is an angular-falloff triangle mask (any-vertex-in-band rule), so the per-part split below is an estimate from the mask geometry rather than an exact ring-index analytic count; the total (1920) is exact, matching scripts/breadlab-shot.mjs stdout stats.",
+  "parts": [
+    { "name": "root", "kind": "container", "module": "createCampagne", "triangles": 1920 },
+    { "name": "dome", "kind": "part", "module": "buildDome", "triangles": 1690 },
+    { "name": "dome-slash-crumb", "kind": "part", "module": "buildDome", "triangles": 230 }
+  ]
+}

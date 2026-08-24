@@ -1,0 +1,6 @@
+[
+  {"id": "pore-dimple-field", "score": 0.81, "tier": "critical",
+   "notes": "Now reads at the shipping camera, which was the whole purpose of this iteration. Grid raised from 24/20 to a uniform 30 sectors and pit depths raised (crater 0.062->0.075, medium 0.046->0.058, small 0.030->0.038, tiny 0.018->0.022), putting the crater wall at about 32 degrees tangentially and 40 degrees radially instead of 22/35. All 22 pits now place on the top disk (was 20 of 22) with every size class meeting quota, verified offline by replaying the builder PRNG in check_pores.py before rendering. At azimuth 0 roughly 12-15 pits are individually countable as concave faceted marks; from top and from 90/180/270 the full field reads with a clean outer margin and no trenching. Honestly just over threshold rather than comfortably: the reference's pits still have harder octagonal rims than a one-cell grid dip can produce."},
+  {"id": "baked-faceting", "score": 0.75, "tier": "important",
+   "notes": "Faceting is baked as split vertices (lib.facet), so it survives the runtime's MeshLambertMaterial swap. Crisp on the rim at every azimuth. The denser face grid also improved top-face faceting over the previous pass, since the pits now break up what were near-coplanar ring triangles."}
+]

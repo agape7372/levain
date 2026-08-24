@@ -1,0 +1,23 @@
+{
+  "note": "Parts as the builder constructs them, BEFORE the mandatory final mergeByMaterial. scripts/breads/baguette.ts adds one named mesh per leaf component (baguette-body incl. both pole caps and ear ridges, baguette-slashes = the 4 trench floors); mergeByMaterial then fuses them into 2 meshes because the consumer caps a bread at 2 materials / 2 meshes (scripts/breads/types.ts sections 1-2). Triangle counts are analytic from the station/sector grid classification (34 stations x 32 sectors, 4 slash footprints classified per vertex, triangles assigned by majority vote) and sum to 2048, matching the harness's reported total exactly.",
+  "parts": [
+    {
+      "name": "root",
+      "kind": "container",
+      "module": "createBaguette",
+      "triangles": 2048
+    },
+    {
+      "name": "baguette-body",
+      "kind": "part",
+      "module": "buildBaguette",
+      "triangles": 1814
+    },
+    {
+      "name": "baguette-slashes",
+      "kind": "part",
+      "module": "buildBaguette",
+      "triangles": 234
+    }
+  ]
+}

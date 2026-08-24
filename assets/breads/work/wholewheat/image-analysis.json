@@ -1,0 +1,65 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": {
+    "wholewheat.png": "three-quarter top-front, 1536x1024",
+    "wholewheat-2.png": "front elevation, 1536x1024",
+    "wholewheat-3.png": "top-down, 1536x1024"
+  },
+  "layer1_identification": {
+    "workType": "round whole-wheat boule loaf",
+    "broadClassification": "food prop / stylized low-poly game asset",
+    "primaryDomain": "object",
+    "confidence": 0.97,
+    "note": "Same style family as campagne/pancake. assets/prompts/breads/wholewheat.json explicitly calls this 'the same silhouette family as a campagne boule', but the rendered reference is measurably rounder/taller (see below) - per CRIB, the image is the authority on proportions, the JSON only on color, so this bread's own DOME_HEIGHT is measured independently while the ring-groove/wobble code is shared with campagne via scripts/breads/domeShell.ts."
+  },
+  "layer2_form_silhouette": {
+    "boundingVolume": "rounder, taller dome than campagne - closer to a squashed sphere",
+    "symmetry": "radial about the vertical axis, no slash to break it (unlike campagne)",
+    "shapeLanguage": "organic dome expressed with geometric faceting",
+    "measurements_px": {
+      "front_elevation_width": "~1150 (edge to edge at the base)",
+      "front_elevation_height": "~685 (base to apex)",
+      "front_elevation_width_over_height": "1.68 (height/width 0.596) - notably taller/rounder than campagne's 0.379",
+      "topdown_outline_diameter": "~900, circular",
+      "topdown_ring_count": "approximately 12-13 concentric rings, denser and covering nearly the full visible disk edge-to-edge (no smooth outer margin, unlike campagne's early groove-zone mistake)"
+    },
+    "derivedRatios": {
+      "domeHeightOverDiameter": 0.596
+    }
+  },
+  "layer3_decomposition": {
+    "macro": ["dome body (single continuous boule, no slash)"],
+    "meso": [],
+    "micro": ["concentric banneton ring grooves across the whole dome surface", "coarse whole-grain speckle across the crust", "light-to-dark tonal gradient"]
+  },
+  "layer4_spatial": [
+    "<ring grooves, embedded-in, dome body> contact: concentric shallow grooves, centered on the apex, covering the whole visible dome surface edge to edge",
+    "<speckle flecks, scattered-on, dome surface> contact: small raised/light flecks scattered densely and fairly uniformly (not ridge-biased like campagne's flour dust)",
+    "no floating parts; single continuous body resting on a flat unseen base, no slash/crumb split"
+  ],
+  "layer5_materials": {
+    "single_substance": "opaque dielectric, matte crust only - no second material (no slash exposes any crumb)",
+    "metalness": 0.0,
+    "roughness": "1.0 (fully matte clay); no specular lobe anywhere",
+    "translucency": "opaque",
+    "relief": "faceted planar shading; ring grooves read as shallow concentric channels, speckle reads as small faceted flecks",
+    "runtimeNote": "consumer runtime force-replaces every material with MeshLambertMaterial keeping only map and color (scripts/breads/types.ts section 2)"
+  },
+  "layer6_color": {
+    "source": "assets/prompts/breads/wholewheat.json geometry.crust (authoritative, hand-transcribed)",
+    "crustBase": "#8C5A32 - JSON states this is 'one full shade darker than a plain campagne crust' (campagne is #A9713F)",
+    "speckleFleck": "not specified in JSON hex - resolved as a documented deterministic lighten of the crust base (see author_spec.py), distinct from campagne's flour-dust hex since this is grain fleck, not surface dusting",
+    "finish": "matte"
+  },
+  "layer7_identity_features": [
+    "spiral/concentric banneton ring markings pressed across the whole top surface, denser than campagne's and reaching edge to edge",
+    "coarse grainy speckle suggesting whole-grain flecks across the whole crust - the second identity marker alongside the darker base tone",
+    "one full shade darker crust than campagne - assets/prompts/breads/wholewheat.json notes_ko: without this the model would read as plain white bread",
+    "no slash, no cross pattern - a plain unbroken dome unlike campagne"
+  ],
+  "layer8_uncertainty": [
+    "underside is never visible in any of the three views or any turntable azimuth above the horizon - modelled as a flat closed base",
+    "exact ring phase/spiral pitch and exact speckle positions are not identity-critical; ring count/coverage and speckle density/color are what is matched",
+    "speckle fleck hex has no source in the prompt JSON; resolved by a documented deterministic lighten of the crust base, never pixel-sampled (types.ts section 8)"
+  ]
+}

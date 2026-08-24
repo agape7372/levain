@@ -1,0 +1,60 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": {
+    "loaf.png": "three-quarter top-front, 1536x1024",
+    "loaf-2.png": "front elevation, 1536x1024",
+    "loaf-3.png": "top-down, 1536x1024"
+  },
+  "layer1_identification": {
+    "workType": "pan-baked rectangular sandwich loaf",
+    "broadClassification": "food prop / stylized low-poly game asset",
+    "primaryDomain": "object",
+    "confidence": 0.97
+  },
+  "layer2_form_silhouette": {
+    "boundingVolume": "rounded rectangular box (pan-shaped), near-vertical sides, domed only on top as a RIDGE running the length axis (not a mound peaking at one point - confirmed in loaf-2.png front elevation, where the dome reads as a smooth arch spanning the whole width, and in loaf.png three-quarter, where the ridge crest runs nearly level along most of the length before rounding down at the very ends)",
+    "symmetry": "bilateral both ways (length axis and width axis), broken only by minimal authored jitter",
+    "measurements_px": {
+      "topdown_length": 895,
+      "topdown_width": 535,
+      "frontElevation_domeSpan(length)": 1030,
+      "frontElevation_totalHeight": 675,
+      "frontElevation_rimHeight": 420
+    },
+    "derivedRatios": {
+      "widthOverLength": 0.598,
+      "heightOverLength": 0.655,
+      "rimHeightOverTotalHeight": 0.622,
+      "note": "in width=1.0 units: length=1.673, height=1.096 - a squat, elongated pan shape, height only slightly taller than the short-axis width"
+    }
+  },
+  "layer3_decomposition": {
+    "macro": ["loaf-body (vertical walls + underside, prism)", "loaf-dome (top ridge, extruded arch)"],
+    "meso": ["dome crest running the length", "rounded box corners at both short ends", "small bottom foot bevel"],
+    "micro": ["essentially none - CRIB/GDD instruct minimal detail, smooth is this bread's identity"]
+  },
+  "layer4_spatial": [
+    "<loaf-dome, above, loaf-body> contact: flush, shared perimeter ring at the crust colour boundary (rimHeightFraction 0.62)"
+  ],
+  "layer5_materials": {
+    "single_substance": "opaque dielectric, matte",
+    "metalness": 0.0,
+    "roughness": "1.0",
+    "relief": "very low - CRIB explicit instruction: no cracks, no blistering, do not add a displacement grid without dense detail to justify it"
+  },
+  "layer6_color": {
+    "source": "assets/prompts/breads/loaf.json geometry.crust (authoritative)",
+    "domeAlbedo": "#C68958",
+    "sideAndBottomAlbedo": "#F4EAD4",
+    "observedVsSpec": "reference dome reads lighter/more saturated orange under the key light than the flat hex; expected Lambert lighting effect, not a colour bug (same pattern documented in pancake/scone material-pass notes)"
+  },
+  "layer7_identity_features": [
+    "angular near-vertical sides with only a small corner/foot bevel - if the sides go fully round it reads as a generic round loaf, losing the 'pan-baked' identity (loaf.json notes_ko)",
+    "dome confined strictly to the top face, never bleeding onto the side walls",
+    "ridge dome (arch along the length), not a mound (peak at one point) - confirmed by the front elevation's smooth level-topped arch and the top-down view's fairly flat/even shading band down the centre"
+  ],
+  "layer8_uncertainty": [
+    "underside never visible in any view; modelled as a closed flat cap",
+    "exact taper profile at the very ends is inferred from the three-quarter view's visible corner rounding, not independently measured - treated as an approximate corner bevel, matching how pancake/scone treated their own unmeasured corner curvature"
+  ]
+}

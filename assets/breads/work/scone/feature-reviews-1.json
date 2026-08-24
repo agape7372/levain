@@ -1,0 +1,38 @@
+[
+  {
+    "id": "wedge-silhouette",
+    "score": 0.82,
+    "tier": "critical",
+    "notes": "Rounded-triangle wedge reads correctly in all 4 turntable angles after fixing an orientation bug (the apex was pointing away from the camera, not toward it - 180deg Y-rotation took IoU from 0.659 to 0.821, close to pancake's accepted 0.813 precedent). No holes or silhouette collapse (area ratios 0.98/0.99/0.98 across azimuth 90/180/270)."
+  },
+  {
+    "id": "asymmetric-two-tone",
+    "score": 0.85,
+    "tier": "critical",
+    "notes": "Only the top face carries the golden crust color; every other face (both cut sides, outer arc, underside) is cream. Boundary is a clean geometric ring, no bleed."
+  },
+  {
+    "id": "fissure-field",
+    "score": 0.76,
+    "tier": "critical",
+    "notes": "Surface-pass iteration: FISSURE_DEPTH raised 0.06 -> 0.11 -> 0.15 across 2 render checks (not counted against the append_review loop budget, since only the render was re-run, not the formal review). At 0.15, azimuth-180 shows clear crack terrain with distinct dark grooves and facet walls, not just low-poly noise; the primary three-quarter camera angle shows them more subtly (partially foreshortened by this fissure set's Z placement), so the honest read is 'present and legible from most angles, softer from one' rather than fully matching the reference's crisp cracks from every angle. Coverage verified pre-render with check_fissures.py (4/18, 7/18, 13/18 sectors matched per fissure)."
+  },
+  {
+    "id": "height-width-ratio",
+    "score": 0.82,
+    "tier": "critical",
+    "notes": "Height/width is authored at exactly 0.5 (WEDGE_HEIGHT=1.0 against a 2.0 outline diameter), matching prompts/breads/scone.json notes_ko v3 verbatim - never a standing cone or tower in any of the 4 turntable angles. The residual tier1 scale/aspect delta (0.19-0.21) is attributed to ortho-vs-perspective camera mismatch (grimoire Divine-Eye caveat), not to this authored ratio being wrong."
+  },
+  {
+    "id": "rounded-corners",
+    "score": 0.65,
+    "tier": "important",
+    "notes": "Back corners round well; apex corner improved from a 66.8deg near-knife-point (iteration attempts 1-2) to 122.5deg (obtuse, blunt) but is still a bit more angular than the reference's very blunt tip."
+  },
+  {
+    "id": "baked-faceting",
+    "score": 0.85,
+    "tier": "important",
+    "notes": "Flat faceted shading baked into geometry via facet() (split vertices, recomputed normals); no flatShading flag relied upon, matches the low-poly aesthetic of the reference."
+  }
+]

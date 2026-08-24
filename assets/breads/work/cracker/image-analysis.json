@@ -1,0 +1,66 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": {
+    "cracker.png": "three-quarter top-front, 1536x1024",
+    "cracker-2.png": "front elevation, 1536x1024",
+    "cracker-3.png": "top-down, 1536x1024"
+  },
+  "layer1_identification": {
+    "workType": "single square artisan cracker",
+    "broadClassification": "food prop / stylized low-poly game asset",
+    "primaryDomain": "object",
+    "confidence": 0.97,
+    "note": "reference images are stylized low-poly renders, not photographs; target look is faceted matte clay"
+  },
+  "layer2_form_silhouette": {
+    "boundingVolume": "thin flat square wafer, slightly rough hand-cut edges (not a perfect machine square)",
+    "symmetry": "roughly square footprint, radial grid pattern breaks perfect symmetry only through hand-cut edge noise",
+    "shapeLanguage": "geometric (flat slab) with organic edge noise",
+    "measurements_px": {
+      "front_elevation_width": 1150,
+      "front_elevation_thickness": 40,
+      "topdown_edge_length": 900
+    },
+    "derivedRatios": {
+      "thicknessOverWidth_frontElevationMeasured": 0.035,
+      "thicknessOverWidth_specTarget": 0.10,
+      "note": "front elevation reads thinner than the spec's authored 1/10 ratio (see cracker.json notes_ko v3: image-to-3D over-thinned once, spec hex/ratio is authoritative over the pixel read per CRIB color-authority rule extended to proportion)"
+    }
+  },
+  "layer3_decomposition": {
+    "macro": ["wafer slab"],
+    "meso": ["top face (docking-hole grid + speckles)", "underside (plain)", "hand-cut edge band"],
+    "micro": ["docking hole grid (regular, pressed pin holes)", "sesame seed speckles (raised ovals)", "poppy seed speckles (small dark dots)"]
+  },
+  "layer4_spatial": [
+    "<docking holes, embedded-in, top face> contact: embed (concave displacement, not added parts)",
+    "<sesame speckles, embedded-in, top face> contact: embed (raised bump, geometric)",
+    "<poppy speckles, on, top face> contact: surface-level, near-flat (color-only or minimal bump)",
+    "no floating parts; single rigid slab"
+  ],
+  "layer5_materials": {
+    "single_substance": "opaque dielectric, matte",
+    "metalness": 0.0,
+    "roughness": "1.0 (fully matte clay)",
+    "translucency": "opaque",
+    "relief": "faceted planar shading; docking holes read as small conical pits, seeds as small polygonal bumps",
+    "runtimeNote": "consumer runtime keeps only map+color (types.ts section 2)"
+  },
+  "layer6_color": {
+    "source": "assets/prompts/breads/cracker.json geometry.crust (authoritative, hand-transcribed)",
+    "topFaceAlbedo": "#D9A552",
+    "finish": "matte, uniform across the whole top face (single tone, no two-tone split)",
+    "observedVsSpec": "reference shows subtle low-poly facet-shading variance across the top face from the AI renderer's own faceting; spec calls one uniform hex, which is authoritative per CRIB color rule"
+  },
+  "layer7_identity_features": [
+    "regular grid of small docking holes (pin holes) pressed into the top face, evenly spaced — the single most defining trait; without it the object is just a flat square",
+    "scattered sesame + poppy seed speckles across the surface, not gridded",
+    "slightly rough, hand-cut edges rather than a perfect machine-cut square",
+    "thin flat wafer silhouette, clearly not a thick slab"
+  ],
+  "layer8_uncertainty": [
+    "underside is fully occluded in all three views; modelled as a plain flat face, never visible from any turntable azimuth above the horizon",
+    "exact docking-hole count is not identity-critical; a regular grid pattern with visible margin from the edges is what is matched (top-down reads roughly 7-8 holes per side)",
+    "exact seed positions are not identity-critical; procedurally seeded from the builder rng"
+  ]
+}

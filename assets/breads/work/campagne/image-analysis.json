@@ -1,0 +1,71 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": {
+    "campagne.png": "three-quarter top-front, 1536x1024",
+    "campagne-2.png": "front elevation, 1536x1024",
+    "campagne-3.png": "top-down, 1536x1024"
+  },
+  "layer1_identification": {
+    "workType": "round country boule loaf",
+    "broadClassification": "food prop / stylized low-poly game asset",
+    "primaryDomain": "object",
+    "confidence": 0.97,
+    "note": "reference images are themselves stylized low-poly renders, not photographs; target look is faceted matte clay, same style family as pancake"
+  },
+  "layer2_form_silhouette": {
+    "boundingVolume": "flattened dome (squashed hemisphere) sitting on a flat base",
+    "symmetry": "radial about the vertical axis for the dome body; broken by the cross-slash which reads as two perpendicular linear cuts",
+    "shapeLanguage": "organic dome expressed with geometric faceting",
+    "measurements_px": {
+      "front_elevation_width": "~1160 (edge to edge at widest, near the base)",
+      "front_elevation_height": "~440 (base to apex)",
+      "front_elevation_width_over_height": "2.64 (a low, wide dome - flatter than a half-sphere, closer to the pancake stack's squashness but single-body)",
+      "topdown_outline_diameter": "~930, near-circular with very slight wobble",
+      "topdown_ring_count": "approximately 10-11 concentric rings visible from apex to about 85% of the radius",
+      "slash_reach_fraction_of_radius": "cuts run from the very apex out to roughly 0.75-0.8 of the dome radius, stopping short of the base rim",
+      "slash_width_fraction_of_diameter": "each cut arm is a narrow wedge, roughly 4-6% of the diameter wide at its widest (near center), tapering toward the tip"
+    },
+    "derivedRatios": {
+      "domeHeightOverDiameter": 0.379,
+      "widestPointHeight": "at or very near the base (front elevation shows the silhouette is widest at the bottom edge, curving continuously up to the apex - a true dome, not a bulging equator like the pancake rim)"
+    }
+  },
+  "layer3_decomposition": {
+    "macro": ["dome body (single continuous boule)"],
+    "meso": ["cross-slash valley (two perpendicular cut lines meeting at the apex)", "ear ridges (raised lip along each cut edge)"],
+    "micro": ["concentric banneton ring grooves across the whole dome surface", "flour dusting concentrated on ring ridges", "darker-to-lighter radial color gradient across the dome"]
+  },
+  "layer4_spatial": [
+    "<cross-slash, embedded-in, dome body> contact: two perpendicular trenches cut into the dome surface, meeting at the apex, exposing a lighter crumb color at the floor",
+    "<ear ridge, adjoins, cross-slash edge> contact: a raised lip runs along each trench edge where the crust tore open",
+    "<ring grooves, embedded-in, dome body> contact: concentric shallow grooves, centered on the apex, covering the whole visible dome surface",
+    "no floating parts; single continuous body resting on a flat unseen base"
+  ],
+  "layer5_materials": {
+    "single_substance": "opaque dielectric, matte crust + a second opaque dielectric, matte crumb (exposed at the slash)",
+    "metalness": 0.0,
+    "roughness": "1.0 (fully matte clay); no specular lobe anywhere",
+    "translucency": "opaque",
+    "relief": "faceted planar shading; ring grooves read as shallow concentric channels, the slash reads as a deep V-trench with raised lip edges",
+    "runtimeNote": "consumer runtime force-replaces every material with MeshLambertMaterial keeping only map+color, so PBR scalars beyond albedo are inert (repo scripts/breads/types.ts section 2)"
+  },
+  "layer6_color": {
+    "source": "assets/prompts/breads/campagne.json geometry.crust (authoritative, hand-transcribed)",
+    "crustBase": "#A9713F blending to a darker brown across the dome (gradient, no single hex given for the dark end - resolved deterministically, see author_spec.py)",
+    "crumbAtSlash": "not specified in JSON hex - resolved as a warm golden interior tone consistent with the pancake precedent's 'rim exposes lighter tone' convention (see author_spec.py resolution note)",
+    "flourDusting": "light, scattered unevenly, concentrated on the raised ring ridges",
+    "finish": "matte"
+  },
+  "layer7_identity_features": [
+    "spiral/concentric banneton ring markings pressed across the whole top surface - the single defining feature per assets/prompts/breads/campagne.json notes_ko",
+    "cross-shaped slash with raised burst ears along each cut line",
+    "uneven flour dusting on the ring ridges",
+    "low wide dome silhouette (width/height ~2.6)"
+  ],
+  "layer8_uncertainty": [
+    "underside is never visible in any of the three views or any turntable azimuth above the horizon - modelled as a flat closed base",
+    "exact ring phase/spiral pitch is not identity-critical; ring count and spacing are matched instead",
+    "the dark end of the crust gradient has no explicit hex in the prompt JSON; resolved by a documented deterministic darkening of the given #A9713F rather than by pixel sampling (banned by types.ts section 8)",
+    "crumb (interior) color at the slash has no explicit hex; resolved by the same documented method"
+  ]
+}

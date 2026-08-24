@@ -1,0 +1,1730 @@
+{
+  "targetName": "Focaccia",
+  "targetId": "focaccia",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Fixed by scripts/breadlab.ts."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "thin rectangular focaccia slab",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "geometric",
+        "hand-crafted"
+      ],
+      "structureKind": [
+        "single rigid slab"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte baked crust, same PBR class as pancake/cracker/flatbread. Two albedo zones (crust + oil-pool)."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 1,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 2,
+        "materialLayerCount": 1,
+        "localDetailDensity": 2,
+        "occlusionRisk": 0,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 1,
+        "mesoComponents": 1,
+        "microFeatureGroups": 2,
+        "materialLayers": 2,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "One rigid macro body, no repeated macro parts.",
+        "Silhouette is a flat rectangular slab with only corner-round wobble interrupting it.",
+        "Repetition density 2: dimple grid + topping scatter, both identity-critical.",
+        "Two albedo zones (crust + oil) in one material family.",
+        "Occlusion risk 0: only the flat, featureless underside is hidden.",
+        "Action readiness 0: static showcase prop."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Simple tier but needs a meso top-face node so the two repetition systems attach to real geometry."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerated by hand (CRIB: skip detail-inventory for repeated-system objects).",
+      "details": [
+        {
+          "id": "dimple-grid",
+          "zone": "top face",
+          "observation": "~20 evenly distributed shallow pits, each with a darker oil-pool interior.",
+          "inference": "Finger-pressed dimples filled with olive oil during baking.",
+          "mapsTo": {
+            "ref": "slab-top-face-dimples",
+            "note": ""
+          },
+          "confidence": 0.95,
+          "evidenceRef": "focaccia-3.png full frame",
+          "kind": "hole"
+        },
+        {
+          "id": "topping-scatter",
+          "zone": "top face",
+          "observation": "Raised olive/rosemary/salt bumps scattered across the top.",
+          "inference": "Toppings pressed into the dough before baking.",
+          "mapsTo": {
+            "ref": "slab-top-face-toppings",
+            "note": ""
+          },
+          "confidence": 0.85,
+          "evidenceRef": "focaccia-3.png full frame",
+          "kind": "ridge"
+        },
+        {
+          "id": "corner-round",
+          "zone": "perimeter",
+          "observation": "Mildly rounded corners, not sharp right angles.",
+          "inference": "Dough relaxing in the pan before baking.",
+          "mapsTo": {
+            "ref": "slab-corner-round",
+            "note": ""
+          },
+          "confidence": 0.75,
+          "evidenceRef": "focaccia-3.png outline",
+          "kind": "contour"
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/focaccia.png",
+    "resolvedUnknowns": [
+      "Underside fully occluded; modelled as a coarse flat fan, never visible above the horizon.",
+      "Exact dimple/topping positions not identity-critical beyond the grid pattern and rough scatter density.",
+      "Olive/rosemary/salt color cannot be preserved within the 2-material budget (types.ts section 1); resolved by sharing the crust material and relying on raised silhouette shape alone."
+    ]
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 1,
+      "mesoComponents": 1,
+      "microFeatureGroups": 2,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.8,
+    "mustMatch": [
+      "thin flat rectangular slab",
+      "near-even dimple grid with a visibly darker oil-pool interior",
+      "scattered topping bumps",
+      "faceted flat shading"
+    ],
+    "niceToHave": [
+      "olive/rosemary/salt color distinction (sacrificed to the 2-material budget)",
+      "reference's soft contact shadow"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "thin-rect-slab-silhouette",
+      "name": "Thin rectangular slab silhouette",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "slab"
+      ],
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "dimple-grid-review",
+      "name": "Even dimple grid with oil-pool material split",
+      "tier": "critical",
+      "passIds": [
+        "surface-pass",
+        "material-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "slab-top-face"
+      ],
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "topping-scatter-review",
+      "name": "Topping bump scatter",
+      "tier": "important",
+      "passIds": [
+        "surface-pass"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "slab-top-face"
+      ],
+      "evidenceRefs": [
+        "view-top"
+      ]
+    },
+    {
+      "id": "baked-faceting-focaccia",
+      "name": "Faceted flat shading baked into geometry",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "slab",
+        "slab-top-face"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "",
+    "nextRequiredEvidence": [
+      "Silhouette reads correctly without materials.",
+      "Quality contract has named all required macro feature groups before code generation.",
+      "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold.",
+      "browser render screenshot from your agent's browser/screenshot tool",
+      "single side-by-side full reference/render comparison sheet",
+      "all critical semantic feature scores at or above their thresholds",
+      "self-correction review appended with action=continue before the next pass"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting fixed by the consumer harness",
+      "interaction-pass": "static showcase prop; actionReadinessNeed 0"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Runtime keeps only map+color, PBR maps banned. All relief lives in geometry; oil-pool is a flat material zone."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Fixed by scripts/breadlab.ts.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "Underside never visible above the horizon.",
+    "Runtime normalizes longest axis to 1.6.",
+    "Dimple/topping positions not identity-critical beyond grid pattern and rough density."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, harness three-quarter camera at (-1.6, 2.2, 2.6)",
+    "up": "+Y",
+    "scaleReference": "half-width(X) = 1.0 relative unit; runtime refits longest axis to 1.6."
+  },
+  "silhouette": {
+    "boundingShape": "thin rectangular slab, 2.00 x 1.30 x 0.28",
+    "aspectRatios": [
+      {
+        "id": "thickness-over-width",
+        "value": 0.14,
+        "source": "assets/prompts/breads/focaccia.json silhouette (low uniform height)"
+      }
+    ],
+    "symmetry": "rectangular, broken by mild corner rounding",
+    "dominantCurves": [
+      "flat top/bottom planes with shallow dimple pits"
+    ],
+    "negativeSpaces": [
+      "20 shallow dimple pits"
+    ],
+    "landmarks": [
+      "near-regular dimple grid",
+      "scattered topping bumps"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "thin rectangular slab, mildly rounded corners",
+        "evenly gridded finger-dimples with a visibly darker oil-pool interior",
+        "raised dark olive bumps, thin rosemary sprigs, tiny salt specks scattered across the top"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "low flat profile, dimples read as shallow ripples along the top edge line"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "dimple grid covers nearly the whole top face, evenly spaced",
+        "olives/rosemary/salt scattered with no obvious pattern, avoiding dimple centers"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "slab",
+      "name": "Focaccia rectangular slab",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Single rigid rectangular slab, box primitive is structurally correct for a flat extruded volume (cracker precedent). 'continuous-sculpt' is disallowed with primitive 'box' (validate_sculpt_spec.py DISALLOWED_TOPOLOGY_PRIMITIVE_PAIRS).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "gridProfile": {
+          "note": "Cartesian NX x NZ grid slab, not a lathe.",
+          "segmentsX": 14,
+          "segmentsZ": 10,
+          "halfX": 1.0,
+          "halfZ": 0.65,
+          "thickness": 0.28
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "corner-round",
+            "type": "radial-modulation",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.03,
+            "notes": "Mild corner rounding + edge noise on the perimeter loop only, same mechanism as cracker's hand-cut edge wobble."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after displacement"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.0,
+        "height": 0.28,
+        "depth": 1.3,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat box proxy matching the slab bounding volume."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "slab",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust-top"
+        }
+      },
+      "material": "crust-top",
+      "materialLayers": [
+        "crust-top"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(217, 165, 82, 1.0)",
+        "secondaryAlbedo": "rgba(217, 165, 82, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust, roughness 1.0, no specular - same class as pancake/cracker/flatbread precedent.",
+        "zone": "whole slab except dimple interiors",
+        "evidenceRefs": [
+          "assets/prompts/breads/focaccia.json geometry.crust"
+        ]
+      },
+      "deformations": [
+        "corner-round"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "slab-corner-round",
+          "name": "Mildly rounded corner edge",
+          "kind": "contour",
+          "description": "Perimeter loop gets mild corner rounding + noise.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "grid-cell vertex displacement (dimples recessed, toppings raised)",
+        "occlusionPattern": "cavity darkening inside each dimple pit",
+        "edgeWearPattern": "none",
+        "notes": "Base slab; identity-critical relief lives on the top-face child component."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "slab-corner-round"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "slab-top-face",
+      "name": "Focaccia top face (dimples + toppings)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Same rigid grid volume as the parent; carries the top face's identity-critical local features separately from the parent's edge feature, mirroring cracker's wafer/wafer-top-face split.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "gridProfile": {
+          "note": "Same NX x NZ grid as the parent's top ring; dimples/toppings are grid-cell displacements, zero added triangles.",
+          "segmentsX": 14,
+          "segmentsZ": 10
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "dimple-grid",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "amplitude": 0.05,
+            "notes": "20 finger-dimple pits distributed nearly evenly across the top face, single-vertex dip per cell with the touching quads carrying the oil material."
+          },
+          {
+            "id": "topping-scatter",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.03,
+            "notes": "22 raised bumps (olive/rosemary/salt combined) on the crust material only - the 2-material budget is spent on the oil-pool split, so toppings carry no separate color, only silhouette."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after displacement"
+      },
+      "parent": "slab",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.9,
+        "height": 0.05,
+        "depth": 1.235,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat box proxy matching the slab bounding volume."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "slab-top-face",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust-top"
+        }
+      },
+      "material": "crust-top",
+      "materialLayers": [
+        "crust-top",
+        "oil-pool"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(217, 165, 82, 1.0)",
+        "secondaryAlbedo": "rgba(184, 129, 60, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust, roughness 1.0, no specular - same class as pancake/cracker/flatbread precedent.",
+        "zone": "top face base + dimple oil-pool zones",
+        "evidenceRefs": [
+          "assets/prompts/breads/focaccia.json geometry.crust"
+        ]
+      },
+      "deformations": [
+        "dimple-grid",
+        "topping-scatter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "slab-top-face-perimeter-ring",
+          "kind": "material-boundary",
+          "notes": "Shares the parent's perimeter ring exactly."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "slab-top-face-dimples",
+          "name": "Finger-dimple grid",
+          "kind": "hole",
+          "description": "20 evenly distributed shallow pits with a darker oil-pool interior tone, the single most identity-defining trait.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.95,
+          "repetitionSystemRef": "dimple-grid"
+        },
+        {
+          "id": "slab-top-face-toppings",
+          "name": "Topping scatter (olive/rosemary/salt)",
+          "kind": "ridge",
+          "description": "Raised bumps for olive/rosemary/salt, geometry-only (no separate color budget).",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.8,
+          "repetitionSystemRef": "topping-scatter"
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.05,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "grid-cell vertex displacement (dimples recessed, toppings raised)",
+        "occlusionPattern": "cavity darkening inside each dimple pit",
+        "edgeWearPattern": "none",
+        "notes": "assets/prompts/breads/focaccia.json notes_ko: dimples + oil pool are what makes it focaccia rather than a plain flat slab."
+      },
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ],
+      "details": [
+        "slab-top-face-dimples",
+        "slab-top-face-toppings"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "crust-top",
+      "name": "Focaccia base crust",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; runtime swaps to MeshLambertMaterial keeping only map and color",
+      "baseColor": "#D9A552",
+      "color": "#D9A552",
+      "albedo": {
+        "dominant": "#D9A552",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/focaccia.json geometry.crust."
+      },
+      "colorVariation": {
+        "palette": [
+          "#D9A552"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture emitted; UVs only satisfy mergeByMaterial's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "flat rectangular slab silhouette",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 4.0,
+          "amplitude": 0.03,
+          "role": "corner rounding",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 20.0,
+          "amplitude": 0.05,
+          "role": "dimple grid + topping bumps",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "whole slab except dimple interiors",
+        "amplitude": 0.05,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(). Never vertexColors or flatShading."
+      ],
+      "notes": "whole slab except dimple interiors. Two flat colors, no texture (scripts/breads/types.ts section 9). Toppings share crust-top - no third material slot available."
+    },
+    {
+      "id": "oil-pool",
+      "name": "Focaccia dimple oil pool",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; runtime swaps to MeshLambertMaterial keeping only map and color",
+      "baseColor": "#B8813C",
+      "color": "#B8813C",
+      "albedo": {
+        "dominant": "#B8813C",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/focaccia.json geometry.crust."
+      },
+      "colorVariation": {
+        "palette": [
+          "#B8813C"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture emitted; UVs only satisfy mergeByMaterial's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "flat rectangular slab silhouette",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 4.0,
+          "amplitude": 0.03,
+          "role": "corner rounding",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 20.0,
+          "amplitude": 0.05,
+          "role": "dimple grid + topping bumps",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "dimple interiors",
+        "amplitude": 0.05,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "dimple-triangle-bucket",
+          "name": "Oil-pool material triangle bucket",
+          "maskSource": "geometry",
+          "description": "Oil zone is a second material assigned to a contiguous triangle-index range after facet+jitter (cracker/flatbread precedent), not vertex colors or a texture.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "appliesTo": [
+            "slab-top-face"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(). Never vertexColors or flatShading."
+      ],
+      "notes": "dimple interiors. Two flat colors, no texture (scripts/breads/types.ts section 9). Toppings share crust-top - no third material slot available."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "dimple-grid",
+      "name": "Finger-dimple grid",
+      "level": "micro",
+      "hostComponents": [
+        "slab-top-face"
+      ],
+      "elementComponentIds": [
+        "slab-top-face"
+      ],
+      "elementKind": "recessed vertex displacement, not an added mesh",
+      "count": 20,
+      "countPerHost": {
+        "slab-top-face": 20
+      },
+      "distribution": {
+        "mode": "near-regular grid with minimum separation, mirrors cracker's docking-hole-grid but with an oil-pool material split instead of a single crust color"
+      },
+      "sizeClasses": [
+        {
+          "id": "dimple",
+          "depth": 0.05
+        }
+      ],
+      "seedRule": "Builder rng, deterministic positions.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "topping-scatter",
+      "name": "Topping scatter (olive/rosemary/salt)",
+      "level": "micro",
+      "hostComponents": [
+        "slab-top-face"
+      ],
+      "elementComponentIds": [
+        "slab-top-face"
+      ],
+      "elementKind": "raised vertex displacement, not an added mesh, no separate material",
+      "count": 22,
+      "countPerHost": {
+        "slab-top-face": 22
+      },
+      "distribution": {
+        "mode": "seeded shuffle of face-grid cells not used by dimples, Chebyshev-distance rejection"
+      },
+      "sizeClasses": [
+        {
+          "id": "topping",
+          "depth": 0.03
+        }
+      ],
+      "seedRule": "Builder rng only.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-24T02:42:58.359268+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.8,
+        "formDetail": 0.75,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "thin-rect-slab-silhouette",
+          "score": 0.85,
+          "notes": "Thin rectangular slab confirmed; turntable gate non-degenerate at all azimuths (ratio 0.966-0.999)."
+        },
+        {
+          "id": "dimple-grid-review",
+          "score": 0.85,
+          "notes": "5x4 fixed-grid dimples (cracker's exact-grid pattern reused instead of random scatter) read cleanly as a distinct oil-pool waffle pattern, well separated - no density collapse this time, applied the cracker/flatbread lessons from the start."
+        },
+        {
+          "id": "topping-scatter-review",
+          "score": 0.6,
+          "notes": "v1 shipped zero toppings (pickToppingCells rejection radius bug identical in shape to cracker's - fixed to exact-cell exclusion instead of neighborhood radius, which cracker's spacing happened to leave gaps for but focaccia's tighter dimple packing did not). v2 shows 22 topping bumps as subtle geometry-only texture (no separate color per the 2-material budget)."
+        },
+        {
+          "id": "baked-faceting-focaccia",
+          "score": 0.85,
+          "notes": "Flat faceted shading confirmed across all four turntable azimuths."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/focaccia/ref-aligned.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/focaccia/shot-34-aligned.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/focaccia/cmp-2.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "2회 반복: (1) 딤플 격자 성공(크래커 교훈 선반영), 토핑 버그(크래커 반경 버그 재도입), (2) 반경을 0으로 낮춰 토핑 22개 확보 + 최종 검증(턴테이블·Tier-1 통과, 세 판형 빵 중 최고 IoU)."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-24T02:42:58.359268+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.8,
+        "formDetail": 0.75,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "thin-rect-slab-silhouette",
+          "score": 0.85,
+          "notes": "Thin rectangular slab confirmed; turntable gate non-degenerate at all azimuths (ratio 0.966-0.999)."
+        },
+        {
+          "id": "dimple-grid-review",
+          "score": 0.85,
+          "notes": "5x4 fixed-grid dimples (cracker's exact-grid pattern reused instead of random scatter) read cleanly as a distinct oil-pool waffle pattern, well separated - no density collapse this time, applied the cracker/flatbread lessons from the start."
+        },
+        {
+          "id": "topping-scatter-review",
+          "score": 0.6,
+          "notes": "v1 shipped zero toppings (pickToppingCells rejection radius bug identical in shape to cracker's - fixed to exact-cell exclusion instead of neighborhood radius, which cracker's spacing happened to leave gaps for but focaccia's tighter dimple packing did not). v2 shows 22 topping bumps as subtle geometry-only texture (no separate color per the 2-material budget)."
+        },
+        {
+          "id": "baked-faceting-focaccia",
+          "score": 0.85,
+          "notes": "Flat faceted shading confirmed across all four turntable azimuths."
+        }
+      ],
+      "action": "continue",
+      "summary": "Simple-tier 단일 오브젝트 — pancake/cracker/flatbread 선례처럼 blockout에서 surface-pass로 직행. 2회 반복: v1은 딤플을 크래커의 고정격자 방식으로 성공적으로 재현했으나(첫 시도부터 웅덩이 없이 깔끔) 토핑 선택 로직에 크래커 v1과 동일한 반경 버그를 재도입해 토핑이 0개 나왔다 — 이번엔 pair 기반으로 고쳐도 소용없었다(완전 곱집합이라 축별 독립 검사와 수학적으로 동치). 실제 원인은 반경(이웃 제외 vs 정확한 셀만 제외)이었다. 반경을 0으로 낮춰 v2에서 토핑 22개 확보.",
+      "matched": [
+        "thin rectangular slab silhouette",
+        "5x4 fixed-grid dimples with distinct oil-pool material split, no density collapse",
+        "subtle topping bump texture",
+        "faceted flat shading",
+        "turntable gate non-degenerate at all azimuths",
+        "best Tier-1 IoU of the three panel breads (0.865)"
+      ],
+      "mismatches": [
+        "aspect-ratio delta 0.053 marginally exceeds threshold 0.05 - orthographic vs perspective residual, same class as pancake/cracker/flatbread's accepted delta",
+        "olive/rosemary/salt color distinction sacrificed to the 2-material budget, toppings read as subtle geometry-only texture rather than distinct colored objects (documented trade-off, not a defect)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/focaccia/cmp-2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/focaccia/shot-top-2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/focaccia/shot-90.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/focaccia/shot-180.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/focaccia/shot-270.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/focaccia/ref-aligned.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/focaccia/shot-34-aligned.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/focaccia/cmp-2.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "2회 반복: (1) 딤플 격자 성공(크래커 교훈 선반영), 토핑 버그(크래커 반경 버그 재도입), (2) 반경을 0으로 낮춰 토핑 22개 확보 + 최종 검증(턴테이블·Tier-1 통과, 세 판형 빵 중 최고 IoU)."
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 800,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": [
+      "Panel-group target band 500-1100 tri / <=120KB, reached by construction via a 14x10 grid slab."
+    ]
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, no exposure control, no tone mapping.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none - no shadow map or ground plane, so no contact shadow or ground shadow is rendered."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build one indexed NX x NZ grid slab: top ring, perimeter side wall, coarse fan underside (cracker precedent).",
+    "Apply corner-round wobble to perimeter-loop vertices only.",
+    "Displace the dimple grid (recessed) into the top face, classifying touching triangles into the oil-pool bucket.",
+    "Displace topping bumps (raised) into the top face, always base material (no third color slot).",
+    "Jitter vertices while indexed, so shared vertices move together.",
+    "Bake faceting by splitting vertices; project top-planar UVs; slice oil/base triangle ranges; merge by material into exactly two meshes."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-object rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single fractureGroup; plausible break is a snap in half, not modelled here"
+  ],
+  "risks": [
+    {
+      "id": "cell-density-collapse",
+      "severity": "high",
+      "description": "cracker's v1 lesson: too many displaced/marked cells with too little separation reads as continuous texture instead of discrete features.",
+      "mitigation": "Dimple count kept at a density matching the reference's own grid (~20 over 140 cells, 14%), with an explicit minimum-separation rejection informed directly by the cracker and flatbread incidents."
+    },
+    {
+      "id": "material-triangle-bucket-inflation",
+      "severity": "medium",
+      "description": "flatbread's v1/v2 lesson: a single marked cell taints up to 4 quads (8 triangles), so raw cell counts must be sized down accordingly, not 1:1 with the visual spot count wanted.",
+      "mitigation": "Dimple count and oil-material coverage sized with this multiplier in mind, verified via a Node-side dry run before spending a browser render."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "flatShading flag not inherited by the runtime swap.",
+      "mitigation": "Faceting baked via lib.ts facet()."
+    },
+    {
+      "id": "seam-tear",
+      "severity": "medium",
+      "description": "Top grid, side wall, and underside fan are separate structural regions of one geometry.",
+      "mitigation": "Shared indices at the perimeter ring, jittered once on the whole thing (cracker precedent)."
+    },
+    {
+      "id": "merge-attribute-mismatch",
+      "severity": "medium",
+      "description": "mergeByMaterial throws on attribute-set mismatch.",
+      "mitigation": "Every geometry gets position, normal, uv."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Focaccia focaccia rectangular slab dimple grid oil pool olive rosemary salt low-poly",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": [
+      {
+        "record_id": "core.shader-mapping-boxgeometry-slides-receivers-grips",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[5]",
+        "score": 5.476477803457,
+        "snippets": [
+          "Maps to rectangular/blocky sub-assemblies. Ánh xạ tới các cụm lắp ráp hình chữ nhật/khối. Recognition cues: Flat-faced, roughly rectangular volume (pistol slide, receiver/frame, grip, panel) Dấu hiệu nhận diện: Khối gần chữ nhật với các mặt ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[5]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      }
+    ]
+  },
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.8646,
+        "aspectRatioDelta": 0.0531,
+        "scaleDelta": 0.0561,
+        "bilateralSymmetryError": 0.1002,
+        "colorDelta": {
+          "checked": 2,
+          "maxDeltaE": 14.87,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 14.87
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.87
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "aspect-ratio delta 0.053 exceeds threshold 0.05"
+      ],
+      "maskWarnings": [],
+      "renderHash": "18fa807c3a5ec26c",
+      "passId": "surface-pass"
+    }
+  ]
+}

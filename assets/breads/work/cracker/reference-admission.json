@@ -1,0 +1,14 @@
+{
+  "admitted": true,
+  "reasons": [],
+  "provenance": {
+    "viewpoint": "three-quarter",
+    "sourcePath": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\cracker.png",
+    "width": 1536,
+    "height": 1024,
+    "foregroundCoverage": 0.3622,
+    "largestComponentFraction": 1.0,
+    "pHash": 18092833571513416724,
+    "duplicateOfHash": null
+  }
+}

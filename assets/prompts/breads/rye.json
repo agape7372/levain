@@ -1,6 +1,6 @@
 {
   "id": "rye",
-  "version": 1,
+  "version": 2,
   "name_ko": "호밀빵",
   "subject": "an oval bâtard-shaped rye loaf",
   "geometry": {
@@ -11,13 +11,17 @@
       "a single shallow slash with only a faintly opened ear, weaker and less pronounced than on a baguette or campagne"
     ]
   },
-  "style_ref": "shared-style-v1",
+  "style_ref": "shared-style-v2",
   "camera": "three-quarter top-front view, object centered, 15% margin",
-  "background": "solid #F2E6D3, no props, no floor texture",
-  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows",
-  "negative": ["face", "eyes", "mouth", "character", "text", "watermark", "plate", "board", "hands", "photorealism", "glossy plastic", "people"],
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features"],
   "views": ["three-quarter top-front", "front elevation", "top-down"],
   "output": { "aspect": "1:1", "size": 1024 },
-  "prompt_flat": "A cozy low-poly stylized 3D render of an oval bâtard-shaped rye loaf. Geometry: an oval bâtard shape, elongated but rounder and shorter than a baguette. Crust: a deep chestnut brown surface blends toward near-black (#4A3226) in patches, mottled and blotchy rather than uniform; caraway seeds are scattered densely across the whole top surface as a topping; a single shallow slash shows only a faintly opened ear, weaker and less pronounced than on a baguette or campagne. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, rounded silhouette, stylized 3D render. Camera: three-quarter top-front view, object centered, 15% margin. Background: solid #F2E6D3, no props, no floor texture. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows. Generate the same object consistently across each requested view — three-quarter top-front, front elevation, and top-down — keeping identical proportions, colors, and surface details between views. Negative: no face, no eyes, no mouth, no character, no text, no watermark, no plate, no board, no hands, no photorealism, no glossy plastic, no people.",
+  "prompt_flat": "A cozy low-poly stylized 3D render of an oval bâtard-shaped rye loaf, a single game asset object on a plain backdrop. Geometry: an oval bâtard shape, elongated but rounder and shorter than a baguette. Crust: a deep chestnut brown surface blends toward near-black (#4A3226) in patches, mottled and blotchy rather than uniform; caraway seeds are scattered densely across the whole top surface as a topping; a single shallow slash shows only a faintly opened ear, weaker and less pronounced than on a baguette or campagne. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact rye loaf, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact rye loaf, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the mottled patches and caraway seeds are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
   "notes_ko": "짙은 체스넛~거의 흑색의 얼룩덜룩한 색과 캐러웨이 씨 토핑이 없으면 일반 바타르빵과 구분되지 않는다. 귀는 약하게만 표현한다."
 }

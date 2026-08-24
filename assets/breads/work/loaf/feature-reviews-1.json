@@ -1,0 +1,38 @@
+[
+  {
+    "id": "loaf-silhouette",
+    "score": 0.82,
+    "tier": "critical",
+    "notes": "Rounded pan-box silhouette with a ridge dome reads correctly across all 4 turntable angles; no degenerate views, area ratios 1.00-1.02 across azimuth 90/180/270 (diagnose_render_multi_angle). Aspect-ratio delta 0.0106 and scale delta 0.0106 against the aligned reference - both essentially exact, driven by measured pixel ratios in image-analysis.json (length=1.673, height=1.096 in width=1.0 units) rather than eyeballing."
+  },
+  {
+    "id": "angular-sides",
+    "score": 0.85,
+    "tier": "critical",
+    "notes": "Sides stay near-vertical with only a small foot bevel; corner rounding at the length-axis ends was tuned down from an initial overly-wide taper (3-station, ~0.37 length units) to a tighter one (2-station, ~0.15 length units, STATIONS zScale 0.3/0.75/0.95/1.0) closer to loaf-3.png's visibly crisp corner radius."
+  },
+  {
+    "id": "top-only-dome-color",
+    "score": 0.85,
+    "tier": "critical",
+    "notes": "Dome colour (crust-top) confined strictly to hFrac > RIM_HFRAC (0.62); walls and underside stay crust-side. Boundary is a clean geometric ring, no bleed onto the vertical walls."
+  },
+  {
+    "id": "ridge-not-mound",
+    "score": 0.85,
+    "tier": "critical",
+    "notes": "Dome crests at full height along the constant-cross-section middle (stations -1.5 to 1.5, more than half the length) before rounding down only in the last 2 stations per end - a level ridge, not a single-point mound. Built by extruding a constant arch profile along X (station sweep), deliberately not reusing pancake/scone's radial-scale-toward-centroid technique, which would have produced a mound (documented in author_spec.py risks.mound-not-ridge)."
+  },
+  {
+    "id": "low-texture",
+    "score": 0.85,
+    "tier": "important",
+    "notes": "Lowest jitter amplitude of the three chunk breads (0.006 vs scone's 0.01) and no displacement/detail system at all, matching CRIB's explicit instruction that this bread's identity is smoothness."
+  },
+  {
+    "id": "baked-faceting",
+    "score": 0.82,
+    "tier": "important",
+    "notes": "Flat faceted shading baked into geometry via facet() (split vertices, recomputed normals); no flatShading flag relied upon. A small crease remains visible at the wall/dome boundary near both tapered ends (confirmed via pixel sampling to be a sharp facet, not a hole) - softened across 2 iterations but not fully eliminated within this pass's render budget."
+  }
+]

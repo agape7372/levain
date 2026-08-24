@@ -1,0 +1,7 @@
+[
+  {"id": "oval-thin-disk-silhouette", "score": 0.85, "notes": "Thin oval profile confirmed in front elevation; turntable gate non-degenerate at all azimuths (ratio 0.985-0.995)."},
+  {"id": "blister-dome-field", "score": 0.8, "notes": "Domes read clearly in front-elevation cross-section after excluding the two innermost rings (which produced near-vertical spikes at v1) and raising height/spread ~30% (v2, 0.09->0.12 large class) once the spike risk was ruled out at this ring range."},
+  {"id": "char-spot-material-split", "score": 0.75, "notes": "Char patches are distinct and separated after two density fixes (v1: full 3x3 neighborhood per blister crown covered ~half the face; v2: 21 single-cell marks still merged into wedges from insufficient separation; v3: 10 marks with proper spacing gives scattered low-poly blocky patches)."},
+  {"id": "hand-stretched-outline", "score": 0.75, "notes": "Outline wobble visible, oval base shape confirmed."},
+  {"id": "baked-faceting-flatbread", "score": 0.85, "notes": "Flat faceted shading confirmed across all four turntable azimuths."}
+]

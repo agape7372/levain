@@ -1,6 +1,6 @@
 {
   "id": "pancake",
-  "version": 1,
+  "version": 2,
   "name_ko": "팬케이크",
   "subject": "a stack of three fluffy round pancakes",
   "geometry": {
@@ -11,13 +11,17 @@
       "small irregular bubbles and tiny burst pore holes scattered across every top surface, rendered as low-poly faceted dimples"
     ]
   },
-  "style_ref": "shared-style-v1",
+  "style_ref": "shared-style-v2",
   "camera": "three-quarter top-front view, object centered, 15% margin",
-  "background": "solid #F2E6D3, no props, no floor texture",
-  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows",
-  "negative": ["face", "eyes", "mouth", "character", "text", "watermark", "plate", "board", "hands", "photorealism", "glossy plastic", "people"],
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "syrup", "butter"],
   "views": ["three-quarter top-front", "front elevation", "top-down"],
   "output": { "aspect": "1:1", "size": 1024 },
-  "prompt_flat": "A cozy low-poly stylized 3D render of a stack of three fluffy round pancakes. Geometry: three stacked flat disks with slightly irregular hand-poured edges, each disk slightly offset from the one below with a subtle sag at the stack edges. Crust: the top surface of each pancake is a soft clay-like matte medium brown (#C68958), while the underside and edge rim of each disk show a deeper golden brown (#A9713F); small irregular bubbles and tiny burst pore holes are scattered across every top surface as low-poly faceted dimples. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, rounded silhouette, stylized 3D render. Camera: three-quarter top-front view, object centered, 15% margin. Background: solid #F2E6D3, no props, no floor texture. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows. Generate the same object consistently across each requested view — three-quarter top-front, front elevation, and top-down — keeping identical proportions, colors, and surface details between views. Negative: no face, no eyes, no mouth, no character, no text, no watermark, no plate, no board, no hands, no photorealism, no glossy plastic, no people.",
-  "notes_ko": "팬케이크는 표면에 작은 기포와 터진 구멍이 흩뿌려져 있어야 한다 — 이게 없으면 매끈한 플라스틱 원반처럼 보인다."
+  "prompt_flat": "A cozy low-poly stylized 3D render of a stack of three fluffy round pancakes, a single game asset object on a plain backdrop. Geometry: three stacked flat disks with slightly irregular hand-poured edges, each disk slightly offset from the one below with a subtle sag at the stack edges. Crust: the top surface of each pancake is a soft clay-like matte medium brown (#C68958), while the underside and edge rim of each disk show a deeper golden brown (#A9713F); small irregular bubbles and tiny burst pore holes are scattered across every top surface as low-poly faceted dimples. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no syrup, no butter pat, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact pancake stack, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view), so the three offset layers are clearly visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact pancake stack, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the bubbles and pore holes on the top disk are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "팬케이크는 표면에 작은 기포와 터진 구멍이 흩뿌려져 있어야 한다 — 이게 없으면 매끈한 플라스틱 원반처럼 보인다. v2: 시럽·버터 negative 추가 — 팬케이크 스택은 생성 모델이 시럽·버터를 기본으로 얹는 경향이 강하다."
 }

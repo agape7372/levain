@@ -1,0 +1,23 @@
+{
+  "note": "Parts as the builder constructs them, BEFORE the mandatory final mergeByMaterial. scripts/breads/loaf.ts adds one named mesh per leaf component (loaf-body incl. end caps, loaf-dome); mergeByMaterial then fuses them into 2 meshes because the consumer caps a bread at 2 materials / 2 meshes (scripts/breads/types.ts sections 1-2). Triangle counts are analytic from the station/profile-gap construction (11 stations x 12 profile gaps, plus 2 end-cap fans of 10 triangles each) and sum to 260, matching the harness's reported total exactly.",
+  "parts": [
+    {
+      "name": "root",
+      "kind": "container",
+      "module": "createLoaf",
+      "triangles": 260
+    },
+    {
+      "name": "loaf-body",
+      "kind": "part",
+      "module": "buildLoaf",
+      "triangles": 140
+    },
+    {
+      "name": "loaf-dome",
+      "kind": "part",
+      "module": "buildLoaf",
+      "triangles": 120
+    }
+  ]
+}

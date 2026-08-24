@@ -1,0 +1,4 @@
+[
+  {"id": "stacked-offset-silhouette", "score": 0.85, "tier": "critical",
+   "notes": "Three rim bands read separately at every azimuth and each disk is visibly offset from the one below. Turntable gate confirms no interior holes and no silhouette collapse (area ratios 1.00/0.97/0.96 across 90/180/270). Held back from higher by a 0.14 bbox aspect delta against the aligned reference: our stack projects flatter, which traces to the harness's fixed orthographic camera rather than the model, whose front-elevation stack ratio is 0.321 against the reference's measured 0.325."}
+]

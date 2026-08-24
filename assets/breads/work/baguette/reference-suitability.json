@@ -1,0 +1,21 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": [
+    "assets/breads/src/baguette.png (three-quarter top-front, diagonal framing)",
+    "assets/breads/src/baguette-2.png (front elevation)",
+    "assets/breads/src/baguette-3.png (strict top-down orthographic)"
+  ],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "objectOccupiesEnoughOfFrame": "single loaf fills the frame diagonally with clear margin in all three views",
+    "strongSilhouette": "unambiguous tapered-spindle silhouette in all three views, mutually consistent",
+    "majorMaterialsVisible": "two matte dielectric zones (crust vs exposed crumb inside each slash)",
+    "hiddenSideInferable": "radial symmetry per cross-section; both tips close via true poles, no hidden underside geometry to infer",
+    "procedurallyApproximable": "tapered tube extrusion along the length axis with grid-cell-classified slash trenches; no smoke, liquid, glass or lace anywhere"
+  },
+  "notConditional": "three views supplied, mutually consistent proportions and slash count (4 confirmed in all views)",
+  "stylizationLevel": "low-poly faceted matte clay - explicitly the requested target, highest facet density of the three chunk breads",
+  "complexity": "simple",
+  "askForBetterInput": "not needed"
+}

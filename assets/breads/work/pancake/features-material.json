@@ -1,0 +1,4 @@
+[
+  {"id": "two-tone-crust-split", "score": 0.82, "tier": "critical",
+   "notes": "Scored against the authored palette, which is the contract here. Top face #C68958 and rim/underside #A9713F are carried by two separate materials on two separate meshes split on the shared perimeter ring, so the boundary is hard, watertight, and survives the runtime's MeshLambertMaterial swap - no vertex colors anywhere. Scored against the reference IMAGE instead it would be about 0.68: the reference renders its rim bevel markedly LIGHTER than its top face, which contradicts its own prompt JSON (crust[1] is the deeper brown). The prompt JSON was followed, as instructed. This is a palette-source discrepancy to settle before the remaining nine breads, not a modelling defect."}
+]

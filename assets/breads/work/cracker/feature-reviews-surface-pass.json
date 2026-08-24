@@ -1,0 +1,7 @@
+[
+  {"id": "thin-square-wafer-silhouette", "score": 0.9, "notes": "Thickness/width ratio matches the 1/10 spec target; turntable gate confirms no degenerate collapse from any azimuth."},
+  {"id": "hand-cut-edge", "score": 0.75, "notes": "Perimeter shows visible irregularity, subtler than the reference but clearly not a machine-square edge."},
+  {"id": "docking-hole-grid-review", "score": 0.85, "notes": "Regular 4x4 grid of distinct pits with clear flat gaps between them, matching the reference's grid identity after reducing spacing/depth from the over-dense v1."},
+  {"id": "seed-speckle-review", "score": 0.6, "notes": "Scatter is present but reads faintly at the harness camera distance; important-tier, not a blocker."},
+  {"id": "baked-faceting-review", "score": 0.85, "notes": "Flat faceted shading confirmed across all four turntable azimuths, no smooth-shaded gradient anywhere."}
+]

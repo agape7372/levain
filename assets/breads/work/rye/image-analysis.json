@@ -1,0 +1,71 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": {
+    "rye.png": "three-quarter top-front, 1536x1024",
+    "rye-2.png": "front elevation, 1536x1024",
+    "rye-3.png": "top-down, 1536x1024"
+  },
+  "layer1_identification": {
+    "workType": "oval bâtard-shaped rye loaf",
+    "broadClassification": "food prop / stylized low-poly game asset",
+    "primaryDomain": "object",
+    "confidence": 0.97,
+    "note": "First bread in this batch with true directional asymmetry (elongated shape + a single lengthwise slash) - unlike campagne/wholewheat/pancake which are radially symmetric families."
+  },
+  "layer2_form_silhouette": {
+    "boundingVolume": "elongated stretched dome, rounded at both ends, elliptical footprint - closer to campagne's height profile than expected, just stretched along one horizontal axis",
+    "symmetry": "bilateral about the long axis (approximately radial-family construction stretched, not a true capsule with a flat-walled middle)",
+    "shapeLanguage": "organic elongated dome expressed with geometric faceting",
+    "measurements_px": {
+      "front_elevation_width": "~1200 (edge to edge, x~155 to x~1355)",
+      "front_elevation_height": "~450 (x~275 top to x~725 bottom)",
+      "front_elevation_width_over_height": "2.67 (height/width 0.375) - nearly identical ratio to campagne's 0.379",
+      "topdown_length": "~1220 (x~155 to x~1380)",
+      "topdown_width": "~700 (y~150 to y~850)",
+      "topdown_length_over_width": "1.74 - the horizontal ellipse stretch factor",
+      "slash_span_fraction_of_length": "~0.57 of total length, centered, ~19% margin at each end (does not reach the tips)"
+    },
+    "derivedRatios": {
+      "domeHeightOverWidth": 0.375,
+      "lengthOverWidth": 1.74
+    }
+  },
+  "layer3_decomposition": {
+    "macro": ["elongated dome body (single continuous loaf, no ring-groove system unlike campagne/wholewheat)"],
+    "meso": ["single lengthwise slash valley, centered, margin at both ends"],
+    "micro": ["dense caraway seed scatter across the whole surface", "hard-edged mottled dark/light patches across the crust"]
+  },
+  "layer4_spatial": [
+    "<slash, embedded-in, dome body> contact: one linear trench running along the top of the loaf lengthwise, centered, stopping short of both tips, exposing a lighter golden interior at the floor",
+    "<caraway seeds, scattered-on, dome surface> contact: dense small raised fleck scatter across the whole crust, avoiding only the slash floor itself",
+    "<mottled patches, blended-into, dome surface> contact: broad hard-edged dark patches over a lighter chestnut base, not a smooth gradient",
+    "no floating parts; single continuous body resting on a flat unseen base"
+  ],
+  "layer5_materials": {
+    "single_substance": "opaque dielectric, matte crust (mottled) + a second opaque dielectric, matte, shared by the slash-floor crumb and the caraway seeds (both read as a similarly bright warm tone against the dark mottled crust)",
+    "metalness": 0.0,
+    "roughness": "1.0 (fully matte clay); no specular lobe anywhere",
+    "translucency": "opaque",
+    "relief": "faceted planar shading; slash reads as a shallow, fairly wide-floored valley (weaker/shallower than campagne's V-notch), seeds read as small raised faceted flecks",
+    "runtimeNote": "consumer runtime force-replaces every material with MeshLambertMaterial keeping only map+color (scripts/breads/types.ts section 2)"
+  },
+  "layer6_color": {
+    "source": "assets/prompts/breads/rye.json geometry.crust (authoritative, hand-transcribed)",
+    "crustDarkPatches": "#4A3226 (given directly)",
+    "crustBase": "not specified in JSON hex ('deep chestnut brown' description only) - resolved as a documented deterministic lighten of #4A3226 (see author_spec.py)",
+    "seedsAndCrumb": "not specified in JSON hex - resolved by reusing the family's existing 'golden' hex #D9A552 (assets/prompts/breads/cracker.json and flatbread.json), shared by both the slash crumb and the caraway seeds per a single bright material (types.ts section 1's <=2 materials constraint)",
+    "finish": "matte"
+  },
+  "layer7_identity_features": [
+    "deep chestnut-to-near-black mottled, blotchy crust (not uniform) - #4A3226 patches over a lighter chestnut base",
+    "dense caraway seed topping across the whole surface",
+    "single shallow lengthwise slash with only a faintly opened ear - weaker than campagne's, per assets/prompts/breads/rye.json notes_ko",
+    "oval bâtard silhouette, elongated but rounder/shorter than a baguette (length/width 1.74, much less extreme than baguette.json's 'extreme length-to-diameter ratio')"
+  ],
+  "layer8_uncertainty": [
+    "underside is never visible in any of the three views - modelled as a flat closed base",
+    "exact seed positions and exact mottle patch shapes are not identity-critical; density/coverage and hard-edged patchiness are what is matched",
+    "crust base and seed/crumb hexes have no source in the prompt JSON; resolved by a documented deterministic lighten and a documented reuse of an existing family hex respectively, never pixel-sampled (types.ts section 8)",
+    "seeds are rendered as micro-geometry with individual faceting in the reference; this build represents them as a baked texture scatter instead (documented decision, verified against the render before finalizing - see task report)"
+  ]
+}

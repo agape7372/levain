@@ -1,0 +1,51 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": {
+    "flatbread.png": "three-quarter top-front, 1536x1024",
+    "flatbread-2.png": "front elevation, 1536x1024",
+    "flatbread-3.png": "top-down, 1536x1024"
+  },
+  "layer1_identification": {
+    "workType": "single thin round-to-oval flatbread",
+    "broadClassification": "food prop / stylized low-poly game asset",
+    "primaryDomain": "object",
+    "confidence": 0.97
+  },
+  "layer2_form_silhouette": {
+    "boundingVolume": "thin oval disk, loosely irregular hand-stretched edge (not a perfect ellipse)",
+    "symmetry": "approximate radial/oval, broken by edge wobble and asymmetric blister placement",
+    "derivedRatios": { "thicknessOverDiameter_specTarget": 0.083 }
+  },
+  "layer3_decomposition": {
+    "macro": ["oval disk body"],
+    "meso": ["top face (blisters + char)", "rim wall", "underside (plain)"],
+    "micro": ["raised puffed blister domes (~11-13, varying size)", "dark scorch/char spots (many, concentrated on blister tops + scattered smaller ones on flat area)"]
+  },
+  "layer4_spatial": [
+    "<blister domes, raised-from, top face> contact: convex vertex-cluster displacement, not added meshes",
+    "<char spots, on, blister tops and flat top face> contact: material-only, no geometry change of their own (rides on whatever geometry is underneath)",
+    "no floating parts; single rigid disk"
+  ],
+  "layer5_materials": {
+    "single_substance": "opaque dielectric, matte",
+    "metalness": 0.0,
+    "roughness": "1.0",
+    "relief": "faceted planar shading; blisters read as low-poly hemispherical bumps"
+  },
+  "layer6_color": {
+    "source": "assets/prompts/breads/flatbread.json geometry.crust (authoritative)",
+    "baseAlbedo": "#D9A552",
+    "charAlbedo": "not specified in JSON - authored decision, see author_spec.py notes",
+    "finish": "matte"
+  },
+  "layer7_identity_features": [
+    "raised blister domes distributed across the top face, most with a dark scorched crown",
+    "irregular dark char/scorch spots scattered on the flat area too, not just on blisters",
+    "loosely irregular hand-stretched oval outline",
+    "thin disk, visible but modest thickness (about 1/12 diameter per spec)"
+  ],
+  "layer8_uncertainty": [
+    "underside fully occluded; modelled plain, never visible above the horizon",
+    "exact blister/char positions not identity-critical; count and rough distribution are matched"
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": {
+    "pancake.png": "three-quarter top-front, 1536x1024",
+    "pancake-2.png": "front elevation (slight camera elevation), 1536x1024",
+    "pancake-3.png": "top-down, 1536x1024"
+  },
+  "layer1_identification": {
+    "workType": "stack of three round griddle pancakes",
+    "broadClassification": "food prop / stylized low-poly game asset",
+    "primaryDomain": "object",
+    "confidence": 0.97,
+    "note": "reference images are themselves stylized low-poly renders, not photographs; the target look is faceted matte clay, not photoreal"
+  },
+  "layer2_form_silhouette": {
+    "boundingVolume": "flat cylinder stack; footprint is a near-circular rounded polygon",
+    "symmetry": "radial (approximate) per disk; stack symmetry broken by per-disk XZ offset",
+    "shapeLanguage": "organic form expressed with geometric faceting",
+    "measurements_px": {
+      "front_elevation_disk_width": "top 1200, middle 1210, bottom 1155 (all three effectively equal diameter)",
+      "front_elevation_rim_band_height": "top 120, middle 125, bottom 135",
+      "stack_rim_height_total": 390,
+      "topdown_outline_diameter": 930,
+      "topdown_outline_sides": "18-22 sided rounded polygon, radius wobble roughly +/-3%"
+    },
+    "derivedRatios": {
+      "diskThicknessOverDiameter": 0.10,
+      "stackHeightOverDiameter": 0.33,
+      "widestPointHeight": "mid-rim (equator bulge); the top face perimeter is inset from the widest point"
+    }
+  },
+  "layer3_decomposition": {
+    "macro": ["disk-top", "disk-middle", "disk-bottom"],
+    "meso_per_disk": ["top face (slightly crowned, inset from widest point)", "rim wall (convex equator bulge)", "underside (occluded)"],
+    "micro": ["pore dimple field on top face", "hand-poured radial wobble on outline", "edge sag at the top face perimeter"]
+  },
+  "layer4_spatial": [
+    "<disk-middle, below, disk-top> contact: flush stacked, small XZ offset",
+    "<disk-bottom, below, disk-middle> contact: flush stacked, small XZ offset in a different direction",
+    "<pore dimples, embedded-in, top face> contact: embed (concave displacement, not added parts)",
+    "no floating parts; each disk rests on the one beneath, contact type = overlap/rest"
+  ],
+  "layer5_materials": {
+    "single_substance": "opaque dielectric, matte",
+    "metalness": 0.0,
+    "roughness": "1.0 (fully matte clay); reference shows no specular lobe anywhere",
+    "translucency": "opaque",
+    "relief": "faceted planar shading; pores read as concave conical pits with polygonal rims",
+    "runtimeNote": "consumer runtime force-replaces every material with MeshLambertMaterial keeping only map+color, so PBR scalars beyond albedo are inert (repo scripts/breads/types.ts section 2)"
+  },
+  "layer6_color": {
+    "source": "assets/prompts/breads/pancake.json geometry.crust (authoritative, hand-transcribed)",
+    "topFaceAlbedo": "#C68958",
+    "rimAndUndersideAlbedo": "#A9713F",
+    "finish": "matte",
+    "observedVsSpec": "in the reference renders the rim reads LIGHTER than the top face; that is the upper-left key light striking the outward-facing bevel, not albedo. Spec hexes are used as albedo and the harness key light at (-2,6,2) reproduces the same relationship."
+  },
+  "layer7_identity_features": [
+    "three-layer stack with visible per-layer XZ offset (front elevation shows three distinct rim bands)",
+    "pore dimple field: roughly 40 pits on the top face, four size classes (crater 7.5% of diameter, medium 5%, small 2%, tiny 1.3%), sparser within the outer 8% margin",
+    "concave faceted pits, each a polygonal cone pushed into the surface (never a raised bump)",
+    "hand-poured wobbly outline, not a true circle",
+    "two-tone crust: lit top face vs deeper rim/underside",
+    "edge sag: the top face perimeter droops below the widest point of the rim"
+  ],
+  "layer8_uncertainty": [
+    "underside of every disk is hidden in all three views (occluded by the disk below / by the ground plane); modelled as a closed low-detail cap and never visible from any turntable azimuth above the horizon",
+    "the interior between stacked disks is hidden; contact is modelled as a small overlap rather than a solved crease",
+    "exact pore positions are not identity-critical and are procedurally seeded from the builder rng; size distribution and count are matched instead",
+    "reference renders carry a soft contact shadow between layers that the flat-lit harness will not reproduce; this is expected, not a defect"
+  ]
+}

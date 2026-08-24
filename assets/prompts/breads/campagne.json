@@ -1,6 +1,6 @@
 {
   "id": "campagne",
-  "version": 1,
+  "version": 2,
   "name_ko": "깜빠뉴",
   "subject": "a round country boule loaf",
   "geometry": {
@@ -12,13 +12,17 @@
       "light flour dusting scattered unevenly across the top, especially along the spiral ridges"
     ]
   },
-  "style_ref": "shared-style-v1",
+  "style_ref": "shared-style-v2",
   "camera": "three-quarter top-front view, object centered, 15% margin",
-  "background": "solid #F2E6D3, no props, no floor texture",
-  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows",
-  "negative": ["face", "eyes", "mouth", "character", "text", "watermark", "plate", "board", "hands", "photorealism", "glossy plastic", "people"],
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features"],
   "views": ["three-quarter top-front", "front elevation", "top-down"],
   "output": { "aspect": "1:1", "size": 1024 },
-  "prompt_flat": "A cozy low-poly stylized 3D render of a round country boule loaf. Geometry: a round boule with a smooth, rounded dome top. Crust: an amber to dark brown surface (#A9713F blended darker) covers the dome; spiral banneton ring markings are pressed concentrically across the whole top surface as the defining signature feature; a cross-shaped slash is cut into the center of the dome, opened into a raised burst 'ear' along each cut line; light flour dusting is scattered unevenly across the top, especially along the spiral ridges. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, rounded silhouette, stylized 3D render. Camera: three-quarter top-front view, object centered, 15% margin. Background: solid #F2E6D3, no props, no floor texture. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows. Generate the same object consistently across each requested view — three-quarter top-front, front elevation, and top-down — keeping identical proportions, colors, and surface details between views. Negative: no face, no eyes, no mouth, no character, no text, no watermark, no plate, no board, no hands, no photorealism, no glossy plastic, no people.",
+  "prompt_flat": "A cozy low-poly stylized 3D render of a round country boule loaf, a single game asset object on a plain backdrop. Geometry: a round boule with a smooth, rounded dome top. Crust: an amber to dark brown surface (#A9713F blended darker) covers the dome; spiral banneton ring markings are pressed concentrically across the whole top surface as the defining signature feature; a cross-shaped slash is cut into the center of the dome, opened into a raised burst 'ear' along each cut line; light flour dusting is scattered unevenly across the top, especially along the spiral ridges. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact boule loaf, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact boule loaf, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the spiral banneton rings and cross slash are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
   "notes_ko": "바네통 나선 링 자국이 이 빵의 최대 시그니처다 — 여기에 십자 칼집으로 벌어진 귀와 밀가루 더스팅까지 더해져야 깜빠뉴로 인식된다."
 }

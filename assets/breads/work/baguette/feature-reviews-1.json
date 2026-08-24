@@ -1,0 +1,32 @@
+[
+  {
+    "id": "spindle-silhouette",
+    "score": 0.8,
+    "tier": "critical",
+    "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+  },
+  {
+    "id": "slash-count-placement",
+    "score": 0.72,
+    "tier": "critical",
+    "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+  },
+  {
+    "id": "ear-crumb-contrast",
+    "score": 0.72,
+    "tier": "critical",
+    "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+  },
+  {
+    "id": "no-shadow-artifact",
+    "score": 0.8,
+    "tier": "important",
+    "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+  },
+  {
+    "id": "baked-faceting",
+    "score": 0.75,
+    "tier": "important",
+    "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+  }
+]

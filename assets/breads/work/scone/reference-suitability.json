@@ -1,0 +1,21 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": [
+    "assets/breads/src/scone.png (three-quarter top-front)",
+    "assets/breads/src/scone-2.png (front elevation)",
+    "assets/breads/src/scone-3.png (top-down)"
+  ],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "objectOccupiesEnoughOfFrame": "single wedge fills the frame with clear margin in all three views (see check_reference_admission for the measured fraction)",
+    "strongSilhouette": "unambiguous rounded-triangle wedge in top-down; wide-blob elevation is an expected consequence of the apex-forward pose, not a weak silhouette",
+    "majorMaterialsVisible": "single matte dielectric crust in two tonal zones (top vs everything else)",
+    "hiddenSideInferable": "underside is flat and occluded by the ground plane in every turntable azimuth above the horizon; no unresolved hidden geometry",
+    "procedurallyApproximable": "loft/extrude of a rounded-triangle outline plus displaced-grid fissures on the top face; no smoke, liquid, glass or lace anywhere"
+  },
+  "notConditional": "three views supplied (three-quarter, front elevation, top-down); top-down is the authoritative footprint reference so the single-view caveat does not apply",
+  "stylizationLevel": "low-poly faceted matte clay - explicitly the requested target, not a fallback",
+  "complexity": "simple",
+  "askForBetterInput": "not needed"
+}

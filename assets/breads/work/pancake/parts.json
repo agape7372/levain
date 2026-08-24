@@ -1,0 +1,47 @@
+{
+  "note": "Parts as the builder constructs them, BEFORE the mandatory final mergeByMaterial. scripts/breads/pancake.ts adds one named mesh per leaf component (body + griddle face per disk); mergeByMaterial then fuses them into 2 meshes because the consumer caps a bread at 2 materials / 2 meshes (scripts/breads/types.ts sections 1-2). Triangle counts are analytic from the lathe ring/segment counts and sum to 1980, matching the harness's reported total exactly.",
+  "parts": [
+    {
+      "name": "root",
+      "kind": "container",
+      "module": "createPancake",
+      "triangles": 1980
+    },
+    {
+      "name": "disk-bottom",
+      "kind": "part",
+      "module": "buildDisk",
+      "triangles": 270
+    },
+    {
+      "name": "disk-bottom-face",
+      "kind": "part",
+      "module": "buildDisk",
+      "triangles": 330
+    },
+    {
+      "name": "disk-middle",
+      "kind": "part",
+      "module": "buildDisk",
+      "triangles": 270
+    },
+    {
+      "name": "disk-middle-face",
+      "kind": "part",
+      "module": "buildDisk",
+      "triangles": 330
+    },
+    {
+      "name": "disk-top",
+      "kind": "part",
+      "module": "buildDisk",
+      "triangles": 270
+    },
+    {
+      "name": "disk-top-face",
+      "kind": "part",
+      "module": "buildDisk",
+      "triangles": 510
+    }
+  ]
+}

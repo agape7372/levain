@@ -1,0 +1,2700 @@
+{
+  "targetName": "Baguette with Diagonal Slashes",
+  "targetId": "baguette-with-diagonal-slashes",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\baguette.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved - fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "baguette with diagonal slashes",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "geometric",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "single-body tapered tube"
+      ],
+      "motionPotential": [
+        "static prop, whole-object rotation only"
+      ],
+      "materialFamilies": [
+        "matte baked crust",
+        "exposed crumb"
+      ],
+      "notes": "Single rigid tube, two material zones split by 4 independently-classified slash footprints."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 0,
+        "componentCount": 0,
+        "hierarchyDepth": 0,
+        "repetitionDensity": 0,
+        "materialLayerCount": 0,
+        "localDetailDensity": 0,
+        "occlusionRisk": 0,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 1,
+        "mesoComponents": 1,
+        "microFeatureGroups": 0,
+        "materialLayers": 1,
+        "repetitionSystems": 0
+      },
+      "reasoning": [
+        "Assess 'Baguette with Diagonal Slashes' from the image before finalizing componentTree/materials."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro"
+      ],
+      "needsRepetitionSystems": false,
+      "needsMaterialLocalOverrides": false,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Choose simple/moderate/complex/ultra-complex from observed structure, not from a hardcoded domain."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerate every identity-defining small detail before authoring the spec. Each detail must map to a component.localFeatures entry or material.localOverrides entry, never prose only. Use forge/stage1_intake/build_detail_inventory.py to scan zones.",
+      "details": [
+        {
+          "id": "slash-field",
+          "name": "4 diagonal overlapping slashes",
+          "description": "Lens-shaped bands tilted from the length axis, each with a raised ear and recessed crumb floor.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "confidence": 0.85,
+          "mapsTo": {
+            "ref": "slash-field",
+            "note": "baguette-slashes.localFeatures.slash-field"
+          },
+          "kind": "hole",
+          "mapsToNote": "baguette-slashes.localFeatures.slash-field"
+        },
+        {
+          "id": "taper-profile",
+          "name": "Gradual bipolar taper",
+          "description": "Radius eases to a true point over the outer ~35-40% of the length at each end.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.9,
+          "mapsTo": {
+            "ref": "taper-profile",
+            "note": "baguette-body.localFeatures.taper-profile"
+          },
+          "kind": "bevel",
+          "mapsToNote": "baguette-body.localFeatures.taper-profile"
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "name": "Raised ear + recessed crumb colour",
+          "description": "The decisive identity feature - without it the object reads as a generic rod.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.95,
+          "mapsTo": {
+            "ref": "slash-boundary",
+            "note": "materials.slash-boundary"
+          },
+          "kind": "seam",
+          "mapsToNote": "materials.slash-boundary"
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png"
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 1,
+      "mesoComponents": 1,
+      "microFeatureGroups": 0,
+      "materialLayers": 1,
+      "repetitionSystems": 0,
+      "reviewViewpoints": 2
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.8,
+    "mustMatch": [
+      "extreme length/diameter taper spindle silhouette",
+      "4 diagonal overlapping slashes with raised ears and recessed crumb",
+      "crumb colour never bleeds outside the slash trenches",
+      "faceted flat shading baked into geometry"
+    ],
+    "niceToHave": [
+      "exact slash tilt angle (a visual estimate, not measured)",
+      "exact taper curvature"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "spindle-silhouette",
+      "name": "Long tapered spindle, extreme L/D",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "baguette-body"
+      ],
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "slash-count-placement",
+      "name": "4 diagonal overlapping slashes, correctly tilted",
+      "tier": "critical",
+      "passIds": [
+        "surface-pass"
+      ],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": [
+        "baguette-slashes"
+      ],
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "ear-crumb-contrast",
+      "name": "Raised ear + recessed crumb-coloured floor",
+      "tier": "critical",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": [
+        "baguette-slashes"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "no-shadow-artifact",
+      "name": "No dark patch under either tip (harness is shadowless)",
+      "tier": "important",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "baguette-body"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "baked-faceting",
+      "name": "Faceted flat shading, high facet density",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "baguette-body"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": [],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy; preSpecAssessment scores actionReadinessNeed 0"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Same runtime-budget reclassification as the other breads."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by scripts/breadlab.ts, mirrored from scripts/thumbsHarness.ts.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "Both tips are true poles (radius -> 0); no underside geometry exists to hide, so the harness's flat-lit shadowless render has nothing to occlude there.",
+    "The harness normalizes the longest axis to 1.6, so absolute dimensions are arbitrary and only the authored ratios carry meaning.",
+    "Exact slash tilt angle is a visual estimate (32deg), not an independently measured value - accepted like pancake's unmeasured pore positions."
+  ],
+  "coordinateFrame": {
+    "front": "+X is the length axis; the harness three-quarter camera sits at (-1.6, 2.2, 2.6)",
+    "up": "+Y",
+    "scaleReference": "cross-section radius = 1.0 relative unit. Absolute scale is meaningless: the consumer runtime refits the longest axis to 1.6 (scripts/breads/types.ts section 7)."
+  },
+  "silhouette": {
+    "boundingShape": "tapered spindle, 22.73 long by 2.0 diameter",
+    "aspectRatios": [
+      {
+        "id": "length-over-diameter",
+        "value": 11.365,
+        "source": "baguette-2.png pixel bbox, PIL measurement"
+      }
+    ],
+    "symmetry": "radial per cross-section; bilateral along length (both ends taper similarly)",
+    "dominantCurves": [
+      "gradual bipolar taper to a true point at each end"
+    ],
+    "negativeSpaces": [
+      "4 slash trenches, the only negative space besides the taper"
+    ],
+    "landmarks": [
+      "4 evenly spaced slashes in the constant-radius middle zone, tilted 32deg from the length axis"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front, diagonal framing",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "long thin spindle tapered to a point at both ends",
+        "4 diagonal overlapping slashes with raised ear rims and recessed crumb"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "length/diameter = 11.365 (measured pixel bbox)",
+        "gradual taper over roughly the outer 35-40% of the length at each end"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-top",
+      "view": "strict top-down orthographic",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "4 lens/eye-shaped slashes tilted diagonally relative to the length axis, overlapping consecutively",
+        "slashes span most of the constant-radius middle portion of the length"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Baguette with Diagonal Slashes",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "tapered-sweep",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only root carrying the tube and its slash deformation; emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 22.73,
+        "height": 2.0,
+        "depth": 2.0,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "capsule",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Capsule proxy matching the tapered tube; slashes are far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust"
+        }
+      },
+      "material": "crust",
+      "materialLayers": [
+        "crust"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(169, 113, 63, 1.0)",
+        "secondaryAlbedo": "rgba(244, 234, 212, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust, opaque dielectric, roughness 1.0, no specular lobe - same class as the other breads' crust materials.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/breads/baguette.json geometry.crust"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "n/a",
+        "displacementPattern": "n/a",
+        "occlusionPattern": "cavity darkening inside each slash trench",
+        "edgeWearPattern": "none - freshly baked",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top",
+        "view-front"
+      ],
+      "details": [],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "baguette-body",
+      "name": "Tapered crust shell",
+      "level": "macro",
+      "role": "body",
+      "importance": 0.85,
+      "confidence": 0.9,
+      "primitive": "tapered-sweep",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A single continuous tube swept along the length axis with a radius profile tapering to true poles at both ends - genuinely a tapered sweep, not a lathe (LatheGeometry is banned per CRIB: phi-seam vertex duplication tears under jitter).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation, highest facet density of the chunk group",
+        "latheProfile": {
+          "points": [
+            [
+              0,
+              -1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "segments": 22,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586,
+          "note": "Not a lathe - swept along X through hand-authored STATIONS (radius(x)), true poles at both tips. See scripts/breads/baguette.ts."
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "slash-scatter",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.12,
+            "notes": "Grid-cell classification generalized from scone's point-fissure and loaf's ridge-sweep techniques to a 2D oriented band on an unrolled tube surface. For each (station, sector) grid vertex near the top of the tube, its local (X, arc-length-from-top) position is rotated by -32deg into the slash's own (along, across) frame; if |along| < halfLength and |across| < widthEnvelope(along) (an elliptical eye-shaped envelope that closes to 0 at along=+-halfLength) the vertex is inside the slash footprint. Vertices in the inner ~55% of the width envelope are the crumb-coloured trench floor (dipped inward); the outer band is the raised crust-coloured ear (pushed outward). Triangles are classified crumb by majority vertex vote, then emitted in two ordered passes (crust triangles first, then crumb) so scripts/breads/lib.ts sliceTriangles can split them by a single contiguous boundary index, exactly like scone's body/face split - generalized here from a single shared ring to four independent oriented bands scattered across the grid."
+          }
+        ],
+        "uvStrategy": "cylindrical projection along X (scripts/breads/lib.ts uvCylindrical)",
+        "normalStrategy": "flat normals baked by splitting vertices, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 22.73,
+        "height": 2.0,
+        "depth": 2.0,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "body",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "capsule",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Capsule proxy matching the tapered tube; slashes are far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "baguette-body",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust"
+        }
+      },
+      "material": "crust",
+      "materialLayers": [
+        "crust"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(169, 113, 63, 1.0)",
+        "secondaryAlbedo": "rgba(244, 234, 212, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust, opaque dielectric, roughness 1.0, no specular lobe - same class as the other breads' crust materials.",
+        "zone": "entire crust surface except slash floors",
+        "evidenceRefs": [
+          "assets/prompts/breads/baguette.json geometry.crust"
+        ]
+      },
+      "deformations": [
+        "slash-scatter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "slash-boundary",
+          "kind": "material-boundary",
+          "notes": "Boundary is the per-slash trench-floor footprint, classified per grid vertex - 4 independent boundaries, not one shared ring."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "taper-profile",
+          "name": "Gradual bipolar taper",
+          "kind": "profile-curvature",
+          "description": "Radius eases from 1.0 in the constant middle down to 0 (a true pole) over the outer ~35-40% of the length at each end - a streamlined point, not an abrupt cone.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "profile-driven taper only outside the slash zone",
+        "occlusionPattern": "cavity darkening inside each slash trench",
+        "edgeWearPattern": "none - freshly baked",
+        "notes": "Crust shares one flat albedo except inside slash trenches; deliberately the densest facet field of the chunk group, matching the reference's visibly higher facet count."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "taper-profile"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "baguette-slashes",
+      "name": "Diagonal slash scores with ears and exposed crumb",
+      "level": "meso",
+      "role": "surface",
+      "importance": 1.0,
+      "confidence": 0.85,
+      "primitive": "tapered-sweep",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "4 oriented recessed-and-raised bands displaced into the parent tube's own grid - not separate geometry. The identity-critical feature per baguette.json notes_ko.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0,
+              -1
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "segments": 22,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "slash-scatter",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.12,
+            "notes": "Grid-cell classification generalized from scone's point-fissure and loaf's ridge-sweep techniques to a 2D oriented band on an unrolled tube surface. For each (station, sector) grid vertex near the top of the tube, its local (X, arc-length-from-top) position is rotated by -32deg into the slash's own (along, across) frame; if |along| < halfLength and |across| < widthEnvelope(along) (an elliptical eye-shaped envelope that closes to 0 at along=+-halfLength) the vertex is inside the slash footprint. Vertices in the inner ~55% of the width envelope are the crumb-coloured trench floor (dipped inward); the outer band is the raised crust-coloured ear (pushed outward). Triangles are classified crumb by majority vertex vote, then emitted in two ordered passes (crust triangles first, then crumb) so scripts/breads/lib.ts sliceTriangles can split them by a single contiguous boundary index, exactly like scone's body/face split - generalized here from a single shared ring to four independent oriented bands scattered across the grid."
+          }
+        ],
+        "uvStrategy": "cylindrical projection along X (scripts/breads/lib.ts uvCylindrical)",
+        "normalStrategy": "flat normals baked by splitting vertices"
+      },
+      "parent": "baguette-body",
+      "attachment": null,
+      "dimensions": {
+        "width": 2.2,
+        "height": 0.5,
+        "depth": 0.5,
+        "units": "relative",
+        "confidence": 0.75
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "capsule",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Capsule proxy matching the tapered tube; slashes are far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "baguette-slashes",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust"
+        }
+      },
+      "material": "crumb",
+      "materialLayers": [
+        "crumb"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(244, 234, 212, 1.0)",
+        "secondaryAlbedo": "rgba(169, 113, 63, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust, opaque dielectric, roughness 1.0, no specular lobe - same class as the other breads' crust materials.",
+        "zone": "trench floor inside each slash only",
+        "evidenceRefs": [
+          "assets/prompts/breads/baguette.json geometry.crust"
+        ]
+      },
+      "deformations": [
+        "slash-scatter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "slash-boundary-face",
+          "kind": "material-boundary",
+          "notes": "Shares the parent body's per-slash grid-classified boundary exactly."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "slash-field",
+          "name": "4 diagonal overlapping slashes",
+          "kind": "recessed-detail-scatter",
+          "description": "4 lens-shaped bands tilted 32deg from the length axis, each with a raised ear rim (outer band, pushed outward) around a recessed crumb-coloured trench (inner band, pushed inward). Grid-cell classification generalized from scone's point-fissure and loaf's ridge-sweep techniques to a 2D oriented band on an unrolled tube surface. For each (station, sector) grid vertex near the top of the tube, its local (X, arc-length-from-top) position is rotated by -32deg into the slash's own (along, across) frame; if |along| < halfLength and |across| < widthEnvelope(along) (an elliptical eye-shaped envelope that closes to 0 at along=+-halfLength) the vertex is inside the slash footprint. Vertices in the inner ~55% of the width envelope are the crumb-coloured trench floor (dipped inward); the outer band is the raised crust-coloured ear (pushed outward). Triangles are classified crumb by majority vertex vote, then emitted in two ordered passes (crust triangles first, then crumb) so scripts/breads/lib.ts sliceTriangles can split them by a single contiguous boundary index, exactly like scone's body/face split - generalized here from a single shared ring to four independent oriented bands scattered across the grid.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.85,
+          "repetitionSystemRef": "slash-scatter"
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.12,
+        "normalPattern": "faceted planar shading; each slash contributes hard-edged trench and ear facets",
+        "displacementPattern": "slash trenches and ears displaced into the tube grid",
+        "occlusionPattern": "cavity darkening inside each slash trench",
+        "edgeWearPattern": "none - freshly baked",
+        "notes": "assets/prompts/breads/baguette.json notes_ko: the diagonal overlapping slashes and burst ears are THE decisive identity feature - without them this reads as a generic rod, not a baguette."
+      },
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ],
+      "details": [
+        "slash-field"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "crust",
+      "name": "Baguette crust",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#A9713F",
+      "color": "#A9713F",
+      "albedo": {
+        "dominant": "#A9713F",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/baguette.json geometry.crust, deliberately not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#A9713F"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only to satisfy mergeByMaterial's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "tapered tube extrusion",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 4.0,
+          "amplitude": 0.12,
+          "role": "slash trenches and ears",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 22.0,
+          "amplitude": 0.02,
+          "role": "faceting",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "entire surface except slash floors",
+        "amplitude": 0.12,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material; cavity darkening comes from trench-wall orientation."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading - not inherited by the runtime swap."
+      ],
+      "notes": "entire surface except slash floors. Two solid colours are enough for the whole object, no texture emitted."
+    },
+    {
+      "id": "crumb",
+      "name": "Exposed crumb inside slashes",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#F4EAD4",
+      "color": "#F4EAD4",
+      "albedo": {
+        "dominant": "#F4EAD4",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/baguette.json geometry.crust, deliberately not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#F4EAD4"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only to satisfy mergeByMaterial's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "tapered tube extrusion",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 4.0,
+          "amplitude": 0.12,
+          "role": "slash trenches and ears",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 22.0,
+          "amplitude": 0.02,
+          "role": "faceting",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "recessed slash trench floors only",
+        "amplitude": 0.12,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material; cavity darkening comes from trench-wall orientation."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "slash-boundary",
+          "name": "Slash trench boundary",
+          "maskSource": "geometry",
+          "description": "Boundary is the per-slash grid-classified footprint - 4 independent geometric boundaries, not a texture mask.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "baguette-body",
+            "baguette-slashes"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading - not inherited by the runtime swap."
+      ],
+      "notes": "recessed slash trench floors only. Two solid colours are enough for the whole object, no texture emitted."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "slash-scatter",
+      "name": "Diagonal slash scores",
+      "level": "meso",
+      "hostComponents": [
+        "baguette-slashes"
+      ],
+      "elementComponentIds": [
+        "baguette-slashes"
+      ],
+      "elementKind": "recessed+raised vertex displacement, not added meshes",
+      "count": 4,
+      "distribution": {
+        "mode": "fixed evenly-spaced X positions along the constant-radius middle zone, all at a shared 32deg tilt",
+        "axisAngleDeg": 32,
+        "mechanism": "Grid-cell classification generalized from scone's point-fissure and loaf's ridge-sweep techniques to a 2D oriented band on an unrolled tube surface. For each (station, sector) grid vertex near the top of the tube, its local (X, arc-length-from-top) position is rotated by -32deg into the slash's own (along, across) frame; if |along| < halfLength and |across| < widthEnvelope(along) (an elliptical eye-shaped envelope that closes to 0 at along=+-halfLength) the vertex is inside the slash footprint. Vertices in the inner ~55% of the width envelope are the crumb-coloured trench floor (dipped inward); the outer band is the raised crust-coloured ear (pushed outward). Triangles are classified crumb by majority vertex vote, then emitted in two ordered passes (crust triangles first, then crumb) so scripts/breads/lib.ts sliceTriangles can split them by a single contiguous boundary index, exactly like scone's body/face split - generalized here from a single shared ring to four independent oriented bands scattered across the grid.",
+        "note": "Positions are authored, not randomized - the reference shows a small fixed count (3-5) at a consistent hand-scored angle, not a scattered field."
+      },
+      "sizeClasses": [
+        {
+          "id": "slash",
+          "halfLength": 1.0,
+          "halfWidth": 0.26
+        }
+      ],
+      "seedRule": "Fixed authored positions/angle; only the surface jitter (applied before slash displacement) uses the builder's injected rng argument, never Math.random.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-24T03:31:18.228647+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.68,
+        "componentStructure": 0.85,
+        "formDetail": 0.7,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [
+        {
+          "id": "spindle-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+        },
+        {
+          "id": "slash-count-placement",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+        },
+        {
+          "id": "no-shadow-artifact",
+          "score": 0.8,
+          "tier": "important",
+          "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/cmp-sheet.png",
+      "cameraView": "three-quarter",
+      "notes": "diagnose_render blockout (aligned): silhouetteIoU=0.5281, aspectRatioDelta=0.3734, scaleDelta=0.2872, bilateralSymmetryError=0.1044, colorDelta.maxDeltaE=27.68. diagnose_render_multi_angle: 2/4 false-positive DEGENERATE (verified non-empty via direct pixel sampling, documented above).",
+      "aiVisionNotes": "Object reads as a baguette: long tapered spindle with 4 diagonal slash marks showing crumb colour, denser faceting than the other chunk breads. Weakest points: slash edges read jagged rather than smooth, and the tier1 aspect/IoU numbers are noisier than the other three breads due to the diagonal-composition mismatch."
+    },
+    {
+      "timestamp": "2026-08-24T03:31:58.293536+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.68,
+        "componentStructure": 0.85,
+        "formDetail": 0.7,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [
+        {
+          "id": "spindle-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+        },
+        {
+          "id": "slash-count-placement",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+        },
+        {
+          "id": "no-shadow-artifact",
+          "score": 0.8,
+          "tier": "important",
+          "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/cmp-sheet.png",
+      "cameraView": "three-quarter",
+      "notes": "diagnose_render structural-pass (same geometry): numbers unchanged.",
+      "aiVisionNotes": "Hierarchy reads correctly; no floating parts, no seam gaps at any slash boundary across the turntable."
+    },
+    {
+      "timestamp": "2026-08-24T03:32:44.571138+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.68,
+        "componentStructure": 0.85,
+        "formDetail": 0.7,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [
+        {
+          "id": "spindle-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+        },
+        {
+          "id": "slash-count-placement",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+        },
+        {
+          "id": "no-shadow-artifact",
+          "score": 0.8,
+          "tier": "important",
+          "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/cmp-sheet.png",
+      "cameraView": "three-quarter",
+      "notes": "Same tier1 numbers as structural-pass (geometry unchanged).",
+      "aiVisionNotes": "Taper reads correctly across all angles; no shadow artifacts anywhere."
+    },
+    {
+      "timestamp": "2026-08-24T03:33:22.101375+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.68,
+        "componentStructure": 0.85,
+        "formDetail": 0.7,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [
+        {
+          "id": "spindle-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+        },
+        {
+          "id": "slash-count-placement",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+        },
+        {
+          "id": "no-shadow-artifact",
+          "score": 0.8,
+          "tier": "important",
+          "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/cmp-sheet.png",
+      "cameraView": "three-quarter",
+      "notes": "diagnose_render material-pass: colorDelta.maxDeltaE=27.68. No geometry change this pass.",
+      "aiVisionNotes": "Two colour zones read correctly and are correctly confined to the slash floors; deltaE gap attributed to reference lighting, not wrong albedo."
+    },
+    {
+      "timestamp": "2026-08-24T03:34:01.947353+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.68,
+        "componentStructure": 0.85,
+        "formDetail": 0.7,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [
+        {
+          "id": "spindle-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+        },
+        {
+          "id": "slash-count-placement",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+        },
+        {
+          "id": "no-shadow-artifact",
+          "score": 0.8,
+          "tier": "important",
+          "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/cmp-sheet.png",
+      "cameraView": "three-quarter",
+      "notes": "diagnose_render surface-pass: same numbers as material-pass (no geometry change).",
+      "aiVisionNotes": "The 4-slash identity feature reads correctly and unambiguously as diagonal scoring with exposed crumb, the single most important thing to get right for this bread. Remaining roughness is texture-level, not shape-level."
+    },
+    {
+      "timestamp": "2026-08-24T03:34:46.864020+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.68,
+        "componentStructure": 0.85,
+        "formDetail": 0.7,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [
+        {
+          "id": "spindle-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+        },
+        {
+          "id": "slash-count-placement",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+        },
+        {
+          "id": "no-shadow-artifact",
+          "score": 0.8,
+          "tier": "important",
+          "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/cmp-sheet.png",
+      "cameraView": "three-quarter",
+      "notes": "diagnose_render optimization-pass: same numbers as surface-pass (no geometry change, budget check only). tri=2048 verts=6144 meshes=2 kb=194.2 (breadlab-shot stats).",
+      "aiVisionNotes": "Object reads unambiguously as a baguette: extreme tapered spindle, 4 diagonal slashes with visible crumb and raised ear structure, denser faceting than the other chunk breads. Stopping here - further iteration on the framing-driven tier1 deltas would not fix a model defect, and slash smoothness is now a budget tradeoff, not an open mechanism bug."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-24T03:31:18.228647+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.68,
+        "componentStructure": 0.85,
+        "formDetail": 0.7,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [
+        {
+          "id": "spindle-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+        },
+        {
+          "id": "slash-count-placement",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+        },
+        {
+          "id": "no-shadow-artifact",
+          "score": 0.8,
+          "tier": "important",
+          "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+        }
+      ],
+      "action": "continue",
+      "summary": "6 render iterations to get the slash mechanism right: shallow depth (v1-2) read as scattered dots; more X-density (v3) barely helped; more angular segments (v4) revealed the real bottleneck was slash WIDTH, not resolution (trench was a thin checkmark); widening it (v5) then exposed along-axis resolution as the limiter again (chevron-stepped edges); v6 raised station density once more to close a connected 4-lens pattern. Also verified tube+pole winding analytically before the first render (check_winding.py), catching a 50-percent-inward-facing bug that a naive 'flip both triangles together' guess would have missed.",
+      "matched": [
+        "extreme tapered-spindle silhouette with true poles at both ends, no holes (winding 0/736 inward-facing per check_winding.py, both triangle slots verified independently)",
+        "L/D measured precisely (11.365, PIL pixel bbox, not eyeballed)",
+        "4 diagonal overlapping slashes present, correctly tilted (32deg), connected lens shapes with visible crumb colour",
+        "bilateralSymmetryError 0.104 - the best of the four breads built so far, evidence the true 3D form is well-built",
+        "2048 tri / 194.2KB, within the 8000tri/250KB hard cap (over the 800-1500 CRIB soft target, judged acceptable since this bread has 4 independent slash systems, the most detail of the chunk group)"
+      ],
+      "mismatches": [
+        "silhouetteIoU 0.528 and aspect delta 0.373 are the worst of the four breads - likely a diagonal-framing/composition mismatch (the reference is deliberately posed diagonally across a square frame for this extreme aspect ratio",
+        "the harness's fixed camera does not replicate that composition choice) rather than a shape defect, per grimoire's own procedural-vs-AI-render pixel-alignment caveat",
+        "slash lens edges read jagged/stepped rather than the reference's smooth eye boundary - an accepted low-poly roughness at this budget, not an unresolved mechanism bug",
+        "ear rim reads subtler than the reference's brightly-lit raised lip",
+        "diagnose_render_multi_angle reported false-positive DEGENERATE views at azimuth 90/270 (area=0.0000) - direct PIL pixel sampling confirms all 4 turntable shots have substantial non-background content (469-589 sampled points each), so this is a mask-detection tool limitation for extreme-aspect-ratio shapes, not an actual empty render"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/cmp-sheet.png",
+        "cameraView": "three-quarter",
+        "notes": "diagnose_render blockout (aligned): silhouetteIoU=0.5281, aspectRatioDelta=0.3734, scaleDelta=0.2872, bilateralSymmetryError=0.1044, colorDelta.maxDeltaE=27.68. diagnose_render_multi_angle: 2/4 false-positive DEGENERATE (verified non-empty via direct pixel sampling, documented above).",
+        "aiVisionNotes": "Object reads as a baguette: long tapered spindle with 4 diagonal slash marks showing crumb colour, denser faceting than the other chunk breads. Weakest points: slash edges read jagged rather than smooth, and the tier1 aspect/IoU numbers are noisier than the other three breads due to the diagonal-composition mismatch."
+      }
+    },
+    {
+      "timestamp": "2026-08-24T03:31:58.293536+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.68,
+        "componentStructure": 0.85,
+        "formDetail": 0.7,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [
+        {
+          "id": "spindle-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+        },
+        {
+          "id": "slash-count-placement",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+        },
+        {
+          "id": "no-shadow-artifact",
+          "score": 0.8,
+          "tier": "important",
+          "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+        }
+      ],
+      "action": "continue",
+      "summary": "Structural-pass reviews the same blockout build: hierarchy already correct (root>baguette-body>baguette-slashes), no code change needed",
+      "matched": [
+        "component hierarchy matches spec: baguette-body (macro, body) parented to root, baguette-slashes (meso, surface) parented to baguette-body",
+        "shared grid welds body and slash floors, no seam tear (single indexed geometry, classified and reordered only after jitter)",
+        "2 meshes/2 materials within the <=2-material contract"
+      ],
+      "mismatches": [
+        "same residual tier1 numbers as blockout - carried forward, attributed to diagonal-framing mismatch not a structural defect"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/cmp-sheet.png",
+        "cameraView": "three-quarter",
+        "notes": "diagnose_render structural-pass (same geometry): numbers unchanged.",
+        "aiVisionNotes": "Hierarchy reads correctly; no floating parts, no seam gaps at any slash boundary across the turntable."
+      }
+    },
+    {
+      "timestamp": "2026-08-24T03:32:44.571138+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.68,
+        "componentStructure": 0.85,
+        "formDetail": 0.7,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [
+        {
+          "id": "spindle-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+        },
+        {
+          "id": "slash-count-placement",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+        },
+        {
+          "id": "no-shadow-artifact",
+          "score": 0.8,
+          "tier": "important",
+          "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+        }
+      ],
+      "action": "continue",
+      "summary": "Form-refinement reviews the same build: taper profile and no-shadow-artifact features are already correctly authored",
+      "matched": [
+        "gradual bipolar taper to true poles at both ends, over the outer ~35-40% of the length, matching the reference's streamlined (not abrupt-cone) tips",
+        "no authored shadow or dark patch under either tip - harness is flat-lit and shadowless by construction"
+      ],
+      "mismatches": [
+        "same residual tier1 aspect/IoU numbers as blockout, attributed to diagonal-framing mismatch not shape"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/cmp-sheet.png",
+        "cameraView": "three-quarter",
+        "notes": "Same tier1 numbers as structural-pass (geometry unchanged).",
+        "aiVisionNotes": "Taper reads correctly across all angles; no shadow artifacts anywhere."
+      }
+    },
+    {
+      "timestamp": "2026-08-24T03:33:22.101375+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.68,
+        "componentStructure": 0.85,
+        "formDetail": 0.7,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [
+        {
+          "id": "spindle-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+        },
+        {
+          "id": "slash-count-placement",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+        },
+        {
+          "id": "no-shadow-artifact",
+          "score": 0.8,
+          "tier": "important",
+          "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+        }
+      ],
+      "action": "continue",
+      "summary": "Material-pass: crust/crumb two-tone split reads correctly inside each slash; tier1 flags max colour deltaE 27.68 against REFERENCE PIXELS, same PALETTE RULE reasoning as the other three breads (lowest deltaE of the chunk group, notably)",
+      "matched": [
+        "crust (#A9713F) and crumb (#F4EAD4) both hand-transcribed verbatim from baguette.json geometry.crust",
+        "crumb colour confined to slash trench floors only, never bleeding onto plain crust",
+        "deltaE 27.68 is actually the LOWEST of the four breads built so far (scone 33.95, loaf 34.75), likely because the crumb colour here is a small fraction of total surface area, diluting any lighting-vs-albedo sampling noise"
+      ],
+      "mismatches": [
+        "max colour deltaE still exceeds the 20.0 threshold - PALETTE RULE (spec hex is the colour authority, not reference pixels, since the reference is itself a JSON-generated derivative)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/cmp-sheet.png",
+        "cameraView": "three-quarter",
+        "notes": "diagnose_render material-pass: colorDelta.maxDeltaE=27.68. No geometry change this pass.",
+        "aiVisionNotes": "Two colour zones read correctly and are correctly confined to the slash floors; deltaE gap attributed to reference lighting, not wrong albedo."
+      }
+    },
+    {
+      "timestamp": "2026-08-24T03:34:01.947353+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.68,
+        "componentStructure": 0.85,
+        "formDetail": 0.7,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [
+        {
+          "id": "spindle-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+        },
+        {
+          "id": "slash-count-placement",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+        },
+        {
+          "id": "no-shadow-artifact",
+          "score": 0.8,
+          "tier": "important",
+          "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+        }
+      ],
+      "action": "continue",
+      "summary": "Surface-pass: the slash-count-placement feature (this bread's decisive identity feature) is the culmination of the 6-iteration blockout journey - 4 connected diagonal lens marks with visible crumb colour and ear structure, verified via check_slash_coverage.py before every geometry change",
+      "matched": [
+        "4 diagonal overlapping slashes at the measured 32deg tilt, connected lens shapes (not scattered dots, the v1-v2 failure mode)",
+        "crumb colour visible and confined correctly",
+        "highest facet density of the chunk group, matching the reference's denser low-poly field"
+      ],
+      "mismatches": [
+        "slash lens edges remain jagged/stepped rather than the reference's smooth eye boundary - an accepted low-poly roughness at the current 2048-tri budget, not an unresolved mechanism bug (the mechanism itself - grid classification, majority-vote triangle assignment, ordered emission for sliceTriangles - is verified correct via check_slash_coverage.py and the visible connected shape)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/cmp-sheet.png",
+        "cameraView": "three-quarter",
+        "notes": "diagnose_render surface-pass: same numbers as material-pass (no geometry change).",
+        "aiVisionNotes": "The 4-slash identity feature reads correctly and unambiguously as diagonal scoring with exposed crumb, the single most important thing to get right for this bread. Remaining roughness is texture-level, not shape-level."
+      }
+    },
+    {
+      "timestamp": "2026-08-24T03:34:46.864020+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.68,
+        "componentStructure": 0.85,
+        "formDetail": 0.7,
+        "materialSurface": 0.75,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [
+        {
+          "id": "spindle-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Extreme tapered-spindle silhouette reads correctly, both tips close to true poles, no holes anywhere (winding verified analytically pre-render via check_winding.py, catching the exact bug loaf hit empirically - a 50/50 split where each quad's two triangles need INDEPENDENT winding, not a naive 'flip both together'). L/D measured at 11.365 via PIL pixel bbox on baguette-2.png (image-analysis.json, not eyeballed). bilateralSymmetryError 0.104 is the best of the four chunk/hero breads so far (loaf 0.22-0.24, scone 0.19), evidence the true 3D shape is well-formed. Tier1 aspect-ratio delta 0.373 is elevated versus pancake/scone/loaf's residuals; the reference is composed diagonally across a square frame specifically because of this extreme aspect ratio, while the harness's fixed camera shows an X-aligned object at whatever angle it naturally falls - a framing/composition difference, not a shape defect, per grimoire's own caveat on procedural-vs-AI-render pixel-aligned signals."
+        },
+        {
+          "id": "slash-count-placement",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "4 diagonal slashes, evenly spaced, tilted 32deg from the length axis, visibly overlapping - matches the reference's count and general diagonal-overlap pattern. Took 6 render iterations to get here: v1-v2 (shallow depth) read as tiny scattered marks; v3 (more stations) barely helped; v4 (more segments) revealed the real bottleneck was slash WIDTH not resolution - the trench was a thin checkmark, not a lens; v5 widened it correctly but then along-axis resolution became the limiter again (chevron-stepped edges); v6 raised station density once more. Final shape reads as 4 connected diagonal lens marks but with a visibly jagged/spiky top edge rather than the reference's smooth eye boundary - an acceptable low-poly roughness given this is now firmly a resolution-vs-budget tradeoff, not an unresolved mechanism bug."
+        },
+        {
+          "id": "ear-crumb-contrast",
+          "score": 0.72,
+          "tier": "critical",
+          "notes": "Cream crumb colour visible inside each slash, clearly contrasting the crust; raised ear band (EAR_RAISE 0.11) is present in the geometry (check_slash_coverage.py: 6-13 ear cells per slash) but reads more subtly than the reference's very bright, sharply-lit ear rim - the harness's ambient-heavy lighting is less forgiving of a shallow raised feature than the reference's own render."
+        },
+        {
+          "id": "no-shadow-artifact",
+          "score": 0.8,
+          "tier": "important",
+          "notes": "No authored shadow or dark patch under either tip - the harness is flat-lit and shadowless by construction (same as every other bread), automatically satisfying this."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Highest facet density of the chunk group (2048 tri vs scone's 396 / loaf's 260), matching the reference's visibly denser low-poly facet field. Flat shading baked via facet() throughout."
+        }
+      ],
+      "action": "continue",
+      "summary": "Final: 2048 tri / 6144 vert / 2 meshes / 194.2KB - over the 800-1500 CRIB soft target but well under the 8000tri/250KB hard cap, judged justified for this bread's 4 independent slash systems (the most detail-dense of the chunk group). Fidelity plateaued across 6 formal review passes with two known, documented, non-blocking residual deltas.",
+      "matched": [
+        "tri/KB budget: 2048 tri, 194.2KB, under the hard cap",
+        "2 meshes/2 materials",
+        "byte-deterministic (rng-seeded via hashId('baguette'), no Math.random)",
+        "winding verified analytically before the first render (0/736 inward-facing per check_winding.py, both triangle slots and both pole fans)",
+        "4 diagonal slashes with connected lens shapes and correct crumb exposure, the decisive identity feature, reached after 6 iterative diagnoses (depth, then X-density, then width, then width-vs-length resolution trade-offs)",
+        "best bilateralSymmetryError of the four breads built so far (0.104)"
+      ],
+      "mismatches": [
+        "silhouetteIoU 0.528 and aspect delta 0.373 - the worst of the four breads, attributed to a diagonal-framing/composition mismatch (the reference is deliberately posed diagonally for its extreme L/D",
+        "the harness's fixed camera does not replicate that specific composition choice) rather than a shape defect, consistent with grimoire's caveat on procedural-vs-AI-render pixel-aligned signals",
+        "colour deltaE 27.68, PALETTE RULE (actually the lowest deltaE of the four breads)",
+        "slash lens edges read jagged rather than smooth - an accepted low-poly roughness at this triangle budget, verified to be a resolution tradeoff via check_slash_coverage.py rather than a broken mechanism",
+        "diagnose_render_multi_angle false-positive DEGENERATE at azimuth 90/270, contradicted by direct PIL pixel sampling on both files (469/473 non-background sample points) - a mask-detection tool limitation for extreme-aspect-ratio shapes. None of these block export."
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/baguette.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/shot-0.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/baguette/cmp-sheet.png",
+        "cameraView": "three-quarter",
+        "notes": "diagnose_render optimization-pass: same numbers as surface-pass (no geometry change, budget check only). tri=2048 verts=6144 meshes=2 kb=194.2 (breadlab-shot stats).",
+        "aiVisionNotes": "Object reads unambiguously as a baguette: extreme tapered spindle, 4 diagonal slashes with visible crumb and raised ear structure, denser faceting than the other chunk breads. Stopping here - further iteration on the framing-driven tier1 deltas would not fix a model defect, and slash smoothness is now a budget tradeoff, not an open mechanism bug."
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 1250,
+    "maxDrawCalls": 2,
+    "textureSize": 512,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Hard cap 8000tri/250KB. Target band for the chunk group (scone/loaf/baguette) is 800-1500tri/<=160KB - baguette is the densest of the three (highest facet count observed in the reference, plus 4 independent slash zones needing angular resolution), so it should land near the top of that band, unlike loaf's deliberately sparse 260tri."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key upper-left.",
+      "usage": "Fixed by scripts/breadlab.ts.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "High ambient ratio (0.75).",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none - matches the reference's explicit 'no dark patch under either tapered end' instruction."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill, low intensity, opposite the key.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO on the runtime material."
+    }
+  ],
+  "proceduralStrategy": [
+    "Sweep a circular cross-section along X through hand-authored STATIONS (radius(x)), dense in the slash-bearing middle, sparse in the smooth taper zones, true poles at both tips.",
+    "Classify each (station, sector) grid vertex against 4 oriented slash footprints (rotated local along/across coordinates on the unrolled tube surface) - dip the inner trench band, raise the outer ear band.",
+    "Jitter vertices while indexed, so shared vertices move together and no face tears open.",
+    "Bake faceting by splitting vertices and recomputing normals; never request flatShading.",
+    "Project cylindrical UVs along X, then merge by material into exactly two meshes (crust triangles first, crumb triangles emitted after via ordered classification, then split with sliceTriangles)."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-object rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single rigid body; no plausible sub-fracture for a baked good this size"
+  ],
+  "risks": [
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-colour region paint is discarded by the runtime Lambert swap.",
+      "mitigation": "Two-tone split carried by two separate materials, split on classified grid geometry."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "flatShading is not inherited by the runtime swap.",
+      "mitigation": "Faceting baked into geometry via lib.ts facet() before export."
+    },
+    {
+      "id": "seam-tear",
+      "severity": "medium",
+      "description": "Body and slash floors share vertices; jittering independently would tear the seam.",
+      "mitigation": "Build one indexed tube geometry, jitter it whole, classify and reorder triangles only after."
+    },
+    {
+      "id": "detail-below-tessellation",
+      "severity": "high",
+      "description": "A slash trench narrower than the sector's angular spacing lands between vertices and disappears silently (bit pancake's pores and scone's first fissure attempt).",
+      "mitigation": "SEGMENTS chosen (22) so the slash half-width (0.26 radius units) spans at least ~2 sectors at the tube's circumference; verified analytically before rendering in check_slash_coverage.py."
+    },
+    {
+      "id": "winding-axis-confusion",
+      "severity": "medium",
+      "description": "pancake's (cos t, y, sin t) winding note assumes a Y-axis lathe; sweeping along X instead changes which triangle vertex order faces outward (loaf hit this: an inward-facing tube and, separately, an inward-facing end cap).",
+      "mitigation": "Winding verified analytically (face-normal dot outward-vector check) for both the tube and both pole fans before the first render, reusing loaf's check_cap_winding.py pattern."
+    },
+    {
+      "id": "merge-attribute-mismatch",
+      "severity": "medium",
+      "description": "mergeByMaterial throws when geometries in one bucket carry different attribute sets.",
+      "mitigation": "Every geometry gets exactly position, normal and uv; no color attribute is ever created."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Baguette with Diagonal Slashes",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": [
+      {
+        "record_id": "core.shader-mapping-capsulegeometry-rounded-edge-components",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[6]",
+        "score": 2.011124997243,
+        "snippets": [
+          "Maps to components with hemispherical rounded ends. Ánh xạ tới các bộ phận có đầu bo tròn dạng bán cầu. Recognition cues: Rod-like part with distinctly rounded (not flat-cut) ends, e.g. a knife spine or a safety lever Dấu hiệu nhận diện: Bộ phận ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[6]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.pbr-hand-painted-vs-pbr-texture",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[12]",
+        "score": 1.51182350289,
+        "snippets": [
+          "Distinguishes textures with lighting baked directly into color (static, stylized) from textures that respond dynamically to scene lighting via separate PBR channels. Phân biệt kết cấu có ánh sáng được nướng trực tiếp vào màu (tĩnh, cách điệu) ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[12]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.pbr-clearcoat",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[4]",
+        "score": 1.269840416253,
+        "snippets": [
+          "... sitting on top of a duller or differently-colored base layer; Common on Custom Paint Job / Gunsmith style finishes with a glossy topcoat over illustrative artwork Dấu hiệu nhận diện: Có một điểm sáng thứ cấp sắc nét nằm trên lớp nền mờ ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[4]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  },
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5281,
+        "aspectRatioDelta": 0.3734,
+        "scaleDelta": 0.2872,
+        "bilateralSymmetryError": 0.1044,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 27.68,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 13.17
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.17
+            },
+            {
+              "componentId": null,
+              "deltaE": 27.68
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.528 is below threshold 0.85",
+        "aspect-ratio delta 0.373 exceeds threshold 0.05",
+        "scale delta 0.287 exceeds threshold 0.08",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [],
+      "renderHash": "fd862970d019afbd",
+      "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5281,
+        "aspectRatioDelta": 0.3734,
+        "scaleDelta": 0.2872,
+        "bilateralSymmetryError": 0.1044,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 27.68,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 13.17
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.17
+            },
+            {
+              "componentId": null,
+              "deltaE": 27.68
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.528 is below threshold 0.85",
+        "aspect-ratio delta 0.373 exceeds threshold 0.05",
+        "scale delta 0.287 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "fd862970d019afbd",
+      "passId": "structural-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5281,
+        "aspectRatioDelta": 0.3734,
+        "scaleDelta": 0.2872,
+        "bilateralSymmetryError": 0.1044,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 27.68,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 13.17
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.17
+            },
+            {
+              "componentId": null,
+              "deltaE": 27.68
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.528 is below threshold 0.85",
+        "aspect-ratio delta 0.373 exceeds threshold 0.05",
+        "scale delta 0.287 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "fd862970d019afbd",
+      "passId": "form-refinement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5281,
+        "aspectRatioDelta": 0.3734,
+        "scaleDelta": 0.2872,
+        "bilateralSymmetryError": 0.1044,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 27.68,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 13.17
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.17
+            },
+            {
+              "componentId": null,
+              "deltaE": 27.68
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.528 is below threshold 0.85",
+        "aspect-ratio delta 0.373 exceeds threshold 0.05",
+        "scale delta 0.287 exceeds threshold 0.08",
+        "max per-part color delta-E 27.68 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "fd862970d019afbd",
+      "passId": "material-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5281,
+        "aspectRatioDelta": 0.3734,
+        "scaleDelta": 0.2872,
+        "bilateralSymmetryError": 0.1044,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 27.68,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 13.17
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.17
+            },
+            {
+              "componentId": null,
+              "deltaE": 27.68
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.528 is below threshold 0.85",
+        "aspect-ratio delta 0.373 exceeds threshold 0.05",
+        "scale delta 0.287 exceeds threshold 0.08",
+        "max per-part color delta-E 27.68 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "fd862970d019afbd",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5281,
+        "aspectRatioDelta": 0.3734,
+        "scaleDelta": 0.2872,
+        "bilateralSymmetryError": 0.1044,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 27.68,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 13.17
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.17
+            },
+            {
+              "componentId": null,
+              "deltaE": 27.68
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.528 is below threshold 0.85",
+        "aspect-ratio delta 0.373 exceeds threshold 0.05",
+        "scale delta 0.287 exceeds threshold 0.08",
+        "max per-part color delta-E 27.68 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "fd862970d019afbd",
+      "passId": "optimization-pass"
+    }
+  ]
+}

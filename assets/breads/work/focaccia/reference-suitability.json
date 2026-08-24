@@ -1,0 +1,15 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": ["assets/breads/src/focaccia.png", "assets/breads/src/focaccia-2.png", "assets/breads/src/focaccia-3.png"],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "strongSilhouette": "rectangular slab in top-down; low flat profile with dimple ripples in front elevation",
+    "majorMaterialsVisible": "single matte dielectric crust, base + oil-pool tone",
+    "hiddenSideInferable": "underside flat and plain by construction",
+    "procedurallyApproximable": "rectangular grid slab (cracker precedent) with grid-cell dimple recesses + vertex-cluster topping bumps, no smoke/liquid/glass"
+  },
+  "stylizationLevel": "low-poly faceted matte clay",
+  "complexity": "simple",
+  "askForBetterInput": "not needed"
+}

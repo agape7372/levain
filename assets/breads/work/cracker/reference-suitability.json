@@ -1,0 +1,21 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": [
+    "assets/breads/src/cracker.png (three-quarter top-front)",
+    "assets/breads/src/cracker-2.png (front elevation)",
+    "assets/breads/src/cracker-3.png (top-down)"
+  ],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "objectOccupiesEnoughOfFrame": "single centered square wafer, clear margin, see check_reference_admission for measured foregroundCoverage",
+    "strongSilhouette": "thin flat square outline in front elevation; near-square rounded-edge outline in top-down",
+    "majorMaterialsVisible": "single matte dielectric crust, one tone",
+    "hiddenSideInferable": "underside is flat and plain by construction; never faces any turntable camera above the horizon",
+    "procedurallyApproximable": "flat box/grid slab with displaced grid cells for holes and small raised bumps for seeds; no smoke, liquid, glass or lace"
+  },
+  "notConditional": "three orthogonal-ish views are supplied",
+  "stylizationLevel": "low-poly faceted matte clay — the requested target",
+  "complexity": "simple",
+  "askForBetterInput": "not needed"
+}

@@ -1,0 +1,21 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": [
+    "assets/breads/src/wholewheat.png (three-quarter top-front)",
+    "assets/breads/src/wholewheat-2.png (front elevation)",
+    "assets/breads/src/wholewheat-3.png (top-down)"
+  ],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "objectOccupiesEnoughOfFrame": "foregroundCoverage 0.4481, largestComponentFraction 1.0 (check_reference_admission)",
+    "strongSilhouette": "rounder, taller dome than campagne in front elevation; near-circular ring-textured disk in top-down",
+    "majorMaterialsVisible": "single matte crust, darker than campagne, with coarse speckle - no second material (no slash)",
+    "hiddenSideInferable": "radial symmetry of the dome body; only the flat unseen base is hidden",
+    "procedurallyApproximable": "one continuous revolved dome with profile-modulated concentric ring grooves plus rng-seeded speckle; no smoke, liquid, glass or lace anywhere"
+  },
+  "notConditional": "three orthogonal-ish views are supplied, so the single-view rotational-symmetry caveat does not apply",
+  "stylizationLevel": "low-poly faceted matte clay - same style family as pancake/campagne, third bread through the pipeline",
+  "complexity": "simple",
+  "askForBetterInput": "not needed"
+}

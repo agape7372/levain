@@ -1,6 +1,6 @@
 {
   "id": "baguette",
-  "version": 1,
+  "version": 3,
   "name_ko": "바게트",
   "subject": "a long slender baguette loaf",
   "geometry": {
@@ -12,13 +12,17 @@
       "cream-colored crumb #F4EAD4 visible inside each open slash"
     ]
   },
-  "style_ref": "shared-style-v1",
-  "camera": "three-quarter top-front view, object centered, 15% margin",
-  "background": "solid #F2E6D3, no props, no floor texture",
-  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows",
-  "negative": ["face", "eyes", "mouth", "character", "text", "watermark", "plate", "board", "hands", "photorealism", "glossy plastic", "people"],
+  "style_ref": "shared-style-v2",
+  "camera": "three-quarter top-front view, loaf positioned diagonally across the square frame so its full length fits, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features"],
   "views": ["three-quarter top-front", "front elevation", "top-down"],
   "output": { "aspect": "1:1", "size": 1024 },
-  "prompt_flat": "A cozy low-poly stylized 3D render of a long slender baguette loaf. Geometry: a long, thin cylinder tapered to a point at both ends, with an extreme length-to-diameter ratio far longer than any other loaf. Crust: a deep golden brown surface (#A9713F) runs along the entire length; 3 to 5 diagonal overlapping slash scores are cut along the top, each opened into a raised ridge line (an 'ear') where the crust has burst upward, with cream-colored crumb (#F4EAD4) visible inside each open slash. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, rounded silhouette, stylized 3D render. Camera: three-quarter top-front view, object centered, 15% margin. Background: solid #F2E6D3, no props, no floor texture. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows. Generate the same object consistently across each requested view — three-quarter top-front, front elevation, and top-down — keeping identical proportions, colors, and surface details between views. Negative: no face, no eyes, no mouth, no character, no text, no watermark, no plate, no board, no hands, no photorealism, no glossy plastic, no people.",
-  "notes_ko": "사선으로 겹친 칼집과 그로 인해 벌어진 귀(ear) 라인이 없으면 그냥 막대 모양 빵으로만 보인다 — 바게트의 결정적 특징."
+  "prompt_flat": "A cozy low-poly stylized 3D render of a long slender baguette loaf, a single game asset object on a plain backdrop. Geometry: a long, thin cylinder tapered to a point at both ends, with an extreme length-to-diameter ratio far longer than any other loaf. Crust: a deep golden brown surface (#A9713F) runs along the entire length; 3 to 5 diagonal overlapping slash scores are cut along the top, each opened into a raised ridge line (an 'ear') where the crust has burst upward, with cream-colored crumb (#F4EAD4) visible inside each open slash. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, the loaf positioned diagonally across the square frame so its full length fits, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows. The loaf floats cleanly against a flat empty backdrop: absolutely no cast shadow, no contact shadow, and no darkened patch of background beneath either tapered end. Stylized matte render only — no photorealism, no glossy plastic, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact baguette, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view), laid horizontally across the frame. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact baguette, identical proportions, colors, and surface details — now shown in a strict top-down orthographic view, the camera pointing straight down at the loaf from directly overhead. The silhouette must read as a flat elongated shape with no visible side wall and no perspective foreshortening — clearly a different camera angle from the three-quarter view, not a repeat of it. Lay it diagonally across the frame. Same solid pale sage #DFEAE0 background, object centered, no props, and absolutely no cast shadow or contact shadow anywhere on the background."
+  ],
+  "notes_ko": "사선으로 겹친 칼집과 그로 인해 벌어진 귀(ear) 라인이 없으면 그냥 막대 모양 빵으로만 보인다 — 바게트의 결정적 특징. v2: 1:1 프레임에서 극단적 세장비가 잘리거나 축소되는 문제로 대각선 배치 지시 추가. v3(예방적 강화 — v2 산출물은 실제로 전량 통과했다): 그림자 금지를 '어느 쪽 끝 아래에도 어두운 얼룩 없음'까지, top-down을 '정사영 수직 부감, 측면 벽 안 보임, 메인뷰 반복 아님'까지 구체화. 재생성 트리거는 아니고 다음 세대용 문구 보강일 뿐이다."
 }

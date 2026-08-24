@@ -1,0 +1,419 @@
+{
+  "targetName": "Pancake Stack",
+  "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/pancake.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "stack of three round griddle pancakes",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "sculptural"
+      ],
+      "structureKind": [
+        "repeated modules",
+        "layered shell"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Baked-crust surface reads closest to matte unglazed ceramic in PBR terms: opaque dielectric, roughness 1.0, no specular lobe anywhere in any of the three reference views. Consumer runtime is a stylized low-poly showcase, so the target look is faceted matte clay rather than food photorealism."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 1,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 2,
+        "materialLayerCount": 1,
+        "localDetailDensity": 2,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 3,
+        "mesoComponents": 3,
+        "microFeatureGroups": 3,
+        "materialLayers": 2,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "Three near-identical macro bodies (disk-top, disk-middle, disk-bottom) differing only in XZ offset, Y rotation and a small radius delta, so componentCount scores 1 rather than 3.",
+        "Silhouette is a flat cylinder stack whose only interruption is a low-amplitude hand-poured radius wobble (+/-3% measured on the top-down view), scoring 1.",
+        "Repetition density scores 2: the pore dimple field carries roughly 40 pits across four size classes on the top face, plus the three-disk stack module itself.",
+        "Local detail density scores 2 for the same pore field - assets/prompts/breads/pancake.json notes_ko states that without the pores the object reads as a smooth plastic disk, so the pits are identity-critical rather than decorative.",
+        "One material family in two albedo zones (top face vs rim/underside), so materialLayerCount scores 1.",
+        "Occlusion risk scores 1: only the undersides are hidden, and radial symmetry plus the front-elevation view make them fully inferable.",
+        "Action readiness scores 0: the consumer is a static turntable showcase with no pivots, sockets, colliders or destruction seams.",
+        "Aggregate 9/24 with no axis above 2 maps to the simple tier: few parts, one material family, detail concentrated in a single repeated micro system."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Simple tier by part count, but the spec still needs meso depth (top face vs rim wall vs underside are separately shaded and separately shaped) and a micro repetition system for the pore field, because that field is what separates this object from a generic disk stack."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerated by hand from the three supplied reference views rather than by build_detail_inventory.py: the object is one radially symmetric form with a single repeated micro system, so a 3x3 grid scan would emit nine crops of the same pore field and add no detail the curated prompt spec does not already name.",
+      "details": [
+        {
+          "id": "pore-dimple-field",
+          "zone": "top face of every disk",
+          "observation": "Roughly 40 concave pits scattered across the top face, each a polygonal cone pushed into the surface with a faceted rim. Four size classes measured on the top-down view against a 930px outline diameter: crater 7.5%, medium 5%, small 2%, tiny 1.3%.",
+          "inference": "Burst gas bubbles from griddle cooking.",
+          "mapsTo": {
+            "ref": "disk-top-face-pore-dimples",
+            "note": "component disk-*-top-face localFeatures.pore-dimples + repetitionSystem pore-scatter"
+          },
+          "confidence": 0.95,
+          "evidenceRef": "pancake-3.png full frame",
+          "kind": "hole",
+          "mapsToNote": "component disk-*-top-face localFeatures.pore-dimples + repetitionSystem pore-scatter"
+        },
+        {
+          "id": "pore-edge-margin",
+          "zone": "outer annulus of the top face",
+          "observation": "The outer roughly 8% of the top-face radius carries almost no pits; the field stops short of the rim.",
+          "inference": "Batter edge sets before bubbles reach it.",
+          "mapsTo": {
+            "ref": "disk-top-face-pore-dimples",
+            "note": "component disk-*-top-face localFeatures.pore-dimples distribution.radialRange"
+          },
+          "confidence": 0.8,
+          "evidenceRef": "pancake-3.png outer annulus",
+          "kind": "contour",
+          "mapsToNote": "component disk-*-top-face localFeatures.pore-dimples distribution.radialRange"
+        },
+        {
+          "id": "hand-poured-outline-wobble",
+          "zone": "disk perimeter",
+          "observation": "Outline is an 18-22 sided rounded polygon with a per-sector radius wobble of about +/-3%, not a true circle.",
+          "inference": "Batter poured by hand rather than moulded.",
+          "mapsTo": {
+            "ref": "disk-top-outline-wobble",
+            "note": "component disk-* localFeatures.outline-wobble"
+          },
+          "confidence": 0.9,
+          "evidenceRef": "pancake-3.png outline",
+          "kind": "contour",
+          "mapsToNote": "component disk-* localFeatures.outline-wobble"
+        },
+        {
+          "id": "rim-equator-bulge",
+          "zone": "rim wall",
+          "observation": "The widest point of each disk sits at mid-rim height; the top-face perimeter is inset from it, so the rim reads as a convex band in front elevation.",
+          "inference": "Batter spreads outward and slumps while setting.",
+          "mapsTo": {
+            "ref": "disk-top-equator-bulge",
+            "note": "component disk-*-rim-wall geometryDescriptor.profile"
+          },
+          "confidence": 0.9,
+          "evidenceRef": "pancake-2.png rim band",
+          "kind": "ridge",
+          "mapsToNote": "component disk-*-rim-wall geometryDescriptor.profile"
+        },
+        {
+          "id": "top-face-edge-sag",
+          "zone": "top-face perimeter",
+          "observation": "The top face crowns slightly at centre and droops at the perimeter, dropping below the widest point of the rim.",
+          "inference": "Surface tension sag at the edge of a poured disk.",
+          "mapsTo": {
+            "ref": "disk-top-face-edge-sag",
+            "note": "component disk-*-top-face localFeatures.edge-sag"
+          },
+          "confidence": 0.85,
+          "evidenceRef": "pancake-2.png top disk profile",
+          "kind": "bevel",
+          "mapsToNote": "component disk-*-top-face localFeatures.edge-sag"
+        },
+        {
+          "id": "two-tone-crust-boundary",
+          "zone": "boundary ring between top face and rim wall",
+          "observation": "Top face and rim/underside are separately toned; the boundary is the top-face perimeter ring, a hard edge rather than a gradient.",
+          "inference": "Griddle-contact face browns differently from the free-set edge.",
+          "mapsTo": {
+            "ref": "two-tone-boundary",
+            "note": "materials crust-top and crust-rim, split on the top-face perimeter ring"
+          },
+          "confidence": 0.9,
+          "evidenceRef": "assets/prompts/breads/pancake.json geometry.crust (authoritative palette) cross-checked against pancake.png",
+          "kind": "seam",
+          "mapsToNote": "materials crust-top and crust-rim, split on the top-face perimeter ring"
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/pancake.png",
+    "resolvedUnknowns": [
+      "Underside of every disk is occluded in all three reference views. Resolved by construction: modelled as a closed low-detail cap that no turntable azimuth above the horizon can see. Labelled an approximation, not an observation.",
+      "The contact interface between stacked disks is hidden. Resolved by construction: disks overlap slightly in Y rather than solving a squash crease, keeping every seam above the 0.02 world-unit overlap floor.",
+      "Exact pore positions are not recoverable and are not identity-critical. Count, size distribution and edge margin are matched instead; positions come from the deterministic builder rng.",
+      "Reference renders carry a soft contact shadow under each disk that the flat-lit consumer harness does not reproduce. Accepted as a known lighting delta, not a geometry defect."
+    ]
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "Front elevation shows three distinct rim bands of comparable height, each disk offset from the one below, with no visible gap or interpenetration at either contact.",
+      "Top-down view shows a rounded-polygon outline (not a circle) and a scattered pore field of mixed sizes that stops short of the rim.",
+      "Every surface is faceted: no smooth-shaded gradient anywhere, since the consumer runtime replaces materials with MeshLambertMaterial and flatShading does not survive that swap - the faceting must be baked into the geometry as split vertices.",
+      "Top face and rim/underside read as two distinct tones matching assets/prompts/breads/pancake.json, and that split survives the runtime material swap (so it cannot be carried by vertex colors).",
+      "Triangle count lands in 600-1500 with at most two meshes and at most two materials, per scripts/breads/types.ts."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 3,
+      "microFeatureGroups": 3,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Per-disk thickness/diameter holds at about 0.10 and the three-band rim stack totals about 0.33 of the outline diameter (measured on pancake-2.png).",
+          "The outline is an 18-22 sided rounded polygon with about +/-3% per-sector radius wobble, never a mathematically clean circle.",
+          "The widest point of each disk sits at mid-rim height, with the top-face perimeter inset from it and drooping below it."
+        ],
+        "evidenceRefs": [
+          "pancake-2.png front elevation (thickness and stack ratios)",
+          "pancake-3.png top-down (outline polygon and wobble)"
+        ],
+        "failureModes": [
+          "disks read as clean extruded cylinders, so the object looks machine-cut rather than hand-poured",
+          "stack is too tall or too thin, turning pancakes into a stack of crackers or a single thick cake",
+          "the rim is a straight vertical wall with no equator bulge and no edge sag"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Three separate disk bodies exist as named components, each decomposed into top face, rim wall and underside, so the two-tone split and the pore field attach to real geometry rather than to a texture.",
+          "Each disk carries its own XZ offset and Y rotation so the wobble phase differs between layers and the stack does not read as one extruded prism."
+        ],
+        "evidenceRefs": [
+          "pancake-2.png (three separately visible rim bands)",
+          "pancake.png (per-layer offset visible at the three-quarter angle)"
+        ],
+        "failureModes": [
+          "the three disks share one wobble phase, so the stack silhouette looks like a single grooved cylinder",
+          "the disks are modelled as one body with grooves cut in, losing the per-layer offset"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "The object has no appendages, hinges, tubes or branches - the only contracts are the two stacking contacts, disk-middle under disk-top and disk-bottom under disk-middle.",
+          "Each stacking contact is a rest/overlap of at least 0.02 world units in Y, so no seam opens at any turntable azimuth and no disk floats.",
+          "Sub-surfaces of a disk (top face, rim wall, underside) share the perimeter ring exactly, so the two-tone boundary is watertight."
+        ],
+        "evidenceRefs": [
+          "pancake-2.png (both stacking contacts visible in profile)"
+        ],
+        "failureModes": [
+          "a visible gap or a floating disk at the stacking contact",
+          "top face and rim wall do not share the perimeter ring, opening a crack along the two-tone boundary",
+          "disks interpenetrate so deeply that the middle rim band disappears"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Two albedo zones only: top face #C68958, rim wall plus underside #A9713F, hand-transcribed from assets/prompts/breads/pancake.json geometry.crust.",
+          "Surface relief is carried by geometry in three frequency bands - macro: rim equator bulge and top-face crown; meso: per-sector radius wobble and top-face edge sag; micro: the pore dimple field - because the consumer runtime keeps only map and color from the material.",
+          "Faceting is baked as split vertices with flat normals, not requested via a flatShading flag."
+        ],
+        "evidenceRefs": [
+          "assets/prompts/breads/pancake.json geometry.crust (palette of record)",
+          "pancake-3.png (micro band: pore field)",
+          "pancake-2.png (macro band: rim bulge and crown)"
+        ],
+        "failureModes": [
+          "surface reads as smooth plastic because normals were left smooth or the pore field is missing (called out explicitly in pancake.json notes_ko)",
+          "the two-tone split is carried by vertex colors, which the runtime Lambert swap discards, collapsing the model to one flat tone",
+          "relief is painted into a texture instead of displaced in geometry, so it vanishes when the model is lit from another angle"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo palette is taken verbatim from the curated prompt spec that generated these references, which is a stronger source than pixel sampling because the reference pixels carry baked key-light shading.",
+          "Lighting is fixed and not ours to author: the consumer harness (scripts/breadlab.ts, mirrored from scripts/thumbsHarness.ts) sets a warm directional key at (-2, 6, 2) intensity 1.4, an ambient at 0.75, and a cool fill at (2.5, 3, -2) intensity 0.2, with no shadow map and no tone mapping.",
+          "Relief must survive that fixed lighting from four azimuths (0/90/180/270), which is what proves it is geometry and not painted albedo."
+        ],
+        "evidenceRefs": [
+          "assets/prompts/breads/pancake.json (palette and style of record)",
+          "scripts/breadlab.ts lines 51-58 (lighting rig of record)"
+        ],
+        "documentedLimitation": {
+          "rule": "antiShallowSpecRules: do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation",
+          "limitation": "No referencePbr extraction is run and no PBR maps are produced. The consumer runtime force-replaces every material with MeshLambertMaterial keeping only map and color (scripts/breads/types.ts section 2), and the repo caps textures at a single basecolor of at most 512px with PBR maps banned outright (docs/VISUAL.md section 8). Roughness, metalness, normal, height and AO are therefore inert channels here, and extracting them would produce evidence no consumer can read.",
+          "compensation": "Everything those channels would have carried is moved into geometry: faceting via split vertices, relief via vertex displacement in three frequency bands, and the two-tone finish via a material split on the top-face perimeter ring."
+        },
+        "failureModes": [
+          "PBR scalars are authored into the spec and then silently dropped by the runtime, so the review scores a look the consumer never renders",
+          "colors are sampled from reference pixels, importing the reference's baked key-light shading into albedo and producing a washed-out rim",
+          "relief only reads at the single review azimuth and flattens out at 90/180/270"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "authoringInstruction": "Fill observed object class, complexity reasoning, featureGroups, visualDeltaChecks, and unknowns before generating or implementing ObjectSculptSpec.",
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Pancake Stack lathe revolve disk faceted low-poly flat shading concave dimple displacement",
+    "index": {
+      "status": "rebuilt",
+      "reason": "missing",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": [
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-tsl-node-functions-for-weathering",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[2]",
+        "score": 3.977454161381,
+        "snippets": [
+          "Three.js Shading Language (WebGPU) node-graph functions used to build procedural PBR materials, especially for blending pristine vs. weathered states. Các hàm đồ thị nút của Three.js Shading Language (WebGPU) dùng để xây dựng vật liệu PBR thủ ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[2]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-srgb-linear-color-space-assignment",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[12]",
+        "score": 2.572344637905,
+        "snippets": [
+          "... vật liệu. Recognition cues: Any imported texture that looks like a natural photo → sRGB; any texture that looks like flat gray/colored data noise → NoColorSpace Dấu hiệu nhận diện: Bất kỳ texture nhập vào trông như ảnh tự nhiên → sRGB; ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[12]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "note": "Parts as the builder constructs them, BEFORE the mandatory final mergeByMaterial. scripts/breads/scone.ts adds one named mesh per leaf component (wedge-body, wedge-top); mergeByMaterial then fuses them into 2 meshes because the consumer caps a bread at 2 materials / 2 meshes (scripts/breads/types.ts sections 1-2). Triangle counts are analytic from the ring/station construction (18 outline sectors x 13 profile rings, minus pole reductions at the bottom pole and crown) and sum to 396, matching the harness's reported total exactly.",
+  "parts": [
+    {
+      "name": "root",
+      "kind": "container",
+      "module": "createScone",
+      "triangles": 396
+    },
+    {
+      "name": "wedge-body",
+      "kind": "part",
+      "module": "buildWedge",
+      "triangles": 162
+    },
+    {
+      "name": "wedge-top",
+      "kind": "part",
+      "module": "buildWedge",
+      "triangles": 234
+    }
+  ]
+}

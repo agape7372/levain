@@ -1,0 +1,14 @@
+{
+  "admitted": true,
+  "reasons": [],
+  "provenance": {
+    "viewpoint": "three-quarter",
+    "sourcePath": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\rye.png",
+    "width": 1536,
+    "height": 1024,
+    "foregroundCoverage": 0.3713,
+    "largestComponentFraction": 1.0,
+    "pHash": 12173503523871633413,
+    "duplicateOfHash": null
+  }
+}

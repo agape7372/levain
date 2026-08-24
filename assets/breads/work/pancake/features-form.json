@@ -1,0 +1,6 @@
+[
+  {"id": "disk-profile-bulge-sag", "score": 0.8, "tier": "critical",
+   "notes": "Rim reads convex with its widest point at mid height, and the top face is inset from it and sags to the perimeter. Exactly at threshold rather than above it: the reference's rim carries a bright bevel band our albedo-only palette cannot reproduce, so the bulge reads by shape alone."},
+  {"id": "hand-poured-outline", "score": 0.85, "tier": "important",
+   "notes": "Outline is an irregular 20-24 sided polygon with per-sector radius wobble, and the three disks use different yaw so their wobble phases do not align into one grooved cylinder."}
+]

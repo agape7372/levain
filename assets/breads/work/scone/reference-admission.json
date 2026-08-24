@@ -1,0 +1,14 @@
+{
+  "admitted": true,
+  "reasons": [],
+  "provenance": {
+    "viewpoint": "three-quarter top-front",
+    "sourcePath": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\scone.png",
+    "width": 1536,
+    "height": 1024,
+    "foregroundCoverage": 0.308,
+    "largestComponentFraction": 1.0,
+    "pHash": 13163927907511339682,
+    "duplicateOfHash": null
+  }
+}

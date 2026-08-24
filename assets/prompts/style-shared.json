@@ -1,12 +1,16 @@
 {
-  "id": "shared-style-v1",
+  "id": "shared-style-v2",
   "keywords": [
     "low-poly faceted geometry",
     "soft clay-like matte shading",
     "warm pastel palette",
     "miniature diorama feel",
     "flat color facets",
-    "rounded silhouette",
-    "stylized 3D render"
-  ]
+    "clean simple silhouette",
+    "stylized 3D game asset render"
+  ],
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background",
+  "negative_tail": "Stylized matte render only — no photorealism, no glossy plastic, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "notes_ko": "v2 변경: (1) 배경을 크림(#F2E6D3)에서 페일 세이지(#DFEAE0)로 — 식빵·스콘의 크림색 옆면(#F4EAD4)이 배경과 거의 동일해 image-to-3D 세그먼테이션이 번지는 문제. (2) 'rounded silhouette' 제거 — 크래커(각진 사각)·스콘(웨지)·식빵(각진 팬 옆면) 실루엣과 충돌. (3) 그림자 금지 명시 — 접지 그림자가 3D 변환 시 실루엣에 번지거나 알베도에 어두운 테두리로 구워짐."
 }

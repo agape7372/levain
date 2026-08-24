@@ -1,0 +1,21 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": [
+    "assets/breads/src/pancake.png (three-quarter top-front)",
+    "assets/breads/src/pancake-2.png (front elevation)",
+    "assets/breads/src/pancake-3.png (top-down)"
+  ],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "objectOccupiesEnoughOfFrame": "foregroundCoverage 0.4708, largestComponentFraction 1.0 (check_reference_admission)",
+    "strongSilhouette": "three-band stacked profile in front elevation; rounded-polygon outline in top-down",
+    "majorMaterialsVisible": "single matte dielectric crust in two tonal regions",
+    "hiddenSideInferable": "radial symmetry per disk; only the undersides are hidden and they never face any turntable camera above the horizon",
+    "procedurallyApproximable": "lathe/revolve disks plus displaced polar-grid top faces; no smoke, liquid, glass or lace anywhere"
+  },
+  "notConditional": "three orthogonal-ish views are supplied, so the single-view rotational-symmetry caveat does not apply",
+  "stylizationLevel": "low-poly faceted matte clay — explicitly the requested target, not a fallback",
+  "complexity": "simple",
+  "askForBetterInput": "not needed"
+}

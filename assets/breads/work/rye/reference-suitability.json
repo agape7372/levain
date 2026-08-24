@@ -1,0 +1,21 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": [
+    "assets/breads/src/rye.png (three-quarter top-front)",
+    "assets/breads/src/rye-2.png (front elevation)",
+    "assets/breads/src/rye-3.png (top-down)"
+  ],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "objectOccupiesEnoughOfFrame": "foregroundCoverage 0.3713, largestComponentFraction 1.0 (check_reference_admission) - lower coverage than the round breads because the elongated footprint leaves more margin, still comfortably admitted",
+    "strongSilhouette": "elongated oval bâtard in top-down; low stretched dome in front elevation",
+    "majorMaterialsVisible": "mottled dark/light crust, plus a shared bright tone for the slash crumb and caraway seeds",
+    "hiddenSideInferable": "bilateral symmetry about the long axis; only the flat unseen base is hidden",
+    "procedurallyApproximable": "one continuous revolved-and-stretched dome with a single lengthwise slash and a baked mottle+seed texture; no smoke, liquid, glass or lace anywhere"
+  },
+  "notConditional": "three orthogonal-ish views are supplied, so the single-view rotational-symmetry caveat does not apply",
+  "stylizationLevel": "low-poly faceted matte clay - same style family as pancake/campagne/wholewheat, fourth bread through the pipeline and the first with directional (non-radial) asymmetry",
+  "complexity": "simple",
+  "askForBetterInput": "not needed"
+}

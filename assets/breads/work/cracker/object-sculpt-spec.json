@@ -1,0 +1,1685 @@
+{
+  "targetName": "Square Cracker",
+  "targetId": "square-cracker",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\cracker.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved and deliberately not matched to the reference; the review camera is fixed by scripts/breadlab.ts (pancake.json precedent)."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "single square artisan cracker",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "geometric",
+        "hand-crafted"
+      ],
+      "structureKind": [
+        "single rigid slab"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Baked-crust surface reads as matte unglazed ceramic in PBR terms, same class as pancake.json. One flat albedo zone only."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 1,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 2,
+        "materialLayerCount": 0,
+        "localDetailDensity": 2,
+        "occlusionRisk": 0,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 1,
+        "mesoComponents": 1,
+        "microFeatureGroups": 2,
+        "materialLayers": 1,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "One rigid macro body (wafer), no repeated macro parts, so componentCount scores 1.",
+        "Silhouette is a flat square slab with only the hand-cut edge wobble interrupting it, scoring 1.",
+        "Repetition density scores 2: two independent scatter systems (49-hole grid + ~34 seed speckles) on one face.",
+        "Local detail density scores 2 for the same reason - cracker.json notes_ko states the object reads as a plain flat square without them.",
+        "One material family in one albedo zone (whole object is a single flat tone per team-lead directive), so materialLayerCount scores 0.",
+        "Occlusion risk scores 0: the only hidden face is the flat, featureless underside.",
+        "Action readiness scores 0: static turntable showcase prop.",
+        "Aggregate maps to the simple tier, even lighter than pancake's 9/24 baseline."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": false,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Simple tier by part count, but still needs a meso top-face node so the two identity-critical repetition systems (holes, seeds) attach to real geometry rather than to prose."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerated by hand (CRIB step 3: skip detail-inventory for a single repeated-system object) rather than build_detail_inventory.py - a 3x3 grid scan would just emit nine crops of the same hole grid.",
+      "details": [
+        {
+          "id": "docking-hole-grid",
+          "zone": "top face",
+          "observation": "Regular 49-hole grid, small conical pits pressed evenly into the top face, clear margin from the edges.",
+          "inference": "Machine-pressed docking pins, standard cracker manufacture.",
+          "mapsTo": {
+            "ref": "wafer-top-face-docking-holes",
+            "note": ""
+          },
+          "confidence": 0.95,
+          "evidenceRef": "cracker-3.png full frame",
+          "kind": "hole"
+        },
+        {
+          "id": "seed-speckle-scatter",
+          "zone": "top face",
+          "observation": "Scattered sesame and poppy seed speckles between the holes, not gridded.",
+          "inference": "Seeds pressed into the dough before baking.",
+          "mapsTo": {
+            "ref": "wafer-top-face-seed-speckles",
+            "note": ""
+          },
+          "confidence": 0.85,
+          "evidenceRef": "cracker-3.png full frame",
+          "kind": "ridge"
+        },
+        {
+          "id": "hand-cut-edge-wobble",
+          "zone": "perimeter",
+          "observation": "Edge line is mildly irregular, not a perfectly straight machine-cut square.",
+          "inference": "Hand-cut rather than die-cut dough.",
+          "mapsTo": {
+            "ref": "wafer-edge-wobble",
+            "note": ""
+          },
+          "confidence": 0.8,
+          "evidenceRef": "cracker-3.png outline",
+          "kind": "contour"
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/cracker.png",
+    "resolvedUnknowns": [
+      "Underside is fully occluded in all three reference views. Resolved by construction: modelled as a coarse flat fan, never visible above the horizon.",
+      "Exact hole/seed positions are not identity-critical beyond the grid pattern and rough seed density."
+    ]
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 1,
+      "mesoComponents": 1,
+      "microFeatureGroups": 2,
+      "materialLayers": 1,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.8,
+    "mustMatch": [
+      "thin flat square wafer, thickness about 1/10 of the width",
+      "regular grid of docking holes covering most of the top face",
+      "scattered sesame/poppy seed speckles between the holes",
+      "hand-cut, not machine-square, edge",
+      "faceted flat shading baked into geometry"
+    ],
+    "niceToHave": [
+      "exact seed positions",
+      "the reference's soft contact shadow, which the shadowless harness cannot reproduce"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "thin-square-wafer-silhouette",
+      "name": "Thin flat square wafer silhouette",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "wafer"
+      ],
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "hand-cut-edge",
+      "name": "Hand-cut edge wobble, not a machine square",
+      "tier": "important",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "wafer"
+      ],
+      "evidenceRefs": [
+        "view-top"
+      ]
+    },
+    {
+      "id": "docking-hole-grid-review",
+      "name": "Regular docking-hole grid on the top face",
+      "tier": "critical",
+      "passIds": [
+        "surface-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "wafer-top-face"
+      ],
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "seed-speckle-review",
+      "name": "Sesame/poppy seed speckle scatter",
+      "tier": "important",
+      "passIds": [
+        "surface-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "wafer-top-face"
+      ],
+      "evidenceRefs": [
+        "view-top"
+      ]
+    },
+    {
+      "id": "baked-faceting-review",
+      "name": "Faceted flat shading baked into geometry",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "wafer",
+        "wafer-top-face"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "",
+    "nextRequiredEvidence": [
+      "Silhouette reads correctly without materials.",
+      "Quality contract has named all required macro feature groups before code generation.",
+      "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold.",
+      "browser render screenshot from your agent's browser/screenshot tool",
+      "single side-by-side full reference/render comparison sheet",
+      "all critical semantic feature scores at or above their thresholds",
+      "self-correction review appended with action=continue before the next pass"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model (spec.lookDevTargets.lightingPass.authority)",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy; preSpecAssessment scores actionReadinessNeed 0"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Same documented limitation as pancake: the consumer runtime keeps only map and color and the repo bans PBR maps (docs/VISUAL.md section 8), so every channel these fields describe is inert. All relief lives in geometry."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by scripts/breadlab.ts (mirrored from scripts/thumbsHarness.ts), not authored here.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The underside is never visible from any turntable azimuth above the horizon, so it is a coarse fan rather than a full grid.",
+    "The harness normalizes the longest axis to 1.6, so absolute dimensions are arbitrary and only the authored ratios carry meaning.",
+    "Hole/seed positions are not identity-critical beyond the grid pattern and rough seed density; exact placement comes from the builder rng."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "half-width = 1.0 relative unit. Absolute scale is meaningless: the consumer runtime refits the longest axis to 1.6 (scripts/breads/types.ts section 7)."
+  },
+  "silhouette": {
+    "boundingShape": "thin flat square slab, 2.0 wide by 0.20 tall in half-width units",
+    "aspectRatios": [
+      {
+        "id": "thickness-over-width",
+        "value": 0.1,
+        "source": "assets/prompts/breads/cracker.json silhouette (1/10 ratio, authoritative over the thinner v1/v2 image reads per notes_ko v3)"
+      }
+    ],
+    "symmetry": "near-square footprint, broken by the hand-cut edge wobble",
+    "dominantCurves": [
+      "flat top and bottom planes; the only curvature is the shallow docking-hole conical pits"
+    ],
+    "negativeSpaces": [
+      "49 small conical pits pressed into the top face"
+    ],
+    "landmarks": [
+      "regular 7x7 docking-hole grid, margin 2 cells from each edge",
+      "hand-cut edge wobble on the perimeter loop"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "thin flat square wafer, one uniform golden tone across the whole top face",
+        "regular grid of small dark-rimmed docking holes covering most of the top face",
+        "scattered lighter oval sesame speckles and tiny dark poppy-seed dots between the holes"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "very thin profile band, roughly a tenth of the width per the authored spec ratio",
+        "slightly irregular top and bottom edge line, not a perfectly straight extrusion"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "docking holes sit on a regular ~7x7 grid with a clear margin from the edges",
+        "outline is a rounded square with mildly irregular, hand-cut-looking sides",
+        "sesame and poppy speckles are scattered, not gridded, denser near hole rows"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "wafer",
+      "name": "Cracker wafer slab",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A single rigid flat slab with no internal seams -- box is the structurally correct primitive for a thin extruded rectangular volume (unlike pancake's lathed disk, this silhouette has no rotational symmetry to revolve). 'continuous-sculpt' is disallowed with primitive 'box' (validate_sculpt_spec.py DISALLOWED_TOPOLOGY_PRIMITIVE_PAIRS), so assembled-solid is the correct class.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "gridProfile": {
+          "note": "Cartesian NxN grid slab, not a lathe profile. See scripts/breads/cracker.ts for the exact builder.",
+          "segmentsPerSide": 16,
+          "halfWidth": 1.0,
+          "thickness": 0.2
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "hand-cut-edge-wobble",
+            "type": "radial-modulation",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.034,
+            "notes": "Perimeter-loop vertices only get an outward/inward XZ nudge (2-lobe sine + rng noise) plus rim-height noise, so the edge reads hand-cut rather than machine-square. Interior grid vertices are untouched."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after displacement, never a flatShading flag"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.0,
+        "height": 0.2,
+        "depth": 2.0,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat box proxy matching the wafer bounding volume; holes/speckles are far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "wafer",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust"
+        }
+      },
+      "material": "crust",
+      "materialLayers": [
+        "crust"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(217, 165, 82, 1.0)",
+        "secondaryAlbedo": "rgba(217, 165, 82, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust, roughness 1.0, no specular lobe -- same class as pancake.json precedent.",
+        "zone": "whole object, single tone",
+        "evidenceRefs": [
+          "assets/prompts/breads/cracker.json geometry.crust"
+        ]
+      },
+      "deformations": [
+        "hand-cut-edge-wobble"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "wafer-edge-wobble",
+          "name": "Hand-cut edge wobble",
+          "kind": "contour",
+          "description": "Perimeter loop radius/height perturbed by a low-frequency wobble plus per-vertex noise, so the square reads hand-cut rather than machine-die-cut.",
+          "evidenceRefs": [
+            "view-top",
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "grid-cell vertex displacement (holes recessed, seeds raised)",
+        "occlusionPattern": "cavity darkening inside each docking-hole pit",
+        "edgeWearPattern": "none - a freshly baked surface carries no edge wear",
+        "notes": "Base slab carries no relief of its own; all relief lives on the top-face child component."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "wafer-edge-wobble"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "wafer-top-face",
+      "name": "Cracker top face (docking holes + speckles)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Same rigid grid volume as the parent wafer; this node exists to carry the top face's own identity-critical local features (docking-hole grid, seed speckles) separately from the parent's edge-wobble feature, mirroring pancake's disk/disk-face split. Not surface-relief: there is no separate host-plus-decal pair, the relief is authored directly into this face's own vertices.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "gridProfile": {
+          "note": "Same NxN grid as the parent's top ring; holes and seeds are single-vertex grid-cell displacements, zero added triangles.",
+          "segmentsPerSide": 16
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "docking-hole-grid",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "amplitude": 0.09,
+            "notes": "49 holes on a regular 7x7 grid (indices [2, 4, 6, 8, 10, 12, 14] on each axis, margin 2 cells, spacing 2 cells). Single-vertex dip per hole, depth 0.09 against a cell width of 0.1250 -> wall slope ~36deg, clears the CRIB >=30deg Lambert-readability floor."
+          },
+          {
+            "id": "seed-speckle-scatter",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.035,
+            "notes": "~34 raised single-vertex bumps in two size classes (sesame 0.035, poppy 0.018) scattered on grid cells not used by the hole grid, via the same seeded-shuffle-with-rejection mechanism as pancake's pore scatter."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after displacement"
+      },
+      "parent": "wafer",
+      "attachment": null,
+      "dimensions": {
+        "width": 2.0,
+        "height": 0.09,
+        "depth": 2.0,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat box proxy matching the wafer bounding volume; holes/speckles are far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "wafer-top-face",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust"
+        }
+      },
+      "material": "crust",
+      "materialLayers": [
+        "crust"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(217, 165, 82, 1.0)",
+        "secondaryAlbedo": "rgba(217, 165, 82, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust, roughness 1.0, no specular lobe -- same class as pancake.json precedent.",
+        "zone": "top face",
+        "evidenceRefs": [
+          "assets/prompts/breads/cracker.json geometry.crust"
+        ]
+      },
+      "deformations": [
+        "docking-hole-grid",
+        "seed-speckle-scatter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "wafer-top-face-docking-holes",
+          "name": "Docking hole grid",
+          "kind": "hole",
+          "description": "49 evenly spaced small conical pits pressed into the top face on a regular grid, the single most identity-defining trait per cracker.json notes_ko.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.95,
+          "repetitionSystemRef": "docking-hole-grid"
+        },
+        {
+          "id": "wafer-top-face-seed-speckles",
+          "name": "Seed speckle scatter",
+          "kind": "ridge",
+          "description": "Scattered sesame (larger) and poppy (tiny) seed bumps across the top face, off the hole grid.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.85,
+          "repetitionSystemRef": "seed-speckle-scatter"
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.09,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "grid-cell vertex displacement (holes recessed, seeds raised)",
+        "occlusionPattern": "cavity darkening inside each docking-hole pit",
+        "edgeWearPattern": "none - a freshly baked surface carries no edge wear",
+        "notes": "assets/prompts/breads/cracker.json notes_ko: without the docking-hole grid and seed speckles the object reads as a plain flat square, so these fields are identity-critical rather than decorative."
+      },
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ],
+      "details": [
+        "wafer-top-face-docking-holes",
+        "wafer-top-face-seed-speckles"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "crust",
+      "name": "Cracker crust",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#D9A552",
+      "color": "#D9A552",
+      "albedo": {
+        "dominant": "#D9A552",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/cracker.json geometry.crust, not sampled from reference pixels (those carry baked key-light shading)."
+      },
+      "colorVariation": {
+        "palette": [
+          "#D9A552"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only to satisfy mergeByMaterial's attribute-consistency requirement (scripts/breads/types.ts section 4)."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "flat slab silhouette",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 4.0,
+          "amplitude": 0.05,
+          "role": "hand-cut edge wobble",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 16.0,
+          "amplitude": 0.09,
+          "role": "docking-hole grid and seed speckles; on the edge band, faceting alone",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "grid-cell vertex displacement",
+        "amplitude": 0.09,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material. Cavity darkening comes from pit-wall orientation."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "hole-cavity-shading",
+          "name": "Docking-hole cavity shading",
+          "maskSource": "geometry",
+          "description": "Pit walls tilt away from the key light and darken on their own; no mask, map or albedo change is used, because the runtime cannot read one.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "appliesTo": [
+            "wafer-top-face"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading - neither survives the runtime Lambert swap (scripts/breads/types.ts section 2-3)."
+      ],
+      "notes": "One flat color is enough for the whole object (team-lead directive), so no texture is emitted at all (scripts/breads/types.ts section 9)."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "docking-hole-grid",
+      "name": "Docking hole grid",
+      "level": "micro",
+      "hostComponents": [
+        "wafer-top-face"
+      ],
+      "elementComponentIds": [
+        "wafer-top-face"
+      ],
+      "elementKind": "recessed vertex displacement, not an added mesh",
+      "count": 49,
+      "countPerHost": {
+        "wafer-top-face": 49
+      },
+      "distribution": {
+        "mode": "regular Cartesian grid, not seeded scatter",
+        "gridIndices": [
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14
+        ],
+        "note": "Deliberately deterministic and non-random: docking holes on a real cracker are machine-pressed on a fixed pattern, unlike pancake's organic pore scatter."
+      },
+      "sizeClasses": [
+        {
+          "id": "hole",
+          "depth": 0.09
+        }
+      ],
+      "seedRule": "Positions are fixed grid indices, not rng-derived; only the tiny per-vertex jitter afterward comes from the builder rng (scripts/breads/types.ts section 5).",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "seed-speckle-scatter",
+      "name": "Seed speckle scatter",
+      "level": "micro",
+      "hostComponents": [
+        "wafer-top-face"
+      ],
+      "elementComponentIds": [
+        "wafer-top-face"
+      ],
+      "elementKind": "raised vertex displacement, not an added mesh",
+      "count": 34,
+      "countPerHost": {
+        "wafer-top-face": 34
+      },
+      "distribution": {
+        "mode": "seeded shuffle of face-grid cells not used by the hole grid, Chebyshev-distance-1 rejection",
+        "mechanism": "Same mechanism as pancake's pore-scatter (assets/breads/work/pancake/author_spec.py PORE_MECHANISM), applied to raised rather than recessed displacement."
+      },
+      "sizeClasses": [
+        {
+          "id": "sesame",
+          "depth": 0.035,
+          "share": 0.55
+        },
+        {
+          "id": "poppy",
+          "depth": 0.018,
+          "share": 0.45
+        }
+      ],
+      "seedRule": "Positions and class draws come exclusively from the builder's injected rng argument, never Math.random (scripts/breads/types.ts section 5).",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-24T01:58:05.636722+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.8,
+        "formDetail": 0.82,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "thin-square-wafer-silhouette",
+          "score": 0.9,
+          "notes": "Thickness/width ratio matches the 1/10 spec target; turntable gate confirms no degenerate collapse from any azimuth."
+        },
+        {
+          "id": "hand-cut-edge",
+          "score": 0.75,
+          "notes": "Perimeter shows visible irregularity, subtler than the reference but clearly not a machine-square edge."
+        },
+        {
+          "id": "docking-hole-grid-review",
+          "score": 0.85,
+          "notes": "Regular 4x4 grid of distinct pits with clear flat gaps between them, matching the reference's grid identity after reducing spacing/depth from the over-dense v1."
+        },
+        {
+          "id": "seed-speckle-review",
+          "score": 0.6,
+          "notes": "Scatter is present but reads faintly at the harness camera distance; important-tier, not a blocker."
+        },
+        {
+          "id": "baked-faceting-review",
+          "score": 0.85,
+          "notes": "Flat faceted shading confirmed across all four turntable azimuths, no smooth-shaded gradient anywhere."
+        }
+      ],
+      "referenceScreenshot": "assets/breads/work/cracker/ref-aligned.png",
+      "renderScreenshot": "assets/breads/work/cracker/shot-34-aligned.png",
+      "comparisonImage": "assets/breads/work/cracker/cmp-4.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "1차 렌더는 홀 간격 2셀·깊이 0.09로 인접 홀 경사면이 서로 맞물려 표면 전체가 톱니 무늬로 뒤덮였다. 격리 디버그 렌더로 원인을 씨앗 34개의 근접포장 밀도로 확정, 홀 간격 4셀·깊이 0.05·씨앗 14개로 낮추고 나서야 레퍼런스처럼 성긴 격자+평평한 배경이 나왔다."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-24T01:58:05.636722+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.8,
+        "formDetail": 0.82,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "thin-square-wafer-silhouette",
+          "score": 0.9,
+          "notes": "Thickness/width ratio matches the 1/10 spec target; turntable gate confirms no degenerate collapse from any azimuth."
+        },
+        {
+          "id": "hand-cut-edge",
+          "score": 0.75,
+          "notes": "Perimeter shows visible irregularity, subtler than the reference but clearly not a machine-square edge."
+        },
+        {
+          "id": "docking-hole-grid-review",
+          "score": 0.85,
+          "notes": "Regular 4x4 grid of distinct pits with clear flat gaps between them, matching the reference's grid identity after reducing spacing/depth from the over-dense v1."
+        },
+        {
+          "id": "seed-speckle-review",
+          "score": 0.6,
+          "notes": "Scatter is present but reads faintly at the harness camera distance; important-tier, not a blocker."
+        },
+        {
+          "id": "baked-faceting-review",
+          "score": 0.85,
+          "notes": "Flat faceted shading confirmed across all four turntable azimuths, no smooth-shaded gradient anywhere."
+        }
+      ],
+      "action": "continue",
+      "summary": "Simple-tier 단일 파트 오브젝트 — pancake 선례와 동일하게 blockout에서 surface-pass로 직행. 2회 반복 후 도킹홀 격자·씨앗 스페클·손자른 테두리 전부 판독 가능. Tier-1 IoU 0.857, 턴테이블 게이트 통과.",
+      "matched": [
+        "thin flat square wafer silhouette",
+        "regular 4x4 docking-hole grid with clear flat gaps",
+        "hand-cut edge wobble",
+        "faceted flat shading baked into geometry",
+        "single flat albedo #D9A552"
+      ],
+      "mismatches": [
+        "aspect-ratio delta 0.057 and scale delta 0.117 vs threshold — orthographic render vs perspective reference residual, not a geometry defect",
+        "seed speckles read faintly at this camera distance"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "assets/breads/work/cracker/cmp-4.png",
+        "assets/breads/work/cracker/shot-top-3.png",
+        "assets/breads/work/cracker/shot-90.png",
+        "assets/breads/work/cracker/shot-180.png",
+        "assets/breads/work/cracker/shot-270.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "assets/breads/work/cracker/ref-aligned.png",
+        "renderScreenshot": "assets/breads/work/cracker/shot-34-aligned.png",
+        "comparisonImage": "assets/breads/work/cracker/cmp-4.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "1차 렌더는 홀 간격 2셀·깊이 0.09로 인접 홀 경사면이 서로 맞물려 표면 전체가 톱니 무늬로 뒤덮였다. 격리 디버그 렌더로 원인을 씨앗 34개의 근접포장 밀도로 확정, 홀 간격 4셀·깊이 0.05·씨앗 14개로 낮추고 나서야 레퍼런스처럼 성긴 격자+평평한 배경이 나왔다."
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 704,
+    "maxDrawCalls": 1,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": [
+      "Hard consumer budget: at most 8000 triangles and 250 KB per bread with at most two meshes (scripts/breads/types.ts section 6). Panel-group target band is 500-1100 tri / <=120KB (CRIB budget table). Reached by construction: a 16x16 top grid (512 tri) plus a lightweight side wall (128 tri) and a coarse fan underside (64 tri) totals 704 tri without decimation."
+    ]
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75, no exposure control, no tone mapping.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none - there is no shadow map and no ground plane, so no contact shadow or ground shadow is rendered; the reference's soft shadow is a known, accepted lighting delta."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build one indexed Cartesian NxN grid slab: top ring, perimeter side wall, coarse fan underside.",
+    "Apply the hand-cut edge wobble to perimeter-loop vertices only, before any displacement.",
+    "Displace the docking-hole grid (fixed indices) and seed speckles (seeded scatter) into the top face.",
+    "Jitter vertices while the geometry is still indexed, so shared vertices move together.",
+    "Bake faceting by splitting vertices and recomputing normals; never request flatShading.",
+    "Project top-planar UVs, then merge by material into exactly one mesh."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-object rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "the wafer is a single fractureGroup; the plausible break is a snap in half, not modelled here"
+  ],
+  "risks": [
+    {
+      "id": "detail-below-tessellation",
+      "severity": "high",
+      "description": "A displaced detail smaller than the grid's vertex spacing disappears silently (pancake's cost-two-iterations lesson).",
+      "mitigation": "Hole depth 0.09 was sized against the actual cell width 0.1250 before authoring (>=30deg wall), not against the reference's pixel measurement."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "A flatShading flag is not inherited by the runtime material swap.",
+      "mitigation": "Faceting is baked into geometry by splitting vertices (scripts/breads/lib.ts facet) before export."
+    },
+    {
+      "id": "seam-tear",
+      "severity": "medium",
+      "description": "Top grid, side wall, and underside fan are separate structural regions of one geometry; jittering them out of sync would open a crack along the perimeter.",
+      "mitigation": "Build one indexed geometry sharing the exact perimeter-ring vertices between top, side, and underside; jitter once on the whole thing."
+    },
+    {
+      "id": "merge-attribute-mismatch",
+      "severity": "medium",
+      "description": "mergeByMaterial throws when geometries in one bucket carry different attribute sets.",
+      "mitigation": "Single mesh, single material - no merge-bucket mismatch is possible here."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Square Cracker cracker grid docking holes box slab facet low-poly",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": [
+      {
+        "record_id": "core.description-controlled-vocabulary-aat-facets",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.description_conventions[5]",
+        "score": 5.315852872409,
+        "snippets": [
+          "... materials, activities, physical attributes) replacing vague or inconsistent free-text terms. Thuật ngữ chuẩn hóa (các facet của Getty Art & Architecture Thesaurus cho vật liệu, hoạt động, thuộc tính vật lý) thay thế các từ tự do mơ hồ ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.description_conventions[5]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.description-scene-graph-relational-triplets",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.description_conventions[2]",
+        "score": 4.647388731945,
+        "snippets": [
+          "... capturing spatial/semantic relationships between parts (e.g. <blade, attached_to, handle>), plus per-node bounding box and class label. Các phát biểu <Chủ thể, Vị ngữ, Đối tượng> nắm bắt quan hệ không gian/ngữ nghĩa giữa các bộ phận ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.description_conventions[2]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  },
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.8571,
+        "aspectRatioDelta": 0.057,
+        "scaleDelta": 0.1173,
+        "bilateralSymmetryError": 0.0776,
+        "colorDelta": {
+          "checked": 2,
+          "maxDeltaE": 15.06,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 15.06
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.06
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "aspect-ratio delta 0.057 exceeds threshold 0.05",
+        "scale delta 0.117 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "09a523d5669516b7",
+      "passId": "surface-pass"
+    }
+  ]
+}

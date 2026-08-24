@@ -1,0 +1,59 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": {
+    "scone.png": "three-quarter top-front, 1536x1024",
+    "scone-2.png": "front elevation, 1536x1024",
+    "scone-3.png": "top-down, 1536x1024"
+  },
+  "layer1_identification": {
+    "workType": "single wedge-shaped scone cut from a round scone",
+    "broadClassification": "food prop / stylized low-poly game asset",
+    "primaryDomain": "object",
+    "confidence": 0.97,
+    "note": "reference images are themselves stylized low-poly renders, not photographs; target look is faceted matte clay, not photoreal"
+  },
+  "layer2_form_silhouette": {
+    "boundingVolume": "thick rounded-triangle prism (a Reuleaux-like wedge, not a sharp-cornered triangle); footprint is a rounded triangle with one pointed-but-rounded apex and a shallow convex back edge",
+    "symmetry": "bilateral (approximate) about the apex-to-back-edge axis; broken by hand-poured wobble",
+    "shapeLanguage": "organic form (rounded corners, no sharp edges) expressed with geometric faceting",
+    "topdown_observation": "scone-3.png (top-down): all three corners are heavily rounded, not sharp - the two back corners round with a larger radius (~0.18-0.2 of overall width) than the apex (~0.08-0.1 of overall width), which reads as pointed-but-blunt, not a knife edge. The back edge between the two back corners is a very shallow convex arc (bulge ~3-5% of the chord), consistent with a wedge cut close to the center of a round scone. Overall silhouette proportions from scone-3.png: width (back-corner to back-corner) roughly 830px, height (back edge to apex tip) roughly 730px, so heightAxis/widthAxis approx 0.88 in the top-down footprint (this is the plan-view length ratio, NOT the height/width elevation ratio governed by the prompt JSON).",
+    "elevation_observation": "scone.png + scone-2.png: chunky wedge resting flat on its wide bottom face, vertical thickness roughly half the top width per the prompt JSON (authoritative for the height/width ratio, not re-measured from pixels). Bottom is flat and fully in contact with the ground plane - the object never balances on the apex.",
+    "front_elevation_caveat": "scone-2.png shows a wide rounded rectangular silhouette rather than an obviously triangular one. This is expected: viewed nearly along the bisector axis, a rounded-triangle wedge projects to a wide rounded blob because the apex point recedes toward the viewer/away rather than showing its own width. The top-down view (scone-3.png) is the authoritative footprint shape."
+  },
+  "layer3_decomposition": {
+    "macro": ["wedge-body (bottom + two straight cut side walls + shallow outer arc wall)", "wedge-top (single domed-ish top face)"],
+    "meso_per_wedge": ["top face (colored, carries fissures)", "two straight cut faces (uncolored, flat, meeting at the rounded apex)", "outer arc face (uncolored, the shallow curved edge from the original round scone)", "underside (occluded, flat)"],
+    "micro": ["3 shallow horizontal crack fissures across the top face", "hand-poured outline wobble on the rounded-triangle perimeter"]
+  },
+  "layer4_spatial": [
+    "<wedge-top, above, wedge-body> contact: flush, shared perimeter ring at the crust color boundary",
+    "<fissures, embedded-in, wedge-top> contact: embed (concave groove displacement, not added geometry)",
+    "no floating parts; single rigid body resting on its flat bottom"
+  ],
+  "layer5_materials": {
+    "single_substance": "opaque dielectric, matte",
+    "metalness": 0.0,
+    "roughness": "1.0 (fully matte clay); no specular lobe anywhere in the reference",
+    "translucency": "opaque",
+    "relief": "faceted planar shading; fissures read as shallow linear grooves with visible facet walls, not smooth valleys",
+    "runtimeNote": "consumer runtime force-replaces every material with MeshLambertMaterial keeping only map+color, so PBR scalars beyond albedo are inert (scripts/breads/types.ts section 2)"
+  },
+  "layer6_color": {
+    "source": "assets/prompts/breads/scone.json geometry.crust (authoritative, hand-transcribed)",
+    "topFaceAlbedo": "#D6A15C",
+    "sideAndBottomAlbedo": "#F4EAD4",
+    "finish": "matte",
+    "observedVsSpec": "reference renders show the two straight cut faces and the outer arc face all in the same pale cream tone as the underside - confirms a single 'everything except the top face' material zone, matching the prompt's binary top/side split."
+  },
+  "layer7_identity_features": [
+    "asymmetric two-zone coloring: only the top face is golden, every other face (both cut sides, outer arc, bottom) stays uncolored cream - this is the load-bearing identity feature (if the sides were colored it would read as a muffin, per prompts JSON notes_ko)",
+    "3 shallow, slightly wavy horizontal fissures crossing the top face, roughly evenly spaced from the back edge toward the apex, each spanning the local width at its position (so they shorten as they approach the apex)",
+    "heavily rounded rounded-triangle footprint - no sharp corners anywhere, including the apex",
+    "apex points forward and slightly to one side of the camera axis, never straight-on"
+  ],
+  "layer8_uncertainty": [
+    "underside is hidden in all three views (occluded by the ground plane); modelled as a closed flat cap, never visible from any turntable azimuth above the horizon",
+    "exact fissure paths are not identity-critical; count (3), rough spacing and shortening-toward-apex are what the review scores",
+    "reference renders carry no cast/contact shadow (matches the flat-lit harness, no expected delta here unlike pancake's inter-layer shadow)"
+  ]
+}

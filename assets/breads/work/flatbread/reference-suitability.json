@@ -1,0 +1,19 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": [
+    "assets/breads/src/flatbread.png",
+    "assets/breads/src/flatbread-2.png",
+    "assets/breads/src/flatbread-3.png"
+  ],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "strongSilhouette": "oval disk in top-down; low domed profile with bump silhouette in front elevation",
+    "majorMaterialsVisible": "single matte dielectric crust, base + char tone",
+    "hiddenSideInferable": "underside flat and plain by construction",
+    "procedurallyApproximable": "oval lathe-like disk with polar-grid top face, vertex-cluster dome displacement, no smoke/liquid/glass"
+  },
+  "stylizationLevel": "low-poly faceted matte clay",
+  "complexity": "simple",
+  "askForBetterInput": "not needed"
+}

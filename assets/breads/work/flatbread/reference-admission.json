@@ -1,0 +1,14 @@
+{
+  "admitted": true,
+  "reasons": [],
+  "provenance": {
+    "viewpoint": "three-quarter",
+    "sourcePath": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\flatbread.png",
+    "width": 1536,
+    "height": 1024,
+    "foregroundCoverage": 0.5293,
+    "largestComponentFraction": 1.0,
+    "pHash": 12368163337497651878,
+    "duplicateOfHash": null
+  }
+}

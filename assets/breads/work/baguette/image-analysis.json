@@ -1,0 +1,57 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": {
+    "baguette.png": "three-quarter top-front, diagonal framing, 1536x1024",
+    "baguette-2.png": "front elevation, horizontal, 1536x1024",
+    "baguette-3.png": "strict top-down orthographic, diagonal framing, 1536x1024"
+  },
+  "layer1_identification": {
+    "workType": "long slender baguette loaf with diagonal slash scoring",
+    "broadClassification": "food prop / stylized low-poly game asset",
+    "primaryDomain": "object",
+    "confidence": 0.97
+  },
+  "layer2_form_silhouette": {
+    "boundingVolume": "long thin spindle (cylinder tapered to a point at both ends), extreme length/diameter ratio",
+    "symmetry": "radial per cross-section, bilateral along the length axis (both ends taper similarly)",
+    "measurements_px": {
+      "frontElevation_length": 1432,
+      "frontElevation_diameter": 126,
+      "lengthOverDiameter": 11.365,
+      "measurementMethod": "PIL pixel bounding box on baguette-2.png (straight horizontal front elevation) - not vision-viewing, a script measurement, so it does not spend the 3-image viewing budget (CRIB: pixel measurement of a ratio absent from the prompt JSON follows the pancake precedent of measuring off the image, not re-extracting colour/shape the JSON already states)."
+    },
+    "derivedRatios": {"halfLengthOverRadius": 11.365, "note": "radius=1.0 unit -> half-length=11.365, full length=22.73"}
+  },
+  "layer3_decomposition": {
+    "macro": ["baguette-body (tapered tube)"],
+    "meso": ["4 diagonal slash scores along the top, each with a raised ear rim and a recessed crumb floor"],
+    "micro": ["ear ridge (raised lip immediately around each slash opening)", "crumb floor (recessed, second material)"]
+  },
+  "layer4_spatial": [
+    "<slash-crumb-floor, embedded-in, baguette-body> contact: recessed displacement, not an added mesh",
+    "<slash-ear-ridge, above, baguette-body> contact: raised displacement immediately flanking each trench"
+  ],
+  "layer5_materials": {
+    "single_substance": "opaque dielectric, matte crust; second material for the exposed crumb",
+    "metalness": 0.0,
+    "roughness": "1.0",
+    "relief": "highest facet density of the three chunk breads (visibly more triangular facets across the crust in baguette.png than loaf/scone) - still low-poly faceted, not smooth"
+  },
+  "layer6_color": {
+    "source": "assets/prompts/breads/baguette.json geometry.crust (authoritative)",
+    "crustAlbedo": "#A9713F",
+    "crumbAlbedo": "#F4EAD4",
+    "observedVsSpec": "reference crust reads lighter orange under the key light than the flat hex - expected Lambert lighting effect, same pattern as pancake/scone/loaf material-pass notes"
+  },
+  "layer7_identity_features": [
+    "4 diagonal overlapping slashes - the load-bearing identity feature per baguette.json notes_ko; without them it reads as a generic rod",
+    "each slash reads as a lens/eye shape (pointed at both ends), tilted diagonally relative to the length axis (estimated ~30-35deg from the length axis, from comparing the length-axis angle -32.7deg and each slash's visibly steeper tilt in baguette-3.png), with visible overlap between consecutive slashes",
+    "raised ear rim clearly brighter/higher than the surrounding crust immediately around each opening, with the recessed pale crumb visible inside",
+    "both ends taper gradually to a fine point over roughly the outer 35-40% of the length each, not an abrupt cone"
+  ],
+  "layer8_uncertainty": [
+    "underside never visible in any view; the tube is closed by true poles at both tips (radius->0), not a flat cap - no underside geometry exists to hide",
+    "exact slash tilt angle (~30-35deg) is a visual estimate from the top-down and front-elevation views, not a precise measurement (automated crumb-colour pixel clustering was tried and produced noisy/unreliable clusters, so the estimate is read directly from the images instead) - treated as an approximation like pancake's pore positions",
+    "exact number of slashes confirmed at 4 (within the prompt's stated 3-5 range) across all three views consistently"
+  ]
+}

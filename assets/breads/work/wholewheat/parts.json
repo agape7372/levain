@@ -1,0 +1,7 @@
+{
+  "note": "Single continuous mesh, single material - no slash/crumb split unlike campagne. Triangle count is exact, matching scripts/breadlab-shot.mjs stdout stats.",
+  "parts": [
+    { "name": "root", "kind": "container", "module": "createWholewheat", "triangles": 1920 },
+    { "name": "dome", "kind": "part", "module": "buildGroovedDomeShell", "triangles": 1920 }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": { "focaccia.png": "three-quarter, 1536x1024", "focaccia-2.png": "front elevation, 1536x1024", "focaccia-3.png": "top-down, 1536x1024" },
+  "layer1_identification": { "workType": "thin rectangular slab of focaccia bread", "broadClassification": "food prop / stylized low-poly game asset", "primaryDomain": "object", "confidence": 0.97 },
+  "layer2_form_silhouette": { "boundingVolume": "thin rectangular slab, flat top, low uniform height, mildly rounded corners", "symmetry": "rectangular, near-uniform grid of dimples" },
+  "layer3_decomposition": {
+    "macro": ["rectangular slab"],
+    "meso": ["top face (dimple grid + toppings)", "side wall", "underside (plain)"],
+    "micro": ["finger-dimple grid, recessed, darker oil-pool color inside", "raised olive bumps (near-black)", "rosemary sprig bits (thin, green)", "salt crystal bits (tiny, white)"]
+  },
+  "layer4_spatial": [
+    "<dimples, recessed-in, top face> contact: grid-cell vertex displacement, oil color material on the recess",
+    "<olives/rosemary/salt, raised-on, top face> contact: small vertex-cluster bumps, same crust material (no separate color budget - types.ts caps 2 materials, second slot spent on oil)",
+    "no floating parts; single rigid slab"
+  ],
+  "layer5_materials": { "single_substance": "opaque dielectric, matte", "metalness": 0.0, "roughness": "1.0", "relief": "faceted planar shading; dimples read as shallow round pits with a distinct darker interior tone" },
+  "layer6_color": {
+    "source": "assets/prompts/breads/focaccia.json geometry.crust (authoritative)",
+    "topAlbedo": "#D9A552", "dimpleAlbedo": "#B8813C",
+    "toppingAlbedo": "not specified - budget forces toppings onto the crust material (types.ts section 1: <=2 materials per mesh); olive/rosemary/salt color distinction is sacrificed for their raised silhouette shape"
+  },
+  "layer7_identity_features": [
+    "evenly distributed grid of round finger-dimples across the whole top face, each with a visibly darker interior (oil pool)",
+    "raised dark olive spheres scattered across the surface",
+    "thin rosemary sprig bits and tiny salt crystal specks scattered",
+    "thin flat rectangular slab silhouette, mildly rounded corners"
+  ],
+  "layer8_uncertainty": [
+    "underside fully occluded, modelled plain",
+    "exact dimple/topping positions not identity-critical beyond grid pattern and rough topping scatter density",
+    "olive/rosemary/salt color cannot be preserved within the 2-material budget; documented trade-off, geometry-only distinction"
+  ]
+}

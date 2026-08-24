@@ -1,0 +1,1836 @@
+{
+  "targetName": "Flatbread",
+  "targetId": "flatbread",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\flatbread.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Fixed by scripts/breadlab.ts, not matched to the reference's perspective camera."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "single thin oval flatbread",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "sculptural"
+      ],
+      "structureKind": [
+        "single rigid disk"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte baked crust with a dark scorch zone, same PBR class as pancake/cracker."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 1,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 2,
+        "materialLayerCount": 1,
+        "localDetailDensity": 2,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 1,
+        "mesoComponents": 1,
+        "microFeatureGroups": 2,
+        "materialLayers": 2,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "One rigid macro body (disk), no repeated macro parts.",
+        "Silhouette is an oval disk with outline wobble and blister bumps interrupting an otherwise smooth lathe form.",
+        "Repetition density 2: blister-scatter + char-scatter, both identity-critical per flatbread.json notes_ko.",
+        "Two albedo zones (base + char) in one material family, materialLayerCount 1.",
+        "Occlusion risk 1: only the plain underside is hidden.",
+        "Action readiness 0: static showcase prop."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Simple tier but needs a meso top-face node so blister/char repetition systems attach to real geometry."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerated by hand (CRIB: skip detail-inventory for a single repeated-system object).",
+      "details": [
+        {
+          "id": "blister-dome-field",
+          "zone": "top face",
+          "observation": "~11 raised low-poly domes of varying size, scattered without an obvious grid.",
+          "inference": "Steam pockets puffing up during griddle cooking.",
+          "mapsTo": {
+            "ref": "disk-top-face-blister-domes",
+            "note": ""
+          },
+          "confidence": 0.9,
+          "evidenceRef": "flatbread-3.png full frame",
+          "kind": "ridge"
+        },
+        {
+          "id": "char-spot-scatter",
+          "zone": "top face",
+          "observation": "Dark scorch material on most blister crowns plus independent flat-area spots.",
+          "inference": "Direct flame/griddle contact scorching.",
+          "mapsTo": {
+            "ref": "disk-top-face-char-spots",
+            "note": ""
+          },
+          "confidence": 0.85,
+          "evidenceRef": "flatbread-3.png full frame",
+          "kind": "stain"
+        },
+        {
+          "id": "hand-stretched-outline",
+          "zone": "perimeter",
+          "observation": "Loosely irregular oval outline, not a clean ellipse.",
+          "inference": "Hand-stretched dough.",
+          "mapsTo": {
+            "ref": "disk-outline-wobble",
+            "note": ""
+          },
+          "confidence": 0.8,
+          "evidenceRef": "flatbread-3.png outline",
+          "kind": "contour"
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/flatbread.png",
+    "resolvedUnknowns": [
+      "Underside fully occluded; modelled as a plain closed cap, never visible above the horizon.",
+      "Exact blister/char positions not identity-critical beyond count and rough distribution; seeded from the builder rng.",
+      "Char color not specified in the prompt JSON; authored as a dark scorched brown consistent with the reference and the matte low-poly style."
+    ]
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 1,
+      "mesoComponents": 1,
+      "microFeatureGroups": 2,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.8,
+    "mustMatch": [
+      "thin oval disk, thickness ~1/12 diameter",
+      "raised blister dome field (~11 domes)",
+      "char/scorch material on most blister crowns + scattered flat spots",
+      "irregular hand-stretched outline",
+      "faceted flat shading"
+    ],
+    "niceToHave": [
+      "exact blister/char positions",
+      "reference's soft contact shadow"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "oval-thin-disk-silhouette",
+      "name": "Thin oval disk silhouette",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "disk"
+      ],
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "blister-dome-field",
+      "name": "Raised blister dome field",
+      "tier": "critical",
+      "passIds": [
+        "surface-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "disk-top-face"
+      ],
+      "evidenceRefs": [
+        "view-front",
+        "view-top"
+      ]
+    },
+    {
+      "id": "char-spot-material-split",
+      "name": "Char/scorch two-tone material split",
+      "tier": "critical",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "disk-top-face"
+      ],
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "hand-stretched-outline",
+      "name": "Irregular hand-stretched outline",
+      "tier": "important",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "disk"
+      ],
+      "evidenceRefs": [
+        "view-top"
+      ]
+    },
+    {
+      "id": "baked-faceting-flatbread",
+      "name": "Faceted flat shading baked into geometry",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "disk",
+        "disk-top-face"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "",
+    "nextRequiredEvidence": [
+      "Silhouette reads correctly without materials.",
+      "Quality contract has named all required macro feature groups before code generation.",
+      "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold.",
+      "browser render screenshot from your agent's browser/screenshot tool",
+      "single side-by-side full reference/render comparison sheet",
+      "all critical semantic feature scores at or above their thresholds",
+      "self-correction review appended with action=continue before the next pass"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model",
+      "interaction-pass": "static showcase prop; preSpecAssessment scores actionReadinessNeed 0"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Same documented limitation as pancake/cracker: runtime keeps only map+color, PBR maps banned (docs/VISUAL.md section 8). All relief lives in geometry; char is a flat material zone."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Fixed by scripts/breadlab.ts.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "Underside never visible above the horizon.",
+    "Runtime normalizes longest axis to 1.6.",
+    "Blister/char positions not identity-critical beyond count and rough distribution."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, harness three-quarter camera at (-1.6, 2.2, 2.6)",
+    "up": "+Y",
+    "scaleReference": "long-axis radius = 1.0 relative unit; runtime refits longest axis to 1.6."
+  },
+  "silhouette": {
+    "boundingShape": "thin oval disk, thickness/diameter 0.0833",
+    "aspectRatios": [
+      {
+        "id": "thickness-over-diameter",
+        "value": 0.08333333333333333,
+        "source": "assets/prompts/breads/flatbread.json silhouette (1/12 ratio, authoritative)"
+      }
+    ],
+    "symmetry": "oval, broken by outline wobble and asymmetric blister/char placement",
+    "dominantCurves": [
+      "low-poly hemispherical blister domes rising from a mostly flat top face"
+    ],
+    "negativeSpaces": [],
+    "landmarks": [
+      "11 blister domes",
+      "char material zones on most blister crowns + scattered flat spots"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "thin oval disk with an irregular hand-stretched outline",
+        "roughly a dozen raised blister domes of varying size across the top face",
+        "most blister crowns carry a dark scorched center; smaller dark char spots also sit on the flat area"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "domes clearly bulge above the base disk surface - true raised geometry, not a flat texture",
+        "thin base profile, roughly a twelfth of the diameter"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "oval outline, mildly irregular (not a clean ellipse)",
+        "blisters scattered with no obvious grid; char spots both on blister crowns and independently on flat area"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "disk",
+      "name": "Flatbread disk (rim wall + underside)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous revolved mass (rim + underside), same reasoning as pancake's disk body - a lathe profile with an XZ ellipse squish for the oval outline. Decision tree step 6.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.85,
+              -0.42
+            ],
+            [
+              1.0,
+              0.0
+            ],
+            [
+              0.97,
+              0.85
+            ]
+          ],
+          "segments": 28,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "outline-wobble",
+            "type": "radial-modulation",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.045,
+            "notes": "Per-sector radius wobble (2 low-freq lobes + rng noise) applied identically to body and face so the shared perimeter ring stays welded, same mechanism as pancake."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after displacement"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.0,
+        "height": 0.1667,
+        "depth": 1.72,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "cylinder",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat cylinder proxy matching the disk bounding volume."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "disk",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust-base"
+        }
+      },
+      "material": "crust-base",
+      "materialLayers": [
+        "crust-base"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(217, 165, 82, 1.0)",
+        "secondaryAlbedo": "rgba(217, 165, 82, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust, roughness 1.0, no specular lobe - same class as pancake/cracker precedent.",
+        "zone": "rim wall and underside",
+        "evidenceRefs": [
+          "assets/prompts/breads/flatbread.json geometry.crust"
+        ]
+      },
+      "deformations": [
+        "outline-wobble"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "disk-perimeter-ring",
+          "kind": "material-boundary",
+          "notes": "Shared ring between rim and top face; body and face lathe the same ring so the boundary is watertight."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "disk-outline-wobble",
+          "name": "Hand-stretched outline wobble",
+          "kind": "contour",
+          "description": "Radius wobble per sector, oval base shape.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "vertex-cluster dome displacement (blisters); char is material-only, no displacement",
+        "occlusionPattern": "cavity darkening in facet creases between dome and flat area",
+        "edgeWearPattern": "none",
+        "notes": "Rim/underside carry no relief of their own; all identity-critical relief is on the top face."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "disk-outline-wobble"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "disk-top-face",
+      "name": "Flatbread top face (blisters + char)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Single revolved cap carrying blister displacement and char material zones, same class as pancake's disk-face. Char is a role of 'surface' material assignment, not a recessed feature (no cavity/recess/hollow token), so the recessed-feature gate does not apply.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.97,
+              0.85
+            ],
+            [
+              0.6,
+              0.9
+            ],
+            [
+              0.3,
+              0.93
+            ],
+            [
+              0.0,
+              0.95
+            ]
+          ],
+          "segments": 28,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "outline-wobble",
+            "type": "radial-modulation",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.045,
+            "notes": "Identical to parent body so the shared ring stays welded."
+          },
+          {
+            "id": "blister-domes",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.09,
+            "notes": "11 raised vertex-cluster domes (center vertex + partial 1-ring spread) in three size classes, seeded scatter with Chebyshev-distance rejection so domes never merge."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after displacement"
+      },
+      "parent": "disk",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.94,
+        "height": 0.09,
+        "depth": 1.6684,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "cylinder",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat cylinder proxy matching the disk bounding volume."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "disk-top-face",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust-base"
+        }
+      },
+      "material": "crust-base",
+      "materialLayers": [
+        "crust-base",
+        "crust-char"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(217, 165, 82, 1.0)",
+        "secondaryAlbedo": "rgba(74, 46, 26, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust, roughness 1.0, no specular lobe - same class as pancake/cracker precedent.",
+        "zone": "top face base + char zones",
+        "evidenceRefs": [
+          "assets/prompts/breads/flatbread.json geometry.crust"
+        ]
+      },
+      "deformations": [
+        "outline-wobble",
+        "blister-domes"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "disk-top-face-perimeter-ring",
+          "kind": "material-boundary",
+          "notes": "Shares the parent body's perimeter ring exactly."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "disk-top-face-blister-domes",
+          "name": "Blister dome field",
+          "kind": "ridge",
+          "description": "11 raised low-poly hemispherical bumps of three size classes, scattered with a minimum separation so they read as distinct domes.",
+          "evidenceRefs": [
+            "view-front",
+            "view-top"
+          ],
+          "confidence": 0.9,
+          "repetitionSystemRef": "blister-scatter"
+        },
+        {
+          "id": "disk-top-face-char-spots",
+          "name": "Char/scorch spot scatter",
+          "kind": "stain",
+          "description": "9 blister crowns plus 12 independent flat-area spots carry the dark crust-char material - material-only, no separate displacement.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.85,
+          "repetitionSystemRef": "char-scatter"
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.09,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "vertex-cluster dome displacement (blisters); char is material-only, no displacement",
+        "occlusionPattern": "cavity darkening in facet creases between dome and flat area",
+        "edgeWearPattern": "none",
+        "notes": "assets/prompts/breads/flatbread.json notes_ko: without the char spots and blisters the object reads as a plain tortilla - both fields are identity-critical."
+      },
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ],
+      "details": [
+        "disk-top-face-blister-domes",
+        "disk-top-face-char-spots"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "crust-base",
+      "name": "Flatbread base crust",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; runtime swaps to MeshLambertMaterial keeping only map and color",
+      "baseColor": "#D9A552",
+      "color": "#D9A552",
+      "albedo": {
+        "dominant": "#D9A552",
+        "secondary": [],
+        "samplingNotes": "Base hand-transcribed from assets/prompts/breads/flatbread.json geometry.crust. Char hex is an authored decision (the JSON is silent on char color) - see author_spec.py CHAR_HEX comment."
+      },
+      "colorVariation": {
+        "palette": [
+          "#D9A552"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture emitted; UVs only satisfy mergeByMaterial's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "oval disk silhouette",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 4.0,
+          "amplitude": 0.045,
+          "role": "outline wobble",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 11.0,
+          "amplitude": 0.09,
+          "role": "blister domes; char is a flat material zone with no geometric carrier",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "whole disk except char zones",
+        "amplitude": 0.09,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(). Never vertexColors or flatShading - neither survives the runtime Lambert swap."
+      ],
+      "notes": "whole disk except char zones. Two flat colors, no texture (scripts/breads/types.ts section 9)."
+    },
+    {
+      "id": "crust-char",
+      "name": "Flatbread char/scorch",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; runtime swaps to MeshLambertMaterial keeping only map and color",
+      "baseColor": "#4A2E1A",
+      "color": "#4A2E1A",
+      "albedo": {
+        "dominant": "#4A2E1A",
+        "secondary": [],
+        "samplingNotes": "Base hand-transcribed from assets/prompts/breads/flatbread.json geometry.crust. Char hex is an authored decision (the JSON is silent on char color) - see author_spec.py CHAR_HEX comment."
+      },
+      "colorVariation": {
+        "palette": [
+          "#4A2E1A"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture emitted; UVs only satisfy mergeByMaterial's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "oval disk silhouette",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 4.0,
+          "amplitude": 0.045,
+          "role": "outline wobble",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 11.0,
+          "amplitude": 0.09,
+          "role": "blister domes; char is a flat material zone with no geometric carrier",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "blister crowns + flat char spots",
+        "amplitude": 0.09,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "char-triangle-bucket",
+          "name": "Char material triangle bucket",
+          "maskSource": "geometry",
+          "description": "Char zone is a second material assigned to a contiguous triangle-index range after facet+jitter (pancake's sliceTriangles pattern), not vertex colors or a texture.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "appliesTo": [
+            "disk-top-face"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(). Never vertexColors or flatShading - neither survives the runtime Lambert swap."
+      ],
+      "notes": "blister crowns + flat char spots. Two flat colors, no texture (scripts/breads/types.ts section 9)."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "blister-scatter",
+      "name": "Blister dome scatter",
+      "level": "micro",
+      "hostComponents": [
+        "disk-top-face"
+      ],
+      "elementComponentIds": [
+        "disk-top-face"
+      ],
+      "elementKind": "raised vertex-cluster displacement, not an added mesh",
+      "count": 11,
+      "countPerHost": {
+        "disk-top-face": 11
+      },
+      "distribution": {
+        "mode": "seeded shuffle of face-grid cells, Chebyshev-distance rejection so domes never merge",
+        "minSeparationCells": 2
+      },
+      "sizeClasses": [
+        {
+          "id": "large",
+          "height": 0.09,
+          "spread": 0.65,
+          "share": 0.27
+        },
+        {
+          "id": "medium",
+          "height": 0.065,
+          "spread": 0.55,
+          "share": 0.46
+        },
+        {
+          "id": "small",
+          "height": 0.045,
+          "spread": 0.4,
+          "share": 0.27
+        }
+      ],
+      "seedRule": "Positions and class draws come exclusively from the builder's injected rng argument (scripts/breads/types.ts section 5).",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "char-scatter",
+      "name": "Char/scorch spot scatter",
+      "level": "micro",
+      "hostComponents": [
+        "disk-top-face"
+      ],
+      "elementComponentIds": [
+        "disk-top-face"
+      ],
+      "elementKind": "material assignment only, no geometry of its own",
+      "count": 21,
+      "countPerHost": {
+        "disk-top-face": 21
+      },
+      "distribution": {
+        "mode": "9 of 11 blister crowns get char material (majority, not all); 12 additional independent flat-area spots",
+        "mechanism": "Char cells are collected first into a contiguous triangle-index block during construction so post-facet sliceTriangles can split materials cleanly (pancake precedent)."
+      },
+      "sizeClasses": [
+        {
+          "id": "char-spot",
+          "note": "material only, sized by how many grid cells the triangle bucket covers per spot"
+        }
+      ],
+      "seedRule": "Builder rng only.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-24T02:29:28.284711+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.78,
+        "formDetail": 0.8,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "oval-thin-disk-silhouette",
+          "score": 0.85,
+          "notes": "Thin oval profile confirmed in front elevation; turntable gate non-degenerate at all azimuths (ratio 0.985-0.995)."
+        },
+        {
+          "id": "blister-dome-field",
+          "score": 0.8,
+          "notes": "Domes read clearly in front-elevation cross-section after excluding the two innermost rings (which produced near-vertical spikes at v1) and raising height/spread ~30% (v2, 0.09->0.12 large class) once the spike risk was ruled out at this ring range."
+        },
+        {
+          "id": "char-spot-material-split",
+          "score": 0.75,
+          "notes": "Char patches are distinct and separated after two density fixes (v1: full 3x3 neighborhood per blister crown covered ~half the face; v2: 21 single-cell marks still merged into wedges from insufficient separation; v3: 10 marks with proper spacing gives scattered low-poly blocky patches)."
+        },
+        {
+          "id": "hand-stretched-outline",
+          "score": 0.75,
+          "notes": "Outline wobble visible, oval base shape confirmed."
+        },
+        {
+          "id": "baked-faceting-flatbread",
+          "score": 0.85,
+          "notes": "Flat faceted shading confirmed across all four turntable azimuths."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/flatbread/ref-aligned.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/flatbread/shot-34-aligned2.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/flatbread/cmp-5.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "4회 반복: (1) 물집 스파이크(안쪽 링 제외), (2) char 과다 커버리지(정점 셀 단일 마킹+개수 축소), (3) 물집 높이 30% 상향, (4) 최종 검증(턴테이블·Tier-1 통과)."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-24T02:29:28.284711+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.78,
+        "formDetail": 0.8,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "oval-thin-disk-silhouette",
+          "score": 0.85,
+          "notes": "Thin oval profile confirmed in front elevation; turntable gate non-degenerate at all azimuths (ratio 0.985-0.995)."
+        },
+        {
+          "id": "blister-dome-field",
+          "score": 0.8,
+          "notes": "Domes read clearly in front-elevation cross-section after excluding the two innermost rings (which produced near-vertical spikes at v1) and raising height/spread ~30% (v2, 0.09->0.12 large class) once the spike risk was ruled out at this ring range."
+        },
+        {
+          "id": "char-spot-material-split",
+          "score": 0.75,
+          "notes": "Char patches are distinct and separated after two density fixes (v1: full 3x3 neighborhood per blister crown covered ~half the face; v2: 21 single-cell marks still merged into wedges from insufficient separation; v3: 10 marks with proper spacing gives scattered low-poly blocky patches)."
+        },
+        {
+          "id": "hand-stretched-outline",
+          "score": 0.75,
+          "notes": "Outline wobble visible, oval base shape confirmed."
+        },
+        {
+          "id": "baked-faceting-flatbread",
+          "score": 0.85,
+          "notes": "Flat faceted shading confirmed across all four turntable azimuths."
+        }
+      ],
+      "action": "continue",
+      "summary": "Simple-tier 단일 오브젝트 — pancake/cracker 선례처럼 blockout에서 surface-pass로 직행. 4회 반복(격리 디버그 2회 포함): v1 블리스터를 가장 안쪽 두 링(반지름 0.12·0.26)에 얹어 셀 호 길이 대비 벽 기울기 74도짜리 스파이크로 중심이 별무늬로 뭉개졌고, char도 이웃 3x3 전체를 표시해 얼굴 절반을 뒤덮었다. 안쪽 2개 링 제외 + char를 정점 셀 1개로 축소(21→10마킹) + 물집 높이 30% 상향으로 마무리.",
+      "matched": [
+        "thin oval disk silhouette",
+        "visible blister dome bumps in front-elevation and three-quarter views",
+        "scattered char material patches, distinct and separated",
+        "faceted flat shading",
+        "turntable gate non-degenerate at all azimuths"
+      ],
+      "mismatches": [
+        "aspect-ratio delta 0.095 and scale delta 0.106 vs threshold - orthographic render vs perspective reference residual, same class as pancake/cracker's accepted delta, not a geometry defect",
+        "char patches read as angular low-poly blobs rather than round dots (consistent with the style's faceted aesthetic)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/flatbread/cmp-5.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/flatbread/shot-top-2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/flatbread/shot-90.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/flatbread/shot-180.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/flatbread/shot-270.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/flatbread/ref-aligned.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/flatbread/shot-34-aligned2.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/flatbread/cmp-5.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "4회 반복: (1) 물집 스파이크(안쪽 링 제외), (2) char 과다 커버리지(정점 셀 단일 마킹+개수 축소), (3) 물집 높이 30% 상향, (4) 최종 검증(턴테이블·Tier-1 통과)."
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 700,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": [
+      "Panel-group target band 500-1100 tri / <=120KB (CRIB budget table), reached by construction via a 7-ring x 28-sector oval lathe disk."
+    ]
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, no exposure control, no tone mapping.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none - no shadow map or ground plane, so no contact shadow or ground shadow is rendered; accepted lighting delta."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build one indexed oval lathe disk (body + face rings, ellipse XZ scale).",
+    "Apply outline wobble to body and face profiles identically before any other displacement.",
+    "Raise blister dome vertex clusters into the face.",
+    "Classify each face triangle into a char bucket or base bucket during construction, ordering char triangles first so they form a contiguous range.",
+    "Jitter vertices while indexed, so shared vertices move together.",
+    "Bake faceting by splitting vertices and recomputing normals.",
+    "Project top-planar UVs, slice the char/base triangle ranges, then merge by material into exactly two meshes."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-object rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single fractureGroup; plausible break is a tear, not modelled here"
+  ],
+  "risks": [
+    {
+      "id": "dome-below-tessellation",
+      "severity": "high",
+      "description": "A raised cluster too small relative to grid spacing reads as a spike, not a dome (cracker's docking-hole lesson, inverted).",
+      "mitigation": "Blister spread parameter raises 1-ring neighbors at partial height, not just the center vertex, verified against actual cell spacing before authoring."
+    },
+    {
+      "id": "seed-density-collapse",
+      "severity": "high",
+      "description": "Cracker's v1 defect: too many displaced cells with too little separation reads as a uniform corrugated texture instead of discrete features.",
+      "mitigation": "Blister and char counts kept low relative to the grid (11 blisters / ~21 char spots against ~200 face cells) with an explicit minimum-separation rejection, informed directly by the cracker incident."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "flatShading flag not inherited by the runtime swap.",
+      "mitigation": "Faceting baked via lib.ts facet()."
+    },
+    {
+      "id": "seam-tear",
+      "severity": "medium",
+      "description": "Body and face share a perimeter ring; independent jitter would tear it.",
+      "mitigation": "One indexed geometry, jittered whole, sliced by triangle range only after facet."
+    },
+    {
+      "id": "merge-attribute-mismatch",
+      "severity": "medium",
+      "description": "mergeByMaterial throws on attribute-set mismatch across a bucket.",
+      "mitigation": "Every geometry gets position, normal, uv - no color attribute."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Flatbread flatbread oval disk blister dome bump char scorch spot low-poly",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": [
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-customshadermaterial-csm-weathering-hooks",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[1]",
+        "score": 2.782090510781,
+        "snippets": [
+          "... tục tại runtime thay vì nướng sẵn hoàn toàn vào texture Three.js target: csm_Roughness / csm_Metalness (procedural noise-driven overrides), csm_FragNormal (custom bump for patina), csm_DiffuseColor (mix base color with oxide/dirt color by mask)"
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[1]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.pbr-tangent-space-normal-encoding-directx-vs-opengl",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[13]",
+        "score": 2.5410713068,
+        "snippets": [
+          "... xuất từ CS2/Source 2 có thể cần đảo kênh xanh lá tùy theo quy ước xuất Three.js target: Invert the green channel of the source normal texture (texture data flip) before assigning to MeshPhysicalMaterial.normalMap if bump direction reads inverted"
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[13]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  },
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.8666,
+        "aspectRatioDelta": 0.0951,
+        "scaleDelta": 0.1061,
+        "bilateralSymmetryError": 0.0491,
+        "colorDelta": {
+          "checked": 2,
+          "maxDeltaE": 15.87,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 15.87
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.87
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "aspect-ratio delta 0.095 exceeds threshold 0.05",
+        "scale delta 0.106 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "cfff094f448a6799",
+      "passId": "surface-pass"
+    }
+  ]
+}

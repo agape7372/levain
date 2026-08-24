@@ -1,0 +1,6 @@
+[
+  {"id": "stacked-offset-silhouette", "score": 0.85, "tier": "critical",
+   "notes": "Unchanged by the optimization pass. Turntable gate passes 4 of 4 azimuths with no interior holes and no silhouette collapse."},
+  {"id": "baked-faceting", "score": 0.75, "tier": "important",
+   "notes": "Survives the GLB roundtrip: re-importing the exported binary reproduces identical stats and an indistinguishable render, so the split-vertex faceting is carried in the file rather than reconstructed at load."}
+]

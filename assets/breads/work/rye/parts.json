@@ -1,0 +1,8 @@
+{
+  "note": "Parts as the builder constructs them, BEFORE the mandatory final mergeByMaterial. scripts/breads/rye.ts adds one named mesh per leaf component (crust body, slash-crumb); mergeByMaterial then fuses them into 2 meshes (types.ts sections 1-2). Crust/crumb boundary is an angular-falloff triangle mask (splitTrianglesByVertexMask), so the per-part split is an estimate; the total (576) is exact, matching scripts/breadlab-shot.mjs stdout stats.",
+  "parts": [
+    { "name": "root", "kind": "container", "module": "createRye", "triangles": 576 },
+    { "name": "dome", "kind": "part", "module": "buildLoaf", "triangles": 520 },
+    { "name": "dome-slash-crumb", "kind": "part", "module": "buildLoaf", "triangles": 56 }
+  ]
+}

@@ -1,23 +1,27 @@
 {
   "id": "cracker",
-  "version": 1,
+  "version": 3,
   "name_ko": "크래커",
-  "subject": "a single ultra-thin square cracker",
+  "subject": "a single square artisan cracker",
   "geometry": {
-    "silhouette": "ultra-thin square, about 1.5mm thick, slightly rough hand-cut edges rather than a perfect machine-cut square",
+    "silhouette": "a thin flat square wafer, clearly a cracker and not a slab — its thickness is only about one tenth of its width, so from the side it reads as a thin plate with just enough depth to be solid; slightly rough hand-cut edges rather than a perfect machine-cut square",
     "crust": [
       "uniform matte golden surface #D9A552 across the whole top face",
       "a regular grid pattern of small docking holes (pin holes) pressed into the top face, evenly spaced",
       "scattered sesame seed and poppy seed speckles across the surface"
     ]
   },
-  "style_ref": "shared-style-v1",
+  "style_ref": "shared-style-v2",
   "camera": "three-quarter top-front view, object centered, 15% margin",
-  "background": "solid #F2E6D3, no props, no floor texture",
-  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows",
-  "negative": ["face", "eyes", "mouth", "character", "text", "watermark", "plate", "board", "hands", "photorealism", "glossy plastic", "people"],
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "thick slab", "brownie", "biscuit", "cake", "cube"],
   "views": ["three-quarter top-front", "front elevation", "top-down"],
   "output": { "aspect": "1:1", "size": 1024 },
-  "prompt_flat": "A cozy low-poly stylized 3D render of a single ultra-thin square cracker. Geometry: an ultra-thin square about 1.5mm thick with slightly rough hand-cut edges rather than a perfect machine-cut square. Crust: a uniform matte golden surface (#D9A552) covers the whole top face, with a regular grid pattern of small docking holes (pin holes) pressed evenly into the top face, plus scattered sesame seed and poppy seed speckles across the surface. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, rounded silhouette, stylized 3D render. Camera: three-quarter top-front view, object centered, 15% margin. Background: solid #F2E6D3, no props, no floor texture. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows. Generate the same object consistently across each requested view — three-quarter top-front, front elevation, and top-down — keeping identical proportions, colors, and surface details between views. Negative: no face, no eyes, no mouth, no character, no text, no watermark, no plate, no board, no hands, no photorealism, no glossy plastic, no people.",
-  "notes_ko": "격자형 도킹홀(핀 구멍)과 참깨·양귀비씨 스페클이 없으면 그냥 얇은 사각판으로 보인다 — 크래커의 결정적 특징."
+  "prompt_flat": "A cozy low-poly stylized 3D render of a single square artisan cracker, a single game asset object on a plain backdrop. Geometry: a thin flat square wafer — clearly a cracker, not a slab. Its thickness is only about one tenth of its width, so from the side it reads as a thin plate with just enough depth to be solid; the edges are slightly rough and hand-cut rather than a perfect machine-cut square. Crust: a uniform matte golden surface (#D9A552) covers the whole top face, with a regular grid pattern of small docking holes (pin holes) pressed evenly into the top face, plus scattered sesame seed and poppy seed speckles across the surface. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — not a thick slab, not a brownie, not a biscuit, not a cake, not a cube — no photorealism, no glossy plastic, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact cracker, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view), so its thin profile is visible: the thickness must read as only about one tenth of the width, a thin wafer and not a slab. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact cracker, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the docking hole grid and seed speckles are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "격자형 도킹홀(핀 구멍)과 참깨·양귀비씨 스페클이 없으면 그냥 얇은 사각판으로 보인다 — 크래커의 결정적 특징. v2: '1.5mm'는 스케일 기준이 없어 모델에게 무의미 + 초박형 셸은 image-to-3D 메시가 깨진다 — 폭의 1/10 상대 두께로 교체. v3(실측 후 정정): 'stylized exaggerated thickness'의 exaggerated가 반대로 작용해 폭 1/3~1/4 두께의 브라우니 슬랩으로 렌더됨 — 해당 단어 삭제하고 '얇은 웨이퍼, 슬랩 아님'을 명시 + negative에 thick slab·brownie·biscuit·cake·cube 추가."
 }

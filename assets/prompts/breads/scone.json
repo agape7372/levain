@@ -1,23 +1,27 @@
 {
   "id": "scone",
-  "version": 1,
+  "version": 3,
   "name_ko": "스콘",
   "subject": "a single wedge-shaped scone",
   "geometry": {
-    "silhouette": "a tall wedge (triangular prism), height clearly greater than width, taller impression than wide",
+    "silhouette": "a thick triangular wedge cut from a round scone, resting flat and stable on its wide bottom face with the pointed corner of the triangle facing forward and slightly to the side; its height is roughly half its width, so it is a chunky, sturdy slice, never balanced on a point and never standing upright",
     "crust": [
       "top face only in pale golden brown #D6A15C",
       "side faces left uncolored cream #F4EAD4, sharply contrasting with the top",
       "shallow horizontal crack fissures running across the top surface"
     ]
   },
-  "style_ref": "shared-style-v1",
+  "style_ref": "shared-style-v2",
   "camera": "three-quarter top-front view, object centered, 15% margin",
-  "background": "solid #F2E6D3, no props, no floor texture",
-  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows",
-  "negative": ["face", "eyes", "mouth", "character", "text", "watermark", "plate", "board", "hands", "photorealism", "glossy plastic", "people"],
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "jam", "cream topping", "balanced on a point", "standing upright", "cone shape", "tower"],
   "views": ["three-quarter top-front", "front elevation", "top-down"],
   "output": { "aspect": "1:1", "size": 1024 },
-  "prompt_flat": "A cozy low-poly stylized 3D render of a single wedge-shaped scone. Geometry: a tall wedge (triangular prism) whose height is clearly greater than its width, giving a taller-than-wide impression. Crust: only the top face is colored pale golden brown (#D6A15C); the side faces are left uncolored cream (#F4EAD4), sharply contrasting with the top; shallow horizontal crack fissures run across the top surface. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, rounded silhouette, stylized 3D render. Camera: three-quarter top-front view, object centered, 15% margin. Background: solid #F2E6D3, no props, no floor texture. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows. Generate the same object consistently across each requested view — three-quarter top-front, front elevation, and top-down — keeping identical proportions, colors, and surface details between views. Negative: no face, no eyes, no mouth, no character, no text, no watermark, no plate, no board, no hands, no photorealism, no glossy plastic, no people.",
-  "notes_ko": "윗면만 착색되고 옆면은 무착색 크림색으로 남는 비대칭 착색이 핵심이다 — 옆면까지 다 착색되면 머핀으로 보인다."
+  "prompt_flat": "A cozy low-poly stylized 3D render of a single wedge-shaped scone, a single game asset object on a plain backdrop. Geometry: a thick triangular wedge cut from a round scone, resting flat and stable on its wide bottom face, with the pointed corner of the triangle facing forward and slightly to the side. Its height is roughly half its width, so it reads as a chunky, sturdy slice — never balanced on a point, never standing upright like a tower. Crust: only the top face is colored pale golden brown (#D6A15C); the side faces are left uncolored cream (#F4EAD4), sharply contrasting with the top; shallow horizontal crack fissures run across the top surface. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — not balanced on a point, not standing upright, not a cone, not a tower — no photorealism, no glossy plastic, no jam, no cream topping, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact scone, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). It stays resting flat on its wide bottom face, with the same chunky proportions: height roughly half the width, the flat golden top and the cream sides meeting in a crisp horizontal line. Do not change its pose or proportions between views. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact scone, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the triangular top face and crack fissures are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "윗면만 착색되고 옆면은 무착색 크림색으로 남는 비대칭 착색이 핵심이다 — 옆면까지 다 착색되면 머핀으로 보인다. v2: 'sitting flat on its wide base' 추가 — 키 큰 웨지 지시만 있으면 세워진 도어스톱처럼 그려질 위험. 잼·크림 negative 추가(스콘의 단골 오염 토핑). ★v3(스펙 교정 — 실물이 맞고 스펙이 틀렸던 사례): v1~v2 스펙이 자기모순이었다 — '웨지'와 '높이>폭'은 양립 불가(둥근 스콘을 자른 웨지를 밑면에 눕히면 반드시 폭>높이). 생성 결과물은 처음부터 올바른 스콘 웨지였는데, 옛 스펙을 기준으로 검수하면 '폭이 더 넓다'는 이유로 오탐 실패가 난다. 스펙을 실물에 맞춰 '높이 = 폭의 약 1/2인 두툼한 조각'으로 교정했다. 세움/콘/타워 negative와 후속 뷰 자세 고정 문구는 예방책."
 }

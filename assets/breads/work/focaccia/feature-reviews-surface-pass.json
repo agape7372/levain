@@ -1,0 +1,6 @@
+[
+  {"id": "thin-rect-slab-silhouette", "score": 0.85, "notes": "Thin rectangular slab confirmed; turntable gate non-degenerate at all azimuths (ratio 0.966-0.999)."},
+  {"id": "dimple-grid-review", "score": 0.85, "notes": "5x4 fixed-grid dimples (cracker's exact-grid pattern reused instead of random scatter) read cleanly as a distinct oil-pool waffle pattern, well separated - no density collapse this time, applied the cracker/flatbread lessons from the start."},
+  {"id": "topping-scatter-review", "score": 0.6, "notes": "v1 shipped zero toppings (pickToppingCells rejection radius bug identical in shape to cracker's - fixed to exact-cell exclusion instead of neighborhood radius, which cracker's spacing happened to leave gaps for but focaccia's tighter dimple packing did not). v2 shows 22 topping bumps as subtle geometry-only texture (no separate color per the 2-material budget)."},
+  {"id": "baked-faceting-focaccia", "score": 0.85, "notes": "Flat faceted shading confirmed across all four turntable azimuths."}
+]

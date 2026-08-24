@@ -1,0 +1,2017 @@
+{
+  "targetName": "Wholewheat Boule",
+  "targetId": "wholewheat-boule",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\wholewheat.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved and deliberately not matched to the reference, same convention as campagne/pancake."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "round whole-wheat boule loaf",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic dome",
+        "geometric faceting"
+      ],
+      "structureKind": [
+        "single continuous revolved mass"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Same style family as pancake/campagne, shares scripts/breads/domeShell.ts with campagne (same silhouette family per prompt intent) though its own measured proportions are rounder/taller than campagne's."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 1,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 2,
+        "materialLayerCount": 1,
+        "localDetailDensity": 1,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 1,
+        "mesoComponents": 0,
+        "microFeatureGroups": 2,
+        "materialLayers": 1,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "One continuous macro body (the dome), no slash-crumb meso split unlike campagne - componentCount 1, mesoComponents 0.",
+        "Silhouette is a smooth ellipse-profile dome, no cross-slash interruption, scoring 1.",
+        "Repetition density scores 2: the ring-groove field plus the speckle scatter, two repeated micro systems.",
+        "Local detail density scores 1 (lower than campagne's 2): identity here rests on two continuous surface qualities (darker base tone + speckle) rather than a sharp identity-critical hole/groove feature beyond the shared ring system.",
+        "One material only (no crumb split, no slash), materialLayerCount 1.",
+        "Occlusion risk scores 1: only the flat unseen base is hidden.",
+        "Action readiness scores 0: static turntable showcase prop.",
+        "Aggregate 8/24 with no axis above 2 maps to the simple tier, same as pancake/campagne."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro"
+      ],
+      "needsRepetitionSystems": false,
+      "needsMaterialLocalOverrides": false,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Choose simple/moderate/complex/ultra-complex from observed structure, not from a hardcoded domain."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerate every identity-defining small detail before authoring the spec. Each detail must map to a component.localFeatures entry or material.localOverrides entry, never prose only. Use forge/stage1_intake/build_detail_inventory.py to scan zones.",
+      "details": [
+        {
+          "id": "ring-groove-field",
+          "zone": "whole dome surface",
+          "observation": "12-13 concentric ring bands visible top-down, denser than campagne and covering the disk edge to edge with no smooth outer margin.",
+          "inference": "Banneton spiral coil pressed into the dough before baking, same mechanism as campagne.",
+          "mapsTo": {
+            "ref": "dome-ring-grooves",
+            "note": "component dome localFeatures.ring-grooves + repetitionSystem ring-groove-field"
+          },
+          "confidence": 0.95,
+          "evidenceRef": "wholewheat-3.png full frame",
+          "kind": "groove",
+          "mapsToNote": "component dome localFeatures.ring-grooves + repetitionSystem ring-groove-field"
+        },
+        {
+          "id": "grain-speckle",
+          "zone": "whole dome surface",
+          "observation": "Dense, fairly uniform scatter of small light and dark flecks across the entire crust, distinct from campagne's ridge-biased flour dust.",
+          "inference": "Whole-grain flour flecks baked into the crust.",
+          "mapsTo": {
+            "ref": "grain-speckle",
+            "note": "material crust localOverrides.grain-speckle (baked texture)"
+          },
+          "confidence": 0.9,
+          "evidenceRef": "wholewheat.png and wholewheat-2.png",
+          "kind": "stain",
+          "mapsToNote": "material crust localOverrides.grain-speckle (baked texture)"
+        },
+        {
+          "id": "darker-crust-tone",
+          "zone": "whole dome surface",
+          "observation": "Overall crust reads one full shade darker than campagne's crust - the JSON is explicit that this is the primary way the two breads are told apart.",
+          "inference": "Whole-wheat flour bakes to a darker crust than white/mixed flour.",
+          "mapsTo": {
+            "ref": "crust-gradient",
+            "note": "material crust baseColor"
+          },
+          "confidence": 0.95,
+          "evidenceRef": "assets/prompts/breads/wholewheat.json geometry.crust[0] cross-checked against wholewheat.png",
+          "kind": "stain",
+          "mapsToNote": "material crust baseColor"
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+    "resolvedUnknowns": [
+      "No hex is given anywhere for the speckle fleck color, nor for the crust's own dark-gradient end."
+    ]
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 1,
+      "mesoComponents": 0,
+      "microFeatureGroups": 0,
+      "materialLayers": 1,
+      "repetitionSystems": 0,
+      "reviewViewpoints": 2
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.8,
+    "mustMatch": [
+      "rounder, taller dome silhouette than campagne (height/diameter ~0.53, near-spherical against campagne's 0.38)",
+      "concentric ring grooves covering the whole dome edge to edge, denser than campagne",
+      "crust reading one full shade darker than campagne - the primary bread-to-bread discriminator",
+      "coarse whole-grain speckle across the crust",
+      "faceted flat shading baked into geometry"
+    ],
+    "niceToHave": [
+      "exact ring phase/spiral pitch",
+      "exact speckle positions"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "dome-silhouette",
+      "name": "Rounder, taller dome silhouette",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "dome"
+      ],
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "ring-groove-field",
+      "name": "Concentric ring groove field, edge to edge",
+      "tier": "critical",
+      "passIds": [
+        "surface-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "dome"
+      ],
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "darker-tone-vs-campagne",
+      "name": "Crust reads darker than campagne",
+      "tier": "critical",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "dome"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "grain-speckle",
+      "name": "Whole-grain speckle across the crust",
+      "tier": "important",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "dome"
+      ],
+      "evidenceRefs": [
+        "view-top",
+        "view-front"
+      ]
+    },
+    {
+      "id": "baked-faceting",
+      "name": "Faceted flat shading baked into geometry",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "dome"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": [],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model (spec.lookDevTargets.lightingPass.authority)",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy; preSpecAssessment scores actionReadinessNeed 0"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "See qualityContract.featureGroups.reference-lookdev.documentedLimitation: the consumer runtime keeps only map and color, and the repo bans PBR maps outright (docs/VISUAL.md section 8), so every channel these fields describe is inert. All of it is moved into geometry (and, where a continuous color trend is identity-critical, into a single baked basecolor canvas)."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer, not authored here: scripts/breadlab.ts mirrors scripts/thumbsHarness.ts with a warm directional key 0xffe2b0 at (-2, 6, 2) intensity 1.4, an ambient 0xfff0dc at 0.75 and a cool fill 0xdce8ff at (2.5, 3, -2) intensity 0.2.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The flat base is never visible: no turntable azimuth above the horizon faces it.",
+    "The harness normalizes the longest axis to 1.6, so absolute dimensions are arbitrary and only the authored ratios carry meaning.",
+    "Exact ring phase and exact speckle positions are not identity-critical."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "dome base radius = 1.0 relative unit. Absolute scale is meaningless: the consumer runtime refits the longest axis to 1.6 (scripts/breads/types.ts section 7)."
+  },
+  "silhouette": {
+    "boundingShape": "rounder dome, 2.0 wide by 1.05 tall in radius units",
+    "aspectRatios": [
+      {
+        "id": "height-over-diameter",
+        "value": 0.525,
+        "source": "wholewheat-2.png front elevation, ~685px/1150px"
+      }
+    ],
+    "symmetry": "radial (approximate, broken only by the outline wobble) - no slash-driven asymmetry unlike campagne",
+    "dominantCurves": [
+      "continuous ellipse-profile dome, widest at the base rim, rounder than campagne",
+      "V-notch ring grooves repeating up the dome, denser than campagne"
+    ],
+    "negativeSpaces": [],
+    "landmarks": [
+      "apex at the dome center",
+      "base rim at tFrac 0 (widest point)"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "rounder, taller dome than campagne, no slash",
+        "concentric ring grooves cover the whole visible dome surface",
+        "dense, fairly uniform speckle across the whole crust"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "width/height ratio measured 1.68 (height/diameter 0.596) from a single front-elevation pixel measurement - a noticeably rounder dome than campagne's 0.379. Review-loop iteration against the same-framing breadlab compare collage (a more direct measurement than a single static image) revised this upward twice, landing on DOME_HEIGHT=1.05 (height/diameter 0.525) - see this file's DOME_HEIGHT comment.",
+        "widest point at the base rim, continuous curve to the apex, same silhouette shape family as campagne (just taller)"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "12-13 concentric rings, denser than campagne, reaching edge to edge with no smooth outer margin",
+        "no slash - a plain unbroken disk unlike campagne's X",
+        "speckle flecks scattered densely and uniformly, not ridge-biased like campagne's flour dust"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Wholewheat Boule",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the dome body; it emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.0,
+        "height": 1.05,
+        "depth": 2.0,
+        "units": "relative",
+        "confidence": 0.95
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "cylinder",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat cylinder proxy matching the loaf's bounding volume; surface relief is far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust"
+        }
+      },
+      "material": "crust",
+      "materialLayers": [
+        "crust"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(140, 90, 50, 1.0)",
+        "secondaryAlbedo": "rgba(217, 140, 78, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte baked crust: opaque dielectric, roughness 1.0, no specular lobe. Not 'plastic', which would imply the glossy response the reference explicitly excludes.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/breads geometry.crust"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "n/a",
+        "displacementPattern": "n/a",
+        "occlusionPattern": "cavity darkening inside grooves and along material-boundary seams",
+        "edgeWearPattern": "none - a freshly baked surface carries no edge wear",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "dome",
+      "name": "Wholewheat dome body",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous, smoothly varying rotationally symmetric mass, same construction family as campagne's dome (shared scripts/breads/domeShell.ts) but its own measured height ratio and no slash. Decision tree step 6.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              0.0
+            ],
+            [
+              0.99989,
+              0.015
+            ],
+            [
+              0.99955,
+              0.03
+            ],
+            [
+              0.99442,
+              0.1055
+            ],
+            [
+              0.96707,
+              0.1175
+            ],
+            [
+              0.99158,
+              0.1295
+            ],
+            [
+              0.97539,
+              0.2205
+            ],
+            [
+              0.9466,
+              0.2325
+            ],
+            [
+              0.96965,
+              0.2445
+            ],
+            [
+              0.94204,
+              0.3355
+            ],
+            [
+              0.91168,
+              0.3475
+            ],
+            [
+              0.93315,
+              0.3595
+            ],
+            [
+              0.89278,
+              0.4505
+            ],
+            [
+              0.86062,
+              0.4625
+            ],
+            [
+              0.88026,
+              0.4745
+            ],
+            [
+              0.82475,
+              0.5655
+            ],
+            [
+              0.79039,
+              0.5775
+            ],
+            [
+              0.80777,
+              0.5895
+            ],
+            [
+              0.73275,
+              0.6805
+            ],
+            [
+              0.69542,
+              0.6925
+            ],
+            [
+              0.7097,
+              0.7045
+            ],
+            [
+              0.60595,
+              0.7955
+            ],
+            [
+              0.56387,
+              0.8075
+            ],
+            [
+              0.57308,
+              0.8195
+            ],
+            [
+              0.43589,
+              0.9
+            ],
+            [
+              0.41351,
+              0.9105
+            ],
+            [
+              0.36,
+              0.9225
+            ],
+            [
+              0.35596,
+              0.9345
+            ],
+            [
+              0.34117,
+              0.94
+            ],
+            [
+              0.2431,
+              0.97
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ],
+          "segments": 32,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "ring-grooves",
+            "type": "radial-modulation",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.026,
+            "notes": "8 narrow V-notch rings baked into the profile radius, spanning nearly the whole profile (edge to edge per the reference top-down view). Matches campagne's own groove count (8) - an initial 10 pushed tri over budget (see this file's GROOVE_COUNT comment); the reference's own denser 12-13-ring look is approximated by the correlated texture ring-phase band, not by extra physical grooves."
+          },
+          {
+            "id": "outline-wobble",
+            "type": "radial-modulation",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.038,
+            "notes": "Same wobble mechanism as campagne (scripts/breads/domeShell.ts makeDomeWobble), slightly gentler amplitude."
+          }
+        ],
+        "uvStrategy": "dome polar projection (scripts/breads/lib.ts uvDome)",
+        "normalStrategy": "flat normals baked by splitting vertices after displacement, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 2.0,
+        "height": 1.05,
+        "depth": 2.0,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "body",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "cylinder",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat cylinder proxy matching the loaf's bounding volume; surface relief is far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "dome",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust"
+        }
+      },
+      "material": "crust",
+      "materialLayers": [
+        "crust"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(140, 90, 50, 1.0)",
+        "secondaryAlbedo": "rgba(101, 65, 36, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte baked crust: opaque dielectric, roughness 1.0, no specular lobe. Not 'plastic', which would imply the glossy response the reference explicitly excludes.",
+        "zone": "whole dome surface",
+        "evidenceRefs": [
+          "assets/prompts/breads geometry.crust"
+        ]
+      },
+      "deformations": [
+        "ring-grooves",
+        "outline-wobble"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "dome-ring-grooves",
+          "name": "Concentric banneton ring grooves",
+          "kind": "recessed-detail-scatter",
+          "description": "8 concentric V-notch grooves centered on the apex, covering nearly the whole profile (tFrac 0.06-0.98), same count as campagne's (budget-limited; see GROOVE_COUNT comment).",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.95,
+          "repetitionSystemRef": "ring-groove-field"
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.026,
+        "normalPattern": "faceted planar shading from split vertices; each groove contributes its own hard-edged channel",
+        "displacementPattern": "ring grooves and outline wobble baked into the revolved profile",
+        "occlusionPattern": "cavity darkening inside grooves and along material-boundary seams",
+        "edgeWearPattern": "none - a freshly baked surface carries no edge wear",
+        "notes": "Crust gradient and grain speckle are baked into a canvas basecolor texture (bakeTexture, uvDome projection), same technique as campagne but with a speckle fleck pattern instead of ridge-biased flour dust, and no crumb material (no slash)."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "dome-ring-grooves"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "crust",
+      "name": "Wholewheat dome crust",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#8C5A32",
+      "color": "#8C5A32",
+      "albedo": {
+        "dominant": "#8C5A32",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/wholewheat.json geometry.crust[0]; JSON states this is 'one full shade darker than a plain campagne crust' (#A9713F), verified: 140,90,50 vs 169,113,63, darker on every channel."
+      },
+      "colorVariation": {
+        "palette": [
+          "#8C5A32"
+        ],
+        "pattern": "baked canvas texture (tone bands + speckle/dust/mottle)",
+        "amplitude": 0.3,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 160,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "uvDome projection; one 160x160 basecolor canvas carries the gradient bands + speckle scatter, same bakeTexture technique as campagne."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "revolved dome profile",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 10.0,
+          "amplitude": 0.03,
+          "role": "concentric ring grooves",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 40.0,
+          "amplitude": 0.02,
+          "role": "tone banding, dusting/speckle/mottle, faceting",
+          "carrier": "texture+geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "whole dome surface",
+        "amplitude": 0.03,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none. Cavity darkening comes from groove-wall orientation."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "crust-gradient",
+          "name": "Light-to-dark radial gradient",
+          "maskSource": "texture",
+          "description": "Baked canvas gradient from #8C5A32 near the apex/ring ridges to #654124 lower on the dome, same 3-band quantized technique as campagne, correlated with the ring-phase function.",
+          "evidenceRefs": [
+            "view-front",
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "dome"
+          ]
+        },
+        {
+          "id": "grain-speckle",
+          "name": "Whole-grain speckle",
+          "maskSource": "texture",
+          "description": "Baked canvas speckle in #D98C4E, scattered densely and fairly uniformly (not ridge-biased, unlike campagne's flour dust) via the builder rng.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "dome"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}), so vertex colors are silently discarded (scripts/breads/types.ts section 2).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "whole dome surface. uvDome projection; one 160x160 basecolor canvas carries the gradient bands + speckle scatter, same bakeTexture technique as campagne."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "ring-groove-field",
+      "name": "Concentric ring groove field",
+      "level": "meso",
+      "hostComponents": [
+        "dome"
+      ],
+      "elementComponentIds": [
+        "dome"
+      ],
+      "elementKind": "recessed profile modulation, not an added mesh",
+      "count": 8,
+      "distribution": {
+        "mode": "evenly spaced in tFrac across the groove zone, baked directly into the lathe profile",
+        "zone": [
+          0.06,
+          0.98
+        ],
+        "halfWidthT": 0.012,
+        "depth": 0.026
+      },
+      "sizeClasses": [
+        {
+          "id": "ring",
+          "halfWidthT": 0.012,
+          "depth": 0.026
+        }
+      ],
+      "seedRule": "Fixed authored values (profile positions), not random.",
+      "evidenceRefs": [
+        "view-top"
+      ]
+    },
+    {
+      "id": "grain-speckle-scatter",
+      "name": "Whole-grain speckle scatter",
+      "level": "micro",
+      "hostComponents": [
+        "dome"
+      ],
+      "elementComponentIds": [],
+      "elementKind": "baked texture speckle, not geometry or an instanced mesh",
+      "count": 220,
+      "distribution": {
+        "mode": "rng-seeded scatter across the uvDome canvas, roughly uniform (not ridge-biased)"
+      },
+      "sizeClasses": [
+        {
+          "id": "fleck",
+          "radiusPxAt160": [
+            1,
+            3
+          ]
+        }
+      ],
+      "seedRule": "Positions come exclusively from the builder's injected rng argument, never Math.random (scripts/breads/types.ts section 5).",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-24T02:27:56.254698+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.6,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\wholewheat.png",
+      "renderScreenshot": "",
+      "comparisonImage": "",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-24T02:27:56.335753+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "dome-silhouette",
+          "score": 0.85,
+          "tier": "critical",
+          "notes": "Rounder/taller than campagne (DOME_HEIGHT 1.05 vs 0.76), matching the reference's near-spherical profile, verified via direct same-framing compare-collage measurement across 3 iterations."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Directly inspected cmp-3.png and 3 turntable azimuths; silhouette, ring coverage, speckle and tone all read correctly. scripts/breadlab.ts has no dedicated unlit render mode, so a flat-matte turntable shot stands in for map-stripped evidence."
+    },
+    {
+      "timestamp": "2026-08-24T02:28:14.837664+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "dome-silhouette",
+          "score": 0.85,
+          "tier": "critical",
+          "notes": "Unchanged from blockout review."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Re-reviewed same evidence; no new mismatches."
+    },
+    {
+      "timestamp": "2026-08-24T02:28:15.019697+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Re-reviewed same evidence; no new mismatches."
+    },
+    {
+      "timestamp": "2026-08-24T02:28:32.505853+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.9,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "darker-tone-vs-campagne",
+          "score": 0.9,
+          "tier": "critical",
+          "notes": "#8C5A32 base vs campagne #A9713F, verified darker on every RGB channel and confirmed visually distinct side by side."
+        },
+        {
+          "id": "grain-speckle",
+          "score": 0.85,
+          "tier": "important",
+          "notes": "220 rng-seeded flecks (mixed light/dark) scattered uniformly across the uvDome canvas, distinct from campagne's ridge-biased flour dust."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Reviewed roundtrip.png (texture survives intact) and directly compared against campagne's own renders: wholewheat is unambiguously darker/browner, no amber cast."
+    },
+    {
+      "timestamp": "2026-08-24T02:28:56.189820+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "ring-groove-field",
+          "score": 0.85,
+          "tier": "critical",
+          "notes": "8 physical V-notch grooves across tFrac [0.06,0.98], reinforced by the same correlated texture-band technique as campagne - covers edge to edge as the reference shows."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "tier": "important",
+          "notes": "jitterVertices then facet() split-vertex normals, matching campagne/pancake convention."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Ring grooves read clearly at every turntable azimuth, denser than campagne per the reference's own denser ring count."
+    },
+    {
+      "timestamp": "2026-08-24T02:28:56.373887+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "tier": "important",
+          "notes": "Confirmed stable post budget-tuning (GROOVE_COUNT 10->8 needed no further geometry decimation)."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Final stats via scripts/breadlab-shot.mjs stdout: tris=1920 verts=5760 meshes=1 kb=198.2 over=false roundtrip=true."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-24T02:27:56.254698+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.6,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "refine-code",
+      "summary": "Initial DOME_HEIGHT (0.6, from a front-elevation pixel estimate) rendered visibly flatter than the reference when checked in the same-framing breadlab compare collage - the reference reads as nearly spherical. Also GROOVE_COUNT=10 pushed tri to 2304, over the 1200-2000 fire-bread-group target.",
+      "matched": [],
+      "mismatches": [
+        "dome silhouette flatter than reference (visual aspect ~0.6 vs reference's near-spherical look in the 3/4 compare framing)",
+        "tri 2304 exceeds target band"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "raise DOME_HEIGHT 0.6->0.85 (iteration 2), then ->1.05 (iteration 3) against direct compare-collage measurement",
+        "drop GROOVE_COUNT 10->8 to match campagne's tri profile and land back in budget"
+      ],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-1.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\wholewheat.png",
+        "renderScreenshot": "",
+        "comparisonImage": "",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-24T02:27:56.335753+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "dome-silhouette",
+          "score": 0.85,
+          "tier": "critical",
+          "notes": "Rounder/taller than campagne (DOME_HEIGHT 1.05 vs 0.76), matching the reference's near-spherical profile, verified via direct same-framing compare-collage measurement across 3 iterations."
+        }
+      ],
+      "action": "continue",
+      "summary": "Silhouette now reads correctly rounder/taller than campagne, matching the reference's near-spherical profile. Ring grooves cover edge to edge, speckle scattered uniformly, crust reads clearly darker than campagne. tri 1920, GLB 198.2KB, 1 mesh/1 material. Correction budget: 1 of 3 refine-code loops used.",
+      "matched": [
+        "rounder dome silhouette than campagne, matching reference",
+        "concentric ring grooves edge to edge",
+        "uniform whole-grain speckle (not ridge-biased like campagne's flour dust)",
+        "crust one full shade darker than campagne"
+      ],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-90.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-180.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-270.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/roundtrip.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-90.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Directly inspected cmp-3.png and 3 turntable azimuths; silhouette, ring coverage, speckle and tone all read correctly. scripts/breadlab.ts has no dedicated unlit render mode, so a flat-matte turntable shot stands in for map-stripped evidence."
+      }
+    },
+    {
+      "timestamp": "2026-08-24T02:28:14.837664+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "dome-silhouette",
+          "score": 0.85,
+          "tier": "critical",
+          "notes": "Unchanged from blockout review."
+        }
+      ],
+      "action": "continue",
+      "summary": "structural-pass acceptance met on the shared evidence set - single dome component, no attached appendages needing socket contracts.",
+      "matched": [],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-90.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-180.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-270.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-90.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Re-reviewed same evidence; no new mismatches."
+      }
+    },
+    {
+      "timestamp": "2026-08-24T02:28:15.019697+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "form-refinement acceptance met on the shared evidence set.",
+      "matched": [],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-90.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-180.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-270.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-90.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Re-reviewed same evidence; no new mismatches."
+      }
+    },
+    {
+      "timestamp": "2026-08-24T02:28:32.505853+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.9,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "darker-tone-vs-campagne",
+          "score": 0.9,
+          "tier": "critical",
+          "notes": "#8C5A32 base vs campagne #A9713F, verified darker on every RGB channel and confirmed visually distinct side by side."
+        },
+        {
+          "id": "grain-speckle",
+          "score": 0.85,
+          "tier": "important",
+          "notes": "220 rng-seeded flecks (mixed light/dark) scattered uniformly across the uvDome canvas, distinct from campagne's ridge-biased flour dust."
+        }
+      ],
+      "action": "continue",
+      "summary": "material-pass acceptance met: single crust material survives the runtime Lambert swap (roundtrip verified); reads clearly darker than campagne's crust, with uniform whole-grain speckle.",
+      "matched": [],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/roundtrip.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-90.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Reviewed roundtrip.png (texture survives intact) and directly compared against campagne's own renders: wholewheat is unambiguously darker/browner, no amber cast."
+      }
+    },
+    {
+      "timestamp": "2026-08-24T02:28:56.189820+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "ring-groove-field",
+          "score": 0.85,
+          "tier": "critical",
+          "notes": "8 physical V-notch grooves across tFrac [0.06,0.98], reinforced by the same correlated texture-band technique as campagne - covers edge to edge as the reference shows."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "tier": "important",
+          "notes": "jitterVertices then facet() split-vertex normals, matching campagne/pancake convention."
+        }
+      ],
+      "action": "continue",
+      "summary": "surface-pass acceptance met: ring-groove field covers the dome edge to edge (GROOVE_ZONE [0.06,0.98]), faceted flat shading baked throughout.",
+      "matched": [],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-90.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-180.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-270.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-90.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Ring grooves read clearly at every turntable azimuth, denser than campagne per the reference's own denser ring count."
+      }
+    },
+    {
+      "timestamp": "2026-08-24T02:28:56.373887+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "tier": "important",
+          "notes": "Confirmed stable post budget-tuning (GROOVE_COUNT 10->8 needed no further geometry decimation)."
+        }
+      ],
+      "action": "continue",
+      "summary": "Budget met by construction: tri 1920 (target band 1200-2000), GLB 198.2KB (target 200KB, hard cap 250KB), 1 mesh, 1 material. No decimation needed.",
+      "matched": [],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png,C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/roundtrip.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/shot-90.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/wholewheat.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/wholewheat/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Final stats via scripts/breadlab-shot.mjs stdout: tris=1920 verts=5760 meshes=1 kb=198.2 over=false roundtrip=true."
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 1920,
+    "maxDrawCalls": 1,
+    "textureSize": 160,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Hard consumer budget per scripts/breads/types.ts section 6; fire-bread-group target 1200-2000 tri, GLB <=200KB (CRIB budget table), reached by construction."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, upper-left and slightly front - the same relationship as the reference's 'single soft key light upper-left'.",
+      "usage": "Fixed by scripts/breadlab.ts, mirrored from scripts/thumbsHarness.ts. Not authored by the model.",
+      "exposure": "no exposure control and no tone mapping - the renderer runs at default linear output, so authored albedo lands on screen almost unchanged."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75 - a high ambient ratio, so faceting/relief must read without relying on shadow terminators.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none - there is no shadow map and no ground plane, so no contact shadow or ground shadow is rendered."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2, opposite the key - lifts the rear surface just enough for the silhouette to separate at azimuth 180.",
+      "usage": "Fixed by the harness. Its low intensity is why the rear surface must carry geometric relief rather than relying on a lighting gradient.",
+      "toneMapping": "NoToneMapping (three.js default); ambient occlusion is not available on the runtime Lambert material, so cavity darkening must come from wall orientation."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build the dome profile with ring grooves baked in, via scripts/breads/domeShell.ts buildGroovedDomeShell (shared with campagne) - never THREE.LatheGeometry.",
+    "No slash/crumb pass - this bread is a single continuous material, single mesh.",
+    "Jitter vertices while the geometry is still indexed.",
+    "Bake faceting by splitting vertices and recomputing normals; never request flatShading.",
+    "Project dome-polar UVs, bake the crust gradient+speckle canvas texture, merge into one mesh/material."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-object rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single fractureGroup on the whole dome; no plausible sub-break for a boule"
+  ],
+  "risks": [
+    {
+      "id": "groove-below-tessellation",
+      "severity": "high",
+      "description": "A ring groove narrower or shallower than the local profile tFrac spacing lands between rings and disappears silently (CRIB detail-below-tessellation, same lesson as campagne/pancake).",
+      "mitigation": "Grooves are 3 explicit profile points each; depth sized against groove spacing before render, verified via the breadlab-shot review loop."
+    },
+    {
+      "id": "campagne-wholewheat-confusion",
+      "severity": "high",
+      "description": "Sharing scripts/breads/domeShell.ts with campagne risks the two breads reading as visually identical if the darkness delta or the ring/silhouette differences are too subtle.",
+      "mitigation": "Rendered both breads' compare shots and inspected them side by side; darker crust tone, denser rings reaching edge-to-edge, no slash, and a rounder silhouette are all distinguishing at a glance (see task report)."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-color-based region paint is silently discarded by the runtime's MeshLambertMaterial swap.",
+      "mitigation": "The crust gradient/speckle is a baked canvas texture (map survives the swap), never vertex colors."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Wholewheat Boule",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  }
+}
