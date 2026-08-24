@@ -226,6 +226,37 @@ export const copy = {
     bakeAgain: '다시 만들기',
   },
 
+  // 무료 경제 (확장기획 §9 — Phase 7). 재화 이름은 "가루" 하나.
+  // 누적만 말하고 남은 기한·연속 기록은 말하지 않는다 — 실패 개념이 없는 미션이라
+  // 재촉 문구가 붙을 자리 자체가 없다 (GDD §10 톤).
+  economy: {
+    flourLabel: (n: number) => `가루 ${n}개`,
+    earned: (n: number) => `가루 ${n}개가 생겼어요`,
+    exchangeTitle: '재료 바꾸기',
+    exchangeIntro: '가루로 원하는 재료를 가져올 수 있어요',
+    have: (n: number) => `${n}개 있어요`,
+    buy: (cost: number) => `가루 ${cost}개로 가져오기`,
+    sell: (gain: number) => `가루 ${gain}개로 바꾸기`,
+    notEnough: '가루가 조금 모자라요',
+    atCap: (cap: number) => `이 재료는 ${cap}개까지 둘 수 있어요`,
+    bought: (name: string) => `${name} 1개를 가져왔어요`,
+    sold: (n: number) => `가루 ${n}개로 바꿨어요`,
+    noStock: '바꿀 재료가 없어요',
+    missionsTitle: '가루 모으기',
+    missionsIntro: '지금까지의 횟수는 그대로 쌓여요',
+    missionFeed: (remaining: number, reward: number) =>
+      `밥 주기 — ${remaining}번 더 주면 가루 ${reward}개`,
+    missionBake: (remaining: number, reward: number) =>
+      `빵 굽기 — ${remaining}번 더 구우면 가루 ${reward}개`,
+    missionStage: (reward: number) => `르방이가 한 단계 자랄 때마다 가루 ${reward}개`,
+    missionRecipe: (done: number, total: number, reward: number) =>
+      `처음 만든 빵 ${done}/${total} — 한 종류마다 가루 ${reward}개`,
+    missionCount: (n: number) => `지금까지 ${n}번`,
+    giftTitle: '첫 재료를 하나 골라요',
+    giftBody: '고른 재료로 새로운 빵 하나를 열 수 있어요',
+    giftDone: (name: string) => `${name} 1개를 받았어요`,
+  },
+
   notify: {
     channel: '르방이 돌보기',
     feedTime: '밥 시간이에요',

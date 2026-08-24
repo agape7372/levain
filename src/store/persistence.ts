@@ -7,10 +7,12 @@ import type { BakeGrade, CollectionEntry, FeedRatio, Flour, Location, SimState }
 import { RATIOS, TEMP_MULT } from '../sim';
 // MASS_MAX·ACID_MAX는 sim/index.ts가 재수출하지 않는데 sim/**는 M2 범위 밖(수정 금지)이다.
 // 범위 수치를 여기에 하드코딩하지 않기 위해(CLAUDE.md 규칙 9) constants에서 직접 가져온다.
-import { ACID_MAX, MASS_MAX, SEED_G } from '../sim/constants';
+import { ACID_MAX, MASS_MAX, SEED_G, STAGES } from '../sim/constants';
 import { INGREDIENTS } from '../sim/ingredients';
 import type { IngredientId } from '../sim/ingredients';
 import type { StorageAdapter } from '../platform/storage';
+import type { EconomyState } from './economy';
+import { emptyEconomy } from './economy';
 
 /** v2: 멀티 르방 — starters[] + 전역 도감(shared). 확장기획 2026-08-24 §5 */
 export const SCHEMA_VERSION = 2;
@@ -52,6 +54,8 @@ export interface SharedState {
   collection: Record<string, CollectionEntry>;
   /** 재료함 (§8-2) — 전역, 형태 무관 재료 단위 수량. 키 부재 = {} (v2 내 무버전 추가 키) */
   inventory: Record<IngredientId, number>;
+  /** 무료 경제 카운터 (§9 Phase 7) — 키 부재 = 전부 0 (inventory와 같은 무버전 착륙) */
+  economy: EconomyState;
 }
 
 export interface SaveEnvelope {
@@ -134,10 +138,35 @@ function inventoryOf(v: unknown): Record<IngredientId, number> {
   return out;
 }
 
+/**
+ * 경제 카운터 — 전부 단조 증가 정수. 잔액은 여기 없다(파생, economy.ts 주석).
+ * 스키마 v3를 올리지 않는 이유는 flour·inventory와 동일: 1.1.0~1.2.x 클라이언트가 이
+ * 저장본을 읽을 때 미지 키만 조용히 버리게 해서 OTA 롤백이 전멸이 되지 않게 한다.
+ */
+function economyOf(v: unknown): EconomyState {
+  const d = emptyEconomy();
+  if (!isObject(v)) return d;
+  const int = (x: unknown): number => Math.round(num(x, 0, Number.MAX_SAFE_INTEGER, 0));
+  return {
+    feeds: int(v.feeds),
+    bakes: int(v.bakes),
+    stageMax: Math.round(num(v.stageMax, 0, STAGES.length - 1, 0)),
+    exchanged: int(v.exchanged),
+    spent: int(v.spent),
+    gifted: bool(v.gifted, d.gifted),
+  };
+}
+
 /** 전역(집) 소유 상태 — 하위 키가 없으면 기본값 (inventory가 예고대로 무이행 착륙, flour 패턴) */
 function sharedOf(v: unknown): SharedState {
-  if (!isObject(v)) return { collection: {}, inventory: emptyInventory() };
-  return { collection: collectionOf(v.collection), inventory: inventoryOf(v.inventory) };
+  if (!isObject(v)) {
+    return { collection: {}, inventory: emptyInventory(), economy: emptyEconomy() };
+  }
+  return {
+    collection: collectionOf(v.collection),
+    inventory: inventoryOf(v.inventory),
+    economy: economyOf(v.economy),
+  };
 }
 
 function settingsOf(v: unknown): SaveSettings {

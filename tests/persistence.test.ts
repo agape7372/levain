@@ -11,6 +11,7 @@ import {
   type SaveEnvelope,
   emptyInventory,
 } from '../src/store/persistence';
+import { emptyEconomy } from '../src/store/economy';
 
 const T0 = 1_700_000_000_000;
 
@@ -21,7 +22,7 @@ function envelopeAt(now = T0): SaveEnvelope {
     starters: [{ id: 's1', name: null, ordinal: 1, sim: initialState(now) }],
     activeStarterId: 's1',
     nextStarterOrdinal: 2,
-    shared: { collection: {}, inventory: emptyInventory() },
+    shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy() },
     settings: { muted: true, haptics: false, notifyEnabled: true },
     flags: { onboarded: true, pendingBake: { recipeId: 'loaf', grade: 'best' }, retapHints: 0 },
   };
@@ -145,7 +146,7 @@ describe('validateAndClamp — 있는데 불량이면 살린다', () => {
     });
     expect(env?.settings).toEqual({ muted: false, haptics: true, notifyEnabled: true });
     expect(env?.flags).toEqual({ onboarded: false, pendingBake: null, retapHints: 0 });
-    expect(env?.shared).toEqual({ collection: {}, inventory: emptyInventory() });
+    expect(env?.shared).toEqual({ collection: {}, inventory: emptyInventory(), economy: emptyEconomy() });
     expect(env?.activeStarterId).toBe('s1'); // 없는 activeStarterId → 첫 르방
     expect(env?.nextStarterOrdinal).toBe(2); // max(ordinal)+1 바닥
   });

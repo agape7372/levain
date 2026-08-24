@@ -1,6 +1,26 @@
 // UI ↔ store 결합 절단면 — 화면은 이 인터페이스만 안다. 배선은 app.ts (ARCHITECTURE §5).
 import type { Action, IngredientId, Location, SimEvent, Snapshot } from '../sim';
 
+/** 누적 미션 한 줄 — 리셋·기한 없음. remaining은 다음 보상까지 남은 횟수(1~step) */
+export interface MissionProgress {
+  count: number;
+  remaining: number;
+  step: number;
+  claimed: number;
+}
+
+export interface EconomyView {
+  /** 교환 가루 잔액 */
+  flour: number;
+  feed: MissionProgress;
+  bake: MissionProgress;
+  /** 처음 만들어 본 베이스 레시피 수 / 전체 */
+  basesDone: number;
+  basesTotal: number;
+  /** 첫 재료 선물을 아직 안 받았다 */
+  giftPending: boolean;
+}
+
 export interface GameSettings {
   muted: boolean;
   haptics: boolean;
@@ -35,6 +55,16 @@ export interface GameApi {
 
   /** 새 르방 추가 (홈 + 버튼 — 정식 UI, 2026-08-24 사용자 확정. 슬롯 상한이면 false) */
   addStarter(): boolean;
+
+  // ── 무료 경제 (§9 Phase 7) ──
+  /** 가루 잔액 + 미션 진행 — 전부 파생값 스냅. 렌더할 때마다 새로 읽는다 */
+  economy(): EconomyView;
+  /** 가루로 재료 1개 사기 — 잔액 부족·소프트캡이면 false (무차감) */
+  buyIngredient(id: IngredientId): boolean;
+  /** 재료 1개를 가루로 되돌리기 — 재고 0이면 false */
+  exchangeIngredient(id: IngredientId): boolean;
+  /** 첫 재료 선물 받기 — 이미 받았으면 false */
+  claimStarterGift(id: IngredientId): boolean;
 
   /** 개발자 모드 (설정 버전 7탭 — 사용자 본인 치트. 배선은 app.ts) */
   dev: {

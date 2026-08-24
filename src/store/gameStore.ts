@@ -12,12 +12,14 @@ import {
   LABEL_STAGE, REWIND_TOLERANCE_MS, STARTER_SLOTS_FREE,
   advance, applyAction, betterGrade, deriveBriefing, deriveSnapshot, initialState,
   isPlayable, planNotificationsAll, playableRules, reanchor, ruleByVariantId, stageOf,
-  RECIPES, variantIdOf, DAY,
+  RECIPES, variantIdOf, DAY, INGREDIENT_SOFT_CAP, INGREDIENT_FLOUR_COST,
 } from '../sim';
 import type { Clock } from '../platform/clock';
 import type { StorageAdapter } from '../platform/storage';
 import type { LoadSource, SaveEnvelope, SaveFlags, SaveSettings, StarterRecord } from './persistence';
 import { SCHEMA_VERSION, defaultFlags, defaultSettings, emptyInventory, load, save } from './persistence';
+import type { EconomyState } from './economy';
+import { earnedFlour, emptyEconomy, flourBalance } from './economy';
 
 /** 포그라운드 tick 주기 — rAF 아님. 게임 시간은 wall-clock이다 (ARCHITECTURE §2) */
 const TICK_MS = 5_000;
@@ -52,8 +54,23 @@ export interface GameStore {
   getCollection(): Record<string, CollectionEntry>;
   /** 재료함 (§8-2 — 전역, 재료 단위 수량) */
   getInventory(): Record<IngredientId, number>;
-  /** 재료 지급 — 획득 경로는 Phase 7(미션·교환), 지금은 Levain Lab 전용 진입로 */
+  /**
+   * 재료 지급 — 소프트캡(INGREDIENT_SOFT_CAP)까지만 쌓이고 초과분은 교환 가루로 자동
+   * 전환된다 (§9). Levain Lab·개발자 모드·선물이 공용으로 쓴다.
+   */
   grantIngredient(id: IngredientId, count: number): void;
+
+  // ── 무료 경제 (§9 Phase 7) — 잔액은 파생, store/economy.ts가 정의 ──
+  /** 경제 카운터 원본 (읽기 전용) */
+  getEconomy(): EconomyState;
+  /** 교환 가루 잔액 = 누적 획득 − 누적 사용 */
+  getFlour(): number;
+  /** 가루로 원하는 재료 1개 사기. 잔액 부족·소프트캡 도달이면 false (무차감) */
+  buyIngredient(id: IngredientId): boolean;
+  /** 재료 1개를 가루로 되돌리기 (중복 정리). 재고 0이면 false */
+  exchangeIngredient(id: IngredientId): boolean;
+  /** 첫 재료 선물 1개 (온보딩 §9) — 이미 받았으면 false. 기존 저장본도 1회 받는다 */
+  claimStarterGift(id: IngredientId): boolean;
   /**
    * 변형 굽기 (§8-2 해금 공식) — 원자적: 첫 굽기 = 재료 1 차감 + 도감 발견이 같은
    * dispatch(persist 1회) 안에서 커밋. 발견된 변형 재굽기는 재료 재소비 없음(mass만).
@@ -95,7 +112,7 @@ export function newEnvelope(now: number): SaveEnvelope {
     starters: [{ id: 's1', name: null, ordinal: 1, sim: initialState(now) }],
     activeStarterId: 's1',
     nextStarterOrdinal: 2,
-    shared: { collection: {}, inventory: emptyInventory() },
+    shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy() },
     settings: defaultSettings(),
     flags: defaultFlags(),
   };
@@ -125,6 +142,57 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
   let timer: ReturnType<typeof setInterval> | null = null;
   let ticksSinceSave = 0;
 
+  // ── 경제(§9) 헬퍼 ─────────────────────────────────────────────────────────
+  // 잔액은 저장하지 않는다 — 여기 있는 건 카운터 갱신뿐이고 획득액은 전부 파생이다.
+
+  const economy = (): EconomyState => env.shared.economy;
+  const earnedNow = (): number => earnedFlour(economy(), env.shared.collection);
+
+  function setEconomy(patch: Partial<EconomyState>): void {
+    env = { ...env, shared: { ...env.shared, economy: { ...economy(), ...patch } } };
+  }
+
+  /** stageMax는 이벤트가 아니라 관측으로 올린다 — 구세이브(이미 성장한 르방)도 소급 인정 */
+  let stageMaxDirty = false;
+  function syncStageMax(now: number): void {
+    const top = env.starters.reduce((m, r) => Math.max(m, stageOf(r.sim, now)), 0);
+    if (top <= economy().stageMax) return;
+    setEconomy({ stageMax: top });
+    stageMaxDirty = true;
+  }
+
+  function setInventory(id: IngredientId, value: number): void {
+    env = {
+      ...env,
+      shared: { ...env.shared, inventory: { ...env.shared.inventory, [id]: Math.max(0, value) } },
+    };
+  }
+
+  /**
+   * 소프트캡 지급 (§9): 캡까지만 재료로 쌓고 초과분은 교환 가루로 자동 전환한다.
+   * 이미 캡을 넘은 재고(개발자 치트·구세이브)는 깎지 않는다 — 지급이 재고를 줄이는 일은 없다.
+   */
+  function grantInto(id: IngredientId, count: number): void {
+    const add = Math.max(0, Math.round(count));
+    if (add === 0) return;
+    const cur = env.shared.inventory[id] ?? 0;
+    const next = Math.max(cur, Math.min(INGREDIENT_SOFT_CAP, cur + add));
+    const overflow = add - (next - cur);
+    setInventory(id, next);
+    if (overflow > 0) setEconomy({ exchanged: economy().exchanged + overflow });
+  }
+
+  // 부트 백필 — 이미 성장해 있던 르방(1.2.x 저장본)의 단계 보상을 소급 인정한다.
+  // 생성 시점이라 구독자가 없어 통지 대상이 없다: 이후의 상승만 flourEarned로 나간다.
+  syncStageMax(clock.now());
+  stageMaxDirty = false;
+
+  /** 획득 델타를 이벤트로 — 미션·성장·도감 보상이 조용히 들어오지 않게 (토스트는 UI) */
+  const earnEvents = (before: number): SimEvent[] => {
+    const delta = earnedNow() - before;
+    return delta > 0 ? [{ type: 'flourEarned', amount: delta }] : [];
+  };
+
   /**
    * 통지 없는 내부 catch-up — dispatch가 중간 통지를 내지 않도록 tick()과 분리한다.
    * 시계 역행은 **전 starter + 전역 도감**에 같은 delta로 재정박(확장기획 §5-1) —
@@ -146,6 +214,7 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     }
     setActiveSim(advance(activeSim(), now));
     snap = deriveSnapshot(activeSim(), now);
+    syncStageMax(now);
   }
 
   /** 도감(전역) 갱신 — v1에서 sim이 하던 집계를 이벤트로 이어받는다 (규칙 동일).
@@ -183,6 +252,18 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     }
   }
 
+  /** 누적 미션 카운터 — 급여·굽기 이벤트만 센다 (차단·잠금은 세지 않는다) */
+  function applyEconomyEvents(events: SimEvent[]): void {
+    let feeds = 0;
+    let bakes = 0;
+    for (const e of events) {
+      if (e.type === 'fed') feeds += 1;
+      else if (e.type === 'baked' || e.type === 'bakedDiscard') bakes += 1;
+    }
+    if (feeds === 0 && bakes === 0) return;
+    setEconomy({ feeds: economy().feeds + feeds, bakes: economy().bakes + bakes });
+  }
+
   function emit(events: SimEvent[]): void {
     for (const fn of [...listeners]) fn(snap, events);
   }
@@ -203,22 +284,30 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
   }
 
   function doTick(): Snapshot {
-    advanceTo(clock.now());
-    emit([]);
+    const before = earnedNow();
+    const now = clock.now();
+    stageMaxDirty = false;
+    advanceTo(now);
+    // 성장 단계 보상은 급여 없이도(경과만으로) 오를 수 있다 — 오른 순간 저장까지 마친다
+    if (stageMaxDirty) persist(now);
+    emit(earnEvents(before));
     return snap;
   }
 
   function doDispatch(action: Action): SimEvent[] {
     const now = clock.now(); // 한 번만 캡처 — advance·applyAction·savedAt이 같은 시각을 본다
+    const before = earnedNow();
     advanceTo(now);
     const res = applyAction(activeSim(), action, now);
     setActiveSim(res.state);
     applyBakeEvents(res.events, now);
+    applyEconomyEvents(res.events); // 도감 갱신 뒤 — 레시피 최초 완성분까지 같은 델타에 든다
     snap = deriveSnapshot(activeSim(), now);
+    const events = [...res.events, ...earnEvents(before)];
     persist(now);
     replan(now);
-    emit(res.events);
-    return res.events;
+    emit(events);
+    return events;
   }
 
   return {
@@ -247,16 +336,45 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     getInventory: () => env.shared.inventory,
 
     grantIngredient(id: IngredientId, count: number): void {
-      const cur = env.shared.inventory[id] ?? 0;
-      env = {
-        ...env,
-        shared: {
-          ...env.shared,
-          inventory: { ...env.shared.inventory, [id]: Math.max(0, Math.min(999, cur + count)) },
-        },
-      };
+      const before = earnedNow();
+      grantInto(id, count);
+      persist(clock.now());
+      emit(earnEvents(before));
+    },
+
+    getEconomy: () => economy(),
+    getFlour: () => flourBalance(economy(), env.shared.collection),
+
+    buyIngredient(id: IngredientId): boolean {
+      // 잔액·소프트캡을 **차감 전에** 확인 — 실패는 무차감 (무효 조합 규약과 같은 원칙)
+      if (flourBalance(economy(), env.shared.collection) < INGREDIENT_FLOUR_COST) return false;
+      if ((env.shared.inventory[id] ?? 0) >= INGREDIENT_SOFT_CAP) return false;
+      setEconomy({ spent: economy().spent + INGREDIENT_FLOUR_COST });
+      setInventory(id, (env.shared.inventory[id] ?? 0) + 1);
       persist(clock.now());
       emit([]);
+      return true;
+    },
+
+    exchangeIngredient(id: IngredientId): boolean {
+      const cur = env.shared.inventory[id] ?? 0;
+      if (cur < 1) return false;
+      const before = earnedNow();
+      setInventory(id, cur - 1);
+      setEconomy({ exchanged: economy().exchanged + 1 });
+      persist(clock.now());
+      emit(earnEvents(before));
+      return true;
+    },
+
+    claimStarterGift(id: IngredientId): boolean {
+      if (economy().gifted) return false;
+      const before = earnedNow();
+      setEconomy({ gifted: true });
+      grantInto(id, 1);
+      persist(clock.now());
+      emit(earnEvents(before));
+      return true;
     },
 
     bakeVariant(variantId: string): SimEvent[] {

@@ -342,6 +342,29 @@ html {
   justify-content: center;
 }
 
+/* ── 무료 경제 배너·교환소 (§9) ───────────────────────── */
+.econ-bar {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--bg-soft);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.econ-amount {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.econ-actions { display: flex; gap: 8px; }
+.btn-slim { padding: 7px 12px; font-size: 13px; border-radius: 12px; }
+.exchange-row { align-items: center; gap: 10px; }
+.exchange-texts { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.exchange-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
 /* ── 레시피 도감 ─────────────────────────────────────── */
 .recipes-wrap { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 24px; }
 .recipes-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }

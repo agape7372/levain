@@ -31,8 +31,10 @@ import { createHomeScreen } from './ui/screens/home';
 import { createRecipesScreen } from './ui/screens/recipes';
 import { createShowcaseScreen } from './ui/screens/showcase';
 import { mountOnboarding } from './ui/screens/onboarding';
+import { openStarterGift } from './ui/components/ingredientPicker';
 import type { GameApi } from './ui/gameApi';
-import { LABEL_STAGE } from './sim';
+import { LABEL_STAGE, RECIPES } from './sim';
+import { basesCompleted, missionViews } from './store/economy';
 import type { BakeGrade, SimEvent } from './sim';
 
 export interface StartAppDeps {
@@ -135,6 +137,22 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       scene.setMoldSeed(store.getActiveStarter().sim.createdAt);
       return true;
     },
+    economy: () => {
+      const eco = store.getEconomy();
+      const m = missionViews(eco);
+      return {
+        flour: store.getFlour(),
+        feed: m.feed,
+        bake: m.bake,
+        basesDone: basesCompleted(store.getCollection()),
+        basesTotal: RECIPES.length,
+        giftPending: !eco.gifted,
+      };
+    },
+    buyIngredient: (id) => store.buyIngredient(id),
+    exchangeIngredient: (id) => store.exchangeIngredient(id),
+    claimStarterGift: (id) => store.claimStarterGift(id),
+
     dev: {
       matureActive: () => store.devMatureActive(),
       grantAllIngredients: () => {
@@ -317,6 +335,9 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
           store.setFlags({ pendingBake: { recipeId: e.recipeId, grade: e.grade } });
           setTimeout(() => store.setFlags({ pendingBake: null }), 3000);
           break;
+        case 'flourEarned':
+          toast(copy.economy.earned(e.amount));
+          break;
         case 'flakeMade':
           haptic('light');
           toast(copy.flake.made);
@@ -394,6 +415,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
         scene.snapParams(toRenderParams(store.getSnapshot()));
         tabs.style.display = '';
         toast(copy.onboarding.born);
+        openStarterGift(api); // 첫 재료 선물 (§9) — 창조 의식 직후가 유일한 자연 자리
       },
     });
   } else if (loadSource === 'mirror') {
@@ -403,7 +425,13 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   // ── 부트 브리핑 → (필요시) 곰팡이 종결 모달 — 중앙 팝업 순차, 겹치지 않게 ──
   if (!isNew && store.getEnvelope().flags.onboarded) {
     scene.coverCloth(); // 콜드 스타트 = 천이 덮인 채 시작 — 걷는 게 첫 리추얼
-    openBriefingCard(briefing, () => openMoldModal(api));
+    openBriefingCard(briefing, () => {
+      openMoldModal(api);
+      // 1.2.x 저장본은 온보딩을 이미 지났다 — 선물은 여기서 한 번 권한다.
+      // 곰팡이 종결 모달이 떠 있으면 얹지 않는다(그 화면엔 다른 말이 없다) —
+      // 놓쳐도 재료 탭 배너의 같은 버튼으로 언제든 받을 수 있다.
+      if (!hasOpenModal() && api.economy().giftPending) openStarterGift(api);
+    });
   }
 
   // ── 미표시 굽기 결과 재노출 (강제종료 안전) ──

@@ -150,3 +150,30 @@ export const FILL_DORMANT = 0.65;
 export const STAGE_FILL_FACTOR = [0.5, 0.3, 1.0, 1.0, 1.0, 1.0];
 /** 0단계 D2 가짜 부풀기(실제 현상): 탄생 24~48h 구간의 부피 계수 */
 export const FAKE_RISE_FACTOR = 1.2;
+
+/**
+ * 무료 경제 (확장기획 §9 — Phase 7). 재화 2종: 재료 + 교환 가루.
+ * 유료 젬 없음, 만료 없음, 랜덤 없음 — 원하는 재료를 정가로 산다(도박·불운 배제).
+ *
+ * 잔액은 **저장하지 않는다** (닫힌 함수 모델, CLAUDE.md 규칙 3):
+ * 잔액 = 누적 획득(급여·굽기·성장·도감·교환의 함수) − 누적 사용. 타임스탬프가 없어
+ * 시계 조작 면역이고 재정박 목록(규칙 4)에도 들어가지 않는다.
+ *
+ * 도달 산술(수용 기준 "광고 0으로 전 변형 도달"): 변형 40종 = 재료 40개, 온보딩 선물 1개를
+ * 빼면 39 × 12 = 468 가루. 일회성 = 성장 5단계 60 + 베이스 레시피 10종 120 = 180.
+ * 굽기 미션은 그 50번의 굽기 자체로 120. 남는 168은 급여 미션 14회 = 누적 급여 140회
+ * (하루 2회면 ≈ 70일). 성장 5단계 자체가 30일이라 실질 완주 ≈ 3개월 — 광고는 가속만 판다.
+ */
+export const INGREDIENT_SOFT_CAP = 9;
+/** 재료 1개 → 가루 (자발 교환·소프트캡 초과분 자동 전환 공통 환율) */
+export const FLOUR_PER_INGREDIENT = 4;
+/** 가루 → 재료 1개 (종류 선택). 교환 환율의 3배 = 중복 정리가 이득이되 무한 회전은 손해 */
+export const INGREDIENT_FLOUR_COST = 12;
+/** 누적 미션 — 리셋 없음·연속 보너스 없음 (실패 개념 자체가 없다, §9) */
+export const MISSION_FEED_STEP = 10;
+export const MISSION_BAKE_STEP = 5;
+export const MISSION_REWARD_FLOUR = 12;
+/** 성장 단계 최초 도달 보상 — **집(계정) 최고 기록** 기준 1회 (새 르방으로 재수령 불가) */
+export const STAGE_REWARD_FLOUR = 12;
+/** 베이스 레시피 최초 완성 보상 — 도감 기록에서 파생(1종당 1회) */
+export const RECIPE_REWARD_FLOUR = 12;

@@ -89,6 +89,9 @@ export type SimEvent =
   | { type: 'bakeBlocked'; reason: 'mass' | 'stage' | 'cooldown' | 'unknownRecipe' | 'ingredient' }
   | { type: 'labeled' }
   | { type: 'labelLocked' }
+  // 경제(§9) — sim이 아니라 store가 낸다. labeled/labelLocked와 같은 선례:
+  // 타입은 도메인 어휘라 여기 살지만 applyAction은 이 이벤트를 만들지 않는다.
+  | { type: 'flourEarned'; amount: number }
   | { type: 'flakeMade' }
   | { type: 'flakeBlocked'; reason: 'stage' | 'phase' | 'mass' }
   | { type: 'starterDiscarded' }

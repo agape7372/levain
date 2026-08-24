@@ -12,6 +12,7 @@ import type { GameStore } from '../src/store/gameStore';
 import {
   SCHEMA_VERSION, emptyInventory, migrate, save, validateAndClamp, type SaveEnvelope,
 } from '../src/store/persistence';
+import { emptyEconomy } from '../src/store/economy';
 import {
   DAY, HOUR, INGREDIENTS, advance, deriveSnapshot, initialState, planNotificationsAll,
 } from '../src/sim';
@@ -71,7 +72,7 @@ function envelopeOf(fixes: Fixture[], now: number): SaveEnvelope {
     })),
     activeStarterId: 's1',
     nextStarterOrdinal: fixes.length + 1,
-    shared: { collection: {}, inventory: emptyInventory() },
+    shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy() },
     settings: { muted: true, haptics: false, notifyEnabled: true },
     flags: { onboarded: true, pendingBake: null, retapHints: 0 },
   };
