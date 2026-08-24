@@ -134,6 +134,17 @@ export const copy = {
     labelUnlocked: '병에 이름표를 붙일 수 있어요',
   },
 
+  devMode: {
+    on: '개발자 모드가 켜졌어요',
+    title: '개발자',
+    mature: '르방이 만렙 (5단계·재료량 가득)',
+    ingredients: '재료 전부 +9',
+    addStarter: '새 르방이 추가',
+    slotsFull: '병이 세 개까지예요',
+    collection: '도감 전부 완성',
+    done: '됐어요',
+  },
+
   starter: {
     /** 이름이 없을 때 표시 파생 — 저장하지 않는다 (확장기획 §5-3) */
     defaultName: (ordinal: number) => `르방이 ${ordinal}`,

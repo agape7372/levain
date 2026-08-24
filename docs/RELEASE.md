@@ -133,6 +133,7 @@ npx @capacitor/assets generate --android \
 **릴리스 절차**
 
 ```bash
+# 0) src/version.ts의 APP_VERSION을 <version>으로 먼저 갱신 (설정 하단 표시·개발자 모드 앵커)
 npm run ota:release -- <version>          # 예: 1.1.0 — build → zip → sha256 체크섬 → ota/ 산출물
 # 신규 네이티브 플러그인을 전제로 한 번들이면 최소 네이티브 버전을 명시:
 npm run ota:release -- <version> --min-native=<x.y>

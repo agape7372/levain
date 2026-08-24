@@ -127,6 +127,21 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       const rec = store.getEnvelope().starters.find((r) => r.id === id);
       return rec ? rec.name ?? copy.starter.defaultName(rec.ordinal) : null;
     },
+    dev: {
+      matureActive: () => store.devMatureActive(),
+      grantAllIngredients: () => {
+        for (const id of ['olive', 'choco', 'strawberry', 'chestnut'] as const) store.grantIngredient(id, 9);
+      },
+      addStarter: () => {
+        const rec = store.addStarter();
+        if (rec === null) return false;
+        // addStarter는 새 르방을 활성으로 전환한다 — 씬 컷 계약 동일 적용
+        scene.snapParams(toRenderParams(store.getSnapshot()));
+        scene.setMoldSeed(store.getActiveStarter().sim.createdAt);
+        return true;
+      },
+      completeCollection: () => store.devCompleteCollection(),
+    },
     getSettings: () => ({ ...store.getEnvelope().settings }),
     setSettings: (patch) => {
       store.setSettings(patch);

@@ -11,7 +11,8 @@ import type {
 import {
   LABEL_STAGE, REWIND_TOLERANCE_MS, STARTER_SLOTS_FREE,
   advance, applyAction, betterGrade, deriveBriefing, deriveSnapshot, initialState,
-  isPlayable, planNotificationsAll, reanchor, ruleByVariantId, stageOf,
+  isPlayable, planNotificationsAll, playableRules, reanchor, ruleByVariantId, stageOf,
+  RECIPES, variantIdOf, DAY,
 } from '../sim';
 import type { Clock } from '../platform/clock';
 import type { StorageAdapter } from '../platform/storage';
@@ -59,6 +60,10 @@ export interface GameStore {
    * 무효 조합(카탈로그 밖·v1 미노출)·재료 부족은 **시도 전 차단** — 소비 0, sim 무변경.
    */
   bakeVariant(variantId: string): SimEvent[];
+  /** 개발자 모드(설정 숨은 진입) — 활성 르방 즉시 만렙(5단계·피크 준비) */
+  devMatureActive(): void;
+  /** 개발자 모드 — 도감 전부 완성(베이스 10 + v1 변형 40, 최고 등급) */
+  devCompleteCollection(): void;
   /**
    * 활성 르방 이름 짓기 — 게이트·규칙은 v1 setLabel과 동일(5단계·trim·12자).
    * Phase 3에서 자유화 예정(확장기획 §5-3). labeled/labelLocked 이벤트로 통지.
@@ -271,6 +276,39 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
       // sim 게이트(stage·mass)·판정은 베이스 그대로 — 실패 시 baked 이벤트가 없어
       // applyBakeEvents가 아무것도 안 건드린다(차감 0)
       return doDispatch({ type: 'bake', recipeId: rule.baseRecipeId, variantId });
+    },
+
+    devMatureActive(): void {
+      const now = clock.now();
+      advanceTo(now);
+      const sim = activeSim();
+      // createdAt만 과거로 — 재정박 목록과 무관(더 과거로 미는 건 안전), 일수 게이트 통과용
+      setActiveSim({ ...sim, createdAt: now - 40 * DAY, maturity: 45, mass: 480 });
+      snap = deriveSnapshot(activeSim(), now);
+      persist(now);
+      replan(now);
+      emit([]);
+    },
+
+    devCompleteCollection(): void {
+      const now = clock.now();
+      const collection = { ...env.shared.collection };
+      const keys = [
+        ...RECIPES.map((r) => ({ key: r.id, graded: r.kind === 'bread' })),
+        ...playableRules().map((r) => ({ key: variantIdOf(r), graded: true })),
+      ];
+      for (const { key, graded } of keys) {
+        if (collection[key]) continue; // 실제 기록은 덮지 않는다
+        collection[key] = {
+          bestGrade: graded ? 'best' : null,
+          count: 1,
+          firstAt: now,
+          starterId: env.activeStarterId,
+        };
+      }
+      env = { ...env, shared: { ...env.shared, collection } };
+      persist(now);
+      emit([]);
     },
 
     renameActive(name: string): void {

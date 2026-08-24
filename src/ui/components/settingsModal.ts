@@ -4,6 +4,7 @@ import { LABEL_STAGE } from '../../sim';
 import { confirmModal, openModal } from './modal';
 import { toast } from './toast';
 import type { GameApi } from '../gameApi';
+import { APP_VERSION } from '../../version';
 
 function toggleRow(label: string, on: boolean, onChange: (v: boolean) => void): HTMLElement {
   const row = document.createElement('div');
@@ -109,5 +110,47 @@ export function openSettings(api: GameApi): void {
     }),
   );
 
+  // ── 버전 표시 + 개발자 모드 진입 (7탭 — 사용자 본인 치트, 배포 UI에선 그냥 버전 텍스트) ──
+  const version = document.createElement('div');
+  version.className = 'hint';
+  version.style.cssText = 'text-align:center;padding:10px 0 2px;color:var(--ink-soft,#8a6a4a);user-select:none';
+  version.textContent = `르방이 v${APP_VERSION}`;
+  let taps = 0;
+  version.addEventListener('click', () => {
+    taps += 1;
+    if (taps === 7 && !wrap.querySelector('.dev-rows')) {
+      toast(copy.devMode.on);
+      wrap.insertBefore(buildDevRows(api), version);
+    }
+  });
+  wrap.appendChild(version);
+
   openModal(wrap, { title: copy.settings.title });
+}
+
+/** 개발자 섹션 — 성장·재료·멀티·도감 치트. 게이트(슬롯 상한 등)는 store 규칙 그대로 */
+function buildDevRows(api: GameApi): HTMLElement {
+  const box = document.createElement('div');
+  box.className = 'dev-rows';
+  const title = document.createElement('div');
+  title.className = 'hint';
+  title.style.cssText = 'margin:8px 0 4px;font-weight:600';
+  title.textContent = copy.devMode.title;
+  box.appendChild(title);
+  box.appendChild(actionRow(copy.devMode.mature, () => {
+    api.dev.matureActive();
+    toast(copy.devMode.done);
+  }));
+  box.appendChild(actionRow(copy.devMode.ingredients, () => {
+    api.dev.grantAllIngredients();
+    toast(copy.devMode.done);
+  }));
+  box.appendChild(actionRow(copy.devMode.addStarter, () => {
+    toast(api.dev.addStarter() ? copy.devMode.done : copy.devMode.slotsFull);
+  }));
+  box.appendChild(actionRow(copy.devMode.collection, () => {
+    api.dev.completeCollection();
+    toast(copy.devMode.done);
+  }));
+  return box;
 }

@@ -73,6 +73,7 @@ export function createRecipesScreen(
   }
 
   const content = document.createElement('div');
+  content.style.marginTop = '14px'; // 세그먼트와 첫 카드 라인이 딱 붙는 문제 (사용자 보고 2026-08-24)
 
   wrap.append(head, segRow, content);
   el.appendChild(wrap);
