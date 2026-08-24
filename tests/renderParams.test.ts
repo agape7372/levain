@@ -14,6 +14,7 @@ const base: Snapshot = {
   smell: 'flour',
   stage: 2,
   mass: 200,
+  flour: 'white',
   nextFeedAt: 0,
   peakAt: 0,
   peakEndAt: 0,

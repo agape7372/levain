@@ -1,5 +1,5 @@
 // 밸런스 상수 전부 이 파일 한 곳 — 수치 근거는 docs/GDD.md §3 (실제 르방 리듬)
-import type { FeedRatio, Location } from './types';
+import type { FeedRatio, Flour, Location } from './types';
 
 export const HOUR = 3_600_000;
 export const DAY = 24 * HOUR;
@@ -31,6 +31,22 @@ export const RATIOS: Record<FeedRatio, RatioDef> = {
   '1:2:2': { mass: 300, latentH: 0.75, peakStartH: 7, peakEndH: 9, hungryH: 20, dilute: 0.4, stage: 3 },
   '1:5:5': { mass: 440, latentH: 1.0, peakStartH: 10, peakEndH: 12, hungryH: 30, dilute: 0.3, stage: 4 },
 };
+
+/**
+ * 밀가루 종류 발효 배율 (확장기획 §7-2 — 통밀·호밀은 발효 가속, ×1.15~1.25는 튜닝 가설,
+ * §19-2 "방향 확정 B/C·정량 TO VERIFY"). 산미 적립은 유효시간당이라 자동으로 같이 가속된다.
+ * 균일 배율이 유효한 전제: flour는 **급여 시점에만** 바뀐다(effBaseMs=0으로 리셋) —
+ * 사이클 중간에 바뀌면 접힌 effBaseMs가 옛 배율을 물고 있어 회계가 깨진다.
+ */
+export const FLOUR_TIME_MULT: Record<Flour, number> = {
+  white: 1.0,
+  wholewheat: 1.15,
+  rye: 1.25,
+};
+/** 밀가루 선택(상세 펼치기) 해금 단계 — 성숙 4단계 (§7-1) */
+export const FLOUR_STAGE = 4;
+/** 레시피 flour 친화 보정 — 일치 시 sourFit 가산 (§7-2 "판정 가산점") */
+export const FLOUR_AFFINITY_BONUS = 0.15;
 
 /** 시큼·휴면은 배고픔 시점 기준 오프셋 (1:1:1이면 14h/36h/120h) */
 export const SOUR_AFTER_HUNGRY_H = 22;

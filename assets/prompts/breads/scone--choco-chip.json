@@ -1,0 +1,28 @@
+{
+  "id": "scone--choco-chip",
+  "version": 1,
+  "name_ko": "초코칩 스콘",
+  "subject": "a single wedge-shaped scone studded with chocolate chips",
+  "geometry": {
+    "silhouette": "a thick triangular wedge cut from a round scone, resting flat and stable on its wide bottom face with the pointed corner of the triangle facing forward and slightly to the side; its height is roughly half its width, so it is a chunky, sturdy slice, never balanced on a point and never standing upright",
+    "crust": [
+      "top face only in pale golden brown #D6A15C",
+      "side faces left uncolored cream #F4EAD4, sharply contrasting with the top",
+      "shallow horizontal crack fissures running across the top surface",
+      "small irregular dark chocolate chip studs #3B2418 embedded across the pale golden top face and visible poking out at the cut edges"
+    ]
+  },
+  "style_ref": "shared-style-v2",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "jam", "cream topping", "balanced on a point", "standing upright", "cone shape", "tower", "chocolate drizzle", "melted chocolate pool"],
+  "views": ["three-quarter top-front", "front elevation", "top-down"],
+  "output": { "aspect": "1:1", "size": 1024 },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a single wedge-shaped scone studded with chocolate chips, a single game asset object on a plain backdrop. Geometry: a thick triangular wedge cut from a round scone, resting flat and stable on its wide bottom face, with the pointed corner of the triangle facing forward and slightly to the side. Its height is roughly half its width, so it reads as a chunky, sturdy slice — never balanced on a point, never standing upright like a tower. Crust: only the top face is colored pale golden brown (#D6A15C); the side faces are left uncolored cream (#F4EAD4), sharply contrasting with the top; shallow horizontal crack fissures run across the top surface; small irregular dark chocolate chip studs (#3B2418) are embedded across the pale golden top face and visible poking out at the cut edges. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — not balanced on a point, not standing upright, not a cone, not a tower — no photorealism, no glossy plastic, no jam, no cream topping, no chocolate drizzle, no melted chocolate pool, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact chocolate chip scone, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). It stays resting flat on its wide bottom face, with the same chunky proportions: height roughly half the width, the flat golden top and the cream sides meeting in a crisp horizontal line, chocolate chips visible at the cut edges. Do not change its pose or proportions between views. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact chocolate chip scone, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the triangular top face, crack fissures, and chocolate chip studs are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "베이스 scone.json의 geometry(웨지 실루엣, 윗면만 착색되는 비대칭 컬러링, 균열)를 그대로 계승하고 초코칩 스터드만 추가했다. 세움/콘/타워 negative는 베이스 그대로 유지, 초콜릿 재료가 유발하기 쉬운 드리즐·녹은 웅덩이를 추가로 차단했다."
+}

@@ -47,12 +47,19 @@ const SOUR_TONE = hex(0xcbbda2);
 const DORMANT_TONE = hex(0xe4dccc);
 // 곰팡이 확정 — 잿빛이 도는 바랜 톤. 경고는 다이제틱(반점) 소관, 빨강 시맨틱 없음 (VISUAL §7-1)
 const MOLDY_TONE = hex(0xd8d0be);
+// 밀가루 색 톤 시프트 (§7-2) — 통밀 = 따뜻한 담갈, 호밀 = 어두운 회갈. 상태 톤 위에 약하게 얹는다
+const WHOLEWHEAT_TONE = hex(0xd9c4a3);
+const RYE_TONE = hex(0xbfb096);
+const FLOUR_TONE_MIX = 0.35;
 
 export function toRenderParams(s: Snapshot): RenderParams {
   const a = clamp01(s.activity);
   const moldy = s.phase === 'moldy';
 
   let color = mix(CREAM, HUNGRY_TONE, clamp01(s.hunger));
+  // 밀가루 톤 — 상태 톤보다 먼저(재료가 바탕색), 상태 변화가 그 위를 지나간다
+  if (s.flour === 'wholewheat') color = mix(color, WHOLEWHEAT_TONE, FLOUR_TONE_MIX);
+  else if (s.flour === 'rye') color = mix(color, RYE_TONE, FLOUR_TONE_MIX);
   color = mix(color, SOUR_TONE, smooth(0.25, 0.6, s.sourness));
   color = mix(color, DORMANT_TONE, clamp01(s.dormancy));
   if (moldy) color = mix(color, MOLDY_TONE, 0.7);

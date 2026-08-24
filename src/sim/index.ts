@@ -2,7 +2,7 @@
 export * from './types';
 export { advance, reanchor } from './advance';
 export { applyAction, initialState } from './actions';
-export { deriveSnapshot, effSinceFeedMs, activityAt, phaseAt, stageOf, boundariesH, moldStageAt, clamp, smoothstep } from './derive';
+export { deriveSnapshot, effSinceFeedMs, activityAt, phaseAt, stageOf, boundariesH, moldStageAt, clamp, smoothstep, rateMult } from './derive';
 export { planNotifications, planNotificationsAll, clampQuiet } from './notifyPlan';
 export { deriveBriefing } from './briefing';
 export {
@@ -11,4 +11,5 @@ export {
 export {
   RATIOS, TEMP_MULT, STAGES, FRIDGE_STAGE, FLOAT_OK_ACTIVITY, SEED_G, HOUR, DAY,
   FLAKE_STAGE, FLAKE_COST_G, LABEL_STAGE, REWIND_TOLERANCE_MS, STARTER_SLOTS_FREE,
+  FLOUR_TIME_MULT, FLOUR_STAGE, FLOUR_AFFINITY_BONUS,
 } from './constants';

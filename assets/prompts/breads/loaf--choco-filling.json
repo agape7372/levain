@@ -1,0 +1,28 @@
+{
+  "id": "loaf--choco-filling",
+  "version": 1,
+  "name_ko": "초코 바브카 식빵",
+  "subject": "a pan-baked sandwich loaf of bread with a swirled chocolate babka filling, cut end face exposed",
+  "geometry": {
+    "silhouette": "a rectangular pan-shaped block with angular, smooth, near-vertical sides, domed only on the top face, with the front end face cut straight across to reveal the interior chocolate swirl",
+    "crust": [
+      "thin golden-brown crust #C68958 confined to the domed top only",
+      "smooth matte cream sides #F4EAD4 with straight angular edges, unbrowned",
+      "smooth, low-texture surface overall with no cracks or blistering",
+      "on the exposed cut end face, a dark chocolate swirl #2E1B14 spirals through the pale cream crumb #F4EAD4, babka-style"
+    ]
+  },
+  "style_ref": "shared-style-v2",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "chocolate drizzle on crust", "melted chocolate pool on top", "glossy chocolate glaze"],
+  "views": ["three-quarter top-front", "front elevation", "top-down"],
+  "output": { "aspect": "1:1", "size": 1024 },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a pan-baked sandwich loaf of bread with a swirled chocolate babka filling, a single game asset object on a plain backdrop, its front end face cut straight across to reveal the interior chocolate swirl. Geometry: a rectangular pan-shaped block with angular, smooth, near-vertical sides, domed only on the top face. Crust: a thin golden-brown crust (#C68958) is confined to the domed top only, while the smooth matte cream sides (#F4EAD4) keep straight angular edges and stay unbrowned; the overall surface is smooth and low-texture with no cracks or blistering. On the exposed cut end face, a dark chocolate swirl (#2E1B14) spirals through the pale cream crumb (#F4EAD4), babka-style. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no chocolate drizzle on the crust, no melted chocolate pool on top, no glossy chocolate glaze, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact chocolate babka loaf, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view), so the flat cream side, domed golden top, and the cut end face with its chocolate swirl are all visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact chocolate babka loaf, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the domed top and the chocolate swirl visible at the cut end are both fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "베이스 loaf.json의 geometry(팬 모양 각진 옆면, 윗면만 도는 돔)를 그대로 계승했다. '단면 초코 필링 스월'을 표현하려면 실루엣에 절단면이 필수라 silhouette 끝에 조건절만 덧붙였고, 기존 크러스트 3개 불릿은 손대지 않았다. negative에 크러스트 위 초콜릿 드리즐·광택 글레이즈를 차단해 필링이 겉면으로 새어나오지 않게 했다."
+}

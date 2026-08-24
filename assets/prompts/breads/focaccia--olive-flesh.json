@@ -1,0 +1,29 @@
+{
+  "id": "focaccia--olive-flesh",
+  "version": 1,
+  "name_ko": "올리브 포카치아",
+  "subject": "a thin rectangular slab of focaccia bread studded with chopped olive flesh",
+  "geometry": {
+    "silhouette": "a thin rectangular slab, flat top, low uniform height",
+    "crust": [
+      "matte golden surface #D9A552 across the top",
+      "finger-dimple pits distributed evenly across the entire top surface",
+      "inside each dimple a small pool of darker, more saturated golden-amber color #B8813C, as if olive oil has gathered there",
+      "scattered rosemary leaves, whole black olives, and coarse salt crystals pressed into the surface",
+      "irregular dark purple-black chopped olive flesh chunks #3B2F2F embedded inside and around the oil-filled dimples across the whole top surface"
+    ]
+  },
+  "style_ref": "shared-style-v2",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "cheese topping", "tomato slices", "extra glossy oil sheen"],
+  "views": ["three-quarter top-front", "front elevation", "top-down"],
+  "output": { "aspect": "1:1", "size": 1024 },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a thin rectangular slab of focaccia bread studded with chopped olive flesh, a single game asset object on a plain backdrop. Geometry: a thin rectangular slab with a flat top and low uniform height. Crust: a matte golden surface (#D9A552) covers the top; finger-dimple pits are distributed evenly across the entire top surface; inside each dimple sits a small pool of darker, more saturated golden-amber color (#B8813C), as if olive oil has gathered there — expressed purely as color, not as shine; scattered rosemary leaves, whole black olives, and coarse salt crystals are pressed into the surface; irregular dark purple-black chopped olive flesh chunks (#3B2F2F) are embedded inside and around the oil-filled dimples across the whole top surface. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no specular highlights, no cheese topping, no tomato slices, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact olive focaccia slab, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact olive focaccia slab, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the dimple grid, olive flesh chunks, rosemary, whole olives, and salt are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "베이스 focaccia.json의 geometry(얇은 사각 슬랩, 딤플 그리드, 오일 색 표현)를 그대로 계승하고 다진 올리브 과육 청크(#3B2F2F)만 딤플 주변에 추가했다. negative에 치즈·토마토·추가 광택 차단 — '올리브'라는 재료어가 지중해식 토핑(치즈·토마토) 연상을 유발하기 쉬워 명시적으로 막았다."
+}

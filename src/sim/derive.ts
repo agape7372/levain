@@ -18,11 +18,20 @@ import {
   MOLD_SPREAD_AFTER_HUNGRY_H,
   RATIOS,
   SMELL_BANDS,
+  FLOUR_TIME_MULT,
   SOUR_AFTER_HUNGRY_H,
   STAGES,
   STAGE_FILL_FACTOR,
   TEMP_MULT,
 } from './constants';
+
+/**
+ * 유효시간 배율 = 온도(위치) × 밀가루. flour는 급여 시점에만 바뀌므로(effBaseMs=0 리셋)
+ * 사이클 내 균일 배율이 성립한다 — 위치 접기(actions.setLocation)와 예측(wallFor)도
+ * 반드시 이 함수를 쓸 것 (타이머·게이트 드리프트 방지).
+ */
+export const rateMult = (state: Pick<SimState, 'location' | 'flour'>): number =>
+  TEMP_MULT[state.location] * FLOUR_TIME_MULT[state.flour];
 
 export const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
 
@@ -35,7 +44,7 @@ const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
 
 /** 유효 경과 ms — 위치 앵커 회계(types.ts SimState 주석 참조) */
 export function effSinceFeedMs(state: SimState, now: number): number {
-  return state.effBaseMs + Math.max(0, now - state.locAnchorAt) * TEMP_MULT[state.location];
+  return state.effBaseMs + Math.max(0, now - state.locAnchorAt) * rateMult(state);
 }
 
 /** 현재 비율의 상태 전이 경계 (유효시간 h) */
@@ -144,7 +153,7 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
   let dormancy = smoothstep(b.sour + (b.dormant - b.sour) * 0.6, b.dormant, effH);
   if (phase === 'dormant') dormancy = state.reviveProgress === 1 ? 0.6 : 1;
 
-  const mult = TEMP_MULT[state.location];
+  const mult = rateMult(state);
   const wallFor = (h: number): number =>
     state.locAnchorAt + Math.max(0, h * HOUR - state.effBaseMs) / mult;
 
@@ -163,6 +172,7 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
     smell: smellOf(state.acidity),
     stage,
     mass: state.mass,
+    flour: state.flour,
     nextFeedAt: wallFor(b.hungry),
     peakAt: wallFor(b.peakStart),
     peakEndAt: wallFor(b.peakEnd), // 피크는 구간 — UI는 범위로 말한다 (§19-1 "정답 시간" 단정 금지)

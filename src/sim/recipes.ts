@@ -1,6 +1,6 @@
 // 레시피 데이터·해금·판정 — 정본: docs/GDD.md §6
-import type { BakeGrade, RecipeDef, SimState } from './types';
-import { BAKE_ACTIVITY_W, BAKE_SOUR_W, GRADE_BEST, GRADE_GOOD, SEED_G } from './constants';
+import type { BakeGrade, Flour, RecipeDef, SimState } from './types';
+import { BAKE_ACTIVITY_W, BAKE_SOUR_W, FLOUR_AFFINITY_BONUS, GRADE_BEST, GRADE_GOOD, SEED_G } from './constants';
 import { clamp, stageOf } from './derive';
 
 /** 감점 기울기: 관대 0.015 / 보통 0.025 / 엄격 0.04 (선호 범위 밖 산미 1당) */
@@ -20,23 +20,24 @@ export const RECIPES: readonly RecipeDef[] = [
   { id: 'baguette', kind: 'bread', cost: 60, stage: 4, sourRange: [10, 35], slope: STRICT },
   { id: 'campagne', kind: 'bread', cost: 100, stage: 4, sourRange: [15, 45], slope: STRICT },
   // 호밀빵 = 시큼의 구원 — 방치돼 시어진 르방이 오히려 적기 (실제 호밀 사워도우)
-  { id: 'rye', kind: 'bread', cost: 80, stage: 5, sourRange: [40, 75], slope: NORMAL },
-  { id: 'wholewheat', kind: 'bread', cost: 120, stage: 5, sourRange: [20, 50], slope: STRICT },
+  { id: 'rye', kind: 'bread', cost: 80, stage: 5, sourRange: [40, 75], slope: NORMAL, flourAffinity: 'rye' },
+  { id: 'wholewheat', kind: 'bread', cost: 120, stage: 5, sourRange: [20, 50], slope: STRICT, flourAffinity: 'wholewheat' },
 ];
 
 export const recipeById = (id: string): RecipeDef | undefined => RECIPES.find((r) => r.id === id);
 
-/** 산미 적합도 0~1 — 선호 범위 안 1.0, 벗어난 만큼 기울기 감점 */
-export function sourFit(recipe: RecipeDef, acidity: number): number {
+/** 산미 적합도 0~1 — 선호 범위 안 1.0, 벗어난 만큼 기울기 감점. flour 일치 시 가산 (§7-2) */
+export function sourFit(recipe: RecipeDef, acidity: number, flour?: Flour): number {
   if (!recipe.sourRange) return 1;
   const [lo, hi] = recipe.sourRange;
   const dist = acidity < lo ? lo - acidity : acidity > hi ? acidity - hi : 0;
-  return clamp(1 - recipe.slope * dist, 0, 1);
+  const bonus = recipe.flourAffinity !== undefined && recipe.flourAffinity === flour ? FLOUR_AFFINITY_BONUS : 0;
+  return clamp(1 - recipe.slope * dist + bonus, 0, 1);
 }
 
 /** 판정 점수 = 0.6×activity + 0.4×산미적합도 (GDD §6-2) */
-export function bakeScore(recipe: RecipeDef, activity: number, acidity: number): number {
-  return BAKE_ACTIVITY_W * activity + BAKE_SOUR_W * sourFit(recipe, acidity);
+export function bakeScore(recipe: RecipeDef, activity: number, acidity: number, flour?: Flour): number {
+  return BAKE_ACTIVITY_W * activity + BAKE_SOUR_W * sourFit(recipe, acidity, flour);
 }
 
 export function gradeOf(score: number): BakeGrade {

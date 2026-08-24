@@ -1,6 +1,6 @@
 // applyAction(state, action, now) — 순수. 호출자는 반드시 advance(tick)를 선행한다
 // (액션 순서 불변식 — docs/ARCHITECTURE.md §2). 정본: docs/GDD.md §5·§6·§3-7.
-import type { Action, FeedRatio, SimEvent, SimState } from './types';
+import type { Action, FeedRatio, Flour, SimEvent, SimState } from './types';
 import {
   FLAKE_COST_G,
   FLAKE_MATURITY_KEEP,
@@ -12,9 +12,8 @@ import {
   RATIOS,
   REVIVE_GAP_H,
   SEED_G,
-  TEMP_MULT,
 } from './constants';
-import { activityAt, clamp, effSinceFeedMs, phaseAt, stageOf } from './derive';
+import { activityAt, clamp, effSinceFeedMs, phaseAt, rateMult, stageOf } from './derive';
 import { canBakeBread, canBakeDiscard, bakeScore, gradeOf, recipeById } from './recipes';
 
 export interface ActionResult {
@@ -29,6 +28,7 @@ export function initialState(now: number): SimState {
     lastFedAt: now,
     lastSimulatedAt: now,
     feedRatio: '1:1:1',
+    flour: 'white', // 부활·창조는 기본 가루 — flour 선택은 급여 액션의 몫
     location: 'room',
     locAnchorAt: now,
     effBaseMs: 0,
@@ -41,7 +41,7 @@ export function initialState(now: number): SimState {
   };
 }
 
-function withFeed(state: SimState, ratio: FeedRatio, now: number): SimState {
+function withFeed(state: SimState, ratio: FeedRatio, flour: Flour, now: number): SimState {
   const r = RATIOS[ratio];
   return {
     ...state,
@@ -49,12 +49,13 @@ function withFeed(state: SimState, ratio: FeedRatio, now: number): SimState {
     locAnchorAt: now,
     effBaseMs: 0,
     feedRatio: ratio,
+    flour, // flour는 여기(급여)에서만 바뀐다 — FLOUR_TIME_MULT 균일 배율의 전제
     mass: r.mass,
     acidity: clamp(state.acidity * r.dilute, 0, 100),
   };
 }
 
-function feed(state: SimState, ratio: FeedRatio, now: number): ActionResult {
+function feed(state: SimState, ratio: FeedRatio, flour: Flour, now: number): ActionResult {
   const events: SimEvent[] = [];
   const r = RATIOS[ratio];
   const stageBefore = stageOf(state, now);
@@ -67,7 +68,7 @@ function feed(state: SimState, ratio: FeedRatio, now: number): ActionResult {
   if (phase === 'dormant') {
     if (state.location !== 'room') return { state, events: [{ type: 'needRoom' }] };
     if (state.reviveProgress === 0) {
-      const next = { ...withFeed(state, ratio, now), reviveProgress: 1 as const };
+      const next = { ...withFeed(state, ratio, flour, now), reviveProgress: 1 as const };
       return { state: next, events: [{ type: 'reviveStarted' }] };
     }
     if (effH < REVIVE_GAP_H) {
@@ -75,13 +76,13 @@ function feed(state: SimState, ratio: FeedRatio, now: number): ActionResult {
       const next = { ...state, mass: r.mass, acidity: clamp(state.acidity * r.dilute, 0, 100) };
       return { state: next, events: [{ type: 'reviveTooSoon' }] };
     }
-    const next = { ...withFeed(state, ratio, now), reviveProgress: 0 as const };
+    const next = { ...withFeed(state, ratio, flour, now), reviveProgress: 0 as const };
     return { state: next, events: [{ type: 'revived' }, { type: 'fed', ratio, maturityGained: false }] };
   }
 
   // 일반 급여 — maturity는 유효 6h↑ + 활발·배고픔에서만 적립 (연타 무효, GDD §3-6)
   const gained = effH >= MATURITY_MIN_GAP_H && (phase === 'active' || phase === 'hungry');
-  let next = withFeed(state, ratio, now);
+  let next = withFeed(state, ratio, flour, now);
   if (gained) next = { ...next, maturity: next.maturity + 1 };
   events.push({ type: 'fed', ratio, maturityGained: gained });
 
@@ -96,7 +97,7 @@ function setLocation(state: SimState, to: SimState['location'], now: number): Ac
     return { state, events: [{ type: 'locationLocked' }] };
   }
   // 위치 앵커 회계: 지금까지의 유효시간을 접어 넣고 새 배율로 이어 간다 (types.ts 주석)
-  const folded = state.effBaseMs + Math.max(0, now - state.locAnchorAt) * TEMP_MULT[state.location];
+  const folded = state.effBaseMs + Math.max(0, now - state.locAnchorAt) * rateMult(state);
   const next: SimState = { ...state, location: to, locAnchorAt: now, effBaseMs: folded };
   return { state: next, events: [{ type: 'moved', to }] };
 }
@@ -110,7 +111,7 @@ function bake(state: SimState, recipeId: string, now: number): ActionResult {
   if (gate !== 'ok') return { state, events: [{ type: 'bakeBlocked', reason: gate }] };
 
   // 도감 기록은 전역(집의 기록) — store가 baked 이벤트로 갱신한다 (확장기획 §5-4)
-  const grade = gradeOf(bakeScore(recipe, activityAt(state, now), state.acidity));
+  const grade = gradeOf(bakeScore(recipe, activityAt(state, now), state.acidity, state.flour));
   const next: SimState = { ...state, mass: state.mass - recipe.cost };
   return { state: next, events: [{ type: 'baked', recipeId, grade }] };
 }
@@ -164,6 +165,7 @@ function restoreFlake(state: SimState, now: number): ActionResult {
     locAnchorAt: now,
     effBaseMs: 0,
     feedRatio: '1:1:1',
+    flour: 'white', // 부활·창조는 기본 가루 — flour 선택은 급여 액션의 몫
     location: 'room',
     acidity: 0,
     mass: INITIAL_MASS,
@@ -181,7 +183,7 @@ export function applyAction(state: SimState, action: Action, now: number): Actio
     return { state, events: [{ type: 'moldBlocked' }] };
   }
   switch (action.type) {
-    case 'feed': return feed(state, action.ratio, now);
+    case 'feed': return feed(state, action.ratio, action.flour ?? state.flour, now);
     case 'setLocation': return setLocation(state, action.to, now);
     case 'bake': return bake(state, action.recipeId, now);
     case 'bakeDiscard': return bakeDiscard(state, action.recipeId, now);

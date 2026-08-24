@@ -1,0 +1,28 @@
+{
+  "id": "cracker--olive-oil",
+  "version": 1,
+  "name_ko": "올리브유 크래커",
+  "subject": "a single square artisan cracker brushed with olive oil and a few salt flakes",
+  "geometry": {
+    "silhouette": "a thin flat square wafer, clearly a cracker and not a slab — its thickness is only about one tenth of its width, so from the side it reads as a thin plate with just enough depth to be solid; slightly rough hand-cut edges rather than a perfect machine-cut square",
+    "crust": [
+      "uniform matte golden surface #D9A552 across the whole top face",
+      "a regular grid pattern of small docking holes (pin holes) pressed into the top face, evenly spaced",
+      "a subtle richer olive-gold surface tone #C6903D washing across the top face, suggesting a light brushing of olive oil, expressed purely as a deeper color tone and never as shine",
+      "only a few sparse coarse salt flakes scattered across the surface, no seed speckles"
+    ]
+  },
+  "style_ref": "shared-style-v2",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "thick slab", "brownie", "biscuit", "cake", "cube", "sesame seeds", "poppy seeds", "glossy shine highlight"],
+  "views": ["three-quarter top-front", "front elevation", "top-down"],
+  "output": { "aspect": "1:1", "size": 1024 },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a single square artisan cracker brushed with olive oil and a few salt flakes, a single game asset object on a plain backdrop. Geometry: a thin flat square wafer — clearly a cracker, not a slab. Its thickness is only about one tenth of its width, so from the side it reads as a thin plate with just enough depth to be solid; the edges are slightly rough and hand-cut rather than a perfect machine-cut square. Crust: a uniform matte golden surface (#D9A552) covers the whole top face, with a regular grid pattern of small docking holes (pin holes) pressed evenly into the top face; a subtle richer olive-gold surface tone (#C6903D) washes across the top face, suggesting a light brushing of olive oil, expressed purely as a deeper color tone and never as shine; only a few sparse coarse salt flakes are scattered across the surface, with no seed speckles. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — not a thick slab, not a brownie, not a biscuit, not a cake, not a cube, no sesame or poppy seeds, no glossy shine highlight — no photorealism, no glossy plastic, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact olive oil cracker, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view), so its thin profile is visible: the thickness must read as only about one tenth of the width, a thin wafer and not a slab. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact olive oil cracker, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the docking hole grid and sparse salt flakes are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "베이스 cracker.json의 geometry(폭의 1/10 두께 웨이퍼, 도킹홀 그리드, 거친 손절단 엣지)를 그대로 계승했다. 참깨·양귀비씨 스페클 대신 올리브유 광(색조로만 표현) + 최소 소금 플레이크로 교체하고, negative에 두 씨앗 종류와 광택 하이라이트를 명시적으로 차단했다."
+}

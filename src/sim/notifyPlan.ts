@@ -10,9 +10,8 @@ import {
   QUIET_END_H,
   QUIET_START_H,
   REVIVE_GAP_H,
-  TEMP_MULT,
 } from './constants';
-import { boundariesH, phaseAt } from './derive';
+import { boundariesH, phaseAt, rateMult } from './derive';
 
 /** 조용시간(22~08 로컬)에 걸리면 다음 08:00으로 민다 */
 export function clampQuiet(at: number): number {
@@ -28,14 +27,15 @@ export function clampQuiet(at: number): number {
 export function planNotifications(state: SimState, now: number): NotifyPlan {
   const phase = phaseAt(state, now);
   const slots: NotifySlot[] = [];
-  const mult = TEMP_MULT[state.location];
+  const mult = rateMult(state);
   const b = boundariesH(state);
   const wallFor = (h: number): number =>
     state.locAnchorAt + Math.max(0, h * HOUR - state.effBaseMs) / mult;
 
   // 부활 의식 중 — 2회차 급여 시각 하나만
   if (state.reviveProgress === 1) {
-    const at = clampQuiet(state.lastFedAt + (REVIVE_GAP_H * HOUR) / TEMP_MULT.room);
+    // 부활 게이트(effH < REVIVE_GAP_H)는 flour 배율을 포함하므로 알림도 같은 배율로
+    const at = clampQuiet(state.lastFedAt + (REVIVE_GAP_H * HOUR) / rateMult({ location: 'room', flour: state.flour }));
     if (at > now) slots.push({ id: NOTIFY_SLOT_FEED, at, copyKey: 'reviveSecond', weekly: false });
     return { slots };
   }

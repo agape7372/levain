@@ -3,7 +3,7 @@
 // NaN·범위 밖 숫자는 버리지 않고 clamp로 살린다 — 필드 하나 때문에 기록 전체를 잃지 않는다.
 // 파싱 순서: JSON.parse → migrate(raw) → validateAndClamp(현행 스키마) — 마이그레이션이
 // 검증보다 먼저다. 구버전 저장본이 신버전 가드에 걸려 null(새 게임)이 되는 사고 방지.
-import type { BakeGrade, CollectionEntry, FeedRatio, Location, SimState } from '../sim';
+import type { BakeGrade, CollectionEntry, FeedRatio, Flour, Location, SimState } from '../sim';
 import { RATIOS, TEMP_MULT } from '../sim';
 // MASS_MAX·ACID_MAX는 sim/index.ts가 재수출하지 않는데 sim/**는 M2 범위 밖(수정 금지)이다.
 // 범위 수치를 여기에 하드코딩하지 않기 위해(CLAUDE.md 규칙 9) constants에서 직접 가져온다.
@@ -174,6 +174,9 @@ function simOf(v: unknown): SimState | null {
     lastFedAt,
     lastSimulatedAt,
     feedRatio: typeof ratio === 'string' && has(RATIOS, ratio) ? (ratio as FeedRatio) : '1:1:1',
+    // v2 내 무버전 추가 필드 — 키 부재 = white (label 패턴, §7-2. 스키마 v3 안 올림:
+    // 1.1.0 클라이언트가 이 저장본을 읽을 때 미지 키만 조용히 버리게 — 롤백 = 전멸 방지)
+    flour: v.flour === 'wholewheat' || v.flour === 'rye' ? (v.flour as Flour) : 'white',
     location: typeof loc === 'string' && has(TEMP_MULT, loc) ? (loc as Location) : 'room',
     locAnchorAt,
     effBaseMs: num(v.effBaseMs, 0, Number.MAX_SAFE_INTEGER, 0),

@@ -8,9 +8,8 @@ import {
   HOUR,
   MAX_CATCHUP_MS,
   REWIND_TOLERANCE_MS,
-  TEMP_MULT,
 } from './constants';
-import { boundariesH, clamp } from './derive';
+import { boundariesH, clamp, rateMult } from './derive';
 
 /**
  * 시계 역행: 모든 타임스탬프를 delta만큼 당겨 상대 간격을 보존한다 (GDD §3-8).
@@ -43,7 +42,7 @@ export function advance(state: SimState, now: number): SimState {
 
   // 산미 적분 — [t0, t1]을 상태 전이 경계로 분할 (오프라인 중 위치·비율 불변이 전제:
   // 위치·급여는 액션이고, 액션은 tick(advance) 선행 후 적용된다)
-  const mult = TEMP_MULT[s.location];
+  const mult = rateMult(s);
   const b = boundariesH(s);
   const wallFor = (h: number): number => s.locAnchorAt + Math.max(0, h * HOUR - s.effBaseMs) / mult;
   const cuts = [t0, wallFor(b.hungry), wallFor(b.sour), wallFor(b.dormant), t1]

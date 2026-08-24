@@ -7,8 +7,11 @@ import { openObserveCard } from '../components/observeCard';
 import { openSettings } from '../components/settingsModal';
 import { toast } from '../components/toast';
 import type { GameApi } from '../gameApi';
-import type { FeedRatio, Location, Snapshot } from '../../sim';
-import { RATIOS, FRIDGE_STAGE, FLAKE_STAGE, SEED_G, FLAKE_COST_G } from '../../sim';
+import type { FeedRatio, Flour, Location, Snapshot } from '../../sim';
+import {
+  RATIOS, FRIDGE_STAGE, FLAKE_STAGE, SEED_G, FLAKE_COST_G,
+  FLOUR_STAGE, HOUR, rateMult,
+} from '../../sim';
 import type { Screen } from '../router';
 
 const LOCATIONS: Location[] = ['room', 'window', 'fridge'];
@@ -146,6 +149,73 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     }
     items.get(selected)?.classList.add('selected');
 
+    // ── 상세 펼치기 (§7-1 — 성숙 4단계 해금): 밀가루 선택 + 피크 범위 예보 ──
+    // 기본값 = 현재 가루(스냅샷) — 앱 재시작에도 "쓰던 가루 유지"가 자연스럽다
+    let selectedFlour: Flour = snap.flour;
+    if (snap.stage >= FLOUR_STAGE) {
+      const detail = document.createElement('div');
+      detail.className = 'feed-detail';
+      detail.style.display = 'none';
+
+      const flourTitle = document.createElement('div');
+      flourTitle.className = 'hint';
+      flourTitle.textContent = copy.feed.flourTitle;
+      flourTitle.style.cssText = 'margin:10px 0 6px';
+
+      const flourRow = document.createElement('div');
+      flourRow.className = 'seg';
+      const flourBtns = new Map<Flour, HTMLButtonElement>();
+      const FLOURS: Flour[] = ['white', 'wholewheat', 'rye'];
+
+      const forecast = document.createElement('div');
+      forecast.className = 'hint';
+      forecast.style.cssText = 'margin-top:8px;text-align:center';
+
+      const updateForecast = (): void => {
+        // 피크 예보 — 선택한 비율·가루 + 현재 위치 기준. 범위로 말한다 (§19-1)
+        const r = RATIOS[selected === 'fridgePrep' ? '1:1:1' : selected];
+        const mult = rateMult({ location: api.location(), flour: selectedFlour });
+        const now = api.now();
+        const from = untilText(now + (r.peakStartH * HOUR) / mult, now);
+        const to = untilText(now + (r.peakEndH * HOUR) / mult, now);
+        forecast.textContent =
+          copy.feed.peakForecast(from, to) +
+          (api.location() === 'window' ? '' : ` · ${copy.feed.peakForecastWindow}`);
+      };
+
+      for (const f of FLOURS) {
+        const b = document.createElement('button');
+        b.textContent = copy.feed.flourNames[f];
+        b.title = copy.feed.flourHint[f];
+        b.classList.toggle('active', f === selectedFlour);
+        b.addEventListener('click', () => {
+          selectedFlour = f;
+          flourBtns.forEach((btn, key) => btn.classList.toggle('active', key === f));
+          updateForecast();
+        });
+        flourBtns.set(f, b);
+        flourRow.appendChild(b);
+      }
+
+      detail.append(flourTitle, flourRow, forecast);
+
+      const toggle = document.createElement('button');
+      toggle.className = 'btn btn-ghost';
+      toggle.style.cssText = 'width:100%;margin-top:4px';
+      toggle.textContent = copy.feed.detailOpen;
+      toggle.addEventListener('click', () => {
+        const open = detail.style.display === 'none';
+        detail.style.display = open ? '' : 'none';
+        toggle.textContent = open ? copy.feed.detailClose : copy.feed.detailOpen;
+        if (open) updateForecast();
+      });
+
+      // 비율 선택이 바뀌면 예보 갱신 — 기존 항목 클릭 핸들러 위에 얹는다
+      items.forEach((btn) => btn.addEventListener('click', updateForecast));
+
+      wrap.append(toggle, detail);
+    }
+
     const actions = document.createElement('div');
     actions.className = 'modal-actions';
     const ok = document.createElement('button');
@@ -154,12 +224,12 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     ok.addEventListener('click', () => {
       handle.close();
       if (selected === 'fridgePrep') {
-        api.dispatch({ type: 'feed', ratio: '1:1:1' });
+        api.dispatch({ type: 'feed', ratio: '1:1:1', flour: selectedFlour });
         api.dispatch({ type: 'setLocation', to: 'fridge' });
         return;
       }
       lastRatio = selected;
-      api.dispatch({ type: 'feed', ratio: selected });
+      api.dispatch({ type: 'feed', ratio: selected, flour: selectedFlour });
     });
     actions.appendChild(ok);
     wrap.appendChild(actions);

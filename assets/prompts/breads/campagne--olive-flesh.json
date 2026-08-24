@@ -1,0 +1,29 @@
+{
+  "id": "campagne--olive-flesh",
+  "version": 1,
+  "name_ko": "올리브 깜빠뉴",
+  "subject": "a round country boule loaf with chopped olive flesh mixed into the crumb, one wedge cut away to reveal the cross-section",
+  "geometry": {
+    "silhouette": "a round boule with a smooth, rounded dome top, with one wedge sliced away to reveal the interior crumb cross-section",
+    "crust": [
+      "amber to dark brown surface #A9713F to a darker brown blend across the dome",
+      "spiral banneton ring markings pressed concentrically across the whole top surface (the defining feature)",
+      "a cross-shaped slash cut into the center of the dome, opened into a raised burst 'ear' along each cut line",
+      "light flour dusting scattered unevenly across the top, especially along the spiral ridges",
+      "on the exposed cross-section, small dark purple-black olive flesh flecks #3B2F2F are scattered evenly throughout the pale open crumb"
+    ]
+  },
+  "style_ref": "shared-style-v2",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "cheese", "whole olives on top crust", "oil sheen"],
+  "views": ["three-quarter top-front", "front elevation", "top-down"],
+  "output": { "aspect": "1:1", "size": 1024 },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a round country boule loaf with chopped olive flesh mixed into the crumb, a single game asset object on a plain backdrop. Geometry: a round boule with a smooth, rounded dome top, with one wedge sliced away to reveal the interior crumb cross-section. Crust: an amber to dark brown surface (#A9713F blended darker) covers the dome; spiral banneton ring markings are pressed concentrically across the whole top surface as the defining signature feature; a cross-shaped slash is cut into the center of the dome, opened into a raised burst 'ear' along each cut line; light flour dusting is scattered unevenly across the top, especially along the spiral ridges. On the exposed cross-section, small dark purple-black olive flesh flecks (#3B2F2F) are scattered evenly throughout the pale open crumb. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no cheese, no whole olives on the top crust, no oil sheen, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact olive boule loaf, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view), so the cut wedge face and crumb cross-section stay visible on the side. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact olive boule loaf, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the spiral banneton rings, cross slash, and the wedge cutaway are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "베이스 campagne.json의 geometry(바네통 나선 링, 십자 칼집, 밀가루 더스팅)를 그대로 계승했다. '단면 크럼 혼입'을 표현하려면 실루엣에 웨지 컷어웨이가 필수라 silhouette 문장 끝에 조건절만 덧붙였고, crust 원문 4개 불릿은 손대지 않았다. 크럼 노출을 위한 최소한의 실루엣 추가라는 점을 여기 기록해 둔다."
+}

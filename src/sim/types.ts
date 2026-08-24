@@ -2,6 +2,8 @@
 // sim은 순수: three/DOM/Capacitor import 0, Date.now() 호출 0. now는 항상 인자.
 
 export type FeedRatio = '1:1:1' | '1:2:2' | '1:5:5';
+/** 밀가루 종류 (§7-2 — v2 신규 축). 급여 시점에만 바뀐다 (constants.FLOUR_TIME_MULT 주석) */
+export type Flour = 'white' | 'wholewheat' | 'rye';
 export type Location = 'room' | 'window' | 'fridge';
 export type Phase = 'active' | 'hungry' | 'sour' | 'dormant' | 'moldy';
 export type MoldStage = 'none' | 'spot' | 'spread' | 'dead';
@@ -33,6 +35,8 @@ export interface SimState {
   /** advance()가 마지막으로 반영한 시각 — 시계 역행 방어 기준 */
   lastSimulatedAt: number;
   feedRatio: FeedRatio;
+  /** 마지막 급여에 쓴 밀가루 — 발효·산미 가속과 색 톤의 축. 구세이브 키 부재 → white */
+  flour: Flour;
   location: Location;
   /**
    * 위치 변경 물리 보존 앵커(회중시계):
@@ -60,7 +64,7 @@ export interface SimState {
 }
 
 export type Action =
-  | { type: 'feed'; ratio: FeedRatio }
+  | { type: 'feed'; ratio: FeedRatio; flour?: Flour } // flour 생략 = 이전 것 유지
   | { type: 'setLocation'; to: Location }
   | { type: 'bake'; recipeId: string }
   | { type: 'bakeDiscard'; recipeId: string }
@@ -107,6 +111,8 @@ export interface Snapshot {
   smell: SmellBand;
   stage: number;
   mass: number;
+  /** 마지막 급여의 밀가루 — 렌더 색 톤 시프트용 패스스루 */
+  flour: Flour;
   /** 배고픔 진입 예측 wall-clock (알림·안내) */
   nextFeedAt: number;
   /** 피크 진입 예측 wall-clock — 피크는 구간이라 peakEndAt과 짝으로 범위 표현 */
@@ -152,4 +158,6 @@ export interface RecipeDef {
   sourRange: [number, number] | null;
   /** 감점 기울기: 선호 범위 밖 산미 1당 적합도 감소량 */
   slope: number;
+  /** 같은 밀가루로 밥을 준 상태면 sourFit 가산 (§7-2 — 호밀빵·통밀만) */
+  flourAffinity?: Flour;
 }

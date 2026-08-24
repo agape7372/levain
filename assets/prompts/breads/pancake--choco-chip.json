@@ -1,0 +1,28 @@
+{
+  "id": "pancake--choco-chip",
+  "version": 1,
+  "name_ko": "초코칩 팬케이크",
+  "subject": "a stack of three fluffy round pancakes studded with chocolate chips",
+  "geometry": {
+    "silhouette": "three stacked flat disks, slightly irregular hand-poured edges, each disk slightly offset from the one below, subtle sag at the stack edges",
+    "crust": [
+      "top surface of each disk in soft clay matte medium brown #C68958",
+      "underside and edge rim of each disk in deeper golden brown #A9713F",
+      "small irregular bubbles and tiny burst pore holes scattered across every top surface, rendered as low-poly faceted dimples",
+      "small irregular dark chocolate chip studs #3B2418 embedded across the top surface of each pancake disk, in addition to the existing bubbles and pore holes"
+    ]
+  },
+  "style_ref": "shared-style-v2",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "syrup", "butter", "chocolate drizzle", "melted chocolate pool", "chocolate sauce"],
+  "views": ["three-quarter top-front", "front elevation", "top-down"],
+  "output": { "aspect": "1:1", "size": 1024 },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a stack of three fluffy round pancakes studded with chocolate chips, a single game asset object on a plain backdrop. Geometry: three stacked flat disks with slightly irregular hand-poured edges, each disk slightly offset from the one below with a subtle sag at the stack edges. Crust: the top surface of each pancake is a soft clay-like matte medium brown (#C68958), while the underside and edge rim of each disk show a deeper golden brown (#A9713F); small irregular bubbles and tiny burst pore holes are scattered across every top surface as low-poly faceted dimples; small irregular dark chocolate chip studs (#3B2418) are embedded across the top surface of each pancake disk, in addition to the bubbles and pore holes. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no syrup, no butter pat, no chocolate drizzle, no melted chocolate pool, no chocolate sauce, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact chocolate chip pancake stack, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view), so the three offset layers and the studded chips at the edges are clearly visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact chocolate chip pancake stack, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the chocolate chips, bubbles, and pore holes on the top disk are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "베이스 pancake.json의 geometry(3단 오프셋 원반, 기포·구멍 텍스처)를 그대로 계승하고 초코칩 스터드만 추가했다. 시럽·버터는 이미 베이스 negative에 있었고, 초코 재료가 유발하기 쉬운 드리즐·녹은 초콜릿 웅덩이·초콜릿 소스를 추가로 차단했다."
+}

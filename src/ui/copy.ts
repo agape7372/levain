@@ -89,6 +89,19 @@ export const copy = {
     // 묶음 프리셋 — 밥 + 냉장 이동을 1탭으로 (§7-1 "냉장 갈 준비". 3단계 해금과 동행)
     fridgePrep: '냉장 갈 준비',
     fridgePrepHint: '밥 주고 바로 냉장고로',
+    // 상세 펼치기 (§7-1 — 성숙 4단계 해금): 밀가루 선택 + 피크 범위 예보
+    detailOpen: '자세히',
+    detailClose: '접기',
+    flourTitle: '어떤 가루로 줄까요',
+    flourNames: { white: '다목적', wholewheat: '통밀', rye: '호밀' } as Record<string, string>,
+    flourHint: {
+      white: '늘 먹던 밥이에요',
+      wholewheat: '조금 빨리 자라요',
+      rye: '빨리 자라고 잘 시어져요',
+    } as Record<string, string>,
+    // 범위로 말한다 (§19-1) — "정답 시간" 단정 금지
+    peakForecast: (from: string, to: string) => `${from}~${to} 뒤쯤 가장 부풀 거예요`,
+    peakForecastWindow: '창가에선 더 일러요',
   },
 
   observe: {
