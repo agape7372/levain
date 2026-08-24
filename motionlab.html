@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- Motion Lab — 촉감(grab 점탄성)·상태 프리셋 튜닝 하네스 (dev 전용, vite dev로 서빙.
+     앱 번들과 무관 — breadlab.html과 같은 축). 사용법·URL 파라미터는 scripts/motionlab.ts 머리 주석 -->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>motionlab</title>
+    <style>
+      html, body { margin: 0; background: #e8d9c4; font: 13px/1.5 system-ui, sans-serif; color: #4a3220; }
+      #layout { display: flex; gap: 14px; padding: 12px; align-items: flex-start; flex-wrap: wrap; }
+      /* 세로폰 비율 스테이지 — 프로덕션 카메라 파리티 */
+      #stage { position: relative; width: 360px; height: 640px; flex: none;
+               background: radial-gradient(120% 90% at 50% 42%, #f2e6d3 0%, #e8d9c4 55%, #e0cfb5 100%);
+               border-radius: 12px; overflow: hidden; }
+      canvas#c { display: block; width: 100%; height: 100%; touch-action: none; }
+      #panel { display: flex; flex-direction: column; gap: 10px; width: 340px; }
+      fieldset { border: 1px solid #dccab0; border-radius: 10px; padding: 8px 10px; }
+      legend { font-weight: 600; font-size: 12px; padding: 0 4px; }
+      #presets { display: flex; flex-wrap: wrap; gap: 6px; }
+      #presets button { border: 0; border-radius: 999px; padding: 6px 12px; background: #f2e6d3;
+                        cursor: pointer; font: inherit; }
+      #presets button.on { background: #c4784a; color: #fff8ef; }
+      .row { display: grid; grid-template-columns: 96px 1fr 52px; gap: 8px; align-items: center; }
+      .row input[type=range] { width: 100%; }
+      .row output { font-family: ui-monospace, monospace; font-size: 12px; text-align: right; }
+      #hud { font-family: ui-monospace, monospace; white-space: pre; background: #f2e6d3;
+             padding: 8px 10px; border-radius: 10px; font-size: 12px; }
+      #actions { display: flex; gap: 8px; }
+      #actions button { border: 0; border-radius: 8px; padding: 8px 12px; background: #dccab0;
+                        cursor: pointer; font: inherit; }
+      .hint { color: #8a6a4a; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <div id="layout">
+      <div id="stage"><canvas id="c"></canvas></div>
+      <div id="panel">
+        <fieldset><legend>상태 프리셋</legend><div id="presets"></div></fieldset>
+        <fieldset id="sliders"><legend>grab 점탄성 (URL에 실시간 반영)</legend></fieldset>
+        <div id="hud">-</div>
+        <div id="actions">
+          <button id="copyUrl">URL 복사</button>
+          <button id="reset">기본값 복원</button>
+        </div>
+        <div class="hint">
+          반죽 위에서 <b>천천히 끌면 grab</b>(당기고 멈춰도 유지 → 놓으면 일부 남았다가 처짐),
+          빠르게 문지르면 stir. 목표 장면 = 확장기획 §4-1.
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/scripts/motionlab.ts"></script>
+  </body>
+</html>

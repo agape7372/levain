@@ -310,6 +310,7 @@ export class SceneHost {
             Math.sin(ang) * 0.28,
             -Math.sin(ang) * 2.2 * env,
             Math.cos(ang) * 2.2 * env,
+            false, // wobble은 아래에서 직접 연출 — tick의 속도 유래 구동과 충돌 방지
           );
           dough.wobble.set(Math.cos(ang) * 0.06, Math.sin(ang) * 0.06);
         }

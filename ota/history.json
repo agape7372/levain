@@ -6,5 +6,21 @@
     "size": 5657411,
     "releasedAt": "2026-08-23T15:30:00.764Z",
     "minNative": "1.0"
+  },
+  {
+    "version": "1.0.2",
+    "url": "https://levain-ota.vercel.app/bundles/1.0.2.zip",
+    "checksum": "de19da6af8d024379498ad66aa47bf14c881286ef4527da0edf6743d893d4db0",
+    "size": 7040678,
+    "releasedAt": "2026-08-24T04:46:36.621Z",
+    "minNative": "1.0"
+  },
+  {
+    "version": "1.1.0",
+    "url": "https://levain-ota.vercel.app/bundles/1.1.0.zip",
+    "checksum": "547625c853ed4b3f045004a86610b9afbc2f5c50ebf3c18dada9e0a949f46984",
+    "size": 9751519,
+    "releasedAt": "2026-08-24T10:51:16.675Z",
+    "minNative": "1.0"
   }
 ]

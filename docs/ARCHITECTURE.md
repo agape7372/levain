@@ -10,7 +10,7 @@
 
 **살린다**: 반죽 셰이더 전체(버텍스 가우시안 범프 + 프래그먼트 아날리틱 노멀 재구성 — 제품의 얼굴),
 라이팅(키 0xffe2b0 1.4 + 앰비언트 0xfff0dc 0.55), 베이지 팔레트, 포인터→평면 레이캐스트→wobble 감쇠(×0.9) 입력 모델,
-병 토러스(→ 고무줄 마커로 전용).
+병 토러스 반경값(원통 반지름 0.92로 계승 — 고무줄 마커는 제거됨, VISUAL.md §1-2, 개정 2026-08-24: 고무줄 마커 제거 반영).
 
 **버린다**: unpkg importmap(오프라인 앱에서 죽은 코드 → npm three), `#recipe[style*="block"]` CSS 핵,
 `?tab=` URL 라우팅, 전역 변수 스크립트 구조, rAF 시계를 게임 시간으로 쓰는 구조(게임 시간 = wall-clock),
@@ -36,7 +36,7 @@ levain/
 │  ├─ render/                  # three 전용. sim을 모른다 — RenderParams만
 │  │  ├─ SceneHost.ts          # renderer·scene·camera 수명주기, ResizeObserver, 컨텍스트 유실 복구
 │  │  ├─ dough/ DoughMesh.ts dough.vert.glsl dough.frag.glsl   # ?raw 임포트
-│  │  ├─ jar.ts                # 병 3패스 + 고무줄 마커 + hooch 층
+│  │  ├─ jar.ts                # 병 3패스 + hooch 층 (개정 2026-08-24: 고무줄 마커 제거 반영)
 │  │  ├─ cloth.ts              # 천 덮개 1메시(플릭·탭 걷기)
 │  │  ├─ background.ts         # 라디얼 그라디언트 + 베이크드 소프트 섀도
 │  │  ├─ particles.ts          # 공용 InstancedMesh 풀 256
@@ -127,14 +127,25 @@ export type Action =
 ## 3. 저장
 
 ```ts
+// v2 (개정 2026-08-24: 멀티 르방 — 확장기획 §5. v1은 단일 sim + sim 안 label·collection)
 interface SaveEnvelope {
-  schemaVersion: number;   // 1부터. sim은 버전을 모른다
+  schemaVersion: number;   // 현행 2. sim은 버전을 모른다
   savedAt: number;
-  sim: SimState;
+  starters: StarterRecord[];        // { id, name|null, ordinal, sim } — 물리+정체성
+  activeStarterId: string;          // 항상 starters 안에 있다 (검증이 보증)
+  nextStarterOrdinal: number;       // 삭제해도 순번 재사용 안 함
+  shared: { collection: Record<recipeId, CollectionEntry> }; // 집의 기록 — 르방 폐기에도 남는다
   settings: { muted: boolean; haptics: boolean; notifyEnabled: boolean };
   flags: { onboarded: boolean; pendingBake: { recipeId: string; grade: string } | null };
 }
 ```
+
+- **sim은 여전히 "르방 1개의 물리"** — 멀티는 전부 store 층. 활성만 advance/dispatch,
+  비활성은 닫힌 함수 모델 덕에 방치(전환 시 `advance(now)` 1회로 정산). 백그라운드 시뮬 0.
+- **시계 역행**은 store가 전 starter + `shared.collection.firstAt`에 같은 delta로 재정박
+  (개별 sim에만 맡기면 비활성 르방이 delta만큼 공짜 휴식을 얻는다).
+- 이름은 `StarterRecord.name`(sim 밖) — 폐기(discardStarter)에도 보존된다(§11-2 승인 변경).
+  null이면 표시 시점에 "르방이 {ordinal}" 파생 — 저장하지 않는다.
 
 - **주 = localStorage** `levain:save` (동기 — 부트 대기·깜빡임 0, 액션 직후 동기 저장으로 유실 창 0).
 - **미러 = Capacitor Preferences** (네이티브만, 저장 성공 후 fire-and-forget — Android WebView 스토리지
@@ -142,8 +153,13 @@ interface SaveEnvelope {
 - 저장 시점 4종: 모든 액션 직후 / `visibilitychange hidden` / `App.pause` / 포그라운드 60초.
   전부 같은 `persistence.save()` 하나.
 - **복구 사다리(2계층)**: 주 파싱+범위 가드 → 실패 시 미러 → 실패 시 새 게임 + 담백한 안내.
-  가드는 손으로 쓴 타입·범위 검사(필드 12개 — 라이브러리 불필요). **NaN·범위 밖은 버리지 말고 clamp로 살린다.**
-- **마이그레이션**: `schemaVersion` + 순차 체인 자리만 스캐폴드. 픽스처 테스트는 첫 실제 마이그레이션부터.
+  가드는 손으로 쓴 타입·범위 검사(라이브러리 불필요). **NaN·범위 밖은 버리지 말고 clamp로 살린다.**
+  starter 항목은 단위 관대 — 불량 항목만 폐기, 전 항목이 죽으면 새 게임.
+- **마이그레이션**: 파싱 순서는 **migrate(raw) → validateAndClamp(현행)** — 검증은 현행 스키마만
+  안다. `MIGRATIONS[v]`는 raw(검증 전) 대상 v→v+1 변환. v1→v2: 단일 sim을 starters[0]으로,
+  label→name, sim.collection→shared.collection(+starterId=첫 르방). 픽스처 왕복 테스트
+  tests/persistence.test.ts. ⚠️ v2 저장본이 생긴 뒤 v1 번들로 OTA 롤백하면 저장본을 못 읽고
+  새 게임으로 덮는다 — **롤백 대상은 반드시 v2 인지 번들**(RELEASE.md §8 주의).
 - **기기 이전**: 설정 "기록 내보내기/불러오기" — envelope JSON을 `@capacitor/filesystem` + 공유 시트
   (웹은 파일 다운로드/업로드). `android:allowBackup="true"` 유지 — 재설치 복원은 QA.md에서 실검증.
 

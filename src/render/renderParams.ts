@@ -19,6 +19,12 @@ export interface RenderParams {
   collapse: number;        // 0~1 과숙 크레이터 함몰
   mold: number;            // 0~1 곰팡이 확산 (Snapshot.mold01)
   kahm: number;            // 0~1 kahm 효모 막
+  /** 0=고체(휴면·곰팡이) ~ 1=액체(활발 반유동체) — 실루엣·슬로싱·점성 기억의 공통 축 */
+  liquidity: number;
+  // ── grab 점탄성 물성 (확장기획 §4-2-6 — 상태별 촉감 분리. 수치 = 튜닝 시작 가설) ──
+  grabMax: number;         // 0.06~0.34 잡아 늘일 수 있는 최대 변위 (peak 탱탱=크게, dormant 뻣뻣=작게)
+  grabCreepGain: number;   // 0~1 놓은 뒤 잔류 변형 비율 (hungry 잘 처짐=크게)
+  grabReturnZeta: number;  // 0.85~1.1 복귀 감쇠비 — 임계 근처, 오버슈트 ≤5% (§4-1)
 }
 
 type RGB = [number, number, number];
@@ -51,6 +57,14 @@ export function toRenderParams(s: Snapshot): RenderParams {
   color = mix(color, DORMANT_TONE, clamp01(s.dormancy));
   if (moldy) color = mix(color, MOLDY_TONE, 0.7);
 
+  // liquidity 재료 — 급여 직후 젖은 광 + 피크 거품광 바닥값 (실물 피크 르방은 젖은 유광)
+  const wet = clamp01(Math.max(
+    (1 - smooth(0.15, 0.8, a)) * (1 - smooth(0, 0.45, s.hunger)) * (1 - s.dormancy),
+    0.5 * smooth(0.55, 0.95, a) * (1 - s.dormancy),
+  ));
+  const ripe = smooth(0.7, 0.95, a) * (1 - clamp01(s.dormancy));
+  const collapse = smooth(0.45, 0.8, s.sourness) * (1 - clamp01(s.dormancy));
+
   return {
     color,
     // moldy = 유일하게 숨이 완전히 멎는 상태 (휴면의 '완전 정지 금지'는 죽음 오인 방지책이었다)
@@ -64,13 +78,21 @@ export function toRenderParams(s: Snapshot): RenderParams {
     crust: 0.8 * clamp01(Math.max(s.dormancy, moldy ? 1 : 0)),
     fillY: s.fill,
     hoochAmt: clamp01(s.hooch),
-    // 급여 직후 젖은 광 — 활성이 오르고 배고파질수록 마른다
-    wet: clamp01((1 - smooth(0.15, 0.8, a)) * (1 - smooth(0, 0.45, s.hunger)) * (1 - s.dormancy)),
-    ripe: smooth(0.7, 0.95, a) * (1 - clamp01(s.dormancy)),
-    collapse: smooth(0.45, 0.8, s.sourness) * (1 - clamp01(s.dormancy)),
+    wet,
+    ripe,
+    collapse,
     // spot 진입 직후 mold01≈0이라 반점이 안 보임 — 예고는 보여야 예고다 (바닥값 0.25)
     mold: s.moldStage === 'none' ? 0 : Math.max(0.25, clamp01(s.mold01)),
     kahm: s.kahm ? 1 : 0,
+    // 반유동체 축 — "점도 있는 액체와 고체 사이"(실기기 피드백). 오푸스 상담 수정안:
+    // just-fed(자기수평 배터) 0.82 · 정상 0.57 · 피크 0.42(기공이 구조를 잡아 돔 유지) ·
+    // 시큼/과숙 0.62(묽어짐 = 출렁의 무대) · 휴면 0.02 · 곰팡이 0
+    liquidity: moldy ? 0 : clamp01(0.32 + 0.5 * wet + 0.3 * collapse - 0.12 * ripe) * (1 - 0.95 * s.dormancy),
+    // grab 물성 — just-fed 무름/peak 탱탱/hungry 처짐/dormant 뻣뻣 (§4-1).
+    // 사용자 실기기 확정(2026-08-24 저녁): 피크 = 0.60. 곡선은 비율 유지 스케일
+    grabMax: moldy ? 0.08 : (0.26 + 0.34 * a + 0.10 * clamp01(s.hunger)) * (1 - 0.6 * s.dormancy),
+    grabCreepGain: clamp01(0.30 + 0.45 * clamp01(s.hunger) + 0.2 * clamp01(s.sourness)) * (1 - 0.8 * s.dormancy),
+    grabReturnZeta: 0.95 + 0.1 * s.dormancy,
   };
 }
 
@@ -94,5 +116,9 @@ export function smoothParams(cur: RenderParams, target: RenderParams, dtSec: num
     collapse: n(cur.collapse, target.collapse),
     mold: n(cur.mold, target.mold),
     kahm: n(cur.kahm, target.kahm),
+    liquidity: n(cur.liquidity, target.liquidity),
+    grabMax: n(cur.grabMax, target.grabMax),
+    grabCreepGain: n(cur.grabCreepGain, target.grabCreepGain),
+    grabReturnZeta: n(cur.grabReturnZeta, target.grabReturnZeta),
   };
 }

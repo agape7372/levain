@@ -62,7 +62,8 @@ export class BubbleSystem {
     this.popsThisFrame = 0;
 
     if (density > 0.02 && t >= this.nextSpawnAt) {
-      this.spawn(t, scale, 2 / (1 + agitation));
+      // 동시 가시 상한 4 — 밀집 클러스터 회피 (확장기획 §4-1·§4-2b 트라이포포비아 근거)
+      if (this.bubbles.filter((b) => b.active).length < 4) this.spawn(t, scale, 2 / (1 + agitation));
       const interval = (6 + (0.8 - 6) * Math.min(1, density)) / (1 + 2 * agitation);
       this.nextSpawnAt = t + interval * (0.7 + Math.random() * 0.6);
     }
@@ -93,9 +94,10 @@ export class BubbleSystem {
           b.active = false;
           this.amp[i] = 0;
         } else if (pa < POP_SEC) {
-          this.amp[i] = -0.3 * b.maxAmp * (pa / POP_SEC); // "뽁" — 순간 함몰
+          // "뽁" — 함몰 −0.3→−0.12 완화. 시각 잔상은 프래그 팝 링 하이라이트가 대체 (§4-2-7)
+          this.amp[i] = -0.12 * b.maxAmp * (pa / POP_SEC);
         } else {
-          this.amp[i] = -0.3 * b.maxAmp * (1 - (pa - POP_SEC) / (POP_SEC * 1.5));
+          this.amp[i] = -0.12 * b.maxAmp * (1 - (pa - POP_SEC) / (POP_SEC * 1.5));
         }
       }
       this.pos[i * 2] = b.x;

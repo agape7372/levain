@@ -8,6 +8,7 @@
 - 게임 규칙·수치·문구 톤: `docs/GDD.md`
 - 코드 계약·레이어링·저장·Capacitor: `docs/ARCHITECTURE.md`
 - 씬·uniform·연출·색 토큰: `docs/VISUAL.md`
+- 빵 GLB 제작·수정(img2threejs 스킬 + breadlab 하네스): `docs/BREADS.md` — "빵/레시피 3D 구현해줘" 류 요청은 여기부터
 - `docs/design/`은 원문 참고용 — 정본과 충돌하면 정본이 이긴다.
 
 ## 불변 규칙 (어기면 안 되는 것)

@@ -34,8 +34,8 @@ const glassBackFrag = /* glsl */ `
 `;
 
 // 앞면: 프레넬 림 + 수직 하이라이트 스트릭 2줄(키라이트 방위 정렬).
-// (절차 눈금은 저각에서 얼룩 아티팩트로 번져 제거 — 부피 표시는 고무줄 마커가 정본.
-//  눈금 재도입은 M3에서 각도 보정과 함께 재설계. implementation-notes Deviations 참조)
+// (절차 눈금은 저각에서 얼룩 아티팩트로 번져 제거. 고무줄 마커도 사용자 확정으로 제거(2026-08-23)
+//  — 부피 정보는 도우 fill 표현 + 관찰 카드가 정본. 눈금 재도입은 백로그(각도 보정과 함께 재설계))
 const glassFrontFrag = /* glsl */ `
   precision mediump float;
   varying vec3 vNormal;
@@ -158,7 +158,8 @@ export function createJar(): Jar {
     transparent: true,
     depthWrite: false,
   });
-  const hooch = new THREE.Mesh(new THREE.CircleGeometry(0.8, 40), hoochMat);
+  // 반죽 윗면 월드 반경이 초타원 실루엣으로 0.69×1.3≈0.897까지 커짐 — 도넛 방지 (2026-08-24)
+  const hooch = new THREE.Mesh(new THREE.CircleGeometry(0.86, 40), hoochMat);
   hooch.rotation.x = -Math.PI / 2;
   hooch.position.y = 1.0;
   hooch.renderOrder = 2;
