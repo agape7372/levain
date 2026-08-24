@@ -92,6 +92,12 @@ export const STAGES: Array<{ cycles: number; days: number }> = [
 /** 냉장 보관 해금 단계 */
 export const FRIDGE_STAGE = 3;
 
+/** 이름 짓기 해금 단계 — 5단계(노포) 보상 (GDD §4) */
+export const LABEL_STAGE = 5;
+
+/** 무료 르방 슬롯 수 (확장기획 §5-7 — 추가 슬롯은 경제 단계에서) */
+export const STARTER_SLOTS_FREE = 3;
+
 /** 굽기 판정 */
 export const BAKE_ACTIVITY_W = 0.6;
 export const BAKE_SOUR_W = 0.4;

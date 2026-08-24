@@ -1,5 +1,6 @@
 // 설정 — 중앙 모달. 소리·진동·알림 토글 + 기록 내보내기/불러오기 + 초기화(2단 확인).
 import { copy } from '../copy';
+import { LABEL_STAGE } from '../../sim';
 import { confirmModal, openModal } from './modal';
 import { toast } from './toast';
 import type { GameApi } from '../gameApi';
@@ -63,7 +64,7 @@ export function openSettings(api: GameApi): void {
     }),
   );
   // 병 이름표 — 5단계(노포) 해금 보상 (GDD §4)
-  if (api.getSnapshot().stage >= 5) {
+  if (api.getSnapshot().stage >= LABEL_STAGE) {
     wrap.appendChild(
       actionRow(api.labelText() ? `이름표: ${api.labelText()}` : '이름표 붙이기', () => {
         const box = document.createElement('div');
@@ -80,7 +81,7 @@ export function openSettings(api: GameApi): void {
         ok.className = 'btn btn-primary';
         ok.textContent = '붙이기';
         ok.addEventListener('click', () => {
-          api.dispatch({ type: 'setLabel', label: input.value });
+          api.rename(input.value);
           h.close();
         });
         actions.appendChild(ok);

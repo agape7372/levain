@@ -60,7 +60,10 @@ html {
   position: absolute;
   inset: 0;
   pointer-events: none; /* 자식이 개별로 살린다 */
-  z-index: 10;
+  /* #tabs(20)보다 위 — 스태킹 컨텍스트라 내부 백드롭(40)·토스트(50)가 여기 갇히므로,
+     루트 자체가 탭바 위여야 모달이 탭바를 딤·차단할 수 있다 (BUG-2).
+     화면(.screen)은 bottom이 탭바 위에서 끝나 평소 탭 클릭은 그대로 통과한다. */
+  z-index: 30;
 }
 #ui-root > * { pointer-events: auto; }
 
@@ -131,6 +134,22 @@ html {
   border-radius: 999px;
 }
 .hud-stage-chip.pulse { animation: chip-pulse 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+/* 멀티 르방 전환 행 — 칩 좌우 ‹ › (한 마리면 버튼 숨김, home.ts) */
+.hud-chip-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.chip-nav {
+  border: 0;
+  background: transparent;
+  color: var(--ink-faint);
+  font: 18px/1 inherit;
+  font-family: inherit;
+  padding: 2px 10px;
+  cursor: pointer;
+}
 @keyframes chip-pulse {
   0% { transform: scale(1); }
   40% { transform: scale(1.06); }
@@ -323,6 +342,8 @@ html {
 /* ── 레시피 도감 ─────────────────────────────────────── */
 .recipes-wrap { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 24px; }
 .recipes-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.recipes-title-group { display: flex; align-items: center; gap: 4px; }
+.recipes-back { font-size: 20px; padding: 4px 10px; line-height: 1; }
 .recipes-title { font-size: 19px; font-weight: 600; color: var(--ink); margin: 0; }
 .recipe-grid {
   display: grid;

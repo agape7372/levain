@@ -13,11 +13,17 @@ export type BriefingKey =
   | 'peaked' | 'becameHungry' | 'hoochAppeared' | 'becameSour'
   | 'wentDormant' | 'moldSpotted' | 'moldSpread' | 'moldDied';
 
+/**
+ * 빵 도감 항목 — v2에서 전역(집의 기록)으로 승격돼 sim 밖(SaveEnvelope.shared)에 산다.
+ * 타입은 도메인 어휘라 sim에 남긴다. 갱신은 store가 baked/bakedDiscard 이벤트로 수행.
+ */
 export interface CollectionEntry {
   /** 빵 레시피 최고 등급. discard 레시피는 판정이 없어 null */
   bestGrade: BakeGrade | null;
   count: number;
   firstAt: number;
+  /** 처음 구운 르방 id — v1 이월분은 starters[0] (확장기획 §5-4) */
+  starterId?: string;
 }
 
 export interface SimState {
@@ -46,9 +52,6 @@ export interface SimState {
   reviveProgress: 0 | 1;
   /** discard 레시피 "급여당 1회" 쿨다운 — lastFedAt과 비교 */
   lastDiscardBakeAt: number | null;
-  collection: Record<string, CollectionEntry>;
-  /** 병 이름표 — 5단계 해금 보상 */
-  label: string | null;
   /**
    * 건조 플레이크 백업(죽음 보험) 1슬롯 — 말린 시점 maturity 스냅.
    * 곰팡이 사망 후 restoreFlake로 계보를 잇는다. madeAt은 재정박 목록(advance.reanchor).
@@ -61,9 +64,8 @@ export type Action =
   | { type: 'setLocation'; to: Location }
   | { type: 'bake'; recipeId: string }
   | { type: 'bakeDiscard'; recipeId: string }
-  | { type: 'setLabel'; label: string } // 병 이름표 — 5단계 해금 보상 (rename과 다름: 게이트드)
   | { type: 'makeFlake' }       // 얇게 펴 말리기 — 죽음 보험 (3단계 해금, 활발, -20g)
-  | { type: 'discardStarter' }  // 곰팡이 확정 후 폐기 — 새 개체 (도감·플레이크 보존)
+  | { type: 'discardStarter' }  // 곰팡이 확정 후 폐기 — 새 개체 (도감은 전역이라 자동 보존)
   | { type: 'restoreFlake' };   // 곰팡이 확정 후 플레이크 복원 — 같은 계보 (부활 의식 경유)
 
 export type SimEvent =
@@ -107,8 +109,10 @@ export interface Snapshot {
   mass: number;
   /** 배고픔 진입 예측 wall-clock (알림·안내) */
   nextFeedAt: number;
-  /** 피크 도달 예측 wall-clock */
+  /** 피크 진입 예측 wall-clock — 피크는 구간이라 peakEndAt과 짝으로 범위 표현 */
   peakAt: number;
+  /** 피크 구간 끝 예측 wall-clock */
+  peakEndAt: number;
   /** 유효시간 기준 마지막 밥으로부터의 경과 ms */
   effSinceFeedMs: number;
   /** 곰팡이 단계 (예고 2단 → 사망) */
@@ -129,6 +133,8 @@ export interface NotifySlot {
   copyKey: 'feedTime' | 'fridgeWeek' | 'dormant' | 'reviveSecond' | 'moldWarn';
   /** 냉장 주간 반복 여부 */
   weekly: boolean;
+  /** 멀티 르방 병합 수(§5-6) — 2 이상이면 집계 문구. 플랜 일시값, 저장 안 함 */
+  count?: number;
 }
 
 export interface NotifyPlan {

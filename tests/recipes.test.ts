@@ -55,15 +55,12 @@ describe('recipes — 판정 점수·등급 (GDD §6-2)', () => {
     expect(betterGrade('best', 'good')).toBe('best');
   });
 
-  it('collection: count·firstAt·bestGrade 갱신', () => {
+  it('baked 이벤트가 판정 등급을 실어 나른다 — 도감 집계(전역)는 store 층 (starters.test.ts)', () => {
     const stage3: SimState = { ...initialState(t0), maturity: 12, createdAt: t0 - 9 * DAY, mass: 300 };
     const r1 = applyAction(stage3, { type: 'bake', recipeId: 'flatbread' }, t0);
-    expect(r1.state.collection.flatbread.count).toBe(1);
-    expect(r1.state.collection.flatbread.firstAt).toBe(t0);
-
-    const r2 = applyAction(r1.state, { type: 'bake', recipeId: 'flatbread' }, t0 + HOUR);
-    expect(r2.state.collection.flatbread.count).toBe(2);
-    expect(r2.state.collection.flatbread.firstAt).toBe(t0); // 최초 시각 보존
+    expect(r1.events).toHaveLength(1);
+    expect(r1.events[0].type).toBe('baked');
+    expect(r1.state.mass).toBe(300 - recipeById('flatbread')!.cost);
   });
 });
 

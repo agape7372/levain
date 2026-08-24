@@ -12,7 +12,14 @@ export interface GameApi {
   getSnapshot(): Snapshot;
   /** 표시용 wall-clock — snapshot의 effSinceFeedMs는 유효시간이라 "N시간 전"에 못 쓴다 */
   lastFedAt(): number;
+  /** 활성 르방 이름 (v2: StarterRecord.name — sim 밖 소유) */
   labelText(): string | null;
+  /** 이름 짓기 — 게이트·규칙은 store가 판정 (labeled/labelLocked 이벤트) */
+  rename(name: string): void;
+  /** 멀티 르방 — 홈 칩 전환 UI용 활성 정보 */
+  starters(): { count: number; index: number; name: string | null; ordinal: number };
+  /** 이전/다음 르방 전환 (순환) — 씬 스냅·시드 재설정은 배선(app.ts)이 수행 */
+  switchStarter(dir: 1 | -1): void;
   location(): Location;
   /** 건조 플레이크 말린 시각 — 없으면 null (관찰 카드 표시용) */
   flakeMadeAt(): number | null;

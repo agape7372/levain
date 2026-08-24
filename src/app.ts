@@ -18,6 +18,9 @@ import {
   setMuted, sfxBubble, sfxFed, sfxRevived, sfxUnlock, suspendAudio, resumeAudio, unlockAudio,
   sfxStirStart, sfxStirUpdate, sfxStirEnd, sfxCloth,
 } from './audio/sounds';
+import type { Clock } from './platform/clock';
+import type { StorageAdapter } from './platform/storage';
+import type { GameStore } from './store/gameStore';
 import { copy } from './ui/copy';
 import { toast } from './ui/components/toast';
 import { openModal } from './ui/components/modal';
@@ -29,9 +32,16 @@ import { createRecipesScreen } from './ui/screens/recipes';
 import { createShowcaseScreen } from './ui/screens/showcase';
 import { mountOnboarding } from './ui/screens/onboarding';
 import type { GameApi } from './ui/gameApi';
+import { LABEL_STAGE } from './sim';
 import type { BakeGrade, SimEvent } from './sim';
 
-export async function startApp(): Promise<void> {
+export interface StartAppDeps {
+  /** Levain Lab 전용 주입점 — 프로덕션은 생략(systemClock·정식 저장 키) */
+  clock?: Clock;
+  storage?: StorageAdapter;
+}
+
+export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameStore }> {
   // OTA는 가장 먼저 — 롤백 방지 신호(notifyAppReady)가 늦으면 정상 번들도 되돌려진다.
   // 확인·다운로드는 내부에서 뒤로 미루므로 부팅을 막지 않는다 (platform/ota.ts 계약).
   initOta();
@@ -40,10 +50,11 @@ export async function startApp(): Promise<void> {
   const stage = document.getElementById('stage') as HTMLElement;
   const uiRoot = document.getElementById('ui-root') as HTMLElement;
 
-  const storage = createStorage();
+  const clock = deps.clock ?? systemClock;
+  const storage = deps.storage ?? createStorage();
   const notifier = createNotifier();
   const { store, isNew, loadSource, briefing } = await initGameStore({
-    clock: systemClock,
+    clock,
     storage,
     onNotifyPlan: (plan) => void notifier.applyPlan(plan),
   });
@@ -53,7 +64,7 @@ export async function startApp(): Promise<void> {
   scene.mount();
   scene.snapParams(toRenderParams(store.getSnapshot())); // 앱 오픈 = 즉시 스냅
   scene.start();
-  scene.setMoldSeed(store.getEnvelope().sim.createdAt); // 반점 자리 = 개체 정체성
+  scene.setMoldSeed(store.getActiveStarter().sim.createdAt); // 반점 자리 = 개체 정체성
 
   // 햅틱 예산: 젓기 세션당 첫 팝 1회만 — '희소' 규칙 (VISUAL §5 개정)
   let stirHapticUsed = false;
@@ -84,12 +95,30 @@ export async function startApp(): Promise<void> {
 
   // ── GameApi 어댑터 ──
   const api: GameApi = {
-    now: () => systemClock.now(),
+    now: () => clock.now(),
     getSnapshot: () => store.getSnapshot(),
-    lastFedAt: () => store.getEnvelope().sim.lastFedAt,
-    labelText: () => store.getEnvelope().sim.label,
-    location: () => store.getEnvelope().sim.location,
-    flakeMadeAt: () => store.getEnvelope().sim.flake?.madeAt ?? null,
+    lastFedAt: () => store.getActiveStarter().sim.lastFedAt,
+    labelText: () => store.getActiveStarter().name,
+    rename: (name) => store.renameActive(name),
+    starters: () => {
+      const env = store.getEnvelope();
+      const index = Math.max(0, env.starters.findIndex((r) => r.id === env.activeStarterId));
+      const rec = env.starters[index];
+      return { count: env.starters.length, index, name: rec.name, ordinal: rec.ordinal };
+    },
+    switchStarter: (dir) => {
+      const env = store.getEnvelope();
+      if (env.starters.length < 2) return;
+      scene.skipSequence(); // 연출 중 전환 금지(§5-5) — 남은 연출은 스킵으로 정리
+      const index = Math.max(0, env.starters.findIndex((r) => r.id === env.activeStarterId));
+      const next = env.starters[(index + dir + env.starters.length) % env.starters.length];
+      if (!store.switchStarter(next.id)) return;
+      // switchStarter 호출자 계약 — 전환은 재생 없이 컷: 즉시 스냅 + 개체 반점 시드 재설정
+      scene.snapParams(toRenderParams(store.getSnapshot()));
+      scene.setMoldSeed(store.getActiveStarter().sim.createdAt);
+    },
+    location: () => store.getActiveStarter().sim.location,
+    flakeMadeAt: () => store.getActiveStarter().sim.flake?.madeAt ?? null,
     dispatch: (a) => store.dispatch(a),
     subscribe: (fn) => store.subscribe(fn),
     getSettings: () => ({ ...store.getEnvelope().settings }),
@@ -102,11 +131,12 @@ export async function startApp(): Promise<void> {
       const text = await pickImportFile();
       if (text === null) return false;
       try {
-        const env = validateAndClamp(JSON.parse(text));
-        if (!env) return false;
-        const migrated = migrate(env);
+        // 마이그레이션 먼저 — 검증은 현행 스키마만 안다 (persistence.parseEnvelope와 동일 순서)
+        const migrated = migrate(JSON.parse(text));
         if (!migrated) return false;
-        save(migrated, storage);
+        const env = validateAndClamp(migrated);
+        if (!env) return false;
+        save(env, storage);
         location.reload(); // 가장 안전한 재부트 — 전 상태 재구축
         return true;
       } catch {
@@ -126,11 +156,17 @@ export async function startApp(): Promise<void> {
   // ── 화면·탭 ──
   const router = new Router(uiRoot, {
     onRootBack: () => {
-      // 루트에서 백 = 최소화(종료 아님 — 다마고치는 백그라운드 생존이 자연)
+      // 레시피 탭 루트에서 백 = 르방이 탭 복귀 (사용자 지시 2026-08-24 — 최소화로 빠지면
+      // "돌아갈 길이 없다"로 읽힌다). 르방이 탭 루트에서만 최소화(종료 아님 — 백그라운드 생존이 자연).
+      if (currentTab === 'recipes') {
+        showTab('levain');
+        return;
+      }
       if (isNative()) void CapApp.minimizeApp().catch(() => undefined);
     },
     trySkipSequence: () => scene.skipSequence(),
   });
+  let currentTab: 'levain' | 'recipes' = 'levain';
 
   const home = createHomeScreen(api);
 
@@ -163,7 +199,7 @@ export async function startApp(): Promise<void> {
     return true;
   };
 
-  const recipes = createRecipesScreen(api, () => store.getEnvelope().sim.collection, openShowcase);
+  const recipes = createRecipesScreen(api, () => store.getCollection(), openShowcase, () => showTab('levain'));
 
   const tabs = document.createElement('nav');
   tabs.id = 'tabs';
@@ -175,6 +211,7 @@ export async function startApp(): Promise<void> {
   document.body.appendChild(tabs);
 
   const showTab = (which: 'levain' | 'recipes'): void => {
+    currentTab = which;
     tabLevain.classList.toggle('active', which === 'levain');
     tabRecipes.classList.toggle('active', which === 'recipes');
     router.setRoot(which === 'levain' ? home : recipes);
@@ -201,7 +238,7 @@ export async function startApp(): Promise<void> {
           haptic('success');
           scene.celebrate(); // 기포 3연속 팝 — 다이제틱 축하
           toast(copy.stage.up(copy.stage.names[e.stage] ?? ''));
-          if (e.stage === 5) toast(copy.stage.labelUnlocked);
+          if (e.stage === LABEL_STAGE) toast(copy.stage.labelUnlocked);
           break;
         case 'reviveStarted':
           toast(copy.revive.started);
@@ -238,7 +275,7 @@ export async function startApp(): Promise<void> {
           break;
         case 'starterDiscarded':
           scene.snapParams(toRenderParams(store.getSnapshot())); // 새 반죽 — 즉시 스냅
-          scene.setMoldSeed(store.getEnvelope().sim.createdAt); // 새 개체 = 새 반점 자리
+          scene.setMoldSeed(store.getActiveStarter().sim.createdAt); // 새 개체 = 새 반점 자리
           break;
         case 'moldBlocked':
           openMoldModal(api); // 다른 일은 없다 — 종결 모달로 되돌린다
@@ -326,4 +363,6 @@ export async function startApp(): Promise<void> {
     wrap.appendChild(p);
     openModal(wrap, { title: '구운 빵', onClose: () => api.clearPendingBake() });
   }
+
+  return { store }; // Levain Lab 계기판용 — 프로덕션(main.ts)은 무시
 }

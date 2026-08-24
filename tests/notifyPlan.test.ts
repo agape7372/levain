@@ -5,10 +5,12 @@ import {
   applyAction,
   phaseAt,
   planNotifications,
+  planNotificationsAll,
   clampQuiet,
   HOUR,
   DAY,
 } from '../src/sim';
+import { NOTIFY_SLOT_FEED } from '../src/sim/constants';
 import type { SimState } from '../src/sim';
 
 // 로컬 시각 기준 생성 — clampQuiet은 new Date().getHours()(로컬)로 판단한다
@@ -141,5 +143,46 @@ describe('planNotifications — 상태별 슬롯 (GDD §7)', () => {
     expect(plan.slots[0].copyKey).toBe('reviveSecond');
     expect(plan.slots[0].weekly).toBe(false);
     expect(plan.slots[0].at).toBe(clampQuiet(t0 + 8 * HOUR));
+  });
+});
+
+describe('planNotificationsAll — 멀티 르방 병합 (확장기획 §5-6)', () => {
+  // 조용시간 밖(정오)에서 생성 — clampQuiet 간섭 배제
+  const t0 = local(2024, 0, 15, 12, 0);
+
+  it('한 마리는 단일 플랜 그대로 (count 없음)', () => {
+    const one = planNotificationsAll([initialState(t0)], t0);
+    expect(one.slots.every((s) => s.count === undefined)).toBe(true);
+    expect(one.slots.length).toBeGreaterThan(0);
+  });
+
+  it('둘 다 활발: 같은 슬롯은 가장 이른 시각 1건 + count 2, 슬롯 총량은 3 유지', () => {
+    const a = initialState(t0);                    // 밥 t0 → hungry +14h
+    const b = { ...initialState(t0), lastFedAt: t0 - 4 * HOUR, locAnchorAt: t0 - 4 * HOUR }; // 4h 먼저
+    const plan = planNotificationsAll([a, b], t0);
+    const feed = plan.slots.find((s) => s.id === NOTIFY_SLOT_FEED)!;
+    const feedB = planNotifications(b, t0).slots.find((s) => s.id === NOTIFY_SLOT_FEED)!;
+    expect(feed.at).toBe(feedB.at);                // 더 이른(b) 시각 채택
+    expect(feed.count).toBe(2);
+    expect(plan.slots.length).toBeLessThanOrEqual(3); // 알림 스팸 없음 — 슬롯 의미 유지
+  });
+
+  it('실온+냉장 혼합: 슬롯 1은 더 이른 실온 one-shot(feedTime, weekly:false) + count 2', () => {
+    const room = initialState(t0);
+    const fridge: SimState = { ...initialState(t0), location: 'fridge', maturity: 12, createdAt: t0 - 9 * DAY };
+    const plan = planNotificationsAll([room, fridge], t0);
+    const feed = plan.slots.find((s) => s.id === NOTIFY_SLOT_FEED)!;
+    expect(feed.copyKey).toBe('feedTime');         // 가장 이른(실온) 항목의 문구·반복 채택
+    expect(feed.weekly).toBe(false);
+    expect(feed.count).toBe(2);
+  });
+
+  it('moldy 르방은 병합에 기여 0 (죽음을 푸시로 통지하지 않는다)', () => {
+    const moldy: SimState = { ...initialState(t0), lastFedAt: t0 - 400 * HOUR, locAnchorAt: t0 - 400 * HOUR };
+    expect(phaseAt(moldy, t0)).toBe('moldy');
+    const alone = planNotificationsAll([moldy], t0);
+    expect(alone.slots).toEqual([]);
+    const withAlive = planNotificationsAll([moldy, initialState(t0)], t0);
+    expect(withAlive.slots.every((s) => s.count === undefined)).toBe(true); // 산 놈 혼자 = 병합 없음
   });
 });

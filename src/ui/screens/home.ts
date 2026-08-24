@@ -27,7 +27,21 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
   sub.className = 'hud-sub';
   const chip = document.createElement('div');
   chip.className = 'hud-stage-chip';
-  top.append(status, sub, chip);
+  // 멀티 르방 전환 — 스와이프의 접근성 대체이자 v1 진입로(§5-5). 한 마리면 숨김
+  const chipRow = document.createElement('div');
+  chipRow.className = 'hud-chip-row';
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'chip-nav';
+  prevBtn.textContent = '‹';
+  prevBtn.setAttribute('aria-label', copy.starter.prev);
+  prevBtn.addEventListener('click', () => api.switchStarter(-1));
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'chip-nav';
+  nextBtn.textContent = '›';
+  nextBtn.setAttribute('aria-label', copy.starter.next);
+  nextBtn.addEventListener('click', () => api.switchStarter(1));
+  chipRow.append(prevBtn, chip, nextBtn);
+  top.append(status, sub, chipRow);
   status.addEventListener('click', () => openObserveCard(api));
 
   // ── 우상단 설정 ──
@@ -105,24 +119,30 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     const wrap = document.createElement('div');
     wrap.className = 'option-list';
     const ratios = (Object.keys(RATIOS) as FeedRatio[]).filter((r) => snap.stage >= RATIOS[r].stage);
-    let selected: FeedRatio = ratios.includes(lastRatio) ? lastRatio : '1:1:1';
+    type Choice = FeedRatio | 'fridgePrep';
+    let selected: Choice = ratios.includes(lastRatio) ? lastRatio : '1:1:1';
 
-    const items = new Map<FeedRatio, HTMLButtonElement>();
-    for (const r of ratios) {
+    const items = new Map<Choice, HTMLButtonElement>();
+    const addItem = (key: Choice, nameText: string, hintText: string): void => {
       const item = document.createElement('button');
       item.className = 'option-item';
       const name = document.createElement('span');
-      name.textContent = r;
+      name.textContent = nameText;
       const hint = document.createElement('span');
       hint.className = 'hint';
-      hint.textContent = copy.feed.ratioHint[r];
+      hint.textContent = hintText;
       item.append(name, hint);
       item.addEventListener('click', () => {
-        selected = r;
-        items.forEach((elBtn, key) => elBtn.classList.toggle('selected', key === r));
+        selected = key;
+        items.forEach((elBtn, k) => elBtn.classList.toggle('selected', k === key));
       });
-      items.set(r, item);
+      items.set(key, item);
       wrap.appendChild(item);
+    };
+    for (const r of ratios) addItem(r, r, copy.feed.ratioHint[r]);
+    // 냉장 갈 준비 — 밥(1:1:1) + 냉장 이동 묶음, 2탭을 1탭으로 (§7-1. 냉장 해금 후·냉장 밖에서만)
+    if (snap.stage >= FRIDGE_STAGE && api.location() !== 'fridge') {
+      addItem('fridgePrep', copy.feed.fridgePrep, copy.feed.fridgePrepHint);
     }
     items.get(selected)?.classList.add('selected');
 
@@ -133,6 +153,11 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     ok.textContent = copy.actions.feed;
     ok.addEventListener('click', () => {
       handle.close();
+      if (selected === 'fridgePrep') {
+        api.dispatch({ type: 'feed', ratio: '1:1:1' });
+        api.dispatch({ type: 'setLocation', to: 'fridge' });
+        return;
+      }
       lastRatio = selected;
       api.dispatch({ type: 'feed', ratio: selected });
     });
@@ -169,8 +194,19 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
       sub.textContent = copy.observe.lastFed(agoText(api.lastFedAt(), now));
     }
 
-    const label = api.labelText();
-    chip.textContent = label ? `${label} · ${copy.stage.names[snap.stage]}` : copy.stage.names[snap.stage];
+    const st = api.starters();
+    const multi = st.count > 1;
+    prevBtn.style.display = multi ? '' : 'none';
+    nextBtn.style.display = multi ? '' : 'none';
+    if (multi) {
+      // ‹ 르방이 2 · 2/3 › — 빈 이름은 표시 시점 파생 (§5-3, 저장 안 함)
+      const name = st.name ?? copy.starter.defaultName(st.ordinal);
+      chip.textContent = `${name} · ${st.index + 1}/${st.count}`;
+    } else {
+      chip.textContent = st.name
+        ? `${st.name} · ${copy.stage.names[snap.stage]}`
+        : copy.stage.names[snap.stage];
+    }
 
     feedBtn.textContent =
       snap.phase === 'moldy' ? copy.actions.observe

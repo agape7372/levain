@@ -32,6 +32,9 @@ export class Router {
       s.el.remove();
     }
     this.stack = [screen];
+    // 홈·레시피 Screen은 앱 수명 동안 재사용된다 — push()가 남긴 display:none을
+    // 여기서 복구하지 않으면 그 탭이 재시작 전까지 백지가 된다 (BUG-1)
+    screen.el.style.display = '';
     this.host.appendChild(screen.el);
     screen.onShow?.();
   }

@@ -12,12 +12,13 @@ import {
 } from './constants';
 import { boundariesH, clamp } from './derive';
 
-/** 시계 역행: 모든 타임스탬프를 delta만큼 당겨 상대 간격을 보존한다 (GDD §3-8) */
-function reanchor(state: SimState, delta: number): SimState {
-  const collection: SimState['collection'] = {};
-  for (const [id, e] of Object.entries(state.collection)) {
-    collection[id] = { ...e, firstAt: e.firstAt - delta };
-  }
+/**
+ * 시계 역행: 모든 타임스탬프를 delta만큼 당겨 상대 간격을 보존한다 (GDD §3-8).
+ * export 이유: 멀티 르방에서 역행은 "전 starter + 전역 도감"에 같은 delta로 적용돼야
+ * 한다(확장기획 §5-1) — 그 순회는 store 층(gameStore)이 돈다. 새 타임스탬프 필드를
+ * 추가하면 여기와 tests/clock.test.ts를 동시 갱신할 것.
+ */
+export function reanchor(state: SimState, delta: number): SimState {
   return {
     ...state,
     createdAt: state.createdAt - delta,
@@ -26,7 +27,6 @@ function reanchor(state: SimState, delta: number): SimState {
     locAnchorAt: state.locAnchorAt - delta,
     lastDiscardBakeAt: state.lastDiscardBakeAt === null ? null : state.lastDiscardBakeAt - delta,
     flake: state.flake === null ? null : { ...state.flake, madeAt: state.flake.madeAt - delta },
-    collection,
   };
 }
 

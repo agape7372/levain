@@ -70,3 +70,26 @@ export function planNotifications(state: SimState, now: number): NotifyPlan {
 
   return { slots };
 }
+
+/**
+ * 멀티 르방 병합 플랜 (확장기획 §5-6) — 알림 총량은 N배가 아니라 슬롯 3개 그대로.
+ * 같은 슬롯을 여러 르방이 원하면 **가장 이른 시각 1건**(그 르방의 copyKey·weekly 채택),
+ * 병합 수는 count로 실어 문구를 집계형으로(ui/copy.ts notifyMany).
+ * 사망 침묵·휴면 1건·조용시간 클램프는 개별 planNotifications가 이미 보장한다.
+ */
+export function planNotificationsAll(sims: SimState[], now: number): NotifyPlan {
+  if (sims.length <= 1) return sims.length === 1 ? planNotifications(sims[0], now) : { slots: [] };
+  const bySlot = new Map<number, NotifySlot & { count: number }>();
+  for (const sim of sims) {
+    for (const slot of planNotifications(sim, now).slots) {
+      const cur = bySlot.get(slot.id);
+      if (!cur) bySlot.set(slot.id, { ...slot, count: 1 });
+      else if (slot.at < cur.at) bySlot.set(slot.id, { ...slot, count: cur.count + 1 });
+      else cur.count += 1;
+    }
+  }
+  const slots: NotifySlot[] = [...bySlot.values()]
+    .map(({ count, ...rest }) => (count > 1 ? { ...rest, count } : rest))
+    .sort((a, b) => a.id - b.id);
+  return { slots };
+}

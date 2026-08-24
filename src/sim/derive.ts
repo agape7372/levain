@@ -165,6 +165,7 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
     mass: state.mass,
     nextFeedAt: wallFor(b.hungry),
     peakAt: wallFor(b.peakStart),
+    peakEndAt: wallFor(b.peakEnd), // 피크는 구간 — UI는 범위로 말한다 (§19-1 "정답 시간" 단정 금지)
     effSinceFeedMs: effMs,
     moldStage,
     mold01: smoothstep(b.moldSpot, b.moldDead, effH),

@@ -15,7 +15,7 @@ import {
   TEMP_MULT,
 } from './constants';
 import { activityAt, clamp, effSinceFeedMs, phaseAt, stageOf } from './derive';
-import { betterGrade, canBakeBread, canBakeDiscard, bakeScore, gradeOf, recipeById } from './recipes';
+import { canBakeBread, canBakeDiscard, bakeScore, gradeOf, recipeById } from './recipes';
 
 export interface ActionResult {
   state: SimState;
@@ -37,8 +37,6 @@ export function initialState(now: number): SimState {
     mass: INITIAL_MASS,
     reviveProgress: 0,
     lastDiscardBakeAt: null,
-    collection: {},
-    label: null,
     flake: null,
   };
 }
@@ -111,16 +109,9 @@ function bake(state: SimState, recipeId: string, now: number): ActionResult {
   const gate = canBakeBread(state, recipe, now);
   if (gate !== 'ok') return { state, events: [{ type: 'bakeBlocked', reason: gate }] };
 
+  // 도감 기록은 전역(집의 기록) — store가 baked 이벤트로 갱신한다 (확장기획 §5-4)
   const grade = gradeOf(bakeScore(recipe, activityAt(state, now), state.acidity));
-  const prev = state.collection[recipeId];
-  const entry = prev
-    ? { bestGrade: betterGrade(prev.bestGrade, grade), count: prev.count + 1, firstAt: prev.firstAt }
-    : { bestGrade: grade, count: 1, firstAt: now };
-  const next: SimState = {
-    ...state,
-    mass: state.mass - recipe.cost,
-    collection: { ...state.collection, [recipeId]: entry },
-  };
+  const next: SimState = { ...state, mass: state.mass - recipe.cost };
   return { state: next, events: [{ type: 'baked', recipeId, grade }] };
 }
 
@@ -132,23 +123,8 @@ function bakeDiscard(state: SimState, recipeId: string, now: number): ActionResu
   const gate = canBakeDiscard(state, recipe, now);
   if (gate !== 'ok') return { state, events: [{ type: 'bakeBlocked', reason: gate }] };
 
-  const prev = state.collection[recipeId];
-  const entry = prev
-    ? { ...prev, count: prev.count + 1 }
-    : { bestGrade: null, count: 1, firstAt: now };
-  const next: SimState = {
-    ...state,
-    lastDiscardBakeAt: now,
-    collection: { ...state.collection, [recipeId]: entry },
-  };
+  const next: SimState = { ...state, lastDiscardBakeAt: now };
   return { state: next, events: [{ type: 'bakedDiscard', recipeId }] };
-}
-
-function setLabel(state: SimState, label: string, now: number): ActionResult {
-  if (stageOf(state, now) < 5) return { state, events: [{ type: 'labelLocked' }] };
-  const trimmed = label.trim().slice(0, 12);
-  if (!trimmed) return { state, events: [] };
-  return { state: { ...state, label: trimmed }, events: [{ type: 'labeled' }] };
 }
 
 /** 얇게 펴 말리기 — 죽음 보험. 덮어쓰기 허용(최신 스냅이 더 낫다) */
@@ -164,17 +140,21 @@ function makeFlake(state: SimState, now: number): ActionResult {
   return { state: next, events: [{ type: 'flakeMade' }] };
 }
 
-/** 곰팡이 확정 후 폐기 — 새 개체로 다시 시작. 도감·플레이크는 사람의 기록이라 남는다 */
+/**
+ * 곰팡이 확정 후 폐기 — 새 개체로 다시 시작. 플레이크는 사람의 기록이라 남는다.
+ * 도감은 v2에서 전역(집의 기록)이라 여기서 보존 로직이 필요 없다 — 확장기획 §5-4가 예고한 단순화.
+ * 이름(name)도 starter 레코드 소유라 자동 이월된다 (§11-2 "기본으로 이월하도록 바꾸는 게 옳음").
+ */
 function discardStarter(state: SimState, now: number): ActionResult {
   if (phaseAt(state, now) !== 'moldy') return { state, events: [] }; // 살아있는 르방은 버릴 수 없다
-  const next: SimState = { ...initialState(now), collection: state.collection, flake: state.flake };
+  const next: SimState = { ...initialState(now), flake: state.flake };
   return { state: next, events: [{ type: 'starterDiscarded' }] };
 }
 
 /**
- * 곰팡이 확정 후 플레이크 복원 — 같은 계보. createdAt·label·도감 보존(stageOf 일수
- * 게이트 유지가 핵심), maturity ×0.6, 부활 의식(reviveProgress=1) 경유로 기존
- * 2세션 부활 기계·문구·알림을 전량 재사용한다 ("며칠 만에 재활성" 실관행).
+ * 곰팡이 확정 후 플레이크 복원 — 같은 계보. createdAt 보존(stageOf 일수 게이트 유지가
+ * 핵심 — 이름·도감은 이제 sim 밖 소유라 자연 보존), maturity ×0.6, 부활 의식
+ * (reviveProgress=1) 경유로 기존 2세션 부활 기계·문구·알림을 전량 재사용한다.
  */
 function restoreFlake(state: SimState, now: number): ActionResult {
   if (phaseAt(state, now) !== 'moldy' || state.flake === null) return { state, events: [] };
@@ -205,7 +185,6 @@ export function applyAction(state: SimState, action: Action, now: number): Actio
     case 'setLocation': return setLocation(state, action.to, now);
     case 'bake': return bake(state, action.recipeId, now);
     case 'bakeDiscard': return bakeDiscard(state, action.recipeId, now);
-    case 'setLabel': return setLabel(state, action.label, now);
     case 'makeFlake': return makeFlake(state, now);
     case 'discardStarter': return discardStarter(state, now);
     case 'restoreFlake': return restoreFlake(state, now);

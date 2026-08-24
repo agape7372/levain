@@ -86,12 +86,17 @@ export const copy = {
     },
     done: '맛있게 먹었어요',
     tooSoon: '아직 배부른가 봐요',
+    // 묶음 프리셋 — 밥 + 냉장 이동을 1탭으로 (§7-1 "냉장 갈 준비". 3단계 해금과 동행)
+    fridgePrep: '냉장 갈 준비',
+    fridgePrepHint: '밥 주고 바로 냉장고로',
   },
 
   observe: {
     lastFed: (ago: string) => `${ago} 전에 밥을 먹었어요`,
     nextFeed: (at: string) => `${at}쯤 배고파질 거예요`,
-    peak: (at: string) => `${at}쯤 가장 부풀어요`,
+    // 범위로 말한다 — 실제 르방도 "정답 시간"이 없다 (§19-1, 상태·온도로 변동)
+    peak: (from: string, to: string) => `${from}~${to} 뒤쯤 가장 부풀어요`,
+    peakNow: '지금이 한창때예요',
     massG: (g: number) => `지금 ${g}g이에요`,
   },
 
@@ -114,6 +119,13 @@ export const copy = {
     fakeRise: '크게 부풀었어요. 곧 조용해질 거예요, 정상이에요',
     quietWeek: '이 시기는 원래 조용해요',
     labelUnlocked: '병에 이름표를 붙일 수 있어요',
+  },
+
+  starter: {
+    /** 이름이 없을 때 표시 파생 — 저장하지 않는다 (확장기획 §5-3) */
+    defaultName: (ordinal: number) => `르방이 ${ordinal}`,
+    prev: '이전 르방이',
+    next: '다음 르방이',
   },
 
   recipes: {
@@ -158,6 +170,16 @@ export const copy = {
     permissionHint: '밥 시간을 알려드릴까요',
     permissionSettings: '알림은 시스템 설정에서 켤 수 있어요',
   },
+
+  // 멀티 르방 집계 문구 (확장기획 §5-6) — 같은 슬롯을 여러 르방이 원할 때.
+  // 발화 시각엔 가장 이른 한 마리만 해당될 수 있어 문구는 모호-수량형을 우선한다
+  notifyMany: {
+    feedTime: (n: number) => `르방이 ${n}개가 밥을 기다리고 있어요`,
+    fridgeWeek: (_n: number) => '일주일이 지났어요. 냉장고의 르방이를 봐 주세요',
+    dormant: (_n: number) => '깊이 잠든 르방이가 있어요. 잊지 말고 깨워 주세요',
+    reviveSecond: (_n: number) => '다시 밥 줄 시간이에요',
+    moldWarn: (_n: number) => '표면에 반점이 보이는 르방이가 있어요. 아직 늦지 않았어요',
+  } as Record<string, (n: number) => string>,
 
   settings: {
     title: '설정',

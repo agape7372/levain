@@ -13,7 +13,6 @@ function populatedState(): SimState {
     lastSimulatedAt: t0,
     locAnchorAt: t0 - 2 * HOUR,
     lastDiscardBakeAt: t0 - 1 * HOUR,
-    collection: { pancake: { bestGrade: null, count: 2, firstAt: t0 - 3 * DAY } },
     flake: { madeAt: t0 - 4 * HOUR, maturity: 3 },
   };
 }
@@ -30,7 +29,7 @@ describe('clock — 시계 방어 (GDD §3-8)', () => {
     expect(result.lastSimulatedAt).toBe(s.lastSimulatedAt - delta);
     expect(result.locAnchorAt).toBe(s.locAnchorAt - delta);
     expect(result.lastDiscardBakeAt).toBe((s.lastDiscardBakeAt as number) - delta);
-    expect(result.collection.pancake.firstAt).toBe(s.collection.pancake.firstAt - delta);
+    // 도감 firstAt 재정박은 v2에서 전역(shared) 소유 — store 층 테스트(starters.test.ts)가 커버
     expect(result.flake!.madeAt).toBe(s.flake!.madeAt - delta);
     expect(result.flake!.maturity).toBe(s.flake!.maturity); // maturity는 시계값이 아니라 재정박 대상 아님
 

@@ -16,7 +16,12 @@ export function openObserveCard(api: GameApi): void {
     ['마지막 밥', copy.observe.lastFed(agoText(api.lastFedAt(), now))],
   ];
   if (snap.phase === 'active') {
-    if (now < snap.peakAt) rows.push(['부풀기', copy.observe.peak(untilText(snap.peakAt, now) + ' 뒤')]);
+    // 피크는 구간 — 단정 대신 범위 (§19-1). 구간 안이면 "한창때"
+    if (now < snap.peakAt) {
+      rows.push(['부풀기', copy.observe.peak(untilText(snap.peakAt, now), untilText(snap.peakEndAt, now))]);
+    } else if (now < snap.peakEndAt) {
+      rows.push(['부풀기', copy.observe.peakNow]);
+    }
     rows.push(['다음 밥', copy.observe.nextFeed(untilText(snap.nextFeedAt, now) + ' 뒤')]);
   }
 

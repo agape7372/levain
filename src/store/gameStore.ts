@@ -1,11 +1,19 @@
 // 단일 진실 소스 — state·dispatch·tick·subscribe (ARCHITECTURE §2).
 // 액션 순서 불변식: dispatch = advance(tick) 선행 → applyAction → 동기 저장 → 알림 재계획 → 통지 1회.
 // 통지는 마지막에 딱 한 번 — 중간 통지가 나가면 UI가 액션 전 상태를 한 프레임 그린다.
-import type { Action, BriefingKey, NotifyPlan, SimEvent, Snapshot } from '../sim';
-import { advance, applyAction, deriveBriefing, deriveSnapshot, initialState, planNotifications } from '../sim';
+//
+// v2(확장기획 §5): envelope는 starters[]를 담지만 sim은 여전히 "르방 1개의 물리"다.
+// 멀티는 전부 이 층에서 — 활성 르방만 advance/dispatch하고, 비활성은 닫힌 함수 모델
+// 덕분에 그냥 둔다(전환 시 advance 1회면 정산 끝). 백그라운드 시뮬 0.
+import type { Action, BriefingKey, CollectionEntry, NotifyPlan, SimEvent, SimState, Snapshot } from '../sim';
+import {
+  LABEL_STAGE, REWIND_TOLERANCE_MS, STARTER_SLOTS_FREE,
+  advance, applyAction, betterGrade, deriveBriefing, deriveSnapshot, initialState,
+  planNotificationsAll, reanchor, stageOf,
+} from '../sim';
 import type { Clock } from '../platform/clock';
 import type { StorageAdapter } from '../platform/storage';
-import type { LoadSource, SaveEnvelope, SaveFlags, SaveSettings } from './persistence';
+import type { LoadSource, SaveEnvelope, SaveFlags, SaveSettings, StarterRecord } from './persistence';
 import { SCHEMA_VERSION, defaultFlags, defaultSettings, load, save } from './persistence';
 
 /** 포그라운드 tick 주기 — rAF 아님. 게임 시간은 wall-clock이다 (ARCHITECTURE §2) */
@@ -29,8 +37,29 @@ export interface GameStore {
   dispatch(action: Action): SimEvent[];
   subscribe(fn: StoreListener): () => void;
   getSnapshot(): Snapshot;
-  /** 읽기 전용으로 다뤄야 한다 — 변경은 setSettings/setFlags/dispatch만 */
+  /**
+   * 읽기 전용으로 다뤄야 한다 — 변경은 setSettings/setFlags/dispatch·starter API만.
+   * 특히 starters 배열·shared.collection을 직접 변형하면 단일 진실 소스가 조용히
+   * 깨진다(방어 복사 없음 — 확장기획 §3-5 지뢰 3).
+   */
   getEnvelope(): SaveEnvelope;
+  /** 활성 르방 레코드 — 표시 이름이 필요하면 name ?? `르방이 {ordinal}` 파생 (copy는 UI 소관) */
+  getActiveStarter(): StarterRecord;
+  /** 전역 도감 (집의 기록 — 르방 폐기·삭제에도 남는다) */
+  getCollection(): Record<string, CollectionEntry>;
+  /**
+   * 활성 르방 이름 짓기 — 게이트·규칙은 v1 setLabel과 동일(5단계·trim·12자).
+   * Phase 3에서 자유화 예정(확장기획 §5-3). labeled/labelLocked 이벤트로 통지.
+   */
+  renameActive(name: string): void;
+  /** 새 르방 생성 + 활성 전환. 슬롯 상한(STARTER_SLOTS_FREE) 도달 시 null */
+  addStarter(name?: string | null): StarterRecord | null;
+  /**
+   * 활성 르방 전환 — 대상 sim만 advance(now) 1회로 정산. 미지의 id면 false.
+   * 호출자 계약: 성공 시 씬 snapParams + setMoldSeed(새 활성 createdAt) 재설정은
+   * 호출자 책임 — Phase 3 UI/Levain Lab이 배선한다.
+   */
+  switchStarter(id: string): boolean;
   setSettings(patch: Partial<SaveSettings>): void;
   setFlags(patch: Partial<SaveFlags>): void;
   startNewGame(): void;
@@ -46,7 +75,10 @@ export function newEnvelope(now: number): SaveEnvelope {
   return {
     schemaVersion: SCHEMA_VERSION,
     savedAt: now,
-    sim: initialState(now),
+    starters: [{ id: 's1', name: null, ordinal: 1, sim: initialState(now) }],
+    activeStarterId: 's1',
+    nextStarterOrdinal: 2,
+    shared: { collection: {} },
     settings: defaultSettings(),
     flags: defaultFlags(),
   };
@@ -57,16 +89,66 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
   const { clock, storage } = deps;
 
   let env: SaveEnvelope = envelope ?? newEnvelope(clock.now());
-  let snap: Snapshot = deriveSnapshot(env.sim, clock.now());
+
+  // 불변식: activeStarterId는 항상 starters 안에 있다 (validateAndClamp·starter API가 보증)
+  const activeRecord = (): StarterRecord =>
+    env.starters.find((r) => r.id === env.activeStarterId) ?? env.starters[0];
+  const activeSim = (): SimState => activeRecord().sim;
+
+  function setActiveSim(sim: SimState): void {
+    env = {
+      ...env,
+      starters: env.starters.map((r) => (r.id === env.activeStarterId ? { ...r, sim } : r)),
+    };
+  }
+
+  let snap: Snapshot = deriveSnapshot(activeSim(), clock.now());
   const listeners = new Set<StoreListener>();
 
   let timer: ReturnType<typeof setInterval> | null = null;
   let ticksSinceSave = 0;
 
-  /** 통지 없는 내부 catch-up — dispatch가 중간 통지를 내지 않도록 tick()과 분리한다 */
+  /**
+   * 통지 없는 내부 catch-up — dispatch가 중간 통지를 내지 않도록 tick()과 분리한다.
+   * 시계 역행은 **전 starter + 전역 도감**에 같은 delta로 재정박(확장기획 §5-1) —
+   * 개별 advance에만 맡기면 비활성 르방이 delta만큼 공짜 휴식을 얻는다.
+   */
   function advanceTo(now: number): void {
-    env = { ...env, sim: advance(env.sim, now) };
-    snap = deriveSnapshot(env.sim, now);
+    const last = env.starters.reduce((m, r) => Math.max(m, r.sim.lastSimulatedAt), 0);
+    if (now < last - REWIND_TOLERANCE_MS) {
+      const delta = last - now;
+      const collection: Record<string, CollectionEntry> = {};
+      for (const [id, e] of Object.entries(env.shared.collection)) {
+        collection[id] = { ...e, firstAt: e.firstAt - delta };
+      }
+      env = {
+        ...env,
+        starters: env.starters.map((r) => ({ ...r, sim: reanchor(r.sim, delta) })),
+        shared: { ...env.shared, collection },
+      };
+    }
+    setActiveSim(advance(activeSim(), now));
+    snap = deriveSnapshot(activeSim(), now);
+  }
+
+  /** 도감(전역) 갱신 — v1에서 sim이 하던 집계를 이벤트로 이어받는다 (규칙 동일) */
+  function applyBakeEvents(events: SimEvent[], now: number): void {
+    for (const e of events) {
+      if (e.type !== 'baked' && e.type !== 'bakedDiscard') continue;
+      const prev = env.shared.collection[e.recipeId];
+      const grade = e.type === 'baked' ? e.grade : null;
+      const entry: CollectionEntry = prev
+        ? {
+            ...prev,
+            bestGrade: grade === null ? prev.bestGrade : betterGrade(prev.bestGrade, grade),
+            count: prev.count + 1,
+          }
+        : { bestGrade: grade, count: 1, firstAt: now, starterId: env.activeStarterId };
+      env = {
+        ...env,
+        shared: { ...env.shared, collection: { ...env.shared.collection, [e.recipeId]: entry } },
+      };
+    }
   }
 
   function emit(events: SimEvent[]): void {
@@ -80,9 +162,10 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
 
   function replan(now: number): void {
     if (!deps.onNotifyPlan) return;
-    // 알림을 끄면 빈 플랜을 밀어 예약을 걷어낸다 — 안 그러면 예약이 산 채로 남는다
+    // 알림을 끄면 빈 플랜을 밀어 예약을 걷어낸다 — 안 그러면 예약이 산 채로 남는다.
+    // 전 르방 병합 플랜 (§5-6) — 슬롯 3개 그대로, 같은 슬롯은 가장 이른 시각+집계 문구
     const plan: NotifyPlan = env.settings.notifyEnabled
-      ? planNotifications(env.sim, now)
+      ? planNotificationsAll(env.starters.map((r) => r.sim), now)
       : { slots: [] };
     deps.onNotifyPlan(plan);
   }
@@ -97,7 +180,7 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     tick: doTick,
 
     resumeWithBriefing(): BriefingKey[] {
-      const pre = env.sim;
+      const pre = activeSim();
       const briefing = deriveBriefing(pre, pre.lastSimulatedAt, clock.now());
       doTick();
       return briefing;
@@ -106,9 +189,10 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     dispatch(action: Action): SimEvent[] {
       const now = clock.now(); // 한 번만 캡처 — advance·applyAction·savedAt이 같은 시각을 본다
       advanceTo(now);
-      const res = applyAction(env.sim, action, now);
-      env = { ...env, sim: res.state };
-      snap = deriveSnapshot(env.sim, now);
+      const res = applyAction(activeSim(), action, now);
+      setActiveSim(res.state);
+      applyBakeEvents(res.events, now);
+      snap = deriveSnapshot(activeSim(), now);
       persist(now);
       replan(now);
       emit(res.events);
@@ -124,6 +208,69 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
 
     getSnapshot: () => snap,
     getEnvelope: () => env,
+    getActiveStarter: () => activeRecord(),
+    getCollection: () => env.shared.collection,
+
+    renameActive(name: string): void {
+      const now = clock.now();
+      advanceTo(now);
+      if (stageOf(activeSim(), now) < LABEL_STAGE) {
+        emit([{ type: 'labelLocked' }]);
+        return;
+      }
+      const trimmed = name.trim().slice(0, 12);
+      if (!trimmed) {
+        emit([]);
+        return;
+      }
+      env = {
+        ...env,
+        starters: env.starters.map((r) =>
+          r.id === env.activeStarterId ? { ...r, name: trimmed } : r,
+        ),
+      };
+      persist(now);
+      emit([{ type: 'labeled' }]);
+    },
+
+    addStarter(name?: string | null): StarterRecord | null {
+      if (env.starters.length >= STARTER_SLOTS_FREE) return null;
+      const now = clock.now();
+      advanceTo(now); // 떠나는(현 활성) 르방 정산 + 역행 방어
+      const ordinal = env.nextStarterOrdinal;
+      const trimmed = (name ?? '').trim().slice(0, 12);
+      const rec: StarterRecord = {
+        id: `s${ordinal}`, // ordinal은 재사용되지 않으므로 id도 영원히 유일
+        name: trimmed || null,
+        ordinal,
+        sim: initialState(now),
+      };
+      env = {
+        ...env,
+        starters: [...env.starters, rec],
+        activeStarterId: rec.id,
+        nextStarterOrdinal: ordinal + 1,
+      };
+      snap = deriveSnapshot(rec.sim, now);
+      persist(now);
+      replan(now);
+      emit([]);
+      return rec;
+    },
+
+    switchStarter(id: string): boolean {
+      if (!env.starters.some((r) => r.id === id)) return false;
+      if (id === env.activeStarterId) return true;
+      const now = clock.now();
+      advanceTo(now); // 떠나는 르방 정산 + 역행 방어(전 starter)
+      env = { ...env, activeStarterId: id };
+      setActiveSim(advance(activeSim(), now)); // 새 활성 catch-up 1회 — 닫힌 함수라 이걸로 끝
+      snap = deriveSnapshot(activeSim(), now);
+      persist(now);
+      replan(now);
+      emit([]);
+      return true;
+    },
 
     setSettings(patch: Partial<SaveSettings>): void {
       env = { ...env, settings: { ...env.settings, ...patch } };
@@ -142,7 +289,7 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     startNewGame(): void {
       const now = clock.now();
       env = newEnvelope(now);
-      snap = deriveSnapshot(env.sim, now);
+      snap = deriveSnapshot(activeSim(), now);
       persist(now);
       replan(now);
       emit([]);

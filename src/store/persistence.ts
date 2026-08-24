@@ -1,6 +1,8 @@
 // 저장 envelope 직렬화·버전·복구 (ARCHITECTURE §3).
 // 복구 사다리 2계층: 주 파싱+범위 가드 → 실패 시 미러 → 실패 시 null(호출자가 새 게임).
 // NaN·범위 밖 숫자는 버리지 않고 clamp로 살린다 — 필드 하나 때문에 기록 전체를 잃지 않는다.
+// 파싱 순서: JSON.parse → migrate(raw) → validateAndClamp(현행 스키마) — 마이그레이션이
+// 검증보다 먼저다. 구버전 저장본이 신버전 가드에 걸려 null(새 게임)이 되는 사고 방지.
 import type { BakeGrade, CollectionEntry, FeedRatio, Location, SimState } from '../sim';
 import { RATIOS, TEMP_MULT } from '../sim';
 // MASS_MAX·ACID_MAX는 sim/index.ts가 재수출하지 않는데 sim/**는 M2 범위 밖(수정 금지)이다.
@@ -8,7 +10,8 @@ import { RATIOS, TEMP_MULT } from '../sim';
 import { ACID_MAX, MASS_MAX, SEED_G } from '../sim/constants';
 import type { StorageAdapter } from '../platform/storage';
 
-export const SCHEMA_VERSION = 1;
+/** v2: 멀티 르방 — starters[] + 전역 도감(shared). 확장기획 2026-08-24 §5 */
+export const SCHEMA_VERSION = 2;
 
 export interface SaveSettings {
   muted: boolean;
@@ -27,10 +30,31 @@ export interface SaveFlags {
   pendingBake: PendingBake | null;
 }
 
+/**
+ * 르방 1개 = 물리(sim) + 정체성(id·name·ordinal). 개체 시드는 sim.createdAt에서 파생
+ * (uMoldSeed 관행) — 파생 가능한 값은 저장하지 않는다.
+ */
+export interface StarterRecord {
+  id: string;
+  /** null이면 표시 시점에 "르방이 {ordinal}"로 파생 (저장하지 않는다) */
+  name: string | null;
+  /** 생성 순번 — 삭제해도 재사용 안 함 (nextStarterOrdinal이 보증) */
+  ordinal: number;
+  sim: SimState;
+}
+
+/** 집(계정) 소유 — 특정 르방이 죽거나 삭제돼도 남는 기록 */
+export interface SharedState {
+  collection: Record<string, CollectionEntry>;
+}
+
 export interface SaveEnvelope {
   schemaVersion: number;
   savedAt: number;
-  sim: SimState;
+  starters: StarterRecord[];
+  activeStarterId: string;
+  nextStarterOrdinal: number;
+  shared: SharedState;
   settings: SaveSettings;
   flags: SaveFlags;
 }
@@ -85,9 +109,17 @@ function collectionOf(v: unknown): Record<string, CollectionEntry> {
       bestGrade: GRADES.includes(grade as BakeGrade) ? (grade as BakeGrade) : null,
       count: Math.max(1, Math.round(num(raw.count, 1, Number.MAX_SAFE_INTEGER, 1))),
       firstAt,
+      // 어느 르방이 처음 구웠나 — 없어도 기록은 산다 (v1 이월분은 마이그레이션이 채움)
+      ...(typeof raw.starterId === 'string' && raw.starterId ? { starterId: raw.starterId } : {}),
     };
   }
   return out;
+}
+
+/** 전역(집) 소유 상태 — 하위 키가 없으면 기본값. Phase 6~7의 inventory 등이 무이행 착륙하게 */
+function sharedOf(v: unknown): SharedState {
+  if (!isObject(v)) return { collection: {} };
+  return { collection: collectionOf(v.collection) };
 }
 
 function settingsOf(v: unknown): SaveSettings {
@@ -117,7 +149,7 @@ function flagsOf(v: unknown): SaveFlags {
 const SIM_KEYS = [
   'createdAt', 'lastFedAt', 'lastSimulatedAt', 'feedRatio', 'location',
   'locAnchorAt', 'effBaseMs', 'acidity', 'maturity', 'mass',
-  'reviveProgress', 'collection',
+  'reviveProgress',
 ] as const;
 
 function simOf(v: unknown): SimState | null {
@@ -151,10 +183,19 @@ function simOf(v: unknown): SimState | null {
     reviveProgress: revive === 1 ? 1 : 0,
     // null이 정상 도메인 값이라 키 부재도 null로 받는다
     lastDiscardBakeAt: finite(v.lastDiscardBakeAt),
-    collection: collectionOf(v.collection),
-    label: typeof v.label === 'string' ? v.label : null,
-    flake: flakeOf(v.flake), // label 패턴 — 키 부재도 null. 구세이브(flake 이전)가 그대로 산다
+    flake: flakeOf(v.flake), // 키 부재도 null — 구세이브(flake 이전)가 그대로 산다
   };
+}
+
+/** starter 항목 단위 관대 처리 — sim이 죽었으면 항목만 폐기 (collection 항목 관행) */
+function starterOf(v: unknown, fallbackOrdinal: number): StarterRecord | null {
+  if (!isObject(v)) return null;
+  const sim = simOf(v.sim);
+  if (sim === null) return null;
+  const ordinal = Math.max(1, Math.round(num(v.ordinal, 1, Number.MAX_SAFE_INTEGER, fallbackOrdinal)));
+  const id = typeof v.id === 'string' && v.id ? v.id : `s${ordinal}`;
+  const rawName = typeof v.name === 'string' ? v.name.trim().slice(0, 12) : '';
+  return { id, name: rawName || null, ordinal, sim };
 }
 
 function flakeOf(v: unknown): SimState['flake'] {
@@ -165,47 +206,102 @@ function flakeOf(v: unknown): SimState['flake'] {
 }
 
 /**
- * 손으로 쓴 타입·범위 가드. 현행(v1) 스키마 기준이다 —
- * 첫 실제 마이그레이션이 생기면 migrate를 이 검증 **앞**으로 옮겨야 한다
- * (구버전 저장본이 신버전 가드에 걸려 null이 되는 사고 방지).
+ * 손으로 쓴 타입·범위 가드 — **현행(v2) 스키마 전용**. migrate가 항상 선행되므로
+ * 구버전 모양은 여기 도달하지 않는다 (v1 시절 주석이 예고한 순서 반전, 2026-08-24 시행).
  */
 export function validateAndClamp(raw: unknown): SaveEnvelope | null {
   if (!isObject(raw)) return null;
 
   const schemaVersion = finite(raw.schemaVersion);
-  if (schemaVersion === null) return null;
-  if (schemaVersion > SCHEMA_VERSION) return null; // 다운그레이드 불가 — 미래 저장본은 읽지 않는다
+  if (schemaVersion !== SCHEMA_VERSION) return null; // 미래·과거 모양 모두 migrate 책임
 
   const savedAt = finite(raw.savedAt);
   if (savedAt === null) return null;
 
-  const sim = simOf(raw.sim);
-  if (sim === null) return null;
+  // starters — 항목 단위 관대(불량 항목만 폐기). 0개가 되면 복구 불가(새 게임)
+  if (!Array.isArray(raw.starters)) return null;
+  const starters: StarterRecord[] = [];
+  const seen = new Set<string>();
+  for (let i = 0; i < raw.starters.length; i++) {
+    const rec = starterOf(raw.starters[i], i + 1);
+    if (rec === null) continue;
+    let id = rec.id;
+    while (seen.has(id)) id = `${id}+`; // 방어적 유일화 — 정상 저장본에선 발생 0
+    seen.add(id);
+    starters.push(id === rec.id ? rec : { ...rec, id });
+  }
+  if (starters.length === 0) return null;
+
+  const activeRaw = raw.activeStarterId;
+  const activeStarterId =
+    typeof activeRaw === 'string' && seen.has(activeRaw) ? activeRaw : starters[0].id;
+  const maxOrdinal = starters.reduce((m, s) => Math.max(m, s.ordinal), 0);
+  const nextStarterOrdinal = Math.max(
+    Math.round(num(raw.nextStarterOrdinal, 1, Number.MAX_SAFE_INTEGER, 1)),
+    maxOrdinal + 1, // 순번 재사용 금지의 마지막 방어선
+  );
 
   return {
     schemaVersion,
     savedAt,
-    sim,
+    starters,
+    activeStarterId,
+    nextStarterOrdinal,
+    shared: sharedOf(raw.shared),
     settings: settingsOf(raw.settings),
     flags: flagsOf(raw.flags),
   };
 }
 
 // ── 마이그레이션 ─────────────────────────────────────────────────────────────
-// 현행 schemaVersion 1. 1 미만 버전은 존재한 적이 없어 체인은 비어 있다.
-// 규약: MIGRATIONS[v]는 v → v+1 변환. 반환값의 schemaVersion은 루프가 채운다.
+// 규약: MIGRATIONS[v]는 v → v+1 변환, **raw(검증 전) 대상** — 필드 존재를 가정하지
+// 말 것. 깨진 값은 통과시키고 v2 검증이 항목 단위로 걷어낸다(결과: v1 쓰레기 저장본은
+// 이전과 동일하게 새 게임). 반환값의 schemaVersion은 루프가 채운다.
 
-const MIGRATIONS: Record<number, (e: Record<string, unknown>) => Record<string, unknown>> = {};
+const MIGRATIONS: Record<number, (e: Record<string, unknown>) => Record<string, unknown>> = {
+  // v1(단일 sim, sim 안 label·collection) → v2(starters[] + 전역 도감). 확장기획 §5-2.
+  1: (e) => {
+    const simRaw = isObject(e.sim) ? { ...e.sim } : {};
+    const label = typeof simRaw.label === 'string' ? simRaw.label : null;
+    const collectionRaw = isObject(simRaw.collection) ? simRaw.collection : {};
+    delete simRaw.label;
+    delete simRaw.collection;
 
-export function migrate(env: SaveEnvelope): SaveEnvelope | null {
-  if (env.schemaVersion > SCHEMA_VERSION) return null;
-  let cur = env as unknown as Record<string, unknown>;
-  for (let v = env.schemaVersion; v < SCHEMA_VERSION; v++) {
+    const id = 's1';
+    const collection: Record<string, unknown> = {};
+    for (const [rid, entry] of Object.entries(collectionRaw)) {
+      // 기존 빵 기록에 starterId 없음 → 첫(유일) 르방을 기본값으로 (§5-2)
+      collection[rid] = isObject(entry) ? { ...entry, starterId: id } : entry;
+    }
+
+    const out: Record<string, unknown> = {
+      ...e,
+      starters: [{ id, name: label, ordinal: 1, sim: simRaw }], // 이름을 잃지 않는다
+      activeStarterId: id,
+      nextStarterOrdinal: 2,
+      shared: { collection },
+    };
+    delete out.sim;
+    return out;
+  },
+};
+
+/**
+ * raw → 현행 스키마 raw. null = 읽을 수 없음(미래 버전·체인 끊김·버전 없음) →
+ * 호출자는 새 게임. 검증은 하지 않는다 — validateAndClamp가 뒤따른다.
+ */
+export function migrate(raw: unknown): Record<string, unknown> | null {
+  if (!isObject(raw)) return null;
+  const v0 = finite(raw.schemaVersion);
+  if (v0 === null) return null;
+  if (v0 > SCHEMA_VERSION) return null; // 다운그레이드 불가 — 미래 저장본은 읽지 않는다
+  let cur: Record<string, unknown> = raw;
+  for (let v = v0; v < SCHEMA_VERSION; v++) {
     const step = MIGRATIONS[v];
     if (!step) return null; // 체인이 끊겼다 — 조용히 새 게임이 낫다
     cur = { ...step(cur), schemaVersion: v + 1 };
   }
-  return cur as unknown as SaveEnvelope;
+  return cur;
 }
 
 // ── 입출력 ───────────────────────────────────────────────────────────────────
@@ -240,8 +336,8 @@ function parseEnvelope(raw: string | null): SaveEnvelope | null {
   } catch {
     return null;
   }
-  const validated = validateAndClamp(parsed);
-  return validated === null ? null : migrate(validated);
+  const migrated = migrate(parsed); // 마이그레이션 먼저 — 검증은 현행 스키마만 안다
+  return migrated === null ? null : validateAndClamp(migrated);
 }
 
 export async function load(storage: StorageAdapter): Promise<LoadResult | null> {

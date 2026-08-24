@@ -16,6 +16,7 @@ const base: Snapshot = {
   mass: 200,
   nextFeedAt: 0,
   peakAt: 0,
+  peakEndAt: 0,
   effSinceFeedMs: 0,
   moldStage: 'none',
   mold01: 0,

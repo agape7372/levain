@@ -14,6 +14,8 @@ export function createRecipesScreen(
   getCollection: () => Record<string, CollectionEntry>,
   /** 3D 쇼케이스 열기 — GLB 없으면 false를 돌려주고 카드 리절트로 폴백 */
   openShowcase?: (recipeId: string, headline: string, large: boolean) => Promise<boolean>,
+  /** 뒤로(르방이 탭 복귀) — 헤더 백버튼 (사용자 지시 2026-08-24: 탭만으론 돌아갈 길이 안 보임) */
+  onBack?: () => void,
 ): Screen {
   const el = document.createElement('div');
   el.className = 'screen screen--solid';
@@ -23,15 +25,27 @@ export function createRecipesScreen(
 
   const head = document.createElement('div');
   head.className = 'recipes-head';
+  const titleGroup = document.createElement('div');
+  titleGroup.className = 'recipes-title-group';
+  if (onBack) {
+    const backBtn = document.createElement('button');
+    backBtn.type = 'button';
+    backBtn.className = 'btn btn-ghost recipes-back';
+    backBtn.textContent = '←';
+    backBtn.setAttribute('aria-label', '뒤로');
+    backBtn.addEventListener('click', onBack);
+    titleGroup.appendChild(backBtn);
+  }
   const title = document.createElement('h1');
   title.className = 'recipes-title';
   title.textContent = copy.tabs.recipes;
+  titleGroup.appendChild(title);
   const floatBtn = document.createElement('button');
   floatBtn.type = 'button';
   floatBtn.className = 'btn btn-ghost';
   floatBtn.textContent = copy.actions.floatTest;
   floatBtn.addEventListener('click', onFloatTest);
-  head.append(title, floatBtn);
+  head.append(titleGroup, floatBtn);
 
   const grid = document.createElement('div');
   grid.className = 'recipe-grid';

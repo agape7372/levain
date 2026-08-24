@@ -20,7 +20,11 @@ function toScheduled(slot: NotifySlot): LocalNotificationSchema {
   return {
     id: slot.id,
     channelId: CHANNEL_ID,
-    title: copy.notify[slot.copyKey],
+    // 멀티 르방 병합 슬롯(count ≥2)은 집계 문구 (§5-6)
+    title:
+      slot.count && slot.count > 1
+        ? (copy.notifyMany[slot.copyKey]?.(slot.count) ?? copy.notify[slot.copyKey])
+        : copy.notify[slot.copyKey],
     body: '', // 제목 한 줄이 전부 — 담백하게 (GDD §10)
     // ★ isExactNotification 기본값이 true라서, 끄지 않으면 권한 없을 때 플러그인이
     // schedule마다 시스템 "Alarms & reminders" 설정 화면을 강제로 연다 (에뮬 실측).
