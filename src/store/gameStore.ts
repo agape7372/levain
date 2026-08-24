@@ -154,7 +154,7 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
   function applyBakeEvents(events: SimEvent[], now: number): void {
     for (const e of events) {
       if (e.type !== 'baked' && e.type !== 'bakedDiscard') continue;
-      const key = e.type === 'baked' && e.variantId ? e.variantId : e.recipeId;
+      const key = e.variantId ?? e.recipeId;
       const prev = env.shared.collection[key];
       const grade = e.type === 'baked' ? e.grade : null;
       const entry: CollectionEntry = prev
@@ -166,7 +166,7 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
         : { bestGrade: grade, count: 1, firstAt: now, starterId: env.activeStarterId };
 
       let inventory = env.shared.inventory;
-      if (e.type === 'baked' && e.variantId && !prev) {
+      if (e.variantId && !prev) {
         const rule = ruleByVariantId(e.variantId);
         if (rule) {
           // 재고는 bakeVariant가 dispatch 전에 확인했다 — 여기선 차감만 (음수 방어 max 0)
@@ -273,9 +273,15 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
         emit(events);
         return events;
       }
-      // sim 게이트(stage·mass)·판정은 베이스 그대로 — 실패 시 baked 이벤트가 없어
-      // applyBakeEvents가 아무것도 안 건드린다(차감 0)
-      return doDispatch({ type: 'bake', recipeId: rule.baseRecipeId, variantId });
+      // sim 게이트(stage·mass·쿨다운)·판정은 베이스 그대로 — 실패 시 baked 이벤트가 없어
+      // applyBakeEvents가 아무것도 안 건드린다(차감 0). discard 베이스(팬케이크·크래커·스콘)는
+      // bakeDiscard 경로 — bake는 bread 전용이라 안 통한다 (2026-08-24 밤 발견 수정)
+      const base = RECIPES.find((r) => r.id === rule.baseRecipeId);
+      return doDispatch(
+        base?.kind === 'discard'
+          ? { type: 'bakeDiscard', recipeId: rule.baseRecipeId, variantId }
+          : { type: 'bake', recipeId: rule.baseRecipeId, variantId },
+      );
     },
 
     devMatureActive(): void {

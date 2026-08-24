@@ -127,18 +127,18 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       const rec = store.getEnvelope().starters.find((r) => r.id === id);
       return rec ? rec.name ?? copy.starter.defaultName(rec.ordinal) : null;
     },
+    addStarter: () => {
+      const rec = store.addStarter();
+      if (rec === null) return false;
+      // addStarter는 새 르방을 활성으로 전환한다 — 씬 컷 계약 동일 적용
+      scene.snapParams(toRenderParams(store.getSnapshot()));
+      scene.setMoldSeed(store.getActiveStarter().sim.createdAt);
+      return true;
+    },
     dev: {
       matureActive: () => store.devMatureActive(),
       grantAllIngredients: () => {
         for (const id of ['olive', 'choco', 'strawberry', 'chestnut'] as const) store.grantIngredient(id, 9);
-      },
-      addStarter: () => {
-        const rec = store.addStarter();
-        if (rec === null) return false;
-        // addStarter는 새 르방을 활성으로 전환한다 — 씬 컷 계약 동일 적용
-        scene.snapParams(toRenderParams(store.getSnapshot()));
-        scene.setMoldSeed(store.getActiveStarter().sim.createdAt);
-        return true;
       },
       completeCollection: () => store.devCompleteCollection(),
     },
@@ -206,7 +206,10 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     if (onLevain && !document.hidden) scene.start();
     else scene.stop();
   };
-  const openShowcase = async (recipeId: string, headline: string, large: boolean): Promise<boolean> => {
+  const openShowcase = async (
+    recipeId: string, headline: string, large: boolean,
+    opts?: { onRebake?: () => void },
+  ): Promise<boolean> => {
     try {
       await scene.enterShowcase(`/breads/${recipeId}.glb`);
     } catch {
@@ -225,6 +228,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
         restoreStage();
       },
       onClose: () => router.handleBack(),
+      onRebake: opts?.onRebake,
     });
     router.push(screen);
     return true;
@@ -233,7 +237,6 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   const recipes = createRecipesScreen(api, () => store.getCollection(), {
     openShowcase,
     onBack: () => showTab('levain'),
-    pushScreen: (screen) => router.push(screen),
   });
 
   const tabs = document.createElement('nav');

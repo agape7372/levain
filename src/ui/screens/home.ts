@@ -43,7 +43,20 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
   nextBtn.textContent = '›';
   nextBtn.setAttribute('aria-label', copy.starter.next);
   nextBtn.addEventListener('click', () => api.switchStarter(1));
-  chipRow.append(prevBtn, chip, nextBtn);
+  // 새 르방이 추가 — 정식 UI (2026-08-24 사용자 확정. 이름은 자동 "르방이 N", 개명은 5단계 게이트)
+  const addBtn = document.createElement('button');
+  addBtn.className = 'chip-nav';
+  addBtn.textContent = '+';
+  addBtn.setAttribute('aria-label', copy.starter.add);
+  addBtn.addEventListener('click', () => {
+    confirmModal({
+      body: copy.starter.addConfirm,
+      confirmLabel: copy.starter.add,
+      cancelLabel: '다음에요',
+      onConfirm: () => toast(api.addStarter() ? copy.starter.added : copy.starter.slotsFull),
+    });
+  });
+  chipRow.append(prevBtn, chip, nextBtn, addBtn);
   top.append(status, sub, chipRow);
   status.addEventListener('click', () => openObserveCard(api));
 

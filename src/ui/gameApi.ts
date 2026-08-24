@@ -33,12 +33,13 @@ export interface GameApi {
   /** 활성 르방 표시명 — starterId로 도감 기록의 "사용 르방" 표기용. 미지 id는 null */
   starterNameOf(id: string): string | null;
 
+  /** 새 르방 추가 (홈 + 버튼 — 정식 UI, 2026-08-24 사용자 확정. 슬롯 상한이면 false) */
+  addStarter(): boolean;
+
   /** 개발자 모드 (설정 버전 7탭 — 사용자 본인 치트. 배선은 app.ts) */
   dev: {
     matureActive(): void;
     grantAllIngredients(): void;
-    /** 새 르방 추가 — 슬롯 상한이면 false */
-    addStarter(): boolean;
     completeCollection(): void;
   };
 

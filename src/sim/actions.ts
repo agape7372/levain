@@ -116,7 +116,7 @@ function bake(state: SimState, recipeId: string, now: number, variantId?: string
   return { state: next, events: [{ type: 'baked', recipeId, grade, ...(variantId ? { variantId } : {}) }] };
 }
 
-function bakeDiscard(state: SimState, recipeId: string, now: number): ActionResult {
+function bakeDiscard(state: SimState, recipeId: string, now: number, variantId?: string): ActionResult {
   const recipe = recipeById(recipeId);
   if (!recipe || recipe.kind !== 'discard') {
     return { state, events: [{ type: 'bakeBlocked', reason: 'unknownRecipe' }] };
@@ -125,7 +125,7 @@ function bakeDiscard(state: SimState, recipeId: string, now: number): ActionResu
   if (gate !== 'ok') return { state, events: [{ type: 'bakeBlocked', reason: gate }] };
 
   const next: SimState = { ...state, lastDiscardBakeAt: now };
-  return { state: next, events: [{ type: 'bakedDiscard', recipeId }] };
+  return { state: next, events: [{ type: 'bakedDiscard', recipeId, ...(variantId ? { variantId } : {}) }] };
 }
 
 /** 얇게 펴 말리기 — 죽음 보험. 덮어쓰기 허용(최신 스냅이 더 낫다) */
@@ -186,7 +186,7 @@ export function applyAction(state: SimState, action: Action, now: number): Actio
     case 'feed': return feed(state, action.ratio, action.flour ?? state.flour, now);
     case 'setLocation': return setLocation(state, action.to, now);
     case 'bake': return bake(state, action.recipeId, now, action.variantId);
-    case 'bakeDiscard': return bakeDiscard(state, action.recipeId, now);
+    case 'bakeDiscard': return bakeDiscard(state, action.recipeId, now, action.variantId);
     case 'makeFlake': return makeFlake(state, now);
     case 'discardStarter': return discardStarter(state, now);
     case 'restoreFlake': return restoreFlake(state, now);

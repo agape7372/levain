@@ -205,6 +205,9 @@ html {
 }
 .seg button.active { background: var(--cream); color: var(--ink); font-weight: 600; }
 .seg button:disabled { opacity: 0.35; cursor: default; }
+/* 도감 이중 세그 — 두 줄을 경계 없이 한 덩어리로 (사용자 확정 2026-08-24) */
+.seg--joined-top { border-radius: 18px 18px 0 0; }
+.seg--joined-bottom { border-radius: 0 0 18px 18px; padding-top: 0; }
 
 /* ── 버튼 ────────────────────────────────────────────── */
 .btn {
@@ -371,6 +374,20 @@ html {
 }
 .recipe-card .art img { width: 60px; height: 60px; object-fit: contain; }
 .recipe-card.locked .art { opacity: 0.25; filter: grayscale(1) brightness(1.35); }
+/* ?-실루엣 — 미발견 도감 항목: 단색 실루엣 + 중앙 ? (사용자 확정 2026-08-24) */
+.recipe-card.mystery { position: relative; }
+.recipe-card.mystery .art { opacity: 0.35; filter: grayscale(1) contrast(0.35) brightness(1.15) sepia(0.5); }
+.mystery-mark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
 /* 방금 해금 — 좌→우 wipe 등장 */
 .recipe-card.just-unlocked {
   -webkit-mask-image: linear-gradient(90deg, #000 50%, transparent 50%);

@@ -142,6 +142,21 @@ describe('변형 굽기 — 원자 해금 (§8-2)', () => {
     expect(raw.shared.collection[VID].count).toBe(1);
   });
 
+  it('discard 베이스 변형(초코칩 팬케이크) — bakeDiscard 경로로 원자 해금', () => {
+    const store = matureStore();
+    store.grantIngredient('choco', 1);
+    const vid = 'pancake--choco-chip';
+    const events = store.bakeVariant(vid);
+    expect(events.some((e) => e.type === 'bakedDiscard')).toBe(true);
+    expect(store.getInventory().choco).toBe(0);
+    expect(store.getCollection()[vid]).toMatchObject({ count: 1, bestGrade: null }); // 판정 없음
+    // 쿨다운(급여당 1회) — 재시도는 차단, 재료도 그대로
+    store.grantIngredient('choco', 1);
+    const again = store.bakeVariant(vid);
+    expect(again).toEqual([{ type: 'bakeBlocked', reason: 'cooldown' }]);
+    expect(store.getInventory().choco).toBe(1);
+  });
+
   it('ruleByVariantId 왕복', () => {
     for (const rule of COMPATIBILITY) {
       expect(ruleByVariantId(variantIdOf(rule))).toBe(rule);

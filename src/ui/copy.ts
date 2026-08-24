@@ -150,6 +150,10 @@ export const copy = {
     defaultName: (ordinal: number) => `르방이 ${ordinal}`,
     prev: '이전 르방이',
     next: '다음 르방이',
+    add: '새 르방이',
+    addConfirm: '새 반죽으로 르방이를 하나 더 시작할까요?',
+    added: '새 르방이가 태어났어요',
+    slotsFull: '병이 세 개까지예요',
   },
 
   recipes: {
@@ -182,10 +186,14 @@ export const copy = {
       rye: '시큼함이 오히려 맛이 되는 빵',
       wholewheat: '통밀의 구수함을 담은 깜빠뉴',
     } as Record<string, string>,
-    // ── Phase 6 — 세그먼트·재료함·빵 도감·변형 (§8) ──
-    segments: { recipes: '레시피', pantry: '재료함', gallery: '빵 도감' },
-    retapHint: '레시피 탭을 한 번 더 누르면 재료함이 열려요',
-    pantryEmpty: '아직 재료가 없어요. 르방이를 돌보다 보면 생길 거예요',
+    // ── Phase 6 — 세그먼트·도감·변형 (§8, 2026-08-24 개편: [레시피|도감]-[빵|재료]) ──
+    segments: { recipes: '레시피', gallery: '도감' },
+    galleryTabs: { bread: '빵', ingredient: '재료' },
+    retapHint: '레시피 탭을 한 번 더 누르면 도감이 열려요',
+    galleryMysteryBase: '아직 만나지 못한 빵이에요',
+    bakeTitle: (name: string) => name,
+    bakePlain: (name: string) => `기본 ${name}`,
+    bakeWithIngredient: (ing: string) => `${ing} 1개를 넣어요`,
     ingredientNames: {
       olive: '올리브', choco: '초콜릿', strawberry: '딸기', chestnut: '밤',
     } as Record<string, string>,
@@ -215,15 +223,7 @@ export const copy = {
     variantConfirm: (name: string, ingredientName: string, g: number) =>
       `${name}, 처음 만들어 봐요. ${ingredientName} 1개와 르방 ${g}g을 써요`,
     variantHint: '재료가 생기면 새로운 빵을 만들 수 있어요',
-    // 빵 도감 (§8-3)
-    galleryFilters: { all: '전체', bakeable: '지금 만들 수 있어요', done: '완성' },
-    galleryEmpty: '아직 구운 빵이 없어요',
-    detailFirstAt: (d: string) => `${d}에 처음 구웠어요`,
-    detailBy: (name: string) => `${name}(이)랑 같이 만들었어요`,
-    detailNotYet: '아직 안 구워 봤어요',
-    view3d: '3D로 보기',
     bakeAgain: '다시 만들기',
-    variantsTitle: '이런 것도 만들 수 있어요',
   },
 
   notify: {

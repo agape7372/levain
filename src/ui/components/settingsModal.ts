@@ -146,7 +146,7 @@ function buildDevRows(api: GameApi): HTMLElement {
     toast(copy.devMode.done);
   }));
   box.appendChild(actionRow(copy.devMode.addStarter, () => {
-    toast(api.dev.addStarter() ? copy.devMode.done : copy.devMode.slotsFull);
+    toast(api.addStarter() ? copy.devMode.done : copy.devMode.slotsFull);
   }));
   box.appendChild(actionRow(copy.devMode.collection, () => {
     api.dev.completeCollection();

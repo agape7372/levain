@@ -9,6 +9,8 @@ export interface ShowcaseScreenDeps {
   /** 닫기 버튼 → router.back() */
   onClose: () => void;
   onShow: () => void;
+  /** "다시 만들기" — 닫고 굽기 모달 재진입 (감상 진입 전용, 결과 연출에선 생략) */
+  onRebake?: () => void;
 }
 
 export function createShowcaseScreen(
@@ -32,6 +34,16 @@ export function createShowcaseScreen(
 
   const bottom = document.createElement('div');
   bottom.className = 'showcase-bottom';
+  if (deps.onRebake) {
+    const rebake = document.createElement('button');
+    rebake.className = 'btn btn-ghost';
+    rebake.textContent = copy.recipes.bakeAgain;
+    rebake.addEventListener('click', () => {
+      deps.onClose(); // 씬 정리 먼저 — 굽기 모달은 홈 캔버스 위에 뜬다
+      deps.onRebake?.();
+    });
+    bottom.appendChild(rebake);
+  }
   const close = document.createElement('button');
   close.className = 'btn btn-primary';
   close.textContent = '좋아요';
