@@ -19,6 +19,8 @@ import type { SimState } from '../src/sim';
 
 const LAB_SAVE_KEY = 'levain:lab-save';
 const LAB_OFFSET_KEY = 'levain:lab-clock-offset';
+/** 설치 대기열 — 리로드 직전 저장 레이스를 피한다 (install() 주석) */
+const LAB_PENDING_KEY = 'levain:lab-pending-install';
 
 // ── 시계 — 오프셋은 리로드를 살아남는다 (픽스처 설치 = save + reload 패턴이라 필수) ──
 let offset = Number(localStorage.getItem(LAB_OFFSET_KEY) ?? '0') || 0;
@@ -78,8 +80,18 @@ function envelopeOf(fixes: Fixture[], now: number): SaveEnvelope {
 const labStorage = createStorage(LAB_SAVE_KEY);
 
 function install(fixes: Fixture[]): void {
-  save(envelopeOf(fixes, labClock.now()), labStorage);
+  // ⚠ lab-save에 바로 쓰면 안 된다: reload가 visibilitychange(hidden)를 일으키고
+  // app.ts의 saveNow()가 **설치본 위에 현재 상태를 덮는다**(2026-08-24 실측 — 멀티 설치가
+  // 조용히 1마리로 되돌아왔다). 대기열 키에 넣고 다음 부팅이 집어가게 한다.
+  localStorage.setItem(LAB_PENDING_KEY, JSON.stringify(envelopeOf(fixes, labClock.now())));
   location.reload(); // 가장 안전한 재부트 — importSave와 같은 패턴
+}
+
+// 대기열 소비 — startApp 이전(= 앱이 저장을 읽기 전)이어야 한다
+const pendingRaw = localStorage.getItem(LAB_PENDING_KEY);
+if (pendingRaw !== null) {
+  localStorage.removeItem(LAB_PENDING_KEY);
+  labStorage.saveRaw(pendingRaw);
 }
 
 // 첫 진입 — lab 저장이 없으면 피크 하나를 깔아 온보딩 게이트를 건너뛴다

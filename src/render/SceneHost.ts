@@ -32,6 +32,10 @@ export class SceneHost {
   onStirStart: (() => void) | null = null;
   onStirMove: ((speed01: number) => void) | null = null;
   onStirEnd: (() => void) | null = null;
+  /** 배경 좌우 스와이프 = 르방 전환 (§5-5). 허용 여부·처리 모두 배선은 app.ts.
+   *  필드 위임인 이유: 컨텍스트 유실 복구가 dispose→mount로 attachInput을 다시 부른다 */
+  canSwipe: (() => boolean) | null = null;
+  onSwipe: ((dir: 1 | -1) => void) | null = null;
   private cloth: Cloth | null = null;
   private jar: Jar | null = null;
   private showcase: BreadShowcase | null = null;
@@ -101,6 +105,8 @@ export class SceneHost {
       onStirStart: () => this.onStirStart?.(),
       onStirMove: (s) => this.onStirMove?.(s),
       onStirEnd: () => this.onStirEnd?.(),
+      canSwipe: () => (this.canSwipe?.() ?? false) && !this.isSequenceActive(),
+      onSwipe: (dir) => this.onSwipe?.(dir),
     });
 
     this.resizeObserver = new ResizeObserver(() => this.fit());

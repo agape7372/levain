@@ -23,7 +23,7 @@ import type { StorageAdapter } from './platform/storage';
 import type { GameStore } from './store/gameStore';
 import { copy } from './ui/copy';
 import { toast } from './ui/components/toast';
-import { openModal } from './ui/components/modal';
+import { hasOpenModal, openModal } from './ui/components/modal';
 import { openMoldModal } from './ui/components/moldModal';
 import { openBriefingCard } from './ui/components/briefingCard';
 import { Router } from './ui/router';
@@ -153,6 +153,14 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     clearPendingBake: () => store.setFlags({ pendingBake: null }),
   };
 
+  // ── 배경 좌우 스와이프 = 르방 전환 (§5-5) ──
+  // 칩 ‹ › 와 같은 경로(api.switchStarter). 연출 중 차단은 SceneHost가 얹는다 —
+  // 칩은 skipSequence로 넘어가는 의도적 비대칭: 버튼은 명시 의사, 스와이프는
+  // 급여 2.8s 중의 손가락 흔들림일 수 있다.
+  let showcaseActive = false;
+  scene.canSwipe = () => api.starters().count > 1 && !hasOpenModal() && !showcaseActive;
+  scene.onSwipe = (dir) => api.switchStarter(dir);
+
   // ── 화면·탭 ──
   const router = new Router(uiRoot, {
     onRootBack: () => {
@@ -185,11 +193,13 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     }
     const screen = createShowcaseScreen(recipeId, headline, large, {
       onShow: () => {
+        showcaseActive = true;
         stage.style.visibility = 'visible';
         scene.start();
         scene.spawnSteam(); // 갓 구운 김
       },
       onExit: () => {
+        showcaseActive = false;
         scene.exitShowcase();
         restoreStage();
       },

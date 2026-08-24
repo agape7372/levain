@@ -4,6 +4,8 @@
 //   드래그(≥8px)            → 2채널: 반죽 위에서 천천히 끌면 grab(변위 추종·점탄성),
 //                             빠르게 문지르거나 반죽 밖 시작이면 stir(속도 시어장)
 //                             — 한 포인터 세션의 소유권은 중간에 안 바뀐다 (§5-5 원칙)
+//   배경 시작 + 수평 우세      → swipe(르방 전환). canSwipe()가 false면 이 분기 자체가 없다
+//                             (= 기존 stir 경로 그대로)
 //   덮개 덮임               → 위로 플릭 또는 탭 = 걷기, 반죽 조작은 통과 안 함
 // grab 놓기 = pointerup/cancel (M2 해소 — 80ms 정지 판정은 stir 전용).
 // pointermove는 rAF 코얼레싱 — 프레임당 1회만 레이캐스트.
@@ -18,6 +20,9 @@ const FLICK_MAX_MS = 350;
 /** 드래그 분류 임계 — 이 픽셀 속도(px/ms) 미만이면 grab, 이상이면 stir.
  *  0.9는 실기기에서 grab이 잘 안 잡힘(터치 첫 move가 빠르게 판정) → 1.6 상향 (2026-08-24) */
 const GRAB_MAX_PX_PER_MS = 1.6;
+/** 좌우 스와이프(르방 전환) 최소 이동 · 수평 우세비 (§5-5) */
+const SWIPE_MIN_PX = 48;
+const SWIPE_H_RATIO = 1.5;
 /** 반죽 위 판정 반경 (오브젝트 공간) — 실루엣 반경 상한과 동기 (드리프트 방지) */
 const DOUGH_R = R_XZ_MAX_BASE;
 
@@ -34,6 +39,15 @@ export interface InputHooks {
   /** 신장 정도 0~1 — 사운드·햅틱 훅용 (현재 미배선 — Phase 1 튜닝 후) */
   onGrabMove?(stretch01: number): void;
   onGrabEnd?(): void;
+  /** 지금 르방 전환 스와이프를 받아도 되는가 (르방 2마리 이상·모달/연출/쇼케이스 아님) */
+  canSwipe?(): boolean;
+  /** 전환 방향 — 왼쪽으로 끌면 +1(다음), 오른쪽이면 -1(이전). 칩 ‹ › 와 같은 순서 */
+  onSwipe?(dir: 1 | -1): void;
+}
+
+/** 스와이프 확정 판정 — 누적 이동 기준(8px 시점의 dx/dy 비는 터치 노이즈다). 테스트용 export */
+export function isSwipeCommit(dx: number, dy: number): boolean {
+  return Math.abs(dx) >= SWIPE_MIN_PX && Math.abs(dx) > Math.abs(dy) * SWIPE_H_RATIO;
 }
 
 export function attachInput(
@@ -54,7 +68,7 @@ export function attachInput(
   let downY = 0;
   let downAt = 0;
   let moved = false;
-  let mode: 'grab' | 'stir' | null = null;
+  let mode: 'grab' | 'stir' | 'swipe' | null = null;
   let downOnDough = false;
   let downHitX = 0;
   let downHitZ = 0;
@@ -106,16 +120,26 @@ export function attachInput(
         // 드래그 분류 — 임계 도달 시점의 픽셀 속도. 세션 소유권 고정
         const dtMs = Math.max(1, performance.now() - downAt);
         const slow = distPx / dtMs < GRAB_MAX_PX_PER_MS;
+        const dxT = e.clientX - downX;
+        const dyT = e.clientY - downY;
         if (downOnDough && slow) {
           mode = 'grab';
           dough.grabStart(downHitX, downHitZ);
           hooks.onGrabStart?.();
+        } else if (
+          // 배경 시작 + 수평 우세 → 스와이프 후보. 확정은 up에서 누적 이동으로 (§5-5)
+          !downOnDough &&
+          (hooks.canSwipe?.() ?? false) &&
+          Math.abs(dxT) > Math.abs(dyT)
+        ) {
+          mode = 'swipe';
         } else {
           mode = 'stir';
           hooks.onStirStart?.();
         }
       }
     }
+    if (mode === 'swipe') return; // 반죽에 손대지 않는다 — 레이캐스트도 생략
     if (!raycast(e)) return;
     const t = performance.now() / 1000;
     const dt = Math.max(1 / 240, t - lastHitT);
@@ -182,6 +206,14 @@ export function attachInput(
         hooks.onUncover?.();
       }
       coveredGesture = false;
+      return;
+    }
+
+    if (mode === 'swipe') {
+      // 확정은 여기서만 — 누적 |dx|≥48 & 수평 우세 1.5배. 미달이면 아무 일도 없다
+      const dx = e.clientX - downX;
+      if (isSwipeCommit(dx, dy) && (hooks.canSwipe?.() ?? false)) hooks.onSwipe?.(dx < 0 ? 1 : -1);
+      mode = null;
       return;
     }
 
