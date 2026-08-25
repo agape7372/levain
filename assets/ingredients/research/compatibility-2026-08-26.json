@@ -138,7 +138,7 @@
  {
   "baseRecipeId": "focaccia",
   "ingredientId": "blackgarlic",
-  "form": "piece",
+  "form": "crumble",
   "status": "verified",
   "sourceRef": "https://brodandtaylor.com/blogs/recipes/black-garlic-sourdough-focaccia",
   "demoted": false
@@ -146,7 +146,7 @@
  {
   "baseRecipeId": "loaf",
   "ingredientId": "blackgarlic",
-  "form": "piece",
+  "form": "crumble",
   "status": "conditional",
   "sourceRef": "https://natashasbaking.com/black-garlic-sourdough-bread/",
   "demoted": true
@@ -154,7 +154,7 @@
  {
   "baseRecipeId": "campagne",
   "ingredientId": "blackgarlic",
-  "form": "piece",
+  "form": "crumble",
   "status": "conditional",
   "sourceRef": "https://sourdoughtalk.com/black-garlic-sourdough-bread/",
   "demoted": false
@@ -162,7 +162,7 @@
  {
   "baseRecipeId": "cracker",
   "ingredientId": "blackgarlic",
-  "form": "piece",
+  "form": "crumble",
   "status": "experimental",
   "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
   "demoted": false
@@ -170,7 +170,7 @@
  {
   "baseRecipeId": "flatbread",
   "ingredientId": "blackgarlic",
-  "form": "piece",
+  "form": "crumble",
   "status": "experimental",
   "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
   "demoted": false
@@ -178,7 +178,7 @@
  {
   "baseRecipeId": "rye",
   "ingredientId": "blackgarlic",
-  "form": "piece",
+  "form": "crumble",
   "status": "experimental",
   "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
   "demoted": false
@@ -186,7 +186,7 @@
  {
   "baseRecipeId": "scone",
   "ingredientId": "yuzu",
-  "form": "piece",
+  "form": "slice",
   "status": "conditional",
   "sourceRef": "https://kankitsulabo.com/blogs/sweets/candied-yuzu-peel-scones",
   "demoted": false
@@ -394,7 +394,7 @@
  {
   "baseRecipeId": "campagne",
   "ingredientId": "raisin",
-  "form": "dried",
+  "form": "flesh",
   "status": "conditional",
   "sourceRef": "https://amybakesbread.com/cinnamon-raisin-sourdough-bread/",
   "demoted": true
@@ -402,7 +402,7 @@
  {
   "baseRecipeId": "loaf",
   "ingredientId": "raisin",
-  "form": "dried",
+  "form": "flesh",
   "status": "verified",
   "sourceRef": "https://homegrownhappiness.com/sourdough-cinnamon-raisin-bread/",
   "demoted": false
@@ -410,7 +410,7 @@
  {
   "baseRecipeId": "wholewheat",
   "ingredientId": "raisin",
-  "form": "dried",
+  "form": "flesh",
   "status": "verified",
   "sourceRef": "https://journeytotheeternalcity.com/whole-wheat-cinnamon-swirl-raisin-bread-recipe/",
   "demoted": false
@@ -418,7 +418,7 @@
  {
   "baseRecipeId": "scone",
   "ingredientId": "raisin",
-  "form": "dried",
+  "form": "flesh",
   "status": "conditional",
   "sourceRef": "https://www.thenfeedthem.com/post/how-to-make-quick-sourdough-golden-raisin-scones-with-your-discard",
   "demoted": true
@@ -426,7 +426,7 @@
  {
   "baseRecipeId": "rye",
   "ingredientId": "raisin",
-  "form": "dried",
+  "form": "flesh",
   "status": "conditional",
   "sourceRef": "https://www.virtuousbread.com/bread-recipe/wonderful-recipe-for-delicious-sourdough-rye-and-raisin-bread/",
   "demoted": false
@@ -434,7 +434,7 @@
  {
   "baseRecipeId": "pancake",
   "ingredientId": "raisin",
-  "form": "dried",
+  "form": "flesh",
   "status": "experimental",
   "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
   "demoted": false
@@ -618,7 +618,7 @@
  {
   "baseRecipeId": "scone",
   "ingredientId": "maple",
-  "form": "piece",
+  "form": "cube",
   "status": "experimental",
   "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
   "demoted": true
@@ -626,7 +626,7 @@
  {
   "baseRecipeId": "campagne",
   "ingredientId": "maple",
-  "form": "piece",
+  "form": "cube",
   "status": "conditional",
   "sourceRef": "https://enwnutrition.com/maple-oat-sourdough-bread/",
   "demoted": false
@@ -634,7 +634,7 @@
  {
   "baseRecipeId": "loaf",
   "ingredientId": "maple",
-  "form": "piece",
+  "form": "cube",
   "status": "conditional",
   "sourceRef": "https://vanillaandbean.com/maple-oat-sourdough-sandwich-bread/",
   "demoted": false
@@ -642,7 +642,7 @@
  {
   "baseRecipeId": "focaccia",
   "ingredientId": "maple",
-  "form": "piece",
+  "form": "cube",
   "status": "conditional",
   "sourceRef": "https://actsofsourdough.com/maple-bacon-focaccia/",
   "demoted": false
@@ -650,7 +650,7 @@
  {
   "baseRecipeId": "pancake",
   "ingredientId": "maple",
-  "form": "piece",
+  "form": "cube",
   "status": "experimental",
   "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
   "demoted": false
@@ -798,5 +798,45 @@
   "status": "conditional",
   "sourceRef": "https://dontwastethecrumbs.com/yummy-recipe-toasted-coconut-and-banana-sourdough-pancakes/",
   "demoted": true
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "beet",
+  "form": "fresh",
+  "status": "verified",
+  "sourceRef": "https://sammywongskitchen.com/beet-chia-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "beet",
+  "form": "fresh",
+  "status": "conditional",
+  "sourceRef": "https://www.ourhomesteadonthehill.com/homestead/sourdough-beet-focaccia/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "beet",
+  "form": "fresh",
+  "status": "conditional",
+  "sourceRef": "https://passionspoon.com/beetroot-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "beet",
+  "form": "roasted",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "wholewheat",
+  "ingredientId": "beet",
+  "form": "fresh",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
  }
 ]

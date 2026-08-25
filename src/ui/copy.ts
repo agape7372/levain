@@ -259,6 +259,13 @@ export const copy = {
       olive: '올리브', choco: '초콜릿', strawberry: '딸기', chestnut: '밤',
       walnut: '호두', cranberry: '크랜베리', fig: '무화과', rosemary: '로즈마리',
       cheese: '치즈', cinnamon: '계피', blueberry: '블루베리', pumpkin: '단호박',
+      // 2026-08-26 확장 18종. `poppyseed`는 표준 식품명이 '양귀비씨'지만 아편 연상이 있어
+      // 담백 규칙(GDD §10)에 맞게 '포피시드'로 간다 — 되돌리려면 이 줄만 고치면 된다.
+      raisin: '건포도', lemon: '레몬', banana: '바나나', apricot: '살구',
+      beet: '비트', coconut: '코코넛', pistachio: '피스타치오', oat: '귀리',
+      poppyseed: '포피시드', sunflowerseed: '해바라기씨', flaxseed: '아마씨', maple: '메이플',
+      redbean: '팥', sweetpotato: '고구마', matcha: '말차', blackgarlic: '흑마늘',
+      yuzu: '유자', honey: '꿀',
     } as Record<string, string>,
     formNames: {
       flesh: '과육', slice: '슬라이스', oil: '오일', brine: '브라인',
@@ -267,6 +274,7 @@ export const copy = {
       piece: '구운 조각', flour: '밤가루', puree: '퓌레',
       dried: '건조', sprig: '생잎', cube: '큐브', crumble: '크럼블',
       ground: '가루', swirl: '스월', seed: '씨앗',
+      flake: '플레이크', // 2026-08-26 확장에서 늘어난 형태는 이것 하나뿐 (압착 귀리)
     } as Record<string, string>,
     /** 변형 표시명 — 같은 재료의 형태끼리 표시가 겹치지 않아야 한다 (과육/슬라이스, 생과/구운) */
     variantName: (ingredientName: string, formName: string, baseName: string) => {

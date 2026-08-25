@@ -34,30 +34,55 @@ function matureStore(): GameStore {
   return createGameStore({ clock: { now: () => T0 + 5 * 3_600_000 }, storage: memStorage() }, env);
 }
 
+/**
+ * 카탈로그 기대값 — **`src/sim/ingredients.ts`를 건드리는 변경은 이 블록을 같이 올린다.**
+ *
+ * 왜 리터럴을 유지하나: `expect(X.length).toBe(X.length)` 식으로 파생하면 아무것도 안 잰다.
+ * 사람이 의도적으로 숫자를 올리는 **리뷰 체크포인트**가 이 단언들의 존재 이유다 —
+ * 배치 병합이 행을 조용히 더하거나 빠뜨리는 걸 잡는 유일한 장치다.
+ */
+const EXPECTED = {
+  total: 194,
+  verified: 78,
+  conditional: 76,
+  experimental: 39,
+  blocked: 1,
+  /** §18 재구성분(2026-08-24) — **영구 동결**. URL 재조작 금지 원칙이라 다시 늘지 않는다 */
+  frozenSectionRefs: 46,
+} as const;
+
 describe('카탈로그 무결성 (§18 전사 — 재구성 검증)', () => {
-  it('총 89행, blocked는 정확히 크래커×초코칩 1건', () => {
-    expect(COMPATIBILITY.length).toBe(89);
+  it(`총 ${EXPECTED.total}행, blocked는 정확히 크래커×초코칩 1건`, () => {
+    expect(COMPATIBILITY.length).toBe(EXPECTED.total);
+    // blocked는 "검증해서 실패한 것"이라 늘어나는 게 나쁜 일이 아니다 — 늘면 여기 목록을 갱신한다.
+    // 정확일치를 유지하는 건 **모르는 사이에** 늘거나 사라지는 걸 막기 위해서다.
     const blocked = COMPATIBILITY.filter((r) => r.status === 'blocked');
     expect(blocked).toEqual([
       expect.objectContaining({ baseRecipeId: 'cracker', ingredientId: 'choco', form: 'chip' }),
     ]);
   });
 
-  it('집계 체크섬: verified 45 / conditional 27 / experimental 16 / blocked 1', () => {
+  it('집계 체크섬', () => {
     const count = (s: string): number => COMPATIBILITY.filter((r) => r.status === s).length;
-    // §18 재구성 46행(27/13/5/1) + 확장 8종 조사 43행(18/14/11/0) = 89행.
-    // 회귀 감지용 체크섬 — 행을 늘리면 여기도 같이 올린다.
-    expect(count('verified')).toBe(45);
-    expect(count('conditional')).toBe(27);
-    expect(count('experimental')).toBe(16);
-    expect(count('blocked')).toBe(1);
+    // §18 재구성 46행(27/13/5/1) + 확장 8종 43행(18/14/11/0) + 확장 18종 105행(33/49/23/0).
+    expect(count('verified')).toBe(EXPECTED.verified);
+    expect(count('conditional')).toBe(EXPECTED.conditional);
+    expect(count('experimental')).toBe(EXPECTED.experimental);
+    expect(count('blocked')).toBe(EXPECTED.blocked);
   });
 
-  it('URL sourceRef를 단 행은 verified/conditional뿐이고, 그 역도 성립한다(확장 8종)', () => {
+  it('URL sourceRef를 단 행은 verified/conditional뿐이고, 그 역도 성립한다(URL 조사분 전체)', () => {
     // 조사 계약: **연 페이지의 URL이 없으면 verified/conditional 금지**. 개수를 채우려고
-    // 등급을 올리는 걸 구조적으로 막는다. §18 재구성분은 절 번호 참조라 이 검사에서 제외
+    // 등급을 올리는 걸 구조적으로 막는다.
+    //
+    // ★조사분 개수를 리터럴로 들고 있지 않는다 — §18 재구성분이 **영구 동결**이라
+    // "전체 − 동결분"으로 파생되고, 그러면 배치가 늘어도 유지할 리터럴이 0개다.
+    // 대신 동결분 자체를 단언한다(이쪽이 진짜 불변식이다).
+    const frozen = COMPATIBILITY.filter((r) => r.sourceRef.startsWith('§'));
+    expect(frozen.length).toBe(EXPECTED.frozenSectionRefs);
+
     const expanded = COMPATIBILITY.filter((r) => !r.sourceRef.startsWith('§'));
-    expect(expanded.length).toBe(43);
+    expect(expanded.length).toBe(EXPECTED.total - EXPECTED.frozenSectionRefs);
     for (const r of expanded) {
       const hasUrl = r.sourceRef.startsWith('https://');
       expect(hasUrl, `${variantIdOf(r)} — ${r.status} / ${r.sourceRef}`)
