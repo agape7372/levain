@@ -63,6 +63,7 @@ export const INGREDIENT_BUILDERS: Record<string, IngredientBuilder> = {
   honey: createHoney,
   maple: createMaple,
   pistachio: createPistachio,
+  blackgarlic: createBlackgarlic,
 };
 
 /**
