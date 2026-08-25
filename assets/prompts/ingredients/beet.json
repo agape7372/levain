@@ -1,0 +1,55 @@
+{
+  "id": "beet",
+  "version": 1,
+  "name_ko": "비트",
+  "hero_form": "roasted",
+  "subject": "a single roasted beet root sliced in half lengthwise",
+  "geometry": {
+    "silhouette": "one round beet root sliced in half lengthwise, its flat cut face turned toward the camera and marked with concentric rings radiating from the center, framed by a thin dark skin rim around the outer curve and a short trimmed stub on top where the leaves were removed",
+    "surface": [
+      "a matte magenta cut face (#A83368) marked with alternating concentric rings of deeper plum-magenta (#7A2350) and paler dusty pink (#C4548A) radiating from the center like tree rings, framed by a thin deep maroon-brown skin rim (#5C2438) — rendered as dry matte clay-like flesh, expressed purely as flat color facets, never as shine, never wet or glossy"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "soup",
+    "borscht",
+    "bowl",
+    "blood",
+    "raw meat",
+    "viscera",
+    "leafy greens",
+    "beet greens",
+    "juice",
+    "glossy wet surface"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a single roasted beet root sliced in half lengthwise, a single game asset object on a plain backdrop. Geometry: one round beet root sliced in half lengthwise, its flat cut face turned toward the camera and marked with concentric rings radiating from the center, framed by a thin dark skin rim around the outer curve and a short trimmed stub on top where the leaves were removed. Surface: a matte magenta cut face (#A83368) marked with alternating concentric rings of deeper plum-magenta (#7A2350) and paler dusty pink (#C4548A) radiating from the center like tree rings, framed by a thin deep maroon-brown skin rim (#5C2438) — rendered as dry matte clay-like flesh, expressed purely as flat color facets, never as shine, never wet or glossy. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no soup, no borscht, no bowl, no blood, no raw meat, no viscera, no leafy greens, no beet greens, no juice, no glossy wet surface, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a single roasted beet root sliced in half lengthwise, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a single roasted beet root sliced in half lengthwise, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "평평한 절단면의 동심원 나이테를 결정적 특징으로 명시했다. 자홍색 절단면이 핏빛·생살로 오독될 위험이 커서 '무광 점토질'을 표면 서술에 직접 박고 blood·raw meat·viscera·glossy wet surface를 negative에 명시 차단했다. 수프(보르시)·잎채소 연상도 함께 막았다."
+}

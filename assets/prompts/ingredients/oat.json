@@ -1,0 +1,54 @@
+{
+  "id": "oat",
+  "version": 1,
+  "name_ko": "귀리",
+  "hero_form": "flake",
+  "subject": "a low mound of rolled oat flakes with three flakes separated in front",
+  "geometry": {
+    "silhouette": "a low loose mound of pressed oat flakes heaped together, with three individual flat oval flakes separated and lying in front of the mound, each flake a thin pressed disc with a slightly curled edge",
+    "surface": [
+      "a warm tan body (#D7C7A3) with a deeper toasted-oat shadow (#B8A47D) pooling in the pressed folds, a pale cream highlight (#EDE0C4) catching the flattened top faces, and a darker umber edge ridge (#8F7A54) tracing each flake's curled rim — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "oat groats",
+    "whole grain kernels",
+    "porridge",
+    "milk",
+    "bowl",
+    "spoon",
+    "oat field",
+    "straw",
+    "wheat ears"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a low mound of rolled oat flakes with three flakes separated in front, a single game asset object on a plain backdrop. Geometry: a low loose mound of pressed oat flakes heaped together, with three individual flat oval flakes separated and lying in front of the mound, each flake a thin pressed disc with a slightly curled edge. Surface: a warm tan body (#D7C7A3) with a deeper toasted-oat shadow (#B8A47D) pooling in the pressed folds, a pale cream highlight (#EDE0C4) catching the flattened top faces, and a darker umber edge ridge (#8F7A54) tracing each flake's curled rim — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no oat groats, no whole grain kernels, no porridge, no milk, no bowl, no spoon, no oat field, no straw, no wheat ears, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a low mound of rolled oat flakes with three flakes separated in front, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a low mound of rolled oat flakes with three flakes separated in front, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "압착 귀리(플레이크)가 대표 형태라서 '통귀리(groats)'·'밀 이삭'을 negative로 막았다 — 생성기가 밀밭 사진이나 통곡물 알갱이로 끌고 가는 경향이 있어서다. 납작한 원반 실루엣과 가장자리 결(#8F7A54)이 압착 질감의 핵심 단서다."
+}

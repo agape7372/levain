@@ -1,0 +1,52 @@
+{
+  "id": "raisin",
+  "version": 1,
+  "name_ko": "건포도",
+  "hero_form": "dried",
+  "subject": "a small loose pile of five wrinkled raisins",
+  "geometry": {
+    "silhouette": "five small oblong raisins piled loosely together in a low irregular heap, each one covered in deep puckered wrinkles running along its length, no smooth or glossy stretches, one raisin tilted to show its wrinkled end",
+    "surface": [
+      "a deep near-black brown body (#2E2018) with darker shadow pooling deep in the wrinkle creases (#1D130D) and a warm brown catching the raised ridges between creases (#55402A) — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "grape",
+    "grape cluster",
+    "vine",
+    "stem",
+    "fresh fruit",
+    "wine",
+    "glossy skin"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a small loose pile of five wrinkled raisins, a single game asset object on a plain backdrop. Geometry: five small oblong raisins piled loosely together in a low irregular heap, each one covered in deep puckered wrinkles running along its length, no smooth or glossy stretches, one raisin tilted to show its wrinkled end. Surface: a deep near-black brown body (#2E2018) with darker shadow pooling deep in the wrinkle creases (#1D130D) and a warm brown catching the raised ridges between creases (#55402A) — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no grape, no grape cluster, no vine, no stem, no fresh fruit, no wine, no glossy skin, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a small loose pile of five wrinkled raisins, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a small loose pile of five wrinkled raisins, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "쭈글쭈글한 주름을 결정적 특징으로 명시했다 — 매끈하면 올리브(#3B2F2F 계열)와 실루엣이 구분되지 않는다. 포도 연상(그레이프 클러스터·덩굴·와인)과 광택 있는 생과일 피부를 negative로 명시 차단했다."
+}

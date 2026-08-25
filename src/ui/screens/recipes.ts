@@ -11,7 +11,7 @@ import { ingredientArt } from './ingredientArt';
 import type { GameApi } from '../gameApi';
 import type { CollectionEntry, CompatibilityRule, RecipeDef, SimEvent, Snapshot } from '../../sim';
 import {
-  INGREDIENTS, RECIPES, FLOAT_OK_ACTIVITY, rulesForBase, variantIdOf,
+  INGREDIENTS, RECIPES, FLOAT_OK_ACTIVITY, rulesForBase, variantIdOf, playableRules,
   INGREDIENT_FLOUR_COST, FLOUR_PER_INGREDIENT, INGREDIENT_SOFT_CAP, MISSION_REWARD_FLOUR,
   STAGE_REWARD_FLOUR, RECIPE_REWARD_FLOUR,
 } from '../../sim';
@@ -23,11 +23,16 @@ type GalleryTab = 'bread' | 'ingredient';
 export interface ShowcaseOpts {
   /** 쇼케이스 하단 "다시 만들기" — 닫힌 뒤 굽기 모달 재진입 */
   onRebake?: () => void;
+  /**
+   * 자산 패밀리 (기본 bread). 재료는 GLB 경로가 다르고 **김을 뿜지 않는다** —
+   * 김은 갓 구운 빵의 다이제틱 신호라 생재료에 붙으면 거짓말이 된다.
+   */
+  kind?: 'bread' | 'ingredient';
 }
 
 export interface RecipesScreenDeps {
   /** 3D 쇼케이스 열기 — GLB 없으면 false를 돌려주고 카드 리절트로 폴백 */
-  openShowcase?: (recipeId: string, headline: string, large: boolean, opts?: ShowcaseOpts) => Promise<boolean>;
+  openShowcase?: (id: string, headline: string, large: boolean, opts?: ShowcaseOpts) => Promise<boolean>;
   /** 뒤로(르방이 탭 복귀) — 헤더 백버튼 */
   onBack?: () => void;
 }
@@ -164,6 +169,23 @@ export function createRecipesScreen(
     void deps.openShowcase(recipe.id, '', false, { onRebake: () => openBakeModal(recipe) }).then((ok) => {
       if (!ok) openResultModal(recipe.id, '');
     });
+  }
+
+  /**
+   * 재료 감상 진입 — 3D만. "다시 만들기"는 없다(재료는 굽는 게 아니라 넣는 것이다).
+   * GLB가 아직 없으면 false가 와서 조용히 아무 일도 안 일어난다 — 도감 카드 탭이
+   * 실패 모달을 띄우는 건 과하다.
+   */
+  function openIngredientView(id: string): void {
+    if (!deps.openShowcase) return;
+    void deps.openShowcase(id, copy.recipes.ingredientHeadline(playableCountOf(id)), false, {
+      kind: 'ingredient',
+    });
+  }
+
+  /** 그 재료로 열 수 있는 변형 수 — 쇼케이스 한 줄 문구가 데이터에서 파생된다(재료별 문구 0줄) */
+  function playableCountOf(id: string): number {
+    return playableRules().filter((r) => r.ingredientId === id).length;
   }
 
   // ── 굽기 모달 — "기본 + 재료 추가" 옵션 리스트 (home.ts 비율 모달 패턴) ──
@@ -307,6 +329,25 @@ export function createRecipesScreen(
     return art;
   }
 
+  /**
+   * 재료 카드 아트 — artOf와 같은 구조(PNG 우선 · 실패 시 SVG 폴백).
+   * 그록 원본(assets/ingredients/src/)을 쓰지 않는 이유: 배경이 페일 세이지 단색이라
+   * 카드 표면(--bg-soft)과 충돌한다. GLB에서 구운 **투명 배경** 썸네일만 올린다.
+   */
+  function ingredientArtOf(id: string): HTMLElement {
+    const art = document.createElement('div');
+    art.className = 'art';
+    const img = document.createElement('img');
+    img.src = `/ingredients/thumbs/${id}.png`;
+    img.alt = '';
+    img.addEventListener('error', () => {
+      img.remove();
+      art.appendChild(ingredientArt(id));
+    });
+    art.appendChild(img);
+    return art;
+  }
+
   /** ?-실루엣 카드 — 미발견·미해금 공용 (도감의 신비 항목) */
   function mysteryCard(baseRecipeId: string, onTap: () => void): HTMLButtonElement {
     const card = document.createElement('button');
@@ -428,22 +469,24 @@ export function createRecipesScreen(
     for (const ing of INGREDIENTS) {
       const known = (inv[ing.id] ?? 0) > 0
         || Object.keys(collection).some((k) => k.includes(`--${ing.id}-`));
-      const card = document.createElement('div');
+      // 도감-빵과 같은 규약: 카드는 전부 버튼이고 미발견은 힌트 토스트로 답한다.
+      // (개편 전엔 div라 재료 카드만 아무 반응이 없었다 — 규약 불일치였다)
+      const card = document.createElement('button');
+      card.type = 'button';
       card.className = known ? 'recipe-card' : 'recipe-card mystery';
-      const art = document.createElement('div');
-      art.className = 'art';
-      art.appendChild(ingredientArt(ing.id));
-      card.appendChild(art);
+      card.appendChild(ingredientArtOf(ing.id));
       if (known) {
         const name = document.createElement('div');
         name.className = 'name';
         name.textContent = `${copy.recipes.ingredientNames[ing.id]} · ${copy.recipes.ingredientCount(inv[ing.id] ?? 0)}`;
         card.appendChild(name);
+        card.addEventListener('click', () => openIngredientView(ing.id));
       } else {
         const mark = document.createElement('div');
         mark.className = 'mystery-mark';
         mark.textContent = '?';
         card.appendChild(mark);
+        card.addEventListener('click', () => toast(copy.recipes.galleryIngredientLocked));
       }
       grid.appendChild(card);
     }

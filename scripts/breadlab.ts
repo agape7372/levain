@@ -1,8 +1,12 @@
-// breadlab — 빵 절차 모델링 하네스 (dev 전용). 계약: scripts/breads/types.ts.
+// breadlab — 절차 모델링 하네스 (dev 전용). 계약: scripts/breads/types.ts · scripts/ingredients/types.ts.
 // 씬·조명·카메라·Lambert 강제 = scripts/thumbsHarness.ts와 동일(프로덕션 룩 파리티).
 //
+// ⚠ 이름 빚: 파일명은 breadlab이지만 **빵·재료 두 패밀리를 다 굽는다**(?family=). 개명하면
+//   CRIB.md·핸드오프·문서의 명령줄이 전부 깨지는데 얻는 게 이름뿐이라 두었다 (docs/INGREDIENTS.md 참조).
+//
 // URL 파라미터가 전체 상태(HMR 리로드·puppeteer 재사용 안전):
-//   ?id=<id|debug>       대상 빵 (debug = lib 검증용 내장 블롭)
+//   ?family=bread|ingredient   자산 패밀리 (기본 bread — 기존 빵 명령줄 무변경)
+//   ?id=<id|debug>       대상 (debug = lib 검증용 내장 블롭)
 //   ?view=34|front|top|orbit   카메라 (34 = thumbsHarness 수치 복제, 기본값)
 //   ?azimuth=<도>        카메라를 Y축 기준 회전(턴테이블 게이트용 — view=34 기준 각도 오프셋)
 //   ?overlay=0..1        레퍼런스 3/4뷰를 캔버스 위 반투명 오버레이
@@ -16,7 +20,9 @@ import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { BREAD_BUILDERS, BREAD_ORDER } from './breads/index';
+import { INGREDIENT_BUILDERS, INGREDIENT_ORDER } from './ingredients/index';
 import { facet, hashId, jitterVertices, mergeByMaterial, mulberry32, stdMaterial, uvTopPlanar } from './breads/lib';
+import { FAMILIES } from './lib/families.mjs';
 
 declare global {
   interface Window {
@@ -29,6 +35,13 @@ declare global {
 }
 
 const params = new URLSearchParams(location.search);
+// 패밀리 분기 — 기본 bread라 family 없는 기존 빵 명령줄이 그대로 통한다(회귀 게이트)
+const familyKey = params.get('family') === 'ingredient' ? 'ingredient' : 'bread';
+const family = FAMILIES[familyKey];
+const BUILDERS: Record<string, (rng: () => number) => THREE.Group> =
+  familyKey === 'ingredient' ? INGREDIENT_BUILDERS : BREAD_BUILDERS;
+const ORDER: readonly string[] = familyKey === 'ingredient' ? INGREDIENT_ORDER : BREAD_ORDER;
+
 const id = params.get('id') ?? 'debug';
 const view = params.get('view') ?? '34';
 const overlay = Number(params.get('overlay') ?? '0');
@@ -38,7 +51,7 @@ const compare = params.get('compare') === '1';
 const shot = params.get('shot') === '1';
 const exportParam = params.get('export');
 
-window.__ids = Object.keys(BREAD_BUILDERS);
+window.__ids = Object.keys(BUILDERS);
 
 const canvas = document.getElementById('c') as HTMLCanvasElement;
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -135,31 +148,35 @@ function debugBuilder(rng: () => number): THREE.Group {
   return mergeByMaterial(group);
 }
 
-function buildBread(breadId: string): THREE.Group {
-  if (breadId === 'debug') return debugBuilder(mulberry32(hashId('debug')));
-  const builder = BREAD_BUILDERS[breadId];
-  if (!builder) throw new Error(`미등록 빌더: ${breadId} — 등록됨: [${Object.keys(BREAD_BUILDERS).join(', ') || '없음'}]`);
-  return builder(mulberry32(hashId(breadId)));
+function buildModel(modelId: string): THREE.Group {
+  if (modelId === 'debug') return debugBuilder(mulberry32(hashId('debug')));
+  const builder = BUILDERS[modelId];
+  if (!builder) {
+    throw new Error(
+      `미등록 빌더: ${modelId} (family=${familyKey}) — 등록됨: [${Object.keys(BUILDERS).join(', ') || '없음'}]`,
+    );
+  }
+  return builder(mulberry32(hashId(modelId)));
 }
 
 // ---------- 모드 실행 ----------
 
 async function runExport(spec: string): Promise<void> {
-  const ids = spec === 'all' ? Object.keys(BREAD_BUILDERS) : spec.split(',').map((s) => s.trim()).filter(Boolean);
+  const ids = spec === 'all' ? Object.keys(BUILDERS) : spec.split(',').map((s) => s.trim()).filter(Boolean);
   const glbs: Record<string, string> = {};
-  for (const breadId of ids) {
+  for (const modelId of ids) {
     // 빌더별 격리 — 하나 실패해도 나머지는 낸다 (실패는 __error에 누적)
     try {
-      glbs[breadId] = toB64(await exportGLB(buildBread(breadId)));
+      glbs[modelId] = toB64(await exportGLB(buildModel(modelId)));
     } catch (e) {
-      window.__error = `${window.__error ?? ''}${breadId}: ${String(e)}\n`;
+      window.__error = `${window.__error ?? ''}${modelId}: ${String(e)}\n`;
     }
   }
   window.__glbs = glbs;
 }
 
 async function runView(): Promise<void> {
-  let model: THREE.Object3D = buildBread(id);
+  let model: THREE.Object3D = buildModel(id);
   const glb = await exportGLB(model);
   const kb = glb.byteLength / 1024;
 
@@ -172,8 +189,12 @@ async function runView(): Promise<void> {
   scene.add(model);
 
   const s = statsOf(model);
-  const over = kb > 250 || s.tris > 8000;
-  window.__stats = JSON.stringify({ id, ...s, kb: Math.round(kb * 10) / 10, over, roundtrip });
+  // ★예산은 패밀리마다 다르다 — 여기를 하드코딩으로 되돌리면 재료가 빵의 헐거운 상한(250KB/8000tri)으로
+  //   조용히 통과한다. 정본은 scripts/lib/families.mjs.
+  const over = kb > family.perKB || s.tris > family.maxTri;
+  window.__stats = JSON.stringify({
+    family: familyKey, id, ...s, kb: Math.round(kb * 10) / 10, over, roundtrip,
+  });
 
   if (!shot && !compare) buildUI(kb, s, over, glb);
   if (compare) await buildCompare();
@@ -183,28 +204,34 @@ async function runView(): Promise<void> {
 }
 
 function refSrc(n: 0 | 1 | 2): string {
-  return `/assets/breads/src/${id}${n === 0 ? '' : `-${n + 1}`}.png`;
+  return `/assets/${family.refDir}/src/${id}${n === 0 ? '' : `-${n + 1}`}.png`;
 }
 
 function buildUI(kb: number, s: { tris: number; verts: number; meshes: number }, over: boolean, glb: ArrayBuffer): void {
   const stats = document.getElementById('stats') as HTMLDivElement;
   stats.textContent =
-    `${id}  ${roundtrip ? '[roundtrip]' : '[direct]'}\n` +
-    `tri ${s.tris} / 8000   vert ${s.verts}   mesh ${s.meshes} (≤2)\n` +
-    `GLB ${kb.toFixed(1)}KB / 250KB ${over ? '  ⚠ 예산 초과' : ''}`;
+    `${familyKey}/${id}  ${roundtrip ? '[roundtrip]' : '[direct]'}\n` +
+    `tri ${s.tris} / ${family.maxTri}   vert ${s.verts}   mesh ${s.meshes} (≤2)\n` +
+    `GLB ${kb.toFixed(1)}KB / ${family.perKB}KB ${over ? '  ⚠ 예산 초과' : ''}`;
   if (over) stats.classList.add('over');
 
   const controlsEl = document.getElementById('controls') as HTMLDivElement;
   const sel = document.createElement('select');
-  for (const b of ['debug', ...BREAD_ORDER]) {
+  for (const b of ['debug', ...ORDER]) {
     const opt = document.createElement('option');
     opt.value = b;
-    opt.textContent = BREAD_BUILDERS[b] || b === 'debug' ? b : `${b} (미등록)`;
+    opt.textContent = BUILDERS[b] || b === 'debug' ? b : `${b} (미등록)`;
     if (b === id) opt.selected = true;
     sel.appendChild(opt);
   }
   sel.onchange = () => go({ id: sel.value });
   controlsEl.appendChild(sel);
+
+  // 패밀리 토글 — go()가 location.search를 복사하므로 다른 파라미터는 보존된다
+  const fam = document.createElement('button');
+  fam.textContent = familyKey === 'bread' ? '→ 재료' : '→ 빵';
+  fam.onclick = () => go({ family: familyKey === 'bread' ? 'ingredient' : '', id: 'debug' });
+  controlsEl.appendChild(fam);
 
   for (const v of ['34', 'front', 'top', 'orbit'] as const) {
     const b = document.createElement('button');

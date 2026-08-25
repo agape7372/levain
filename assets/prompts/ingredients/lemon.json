@@ -1,0 +1,53 @@
+{
+  "id": "lemon",
+  "version": 1,
+  "name_ko": "레몬",
+  "hero_form": "slice",
+  "subject": "two lemon slices, one standing upright and the other leaning against it",
+  "geometry": {
+    "silhouette": "two thin round lemon slices, one propped upright and the other leaning behind it with its base slightly overlapping, each ringed by a scalloped peel rim and divided into wedge-shaped pulp segments by thin radiating membrane walls meeting at a small central pith",
+    "surface": [
+      "a vivid yellow-green rind ring (#C8D63E) framing a bright yellow pulp body (#DCCB33) divided into wedge segments by thin ivory-white pith membranes (#F5F0D6), with a deeper golden-yellow shading the lower shaded segments (#A89426) — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "whole lemon only",
+    "lemon tree",
+    "leaves",
+    "juice",
+    "glass",
+    "cocktail",
+    "drink",
+    "ice"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of two lemon slices, one standing upright and the other leaning against it, a single game asset object on a plain backdrop. Geometry: two thin round lemon slices, one propped upright and the other leaning behind it with its base slightly overlapping, each ringed by a scalloped peel rim and divided into wedge-shaped pulp segments by thin radiating membrane walls meeting at a small central pith. Surface: a vivid yellow-green rind ring (#C8D63E) framing a bright yellow pulp body (#DCCB33) divided into wedge segments by thin ivory-white pith membranes (#F5F0D6), with a deeper golden-yellow shading the lower shaded segments (#A89426) — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no whole lemon only, no lemon tree, no leaves, no juice, no glass, no cocktail, no drink, no ice, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact two lemon slices, one standing upright and the other leaning against it, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact two lemon slices, one standing upright and the other leaning against it, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "속껍질 방사 링과 과육 칸막이를 결정적 특징으로 명시했다 — 없으면 그냥 노란 원반으로 보인다. '통레몬'·칵테일·음료 연상을 negative로 차단해 단면 슬라이스만 나오게 했다."
+}

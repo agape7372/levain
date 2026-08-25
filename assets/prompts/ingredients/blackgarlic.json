@@ -1,0 +1,60 @@
+{
+  "id": "blackgarlic",
+  "version": 1,
+  "name_ko": "흑마늘",
+  "hero_form": "piece",
+  "subject": "three fermented black garlic cloves resting together",
+  "geometry": {
+    "silhouette": "three individual garlic cloves in a small loose cluster, each with the characteristic curved crescent cross-section and a tapered pointed tip, thin papery skin fragments clinging to the outer curve of each clove, none overlapping the group's silhouette",
+    "surface": [
+      "a deep near-black brown body (#3A2E28) with a darker shadowed crescent (#2A211D) along the inner curve and a warmer lit facet (#52443B) on the outer curve, with a thin pale papery skin remnant (#6B5C4E) clinging to one edge of each clove — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "white garlic",
+    "raw garlic",
+    "garlic bulb",
+    "braid",
+    "whole head",
+    "cloves in skin only",
+    "sprout",
+    "green shoot",
+    "press",
+    "carved face",
+    "eyes",
+    "smile",
+    "teeth",
+    "anthropomorphic",
+    "mascot"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of three fermented black garlic cloves resting together, a single game asset object on a plain backdrop. Geometry: three individual garlic cloves in a small loose cluster, each with the characteristic curved crescent cross-section and a tapered pointed tip, thin papery skin fragments clinging to the outer curve of each clove, none overlapping the group's silhouette. Surface: a deep near-black brown body (#3A2E28) with a darker shadowed crescent (#2A211D) along the inner curve and a warmer lit facet (#52443B) on the outer curve, with a thin pale papery skin remnant (#6B5C4E) clinging to one edge of each clove — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no white garlic, no raw garlic, no garlic bulb, no braid, no whole head, no cloves in skin only, no sprout, no green shoot, no press, no carved face, no eyes, no smile, no teeth, no anthropomorphic, no mascot, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact three fermented black garlic cloves resting together, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact three fermented black garlic cloves resting together, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "★생마늘의 흰색이 아니라 발효로 검게 변한 색(#3A2E28)을 주색으로 고정했다 — white garlic·raw garlic을 negative 최상단에 명시. 마늘 쪽 특유의 곡선 초승달 단면과 얇은 껍질 잔흔을 결정적 특징으로 명시했다. 쪽 형태가 사람 얼굴·이빨로 읽히기 쉬워 carved face·eyes·smile·teeth·anthropomorphic·mascot을 전부 negative에 박았다."
+}

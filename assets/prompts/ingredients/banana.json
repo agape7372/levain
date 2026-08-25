@@ -1,0 +1,52 @@
+{
+  "id": "banana",
+  "version": 1,
+  "name_ko": "바나나",
+  "hero_form": "slice",
+  "subject": "three banana coin slices arranged in a small overlapping row",
+  "geometry": {
+    "silhouette": "three flat round banana coin slices arranged in a small overlapping row, each with a thin peel rim and a small ring of tiny seed-flecks marking the center",
+    "surface": [
+      "a soft yellow flesh body (#E8D46A) with a slightly deeper shaded underside (#D0BA52), a thin golden-brown peel rim (#C4A83E), and a small ring of dark seed-flecks marking the center of each slice (#8A6B2E) — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "whole banana",
+    "peel",
+    "bunch",
+    "monkey",
+    "smoothie",
+    "split",
+    "ice cream"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of three banana coin slices arranged in a small overlapping row, a single game asset object on a plain backdrop. Geometry: three flat round banana coin slices arranged in a small overlapping row, each with a thin peel rim and a small ring of tiny seed-flecks marking the center. Surface: a soft yellow flesh body (#E8D46A) with a slightly deeper shaded underside (#D0BA52), a thin golden-brown peel rim (#C4A83E), and a small ring of dark seed-flecks marking the center of each slice (#8A6B2E) — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no whole banana, no peel, no bunch, no monkey, no smoothie, no split, no ice cream, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact three banana coin slices arranged in a small overlapping row, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact three banana coin slices arranged in a small overlapping row, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "가운데 씨점 링을 결정적 특징으로 명시했다 — 없으면 그냥 노란 원반이 되어 레몬 조각과 실루엣이 헷갈린다. 통바나나·스무디·아이스크림 등 가공품 연상을 negative로 차단했다."
+}

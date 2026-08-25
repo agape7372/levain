@@ -1,0 +1,57 @@
+{
+  "id": "maple",
+  "version": 1,
+  "name_ko": "메이플",
+  "hero_form": "piece",
+  "subject": "a small cluster of three maple-leaf-shaped maple sugar candies",
+  "geometry": {
+    "silhouette": "three solid maple-leaf-shaped candy pieces resting together in a loose cluster, each a flat five-lobed leaf silhouette with pointed tips and deep sinuses between the lobes, one candy tilted to show its edge thickness",
+    "surface": [
+      "a warm caramel-tan body (#B8823A) with a deeper toffee-brown groove (#8F6224) sunk into the leaf's veins, a pale honey highlight (#D9A85C) on the raised facets between the veins, and a light cream edge (#E8C787) tracing the leaf's thin candy rim — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "maple syrup",
+    "liquid",
+    "bottle",
+    "jug",
+    "pancake",
+    "waffle",
+    "pouring",
+    "drizzle",
+    "tree",
+    "branch",
+    "autumn leaves on ground",
+    "wet glossy surface"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a small cluster of three maple-leaf-shaped maple sugar candies, a single game asset object on a plain backdrop. Geometry: three solid maple-leaf-shaped candy pieces resting together in a loose cluster, each a flat five-lobed leaf silhouette with pointed tips and deep sinuses between the lobes, one candy tilted to show its edge thickness. Surface: a warm caramel-tan body (#B8823A) with a deeper toffee-brown groove (#8F6224) sunk into the leaf's veins, a pale honey highlight (#D9A85C) on the raised facets between the veins, and a light cream edge (#E8C787) tracing the leaf's thin candy rim — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no maple syrup, no liquid, no bottle, no jug, no pancake, no waffle, no pouring, no drizzle, no tree, no branch, no autumn leaves on ground, no wet glossy surface, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a small cluster of three maple-leaf-shaped maple sugar candies, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a small cluster of three maple-leaf-shaped maple sugar candies, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "색만으로는 밤(#7A5638)·계피(#8B4A2B)와 구분이 안 된다 — 단풍잎 실루엣(다섯 갈래 잎+뾰족한 잎끝+깊은 잎맥 골)이 정체성의 전부다. 액체 시럽이 아니라 고형 캔디이므로 '따르기/드리즐/젖은 광택'을 강하게 차단해 생성기가 병에서 흐르는 시럽으로 그리는 걸 막았다."
+}

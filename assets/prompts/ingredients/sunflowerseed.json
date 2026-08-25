@@ -1,0 +1,53 @@
+{
+  "id": "sunflowerseed",
+  "version": 1,
+  "name_ko": "해바라기씨",
+  "hero_form": "seed",
+  "subject": "a small cluster of five to six shelled sunflower seed kernels",
+  "geometry": {
+    "silhouette": "five to six plump teardrop-shaped kernels resting together in a loose cluster, each a fat rounded droplet tapering to a blunt point — the largest and fullest seed shape in the pantry, roughly five times the size of a single poppy seed",
+    "surface": [
+      "a muted grayish-brown body (#4A4640) with a darker umber-gray shadow (#332F2A) on the lower curve, a pale taupe highlight (#8C8478) catching the plump upper faces, and a faint ghost-pale stripe (#6B6558) tracing the kernel's long axis where the hull once gripped — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "sunflower",
+    "flower head",
+    "petals",
+    "shell",
+    "striped hull",
+    "bird feeder",
+    "oil",
+    "bottle"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a small cluster of five to six shelled sunflower seed kernels, a single game asset object on a plain backdrop. Geometry: five to six plump teardrop-shaped kernels resting together in a loose cluster, each a fat rounded droplet tapering to a blunt point — the largest and fullest seed shape in the pantry, roughly five times the size of a single poppy seed. Surface: a muted grayish-brown body (#4A4640) with a darker umber-gray shadow (#332F2A) on the lower curve, a pale taupe highlight (#8C8478) catching the plump upper faces, and a faint ghost-pale stripe (#6B6558) tracing the kernel's long axis where the hull once gripped — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no sunflower, no flower head, no petals, no shell, no striped hull, no bird feeder, no oil, no bottle, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a small cluster of five to six shelled sunflower seed kernels, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a small cluster of five to six shelled sunflower seed kernels, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "씨앗 3종 중 세트에서 가장 큰 씨앗이다 — '포피시드의 5배'로 명시해 크기 대비를 못박았다. 껍질째가 아니라 깐 커널이 대표 형태라 줄무늬 껍질(striped hull)은 옅은 잔흔 한 줄(#6B6558)만 남기고 negative로 차단했다."
+}

@@ -14,7 +14,9 @@ export interface ShowcaseScreenDeps {
 }
 
 export function createShowcaseScreen(
-  recipeId: string,
+  id: string,
+  /** 표시 이름 — 호출부가 해결해서 넘긴다(빵·재료의 이름표가 다른 테이블에 있다) */
+  name: string,
   headline: string,
   large: boolean,
   deps: ShowcaseScreenDeps,
@@ -26,7 +28,7 @@ export function createShowcaseScreen(
   top.className = 'showcase-top';
   const title = document.createElement('div');
   title.className = 'showcase-title';
-  title.textContent = copy.recipes.names[recipeId] ?? recipeId;
+  title.textContent = name;
   const sub = document.createElement('div');
   sub.className = large ? 'showcase-headline large' : 'showcase-headline';
   sub.textContent = headline;
@@ -53,7 +55,7 @@ export function createShowcaseScreen(
   el.append(top, bottom);
 
   return {
-    id: `showcase-${recipeId}`,
+    id: `showcase-${id}`,
     el,
     onShow: () => deps.onShow(),
     onHide: () => deps.onExit(),

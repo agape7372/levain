@@ -232,20 +232,25 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     else scene.stop();
   };
   const openShowcase = async (
-    recipeId: string, headline: string, large: boolean,
-    opts?: { onRebake?: () => void },
+    id: string, headline: string, large: boolean,
+    opts?: { onRebake?: () => void; kind?: 'bread' | 'ingredient' },
   ): Promise<boolean> => {
+    const kind = opts?.kind ?? 'bread';
+    const dir = kind === 'ingredient' ? 'ingredients' : 'breads';
     try {
-      await scene.enterShowcase(`/breads/${recipeId}.glb`);
+      await scene.enterShowcase(`/${dir}/${id}.glb`);
     } catch {
       return false;
     }
-    const screen = createShowcaseScreen(recipeId, headline, large, {
+    const name =
+      (kind === 'ingredient' ? copy.recipes.ingredientNames[id] : copy.recipes.names[id]) ?? id;
+    const screen = createShowcaseScreen(id, name, headline, large, {
       onShow: () => {
         showcaseActive = true;
         stage.style.visibility = 'visible';
         scene.start();
-        scene.spawnSteam(); // 갓 구운 김
+        // 김은 **갓 구운 빵**의 다이제틱 신호다 — 생재료에서 김이 나면 거짓말이 된다
+        if (kind === 'bread') scene.spawnSteam();
       },
       onExit: () => {
         showcaseActive = false;

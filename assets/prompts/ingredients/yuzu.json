@@ -1,0 +1,59 @@
+{
+  "id": "yuzu",
+  "version": 1,
+  "name_ko": "유자",
+  "hero_form": "fresh",
+  "subject": "a single whole yuzu citrus fruit",
+  "geometry": {
+    "silhouette": "one squat round citrus fruit, flattened slightly at both poles rather than pointed, its entire surface covered in an uneven bumpy dimpled rind, with a small concave indentation at the stem end where the fruit attaches to the branch",
+    "surface": [
+      "a warm mustard-yellow rind (#D4C13A) with a deeper shaded tone (#B39D2A) low on the fruit and a brighter lit facet (#E6D766) on the upper bumps, with a small darker olive dimple (#7A6B2E) marking the stem-end indentation — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "lemon",
+    "smooth peel",
+    "pointed ends",
+    "orange",
+    "mandarin",
+    "juice",
+    "tea",
+    "jar",
+    "honey",
+    "drink",
+    "slice",
+    "cut",
+    "leaves",
+    "branch"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a single whole yuzu citrus fruit, a single game asset object on a plain backdrop. Geometry: one squat round citrus fruit, flattened slightly at both poles rather than pointed, its entire surface covered in an uneven bumpy dimpled rind, with a small concave indentation at the stem end where the fruit attaches to the branch. Surface: a warm mustard-yellow rind (#D4C13A) with a deeper shaded tone (#B39D2A) low on the fruit and a brighter lit facet (#E6D766) on the upper bumps, with a small darker olive dimple (#7A6B2E) marking the stem-end indentation — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no lemon, no smooth peel, no pointed ends, no orange, no mandarin, no juice, no tea, no jar, no honey, no drink, no slice, no cut, no leaves, no branch, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a single whole yuzu citrus fruit, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a single whole yuzu citrus fruit, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "★레몬과의 혼동이 최대 위험이라 매끈·뾰족한 레몬 실루엣과 반대로 우툴두툴한 뒴프·납작한 둥근 형태를 실루엣 서술에 명시하고 smooth peel·pointed ends·lemon을 negative 최상단에 막았다. 꼭지 자리 오목함(#7A6B2E)을 결정적 디테일로 넣어 밋밋한 공 모양으로 뭉개지지 않게 했다."
+}

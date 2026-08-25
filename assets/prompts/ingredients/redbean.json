@@ -1,0 +1,55 @@
+{
+  "id": "redbean",
+  "version": 1,
+  "name_ko": "팥",
+  "hero_form": "swirl",
+  "subject": "a single swirled mound of red bean paste with whole beans set into its surface",
+  "geometry": {
+    "silhouette": "one rounded mound of red bean paste coiled inward from its outer edge into a tight spiral, the spiral seam visible winding across the top face, two or three whole red beans nestled into the surface where the seam meets",
+    "surface": [
+      "a deep maroon-red paste body (#6B2E2E) with a darker plum shadow (#522020) sunk into the spiral groove and a warmer lit ridge (#85453B) along the outer coil, with two or three whole beans in a near-black deep red (#3D1818) set into the surface for contrast — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "red bean bun",
+    "bread",
+    "anpan",
+    "dorayaki",
+    "pancake stack",
+    "bowl of soup",
+    "porridge",
+    "whole beans only",
+    "dried beans",
+    "chocolate"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a single swirled mound of red bean paste with whole beans set into its surface, a single game asset object on a plain backdrop. Geometry: one rounded mound of red bean paste coiled inward from its outer edge into a tight spiral, the spiral seam visible winding across the top face, two or three whole red beans nestled into the surface where the seam meets. Surface: a deep maroon-red paste body (#6B2E2E) with a darker plum shadow (#522020) sunk into the spiral groove and a warmer lit ridge (#85453B) along the outer coil, with two or three whole beans in a near-black deep red (#3D1818) set into the surface for contrast — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no red bean bun, no bread, no anpan, no dorayaki, no pancake stack, no bowl of soup, no porridge, no whole beans only, no dried beans, no chocolate, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a single swirled mound of red bean paste with whole beans set into its surface, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a single swirled mound of red bean paste with whole beans set into its surface, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "소용돌이(swirl) 형태로 반죽에 감아 넣는 소를 표현했고, 통팥 알갱이를 근흑색(#3D1818)으로 매끈한 페이스트(#6B2E2E)와 대비시켜 결정적 식별점을 만들었다. 앙팥빵·도라야키 같은 완성 빵과자로 오인되기 쉬워 negative 최상단에 명시했고, 색·질감이 초콜릿(choco.json #4A3428)과 겹칠 위험도 있어 chocolate도 막았다."
+}

@@ -1,0 +1,55 @@
+{
+  "id": "coconut",
+  "version": 1,
+  "name_ko": "코코넛",
+  "hero_form": "dried",
+  "subject": "a small loose pile of shredded dried coconut",
+  "geometry": {
+    "silhouette": "a small loose heap of thin curled coconut shreds piled together in an irregular low mound, thread-like strands overlapping with a few tips curling upward at the edges",
+    "surface": [
+      "a near-white ivory shred body (#EFE6D2) with soft shadow pooling between overlapping strands (#D8CDB4), scattered strand tips toasted to a light golden-brown at their edges (#B08A52), and a few deeper toasted-brown flecks scattered through the pile (#8F6B3C) — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "whole coconut",
+    "coconut shell",
+    "palm tree",
+    "milk",
+    "drink",
+    "cocktail",
+    "piña colada",
+    "cake",
+    "frosting",
+    "snow"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a small loose pile of shredded dried coconut, a single game asset object on a plain backdrop. Geometry: a small loose heap of thin curled coconut shreds piled together in an irregular low mound, thread-like strands overlapping with a few tips curling upward at the edges. Surface: a near-white ivory shred body (#EFE6D2) with soft shadow pooling between overlapping strands (#D8CDB4), scattered strand tips toasted to a light golden-brown at their edges (#B08A52), and a few deeper toasted-brown flecks scattered through the pile (#8F6B3C) — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no whole coconut, no coconut shell, no palm tree, no milk, no drink, no cocktail, no piña colada, no cake, no frosting, no snow, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a small loose pile of shredded dried coconut, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a small loose pile of shredded dried coconut, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "가장자리를 살짝 구운 갈색으로 명시해 흰 눈덩이처럼 안 보이게 했다 — 세트에서 유일한 크림색 재료라 순백으로 나오면 배경(페일 세이지)과 대비만 남고 질감이 안 보인다. 통코코넛·음료·디저트 연상을 negative로 차단했다."
+}

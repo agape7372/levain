@@ -279,7 +279,13 @@ export const copy = {
         case '건조': return `말린 ${ingredientName} ${baseName}`;
         case '크럼블': return `${ingredientName} 크럼블 ${baseName}`;
         case '스월': return `${ingredientName} 스월 ${baseName}`;
-        case '씨앗': return `${ingredientName}씨 ${baseName}`;
+        // ★이름이 이미 '씨'/'시드'로 끝나면 접미를 생략한다. 안 그러면 "해바라기씨씨"·"아마씨씨"·
+        //   "포피시드씨"가 나온다 — 문자열은 유일해서 **유일성 테스트를 통과하고 한국어만 틀린다**
+        //   (filling 함정과 같은 계열). 현행 12종엔 해당 재료가 없어 동작 변화 0이고, 방어만 남는다.
+        case '씨앗':
+          return /(씨|시드)$/.test(ingredientName)
+            ? `${ingredientName} ${baseName}`
+            : `${ingredientName}씨 ${baseName}`;
         case '잼': return `${ingredientName} 스월 ${baseName}`;
         case '오일': return `${ingredientName}유 ${baseName}`;
         case '슬라이스': return `${ingredientName} 슬라이스 ${baseName}`;
@@ -291,6 +297,10 @@ export const copy = {
       }
     },
     ingredientCount: (n: number) => `${n}개`,
+    /** 재료 쇼케이스 한 줄 — 호환성 데이터에서 파생한다(재료가 늘어도 문구는 안 는다) */
+    ingredientHeadline: (n: number) => (n > 0 ? `빵 ${n}종에 넣을 수 있어요` : ''),
+    /** 도감-재료 미발견 탭 — 도감-빵의 variantHint와 같은 자리 */
+    galleryIngredientLocked: '아직 만나지 못한 재료예요',
     needIngredient: (name: string) => `${name}이(가) 있으면 만들 수 있어요`,
     variantConfirm: (name: string, ingredientName: string, g: number) =>
       `${name}, 처음 만들어 봐요. ${ingredientName} 1개와 르방 ${g}g을 써요`,

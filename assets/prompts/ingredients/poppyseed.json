@@ -1,0 +1,54 @@
+{
+  "id": "poppyseed",
+  "version": 1,
+  "name_ko": "포피시드",
+  "hero_form": "seed",
+  "subject": "a low mound of poppy seeds with three seeds enlarged in front",
+  "geometry": {
+    "silhouette": "a low fine mound of countless tiny round poppy seeds heaped together, with three single seeds pulled forward and shown larger for clarity — each a plain round dot, the smallest and finest grain in the pantry, roughly one-fifth the size of a shelled sunflower seed kernel",
+    "surface": [
+      "a deep blue-black body (#2B2A38) with a near-black shadow (#1B1A24) sinking into the mound's crevices, a soft slate-gray highlight (#45424F) catching the rounded tops of the enlarged front seeds, and a faint dusty violet-gray fleck (#5A5568) breaking up the mass — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "poppy flower",
+    "opium",
+    "pod",
+    "capsule",
+    "drug",
+    "bowl",
+    "spoon",
+    "bagel",
+    "cake"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a low mound of poppy seeds with three seeds enlarged in front, a single game asset object on a plain backdrop. Geometry: a low fine mound of countless tiny round poppy seeds heaped together, with three single seeds pulled forward and shown larger for clarity — each a plain round dot, the smallest and finest grain in the pantry, roughly one-fifth the size of a shelled sunflower seed kernel. Surface: a deep blue-black body (#2B2A38) with a near-black shadow (#1B1A24) sinking into the mound's crevices, a soft slate-gray highlight (#45424F) catching the rounded tops of the enlarged front seeds, and a faint dusty violet-gray fleck (#5A5568) breaking up the mass — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no poppy flower, no opium, no pod, no capsule, no drug, no bowl, no spoon, no bagel, no cake, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a low mound of poppy seeds with three seeds enlarged in front, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a low mound of poppy seeds with three seeds enlarged in front, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "씨앗 3종 중 세트에서 가장 미세한 알갱이다 — 실루엣 서술에 '해바라기씨 커널의 1/5 크기'를 못박아 저폴리 변환·64px 썸네일에서 갈색(여기선 검은) 얼룩으로 뭉개지는 걸 막았다. 마약 연상(opium/capsule/drug)은 재료 정체성과 무관한 오염이라 강하게 차단했다."
+}

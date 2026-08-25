@@ -1,0 +1,52 @@
+{
+  "id": "pistachio",
+  "version": 1,
+  "name_ko": "피스타치오",
+  "hero_form": "piece",
+  "subject": "a small cluster of four to five shelled pistachio kernels, one split in half",
+  "geometry": {
+    "silhouette": "four to five plump oblong kernels resting together in a loose cluster, one kernel split lengthwise into two lobes to reveal the groove between them, none overlapping the group's silhouette",
+    "surface": [
+      "a soft yellow-green body (#8FA84A) with a deeper olive-green shadow (#6E8A38) on the lower curves, a pale ivory groove (#EDE4C0) inside the split kernel's cleft, and a thin dusty-mauve skin remnant (#8B5D6E) clinging to the edge of the split lobe — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "shell",
+    "nut in shell",
+    "pistachio ice cream",
+    "green dye",
+    "bright neon green",
+    "bowl",
+    "nutcracker"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a small cluster of four to five shelled pistachio kernels, one split in half, a single game asset object on a plain backdrop. Geometry: four to five plump oblong kernels resting together in a loose cluster, one kernel split lengthwise into two lobes to reveal the groove between them, none overlapping the group's silhouette. Surface: a soft yellow-green body (#8FA84A) with a deeper olive-green shadow (#6E8A38) on the lower curves, a pale ivory groove (#EDE4C0) inside the split kernel's cleft, and a thin dusty-mauve skin remnant (#8B5D6E) clinging to the edge of the split lobe — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no shell, no nut in shell, no pistachio ice cream, no green dye, no bright neon green, no bowl, no nutcracker, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a small cluster of four to five shelled pistachio kernels, one split in half, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a small cluster of four to five shelled pistachio kernels, one split in half, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "쪼개진 반쪽의 홈(#EDE4C0)과 얇은 자주빛 속껍질 잔흔(#8B5D6E)이 결정적 특징이다 — 이게 없으면 그냥 초록 콩으로 보인다. '아이스크림'·'염료' negative는 생성기가 채도 높은 초록을 파스텔 민트나 식용색소처럼 그리는 걸 막는다. 껍질째(shell/nutcracker)는 단일 대표 형태 규칙 위반이라 차단했다."
+}

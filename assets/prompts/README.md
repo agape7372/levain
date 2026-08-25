@@ -6,9 +6,14 @@
 |---|---|---|
 | 프롬프트 | `breads/<id>.json` | `ingredients/<id>.json` |
 | 스타일 | `style-shared.json` (shared-style-v2) | `ingredients/style-shared-ingredient-v1.json` |
-| 일괄 시트 | `GROK_PASTE.md` | `INGREDIENTS_PASTE.md` |
+| 일괄 시트 | `GROK_PASTE.md` | `INGREDIENTS_PASTE.md`(기존 12종) · `INGREDIENTS_PASTE_NEW18.md`(2026-08-26 확장 18종) |
 | 이미지 저장 | `assets/breads/src/` | `assets/ingredients/src/` |
-| 개수 | 10종 + 변형 11종 | 12종 (재료당 대표 형태 1개) |
+| 개수 | 10종 + 변형 11종 | **30종** = 12(이미지 확보) + 18(2026-08-26 신설, 생성 대기) — 재료당 대표 형태 1개 |
+
+**시트를 둘로 나눈 이유**: 기존 12종은 이미지가 이미 다 들어와 있다(36장). 한 파일에 합치면
+사용자가 이미 받은 24종을 다시 훑어야 신규분에 닿는다 — 신규분만 던질 수 있게 분리했다.
+**신규 18종**: raisin · lemon · banana · apricot · beet · coconut · pistachio · oat · poppyseed ·
+sunflowerseed · flaxseed · maple · redbean · sweetpotato · matcha · blackgarlic · yuzu · honey
 
 두 갈래의 **기술 레일(배경 페일 세이지·matte·그림자 금지·단일 오브젝트·1:1 1024·같은 채팅 3뷰)은
 문자 단위로 동일**하다. 재료 쪽만 오브젝트 채도를 완화했다(사용자 지시 2026-08-25) — 광택은 여전히 금지.

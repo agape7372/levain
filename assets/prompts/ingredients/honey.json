@@ -1,0 +1,60 @@
+{
+  "id": "honey",
+  "version": 1,
+  "name_ko": "꿀",
+  "hero_form": "jam",
+  "subject": "a single thick slab of honeycomb with a pooled drop of set honey at one corner",
+  "geometry": {
+    "silhouette": "one thick rectangular slab of honeycomb, its face covered in a rigid grid of hexagonal cells, broken slightly along one edge to reveal the cell depth, with a single rounded blob of hardened honey pooled at one corner of the slab",
+    "surface": [
+      "a warm golden amber comb body (#C99A3D) with darker recessed hexagonal cells (#A67A28) and a brighter lit ridge (#E0B65C) along the raised cell walls, with a deeper amber pooled honey blob (#8F5F1D) hardened at one corner — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "bee",
+    "bees",
+    "hive",
+    "beekeeper",
+    "honey dipper",
+    "wand",
+    "jar",
+    "bottle",
+    "pouring",
+    "drizzle",
+    "liquid pool",
+    "wet glossy surface",
+    "flowers",
+    "tea",
+    "toast"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a single thick slab of honeycomb with a pooled drop of set honey at one corner, a single game asset object on a plain backdrop. Geometry: one thick rectangular slab of honeycomb, its face covered in a rigid grid of hexagonal cells, broken slightly along one edge to reveal the cell depth, with a single rounded blob of hardened honey pooled at one corner of the slab. Surface: a warm golden amber comb body (#C99A3D) with darker recessed hexagonal cells (#A67A28) and a brighter lit ridge (#E0B65C) along the raised cell walls, with a deeper amber pooled honey blob (#8F5F1D) hardened at one corner — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no bee, no bees, no hive, no beekeeper, no honey dipper, no wand, no jar, no bottle, no pouring, no drizzle, no liquid pool, no wet glossy surface, no flowers, no tea, no toast, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a single thick slab of honeycomb with a pooled drop of set honey at one corner, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a single thick slab of honeycomb with a pooled drop of set honey at one corner, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "★액체 웅덩이는 저폴리 3D로 표현이 안 되므로 벌집(honeycomb) 조각을 대표 형태로 고정했다 — 육각 격자(#A67A28 셀)가 정체성 전부다. 굳어서 멈춘 꿀 덩이(#8F5F1D)는 한 모서리에만 두어 liquid pool·drizzle로 번지지 않게 negative에도 명시했다. 벌·벌집채취 장면 연상도 막았다."
+}

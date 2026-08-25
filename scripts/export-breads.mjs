@@ -1,15 +1,18 @@
-// 빵 빌더 → GLB 배치 내보내기 (bake-thumbs.mjs 패턴 — vite dev + puppeteer).
-// 사용: npm run breads:export [-- id1 id2 …]   (인자 없으면 등록된 전부)
+// 빌더 → GLB 배치 내보내기 (bake-thumbs.mjs 패턴 — vite dev + puppeteer).
+// 사용: npm run breads:export [-- id1 id2 …]        (빵. 인자 없으면 등록된 전부)
+//       npm run ingredients:export [-- id1 id2 …]   (재료)
 // GLTFExporter가 canvas/blob API에 의존해 Node 직접 실행 불가 — 브라우저 경유가 정본.
-// 산출: public/breads/<id>.glb  → 이후 npm run check-budget → npm run thumbs
+// 산출: public/<family>/<id>.glb  → 이후 npm run check-budget → npm run thumbs
 import { spawn, execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { launchBrowser } from './lib/launch-browser.mjs';
+import { familyFromArgv, idsFromArgv } from './lib/families.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = 5198;
+const family = familyFromArgv(process.argv.slice(2));
 
 async function main() {
   let puppeteer;
@@ -20,7 +23,7 @@ async function main() {
     process.exit(1);
   }
 
-  const wanted = process.argv.slice(2);
+  const wanted = idsFromArgv(process.argv.slice(2));
   const spec = wanted.length > 0 ? wanted.join(',') : 'all';
 
   // 고정 포트는 잔존 프로세스에 취약 — 선호 포트만 주고 실제 URL은 배너에서 파싱
@@ -49,7 +52,7 @@ async function main() {
   let failed = false;
   try {
     const page = await browser.newPage();
-    await page.goto(`${baseUrl}breadlab.html?export=${encodeURIComponent(spec)}`, {
+    await page.goto(`${baseUrl}breadlab.html?family=${family.key}&export=${encodeURIComponent(spec)}`, {
       waitUntil: 'domcontentloaded',
     });
     await page.waitForFunction('window.__done === true', { timeout: 60000 });
@@ -61,14 +64,16 @@ async function main() {
     const glbs = await page.evaluate('window.__glbs');
     const entries = Object.entries(glbs ?? {});
     if (entries.length === 0) {
-      console.error('산출 GLB 0개 — 레지스트리(scripts/breads/index.ts)에 빌더가 등록됐는지 확인.');
+      const reg = family.key === 'ingredient' ? 'scripts/ingredients/index.ts' : 'scripts/breads/index.ts';
+      console.error(`산출 GLB 0개 — 레지스트리(${reg})에 빌더가 등록됐는지 확인.`);
       process.exit(1);
     }
-    mkdirSync(path.join(root, 'public', 'breads'), { recursive: true });
+    mkdirSync(path.join(root, 'public', family.outDir), { recursive: true });
     for (const [id, b64] of entries) {
       const buf = Buffer.from(b64, 'base64');
-      writeFileSync(path.join(root, 'public', 'breads', `${id}.glb`), buf);
-      console.log(`✓ ${id}.glb ${(buf.length / 1024).toFixed(1)}KB`);
+      writeFileSync(path.join(root, 'public', family.outDir, `${id}.glb`), buf);
+      const kb = buf.length / 1024;
+      console.log(`${kb > family.perKB ? '✗' : '✓'} ${family.key}/${id}.glb ${kb.toFixed(1)}KB / ${family.perKB}KB`);
     }
   } finally {
     await browser.close();

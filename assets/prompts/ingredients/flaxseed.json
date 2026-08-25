@@ -1,0 +1,54 @@
+{
+  "id": "flaxseed",
+  "version": 1,
+  "name_ko": "아마씨",
+  "hero_form": "seed",
+  "subject": "a low mound of flaxseeds with three seeds separated in front",
+  "geometry": {
+    "silhouette": "a low mound of flat oval flaxseeds heaped together, with three individual seeds separated and enlarged in front of the mound — each a flat teardrop-oval tapering to one pointed end, larger than a poppy seed but smaller and flatter than a shelled sunflower seed kernel",
+    "surface": [
+      "a dark chocolate-brown body (#58381A) with a deeper umber shadow (#3E2611) pooling along the tapered point, a warm amber highlight (#A8794A) catching the flat top facet, and a lighter honey-tan rim (#C79A5C) tracing the seed's edge — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "flax flower",
+    "blue flower",
+    "linen",
+    "fabric",
+    "oil",
+    "bottle",
+    "capsule",
+    "supplement",
+    "bowl"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a low mound of flaxseeds with three seeds separated in front, a single game asset object on a plain backdrop. Geometry: a low mound of flat oval flaxseeds heaped together, with three individual seeds separated and enlarged in front of the mound — each a flat teardrop-oval tapering to one pointed end, larger than a poppy seed but smaller and flatter than a shelled sunflower seed kernel. Surface: a dark chocolate-brown body (#58381A) with a deeper umber shadow (#3E2611) pooling along the tapered point, a warm amber highlight (#A8794A) catching the flat top facet, and a lighter honey-tan rim (#C79A5C) tracing the seed's edge — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no flax flower, no blue flower, no linen, no fabric, no oil, no bottle, no capsule, no supplement, no bowl, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a low mound of flaxseeds with three seeds separated in front, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a low mound of flaxseeds with three seeds separated in front, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "씨앗 3종 중 크기·형태 위계의 중간이다 — '포피시드보다 크고 해바라기씨보다 작게'로 상대 서술을 못박았다. 납작하고 한쪽 끝이 뾰족한 타원 실루엣이 나머지 둘(포피시드=둥근 점, 해바라기씨=통통한 물방울)과 구분되는 형태 단서다."
+}

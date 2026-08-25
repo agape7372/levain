@@ -388,5 +388,6 @@ down ─ 이동<8px & <250ms 내 up → poke
 | 기포 | 셰이더 절차(§2) — 비용 고정, 폭주 불가 |
 | 반죽 프래그 fbm 호출 | **상시 ≤2회**(`fbmG` 마이크로 노멀 + 모틀링) + 조건부 게이트 7곳(uPoreDensity·uWallCell·vStretch·uRipe·uCrust·uKahm·uMold). **동시 개방 상한 8** — `wallCells`·`poreDensity`에 `(1−dormancy)·(kahm?0:1)·(1−mold)`을 곱해 **살아있는 분기와 죽은 분기를 상호배타**로 만들었다: 살아있는 최악(피크+grab) 7.3 / 죽은 최악(휴면+곰팡이+kahm+grab) 8.0 / 상태 크로스페이드 과도기 ≈9.3(≤2초). 개편 전 병리적 상한이 11이었으므로 **예산은 오히려 내려갔다**. 유리벽 기공은 fbm이 아니라 2옥타브 sin/cos 값+기울기 동시 산출(`cellField`, 8 trig ≈ fbm 1.33회)이고, 피크 크래그는 기존 `fbmG(vXZ*5.0)` 호출에 진폭만 얹어 **추가 호출 0**이다 (개정 2026-08-25: 축 분해·유리벽 기공) |
 | 셰이더 | 살아있는 도우·유리·파티클은 텍스처 fetch 0 유지, `mediump`, 루프 컴파일 타임 고정 상한(배열 8), 동적 분기 최소. **구운 빵 GLB는 예외**: basecolor 1장 ≤512² webp/png(예산 내 — GLTFExporter는 png만 임베드), PBR 맵 금지 |
-| GLB 예산 | 개당 ≤250KB·10종 합 ≤2.5MB·8k tri/개 (`scripts/check-budget.mjs` 검사) |
+| GLB 예산 (빵) | 개당 ≤250KB·10종 합 ≤2.5MB·8k tri/개 (`scripts/check-budget.mjs` 검사) |
+| GLB 예산 (재료) | 개당 **≤100KB·2500 tri**, 합계는 **개수 비례 64KB/개**(12 → 30종으로 자라는 집합이라 고정 상수를 안 쓴다 — 고정이면 늘 때마다 손으로 올리게 되고 그건 예산을 결과에 맞추는 것이다). 텍스처는 기본 0장, 탈출구도 ≤256². **쇼케이스 draw call ≤4는 빵과 공유이지 2배가 아니다.** 예산 정본 = `scripts/lib/families.mjs`, 절차 = `docs/INGREDIENTS.md` |
 | 배터리 | hidden/타 화면 → rAF 완전 정지 + AudioContext suspend. 복귀 시 uTime은 performance.now 재계산 |

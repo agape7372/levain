@@ -1,9 +1,10 @@
-// 썸네일 하니스 — ?id=<recipeId>의 GLB를 고정 카메라·조명으로 1프레임 렌더.
+// 썸네일 하니스 — ?family=&?id=<id>의 GLB를 고정 카메라·조명으로 1프레임 렌더.
 // 완료 시 window.__done = true (puppeteer가 대기 후 캔버스 캡처).
 // 앱 아이콘용은 ?icon=1 — 병+도우 히어로 구도 대신 GLB 단독 구도만 v1 지원.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import { FAMILIES } from './lib/families.mjs';
 
 declare global {
   interface Window {
@@ -14,6 +15,8 @@ declare global {
 
 const params = new URLSearchParams(location.search);
 const id = params.get('id') ?? 'campagne';
+// 기본 bread — family 없는 기존 호출(빵 썸네일)이 그대로 통한다
+const family = FAMILIES[params.get('family') === 'ingredient' ? 'ingredient' : 'bread'];
 
 const canvas = document.getElementById('c') as HTMLCanvasElement;
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -35,7 +38,7 @@ scene.add(fill);
 const loader = new GLTFLoader();
 loader.setMeshoptDecoder(MeshoptDecoder);
 loader
-  .loadAsync(`/breads/${id}.glb`)
+  .loadAsync(`/${family.outDir}/${id}.glb`)
   .then((gltf) => {
     const root = gltf.scene;
     root.traverse((o) => {
