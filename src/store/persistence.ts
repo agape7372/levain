@@ -7,7 +7,7 @@ import type { BakeGrade, CollectionEntry, FeedRatio, Flour, Location, SimState }
 import { RATIOS, TEMP_MULT } from '../sim';
 // MASS_MAX·ACID_MAX는 sim/index.ts가 재수출하지 않는데 sim/**는 M2 범위 밖(수정 금지)이다.
 // 범위 수치를 여기에 하드코딩하지 않기 위해(CLAUDE.md 규칙 9) constants에서 직접 가져온다.
-import { ACID_MAX, MASS_MAX, SEED_G, STAGES } from '../sim/constants';
+import { ACID_MAX, MASS_MAX, PANTRY_MAX, SEED_G, STAGES } from '../sim/constants';
 import { INGREDIENTS } from '../sim/ingredients';
 import type { IngredientId } from '../sim/ingredients';
 import type { StorageAdapter } from '../platform/storage';
@@ -56,6 +56,12 @@ export interface SharedState {
   inventory: Record<IngredientId, number>;
   /** 무료 경제 카운터 (§9 Phase 7) — 키 부재 = 전부 0 (inventory와 같은 무버전 착륙) */
   economy: EconomyState;
+  /**
+   * 보관 통 (GDD §6-2) — 떼어낸 르방의 총 그램. 빵 원가가 여기서 나간다.
+   * 전역인 이유: 도감·재료와 같은 층이라 르방을 바꿔도 같은 통이다.
+   * 키 부재 = 0 (inventory·economy와 같은 무버전 착륙).
+   */
+  pantry: number;
 }
 
 export interface SaveEnvelope {
@@ -160,12 +166,16 @@ function economyOf(v: unknown): EconomyState {
 /** 전역(집) 소유 상태 — 하위 키가 없으면 기본값 (inventory가 예고대로 무이행 착륙, flour 패턴) */
 function sharedOf(v: unknown): SharedState {
   if (!isObject(v)) {
-    return { collection: {}, inventory: emptyInventory(), economy: emptyEconomy() };
+    return { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0 };
   }
   return {
     collection: collectionOf(v.collection),
     inventory: inventoryOf(v.inventory),
     economy: economyOf(v.economy),
+    // 보관 통 — economy와 같은 등급의 무버전 추가 키. 부재 = 0으로 착륙시켜
+    // 옛 클라이언트가 이 저장본을 읽어도 미지 키만 버리고 살아남게 한다(위 economyOf 주석).
+    // 선물 적립을 안 하는 이유: mass가 "아직 안 뗀 예치금"이라 떼어내기 한 번이면 그대로 들어온다.
+    pantry: Math.round(num(v.pantry, 0, PANTRY_MAX, 0)),
   };
 }
 

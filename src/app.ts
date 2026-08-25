@@ -128,6 +128,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     dispatch: (a) => store.dispatch(a),
     subscribe: (fn) => store.subscribe(fn),
     inventory: () => store.getInventory(),
+    pantry: () => store.getPantry(),
     bakeVariant: (variantId) => store.bakeVariant(variantId),
     starterNameOf: (id) => {
       const rec = store.getEnvelope().starters.find((r) => r.id === id);
@@ -430,13 +431,11 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   // ── 부트 브리핑 → (필요시) 곰팡이 종결 모달 — 중앙 팝업 순차, 겹치지 않게 ──
   if (!isNew && store.getEnvelope().flags.onboarded) {
     scene.coverCloth(); // 콜드 스타트 = 천이 덮인 채 시작 — 걷는 게 첫 리추얼
-    openBriefingCard(briefing, () => {
-      openMoldModal(api);
-      // 1.2.x 저장본은 온보딩을 이미 지났다 — 선물은 여기서 한 번 권한다.
-      // 곰팡이 종결 모달이 떠 있으면 얹지 않는다(그 화면엔 다른 말이 없다) —
-      // 놓쳐도 재료 탭 배너의 같은 버튼으로 언제든 받을 수 있다.
-      if (!hasOpenModal() && api.economy().giftPending) openStarterGift(api);
-    });
+    // 첫 재료 선물을 여기서 자동으로 열지 않는다 (2026-08-25 사용자 지적):
+    // 백드롭으로 닫으면 claimStarterGift가 안 불려 gifted가 false로 남고 → 매 콜드부팅마다
+    // 다시 떴다. "한 번 권한다"가 아니라 매번이었다. 선물 진입로는 온보딩 직후 1회와
+    // 재료 탭 배너 버튼(screens/recipes.ts) 둘뿐이다 — 되돌리지 말 것.
+    openBriefingCard(briefing, () => openMoldModal(api));
   }
 
   // ── 미표시 굽기 결과 재노출 (강제종료 안전) ──

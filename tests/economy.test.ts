@@ -163,6 +163,7 @@ describe('경제 — 획득 경로', () => {
     store.dispatch({ type: 'feed', ratio: '1:5:5' });
     const flour = store.getFlour();
     clock.advance(5 * HOUR);
+    store.grantPantry(100); // 원가는 이제 통(pantry)에서 나간다 — 테스트 주입구로 미리 채운다
     store.dispatch({ type: 'bake', recipeId: 'focaccia' });
     expect(store.getCollection().focaccia).toBeDefined();
     expect(store.getFlour()).toBeGreaterThanOrEqual(flour + RECIPE_REWARD_FLOUR);
@@ -178,6 +179,9 @@ describe('§16 수용 기준 — 광고 0으로 전 변형 도달', () => {
   it('무료 경로만으로 변형 72종 전부 해금된다', () => {
     const { store, clock } = matureStore();
     store.claimStarterGift('olive');
+    // 통은 **주입하지 않는다.** 원가가 통으로 옮겨진 이상 그램도 무료 경로 위에 있고,
+    // grantPantry로 채우면 이 수용 기준이 재는 대상을 우회해 버린다 — 아래 루프가
+    // 실제 떼어내기(split)로만 벌어서 72종에 닿는지가 이 테스트의 전부다
 
     const targets = playableRules().map((r) => variantIdOf(r));
     // 재료 12종 확장(2026-08-25)으로 40 → 72. 이 수치 자체가 아니라 **아래 루프가 상한 안에서
@@ -186,12 +190,17 @@ describe('§16 수용 기준 — 광고 0으로 전 변형 도달', () => {
     const remaining = (): string[] => targets.filter((v) => store.getCollection()[v] === undefined);
 
     let feeds = 0;
-    // 실측 521회(재료 12종·변형 72종, 2026-08-25). 하루 2회면 약 260일 —
+    // 실측 521회(재료 12종·변형 72종, 2026-08-25). **통 경제 도입 후 재측정해도 그대로 521**이다 —
+    // 사이클당 그램 예산(1:5:5 = 380g)이 그 주기에 굽는 양을 넘어서 병목이 아니고,
+    // 실제 병목은 재료(변형 첫 발견마다 1개)다. 하루 2회면 약 260일 —
     // 느린 동거가 컨셉이라 길이 자체는 문제가 아니고, **닿는가**가 수용 기준이다.
     // 상한은 실측의 약 1.3배 — 여기 닿으면 무료 경로가 실제로 막힌 것이다
     const MAX_FEEDS = 700;
     while (remaining().length > 0 && feeds < MAX_FEEDS) {
       clock.advance(6 * HOUR);
+      // 실제 의식 순서 그대로 — 부푼 걸 떼어 보관하고(그램 수입), 그다음 밥을 준다.
+      // split 게이트가 유효 6h라 위 advance가 그 값을 만든다
+      store.dispatch({ type: 'split' });
       store.dispatch({ type: 'feed', ratio: '1:5:5' }); // mass 440 회복 + discard 쿨다운 해제
       feeds += 1;
       clock.advance(5 * HOUR); // 피크 근처 — 판정용(해금 자체엔 무관)

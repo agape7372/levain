@@ -23,16 +23,8 @@ describe('recipes — 단계·mass 게이트 (GDD §6-2)', () => {
     expect(result.state).toBe(stage2);
   });
 
-  it('mass 게이트: 비용+60g 미만이면 mass, 정확히 비용+60이면 성공(씨앗 60g 보존)', () => {
-    const stage3: SimState = { ...initialState(t0), maturity: 12, createdAt: t0 - 9 * DAY };
-
-    const tooLittle = applyAction({ ...stage3, mass: 89 }, { type: 'bake', recipeId: 'flatbread' }, t0);
-    expect(tooLittle.events).toEqual([{ type: 'bakeBlocked', reason: 'mass' }]);
-
-    const exact = applyAction({ ...stage3, mass: 90 }, { type: 'bake', recipeId: 'flatbread' }, t0);
-    expect(exact.events[0].type).toBe('baked');
-    expect(exact.state.mass).toBe(60); // 씨앗 60g은 소모 불가
-  });
+  // mass 게이트 케이스 삭제 — 통 게이트로 이전, pantry 경제, GDD §6-2
+  // (빵 원가는 이제 전역 보관 통에서 나간다 — sim은 mass로 굽기를 막지 않는다)
 });
 
 describe('recipes — 판정 점수·등급 (GDD §6-2)', () => {
@@ -60,7 +52,7 @@ describe('recipes — 판정 점수·등급 (GDD §6-2)', () => {
     const r1 = applyAction(stage3, { type: 'bake', recipeId: 'flatbread' }, t0);
     expect(r1.events).toHaveLength(1);
     expect(r1.events[0].type).toBe('baked');
-    expect(r1.state.mass).toBe(300 - recipeById('flatbread')!.cost);
+    expect(r1.state.mass).toBe(300); // pantry 경제 — bake는 mass를 건드리지 않는다 (GDD §6-2)
   });
 });
 

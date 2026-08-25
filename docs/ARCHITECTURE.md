@@ -91,8 +91,11 @@ export function deriveBriefing(state: SimState, from: number, to: number): Brief
 export type Action =
   | { type: 'feed'; ratio: FeedRatio }
   | { type: 'setLocation'; to: Location }
-  | { type: 'bake'; recipeId: string }          // 빵: mass 차감 + 판정. 커밋은 여기서
+  | { type: 'bake'; recipeId: string }          // 빵: 판정만(GDD §6-2, 2026-08-25). 원가는 mass가
+                                                 // 아니라 store가 쥔 보관 통에서 나간다 — sim은 모른다
   | { type: 'bakeDiscard'; recipeId: string }   // discard: 쿨다운 갱신만
+  | { type: 'split' }                            // 떼어내기: mass를 씨앗 60g까지 줄인다. 통 적립은
+                                                 // store가 'split' 이벤트로 한다 (GDD §5·§6-2)
   | { type: 'makeFlake' }                       // 플레이크 말리기: mass −20g, flake 기록 (GDD §5)
   | { type: 'discardStarter' }                  // moldy 전용: 새 개체로 재시작
   | { type: 'restoreFlake' };                   // moldy 전용: 플레이크로 복원, reviveProgress=1 경유
@@ -103,6 +106,11 @@ export type Action =
   나머지는 전부 `deriveSnapshot`의 파생 — advance에 적분 루프 없음.
   (예외적으로 acidity만 누적값: advance가 구간별 요율로 갱신 — 구간 경계는 닫힌 식으로 산출, 루프 없음.)
 - **액션 순서 불변식**: `dispatch(action)` = `tick(now)` 선행 → `applyAction`. gameStore 파이프라인에 계약으로 박는다.
+- **떼기/통 게이트 분리**(2026-08-25, 보관 통 경제 — GDD §6-2): `split`(떼어내기)의 게이트(`SPLIT_MIN_G`·
+  마지막 급여 후 유효 6h)는 sim(`actions.ts`)이 진다 — 순수 함수라 전역 상태를 모른다. 반대로 굽기의
+  통 잔량 게이트는 store(`gameStore.pantryGate`)가 진다 — `canBakeBread`는 이제 단계만 보고, 원가는
+  sim 밖의 전역 `shared.pantry`에서 나간다. "sim은 전역을 모른다"는 같은 원칙이 도감·재료함·경제와도
+  동일 — pantry는 그 네 번째 사례일 뿐이다.
 - **SimEvent** (`'peaked' | 'becameHungry' | 'wentDormant' | 'recipeUnlocked' | 'stageUp' | 'revived'` …):
   반환값으로만 흘린다 — 상태에 넣지 않음. UI 토스트·연출 트리거용.
 - **결정론 테스트**: 닫힌 함수라 "파생값이 저장·tick 시점과 무관"을 검증
@@ -134,7 +142,12 @@ interface SaveEnvelope {
   starters: StarterRecord[];        // { id, name|null, ordinal, sim } — 물리+정체성
   activeStarterId: string;          // 항상 starters 안에 있다 (검증이 보증)
   nextStarterOrdinal: number;       // 삭제해도 순번 재사용 안 함
-  shared: { collection: Record<recipeId, CollectionEntry> }; // 집의 기록 — 르방 폐기에도 남는다
+  shared: {                                    // 집(계정) 소유 — 르방 폐기·삭제에도 남는다
+    collection: Record<recipeId, CollectionEntry>;
+    inventory: Record<IngredientId, number>;   // 재료함(§8-2) — 무버전 추가 키, 부재→{}
+    economy: EconomyState;                     // 무료 경제 카운터(§9) — 무버전 추가 키, 부재→전부 0
+    pantry: number;                            // 보관 통 총 g(GDD §6-2) — 무버전 추가 키, 부재→0
+  };
   settings: { muted: boolean; haptics: boolean; notifyEnabled: boolean };
   flags: { onboarded: boolean; pendingBake: { recipeId: string; grade: string } | null };
 }
@@ -146,6 +159,14 @@ interface SaveEnvelope {
   (개별 sim에만 맡기면 비활성 르방이 delta만큼 공짜 휴식을 얻는다).
 - 이름은 `StarterRecord.name`(sim 밖) — 폐기(discardStarter)에도 보존된다(§11-2 승인 변경).
   null이면 표시 시점에 "르방이 {ordinal}" 파생 — 저장하지 않는다.
+- **무버전 추가 키**: `inventory`·`economy`·`pantry` 셋 다 `schemaVersion`을 올리지 않고 `shared`에
+  얹혔다. `migrate()`는 `raw.schemaVersion > SCHEMA_VERSION`이면 무조건 `null`(=새 게임)로 처리한다
+  (`persistence.ts` — 미래 모양 저장본은 다운그레이드해서 읽지 않는다) — 그래서 스키마 버전을 올리는
+  릴리스마다 "그 버전을 모르는 과거 번들로는 OTA 롤백 금지"가 하나씩 늘어난다(§3 v1→v2가 그 예).
+  반대로 버전은 그대로 두고 키만 늘리면, 그 키를 모르는 구버전 코드도 `validateAndClamp`의 "키 부재
+  → 기본값(0/{})" 규칙 덕에 나머지를 그대로 읽는다 — 구버전으로의 롤백이 안전하게 남는다. 그래서
+  새 누적값·카운터는 최대한 무버전으로 얹고, 버전을 올려야 하는 경우(필드 의미·구조가 바뀌어 구버전이
+  오독하는 경우)로 한정한다. RELEASE.md §8의 롤백 표가 이 규칙을 그대로 반영한다.
 
 - **주 = localStorage** `levain:save` (동기 — 부트 대기·깜빡임 0, 액션 직후 동기 저장으로 유실 창 0).
 - **미러 = Capacitor Preferences** (네이티브만, 저장 성공 후 fire-and-forget — Android WebView 스토리지

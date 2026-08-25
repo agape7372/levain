@@ -133,7 +133,7 @@ function envelopeAt(now = t0): SaveEnvelope {
     starters: [{ id: 's1', name: null, ordinal: 1, sim: initialState(now) }],
     activeStarterId: 's1',
     nextStarterOrdinal: 2,
-    shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy() },
+    shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0 },
     settings: { muted: true, haptics: false, notifyEnabled: true },
     flags: { onboarded: true, pendingBake: null, retapHints: 0 },
   };

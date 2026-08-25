@@ -32,11 +32,12 @@ function makeStore(now = t0): { store: GameStore; clock: FakeClock; events: SimE
   return { store, clock, events };
 }
 
-/** flatbread(3단계) 굽기가 가능한 활성 sim으로 조정 */
+/** flatbread(3단계) 굽기가 가능한 활성 sim + 통(pantry)으로 조정 — 원가는 이제 통에서 나간다 */
 function makeBakeReady(store: GameStore): void {
   const env = store.getEnvelope();
   const rec = env.starters.find((r) => r.id === env.activeStarterId)!;
   rec.sim = { ...rec.sim, maturity: 12, createdAt: rec.sim.createdAt - 9 * DAY, mass: 300 };
+  store.grantPantry(1000); // 반복 굽기까지 여유 있게 — 게임 규칙을 안 타는 테스트 주입구
 }
 
 describe('starters — 생성·전환', () => {

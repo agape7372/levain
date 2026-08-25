@@ -4,6 +4,7 @@ import { toRenderParams, smoothParams } from '../src/render/renderParams';
 import type { Snapshot } from '../src/sim';
 
 const base: Snapshot = {
+  canSplit: false,
   phase: 'active',
   activity: 0,
   hunger: 0,

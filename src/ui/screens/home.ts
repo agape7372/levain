@@ -7,7 +7,7 @@ import { openObserveCard } from '../components/observeCard';
 import { openSettings } from '../components/settingsModal';
 import { toast } from '../components/toast';
 import type { GameApi } from '../gameApi';
-import type { FeedRatio, Flour, Location, Snapshot } from '../../sim';
+import type { FeedRatio, Flour, Location, SimEvent, Snapshot } from '../../sim';
 import {
   RATIOS, FRIDGE_STAGE, FLAKE_STAGE, SEED_G, FLAKE_COST_G,
   FLOUR_STAGE, HOUR, rateMult,
@@ -56,7 +56,9 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
       onConfirm: () => toast(api.addStarter() ? copy.starter.added : copy.starter.slotsFull),
     });
   });
-  chipRow.append(prevBtn, chip, nextBtn, addBtn);
+  // prev/next는 하단 밥 주기 좌우에 산다 (사용자 지정 자리 — 화면 맨 위는 엄지가 안 닿는다).
+  // 칩은 이름·순번만 표시한다.
+  chipRow.append(chip, addBtn);
   top.append(status, sub, chipRow);
   status.addEventListener('click', () => openObserveCard(api));
 
@@ -107,11 +109,37 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     });
   });
 
+  // 떼어내기 — 씨앗만 남기고 보관 통으로 (GDD §6-2). 말려두기와 같은 확인 모달 패턴
+  const splitBtn = document.createElement('button');
+  splitBtn.className = 'btn btn-ghost btn-split';
+  splitBtn.textContent = copy.split.action;
+  splitBtn.addEventListener('click', () => {
+    const g = api.getSnapshot().mass - SEED_G;
+    confirmModal({
+      body: copy.split.confirm(g),
+      confirmLabel: copy.split.action,
+      cancelLabel: '다음에요',
+      onConfirm: () => {
+        const events = api.dispatch({ type: 'split' });
+        const done = events.find((e): e is Extract<SimEvent, { type: 'split' }> => e.type === 'split');
+        if (done) toast(copy.split.done(done.amount));
+      },
+    });
+  });
+
+  // 밥 주기 좌우 = 이전·다음 르방 (사용자 지정)
   const actionsRow = document.createElement('div');
   actionsRow.className = 'hud-actions';
-  actionsRow.append(feedBtn, flakeBtn);
+  actionsRow.append(prevBtn, feedBtn, nextBtn);
 
-  bottom.append(seg, actionsRow);
+  // 보조 행 — 떼어내기·말려두기 + 보관 통 잔량
+  const subRow = document.createElement('div');
+  subRow.className = 'hud-subactions';
+  const pantryLabel = document.createElement('span');
+  pantryLabel.className = 'pantry-chip';
+  subRow.append(splitBtn, flakeBtn, pantryLabel);
+
+  bottom.append(seg, actionsRow, subRow);
   el.append(top, corner, bottom);
 
   function onFeedTap(): void {
@@ -307,6 +335,19 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     // 말려두기 — 3단계 전엔 숨김, 이후 옅은 비활성 규칙 (문구 대신 disabled)
     flakeBtn.style.display = snap.stage >= FLAKE_STAGE ? '' : 'none';
     flakeBtn.disabled = snap.phase !== 'active' || snap.mass < SEED_G + FLAKE_COST_G;
+
+    // 떼어내기 — 곰팡이·휴면엔 숨김(그 화면엔 다른 말이 없다), 그 외엔 옅은 비활성
+    const splittable = snap.phase !== 'moldy' && snap.phase !== 'dormant';
+    splitBtn.style.display = splittable ? '' : 'none';
+    splitBtn.disabled = !snap.canSplit;
+
+    // 통이 비어 있는데 뗄 수 있으면 그때가 루프를 알려줄 자리다 (그 외엔 잔량만)
+    const pantry = api.pantry();
+    const hint = pantry > 0 ? copy.pantry.label(pantry)
+      : snap.canSplit && splittable ? copy.pantry.hint
+      : '';
+    pantryLabel.textContent = hint;
+    pantryLabel.style.display = hint ? '' : 'none';
 
     // 위치 세그먼트 — 냉장은 3단계 해금 전 비활성 (문구 대신 옅은 비활성 — 사용자 규칙)
     const loc = api.location();

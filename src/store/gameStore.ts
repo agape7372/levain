@@ -13,6 +13,7 @@ import {
   advance, applyAction, betterGrade, deriveBriefing, deriveSnapshot, initialState,
   isPlayable, planNotificationsAll, playableRules, reanchor, ruleByVariantId, stageOf,
   RECIPES, variantIdOf, DAY, INGREDIENT_SOFT_CAP, INGREDIENT_FLOUR_COST,
+  canBakeBread, recipeById, PANTRY_MAX,
 } from '../sim';
 import type { Clock } from '../platform/clock';
 import type { StorageAdapter } from '../platform/storage';
@@ -54,11 +55,18 @@ export interface GameStore {
   getCollection(): Record<string, CollectionEntry>;
   /** 재료함 (§8-2 — 전역, 재료 단위 수량) */
   getInventory(): Record<IngredientId, number>;
+  /** 보관 통 잔량(g) — 빵 원가의 출처 (GDD §6-2) */
+  getPantry(): number;
   /**
    * 재료 지급 — 소프트캡(INGREDIENT_SOFT_CAP)까지만 쌓이고 초과분은 교환 가루로 자동
    * 전환된다 (§9). Levain Lab·개발자 모드·선물이 공용으로 쓴다.
    */
   grantIngredient(id: IngredientId, count: number): void;
+  /**
+   * 보관 통 직접 적립 — Levain Lab·개발자 모드·테스트 전용. 정상 경로는 떼어내기(split)다.
+   * grantIngredient와 같은 등급의 주입구이고, 게임 규칙은 통과하지 않는다.
+   */
+  grantPantry(g: number): void;
 
   // ── 무료 경제 (§9 Phase 7) — 잔액은 파생, store/economy.ts가 정의 ──
   /** 경제 카운터 원본 (읽기 전용) */
@@ -112,7 +120,7 @@ export function newEnvelope(now: number): SaveEnvelope {
     starters: [{ id: 's1', name: null, ordinal: 1, sim: initialState(now) }],
     activeStarterId: 's1',
     nextStarterOrdinal: 2,
-    shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy() },
+    shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0 },
     settings: defaultSettings(),
     flags: defaultFlags(),
   };
@@ -252,6 +260,38 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     }
   }
 
+  /**
+   * 보관 통 정산 — 떼어내면 쌓이고 빵을 구우면 나간다 (GDD §6-2).
+   * sim은 전역 통을 모르므로(순수) 적립·차감이 전부 여기서 일어난다 — 도감·재료와 같은 층이고
+   * doDispatch의 persist 1회 안에서 커밋되므로 원자성은 그 계약에 얹힌다.
+   */
+  function applyPantryEvents(events: SimEvent[]): void {
+    let delta = 0;
+    for (const e of events) {
+      if (e.type === 'split') delta += e.amount;
+      // bakedDiscard는 cost 0 — 통을 쓰지 않는다(급여당 1회 쿨다운이 그 제약, GDD §6-1)
+      else if (e.type === 'baked') delta -= recipeById(e.recipeId)?.cost ?? 0;
+    }
+    if (delta === 0) return;
+    const pantry = Math.max(0, Math.min(PANTRY_MAX, env.shared.pantry + delta));
+    env = { ...env, shared: { ...env.shared, pantry } };
+  }
+
+  /**
+   * 굽기 통 게이트 — dispatch 전 사전 차단(재료 게이트와 같은 결, §8-2).
+   * bakeVariant가 아니라 여기 있는 이유: 베이스 빵은 UI가 dispatch({type:'bake'})를 직접 쏴서
+   * bakeVariant를 우회한다. 늦게 두면 sim이 baked를 만들고 도감이 먼저 기록돼 버린다.
+   * 단계 미해금이면 통을 보지 않는다 — 차단 사유 우선순위를 sim과 같게 유지한다.
+   */
+  function pantryGate(action: Action, now: number): { state: SimState; events: SimEvent[] } | null {
+    if (action.type !== 'bake') return null;
+    const recipe = recipeById(action.recipeId);
+    if (!recipe || recipe.kind !== 'bread') return null;
+    if (canBakeBread(activeSim(), recipe, now) !== 'ok') return null;
+    if (env.shared.pantry >= recipe.cost) return null;
+    return { state: activeSim(), events: [{ type: 'bakeBlocked', reason: 'pantry' }] };
+  }
+
   /** 누적 미션 카운터 — 급여·굽기 이벤트만 센다 (차단·잠금은 세지 않는다) */
   function applyEconomyEvents(events: SimEvent[]): void {
     let feeds = 0;
@@ -298,9 +338,10 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     const now = clock.now(); // 한 번만 캡처 — advance·applyAction·savedAt이 같은 시각을 본다
     const before = earnedNow();
     advanceTo(now);
-    const res = applyAction(activeSim(), action, now);
+    const res = pantryGate(action, now) ?? applyAction(activeSim(), action, now);
     setActiveSim(res.state);
     applyBakeEvents(res.events, now);
+    applyPantryEvents(res.events); // 도감과 같은 델타 — 통 차감·적립도 이 persist 1회에 든다
     applyEconomyEvents(res.events); // 도감 갱신 뒤 — 레시피 최초 완성분까지 같은 델타에 든다
     snap = deriveSnapshot(activeSim(), now);
     const events = [...res.events, ...earnEvents(before)];
@@ -334,12 +375,19 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     getActiveStarter: () => activeRecord(),
     getCollection: () => env.shared.collection,
     getInventory: () => env.shared.inventory,
+    getPantry: () => env.shared.pantry,
 
     grantIngredient(id: IngredientId, count: number): void {
       const before = earnedNow();
       grantInto(id, count);
       persist(clock.now());
       emit(earnEvents(before));
+    },
+
+    grantPantry(g: number): void {
+      const pantry = Math.max(0, Math.min(PANTRY_MAX, env.shared.pantry + Math.round(g)));
+      env = { ...env, shared: { ...env.shared, pantry } };
+      persist(clock.now());
     },
 
     getEconomy: () => economy(),
@@ -391,8 +439,10 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
         emit(events);
         return events;
       }
-      // sim 게이트(stage·mass·쿨다운)·판정은 베이스 그대로 — 실패 시 baked 이벤트가 없어
-      // applyBakeEvents가 아무것도 안 건드린다(차감 0). discard 베이스(팬케이크·크래커·스콘)는
+      // sim 게이트(stage·쿨다운)·통 게이트(doDispatch의 pantryGate)·판정은 베이스 그대로 —
+      // 실패 시 baked 이벤트가 없어 applyBakeEvents가 아무것도 안 건드린다(재료·통 차감 0).
+      // 통 게이트를 여기가 아니라 doDispatch에 둔 이유: 베이스 빵은 UI가 dispatch를 직접 쏘아
+      // 이 함수를 우회한다. discard 베이스(팬케이크·크래커·스콘)는
       // bakeDiscard 경로 — bake는 bread 전용이라 안 통한다 (2026-08-24 밤 발견 수정)
       const base = RECIPES.find((r) => r.id === rule.baseRecipeId);
       return doDispatch(
@@ -408,6 +458,8 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
       const sim = activeSim();
       // createdAt만 과거로 — 재정박 목록과 무관(더 과거로 미는 건 안전), 일수 게이트 통과용
       setActiveSim({ ...sim, createdAt: now - 40 * DAY, maturity: 45, mass: 480 });
+      // 통도 같이 채운다 — 안 채우면 성숙 치트를 써도 빵을 한 개도 못 굽는다(원가가 통에서 나간다)
+      env = { ...env, shared: { ...env.shared, pantry: Math.max(env.shared.pantry, 1_000) } };
       snap = deriveSnapshot(activeSim(), now);
       persist(now);
       replan(now);

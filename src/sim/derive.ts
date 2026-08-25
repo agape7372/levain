@@ -15,8 +15,11 @@ import {
   HOUR,
   MOLD_DEAD_AFTER_HUNGRY_H,
   MOLD_SPOT_AFTER_HUNGRY_H,
+  MATURITY_MIN_GAP_H,
   MOLD_SPREAD_AFTER_HUNGRY_H,
   RATIOS,
+  SEED_G,
+  SPLIT_MIN_G,
   SMELL_BANDS,
   FLOUR_TIME_MULT,
   SOUR_AFTER_HUNGRY_H,
@@ -146,6 +149,9 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
   else if (effH < b.sour) fill = lerp(FILL_HUNGRY, FILL_SOUR, (effH - b.hungry) / (b.sour - b.hungry));
   else if (effH < b.dormant) fill = lerp(FILL_SOUR, FILL_DORMANT, (effH - b.sour) / (b.dormant - b.sour));
   else fill = FILL_DORMANT;
+  // 질량비 — 떼어내면 병이 실제로 줄어야 한다. 급여 직후엔 mass === RATIOS[feedRatio].mass라
+  // 계수가 정확히 1.0이고, 위 곡선의 "급여 시점 = 1.0" 캘리브레이션이 그대로 보존된다.
+  fill *= clamp(state.mass / RATIOS[state.feedRatio].mass, 0, 1);
   fill = clamp(fill, FILL_MIN, FILL_MAX);
 
   const hunger = smoothstep(b.peakEnd, b.sour, effH);
@@ -182,5 +188,7 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
     moldDeadAt: wallFor(b.moldDead),
     kahm,
     hasFlake: state.flake !== null,
+    // actions.split의 게이트와 같은 식 — 두 곳이 어긋나면 눌리는데 막히는 버튼이 된다
+    canSplit: state.mass - SEED_G >= SPLIT_MIN_G && effMs >= MATURITY_MIN_GAP_H * HOUR,
   };
 }

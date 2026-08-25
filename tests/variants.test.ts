@@ -132,39 +132,46 @@ describe('변형 굽기 — 원자 해금 (§8-2)', () => {
     expect(store.getCollection()[VID]).toBeUndefined();
   });
 
-  it('첫 굽기 = 재료 1 차감 + 도감 발견 + mass 소모가 한 번에', () => {
+  it('첫 굽기 = 재료 1 차감 + 도감 발견 + 통(pantry) 소모가 한 번에', () => {
     const store = matureStore();
     store.grantIngredient('olive', 2);
+    store.grantPantry(100);
     const massBefore = store.getSnapshot().mass;
+    const pantryBefore = store.getPantry();
     const events = store.bakeVariant(VID);
     const baked = events.find((e) => e.type === 'baked');
     expect(baked).toMatchObject({ recipeId: 'focaccia', variantId: VID });
     expect(store.getInventory().olive).toBe(1);           // 차감 1
     expect(store.getCollection()[VID]).toMatchObject({ count: 1 }); // 발견
-    expect(store.getSnapshot().mass).toBe(massBefore - 50);         // 포카치아 비용
+    expect(store.getSnapshot().mass).toBe(massBefore);              // mass는 불변 — 원가는 통에서 나간다
+    expect(store.getPantry()).toBe(pantryBefore - 50);              // 포카치아 비용
     expect(store.getCollection().focaccia).toBeUndefined(); // 베이스가 아니라 변형에 기록
   });
 
-  it('재굽기는 재료 재소비 없음 (mass만 — §8-2)', () => {
+  it('재굽기는 재료 재소비 없음 (통은 매번 나간다 — §8-2)', () => {
     const store = matureStore();
     store.grantIngredient('olive', 1);
+    store.grantPantry(200); // 통 소모는 재굽기에도 매번 붙는다 — 두 번 굽을 여유
     store.bakeVariant(VID);
     expect(store.getInventory().olive).toBe(0);
+    const pantryBeforeRebake = store.getPantry();
     const events = store.bakeVariant(VID); // 재고 0이지만 발견된 변형은 굽힌다
     expect(events.some((e) => e.type === 'baked')).toBe(true);
     expect(store.getInventory().olive).toBe(0); // 음수 없음
+    expect(store.getPantry()).toBe(pantryBeforeRebake - 50); // 재굽기도 통 원가는 그대로 나간다
     expect(store.getCollection()[VID].count).toBe(2);
   });
 
-  it('sim 게이트(mass 부족)에 걸리면 재료도 안 나간다', () => {
+  it('통(pantry) 부족에 걸리면 재료도 안 나간다 — 원가 게이트는 store 소관 (GDD §6-2)', () => {
     const env = newEnvelope(T0);
     env.starters[0].sim = {
-      ...initialState(T0), createdAt: T0 - 40 * DAY, maturity: 45, mass: 80, // 포카치아 50+60 미달
+      ...initialState(T0), createdAt: T0 - 40 * DAY, maturity: 45, mass: 480,
     };
     const store = createGameStore({ clock: { now: () => T0 + 5 * 3_600_000 }, storage: memStorage() }, env);
+    // pantry 기본값 0 — 포카치아 비용 50 미달로 사전 차단(사유는 이제 'pantry')
     store.grantIngredient('olive', 1);
     const events = store.bakeVariant(VID);
-    expect(events).toEqual([{ type: 'bakeBlocked', reason: 'mass' }]);
+    expect(events).toEqual([{ type: 'bakeBlocked', reason: 'pantry' }]);
     expect(store.getInventory().olive).toBe(1); // 소비 0
     expect(store.getCollection()[VID]).toBeUndefined();
   });
@@ -175,6 +182,7 @@ describe('변형 굽기 — 원자 해금 (§8-2)', () => {
     env.starters[0].sim = { ...initialState(T0), createdAt: T0 - 40 * DAY, maturity: 45, mass: 480 };
     const store = createGameStore({ clock: { now: () => T0 + 5 * 3_600_000 }, storage }, env);
     store.grantIngredient('olive', 3);
+    store.grantPantry(50);
     store.bakeVariant(VID);
     const raw = JSON.parse(storage.loadRaw()!);
     expect(raw.shared.inventory.olive).toBe(2);

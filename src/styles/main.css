@@ -241,11 +241,35 @@ html {
 
 /* 밥 버튼 옆 보조 액션(말려두기) — 옅은 캡슐, 비활성은 opacity 규칙 공유 */
 .hud-actions { display: flex; gap: 10px; align-items: center; justify-content: center; }
-.btn-flake {
+/* 밥 주기 좌우의 이전·다음 — 엄지 도달 범위. 상단 칩이 아니라 여기가 정본이다 (사용자 지정) */
+.hud-actions .chip-nav {
+  font-size: 24px;
+  padding: 12px 14px;
+  min-width: 48px;
+  border-radius: 999px;
+  color: var(--ink-soft);
+}
+/* 보조 행 — 떼어내기·말려두기·보관 잔량. 밥 주기보다 한 단 낮은 위계 */
+.hud-subactions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 6px;
+  min-height: 22px;
+}
+.pantry-chip {
+  color: var(--ink-faint);
+  font-size: 13px;
+  padding: 0 4px;
+}
+.btn-flake,
+.btn-split {
   background: color-mix(in srgb, var(--bg-soft) 85%, transparent);
   color: var(--ink-soft);
   font-size: 14px;
-  padding: 12px 16px;
+  /* 세로 14px = 높이 44px — 터치 타깃 하한. 12px면 40px라 폰에서 빗나간다 */
+  padding: 14px 16px;
 }
 
 /* ── 모달 (중앙 팝업 고정 — 바닥 시트 금지) ─────────────── */
@@ -313,8 +337,9 @@ html {
 .toast-container {
   position: absolute;
   left: 0; right: 0;
-  /* hud-bottom(위치 세그먼트+밥 버튼 ≈110px) 위로 — 버튼과 겹치면 조작을 가린다 */
-  bottom: calc(52px + 140px + env(safe-area-inset-bottom));
+  /* hud-bottom(위치 세그먼트+밥 버튼+보조 행 ≈160px) 위로 — 버튼과 겹치면 조작을 가린다.
+     보조 행(떼어내기·말려두기·보관 잔량)이 생기면서 한 단 더 올렸다 (2026-08-25) */
+  bottom: calc(52px + 190px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;

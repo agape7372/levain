@@ -1,5 +1,10 @@
 // 재료 도감 일러스트 — 담백한 플랫 SVG. 무캐릭터, 외곽선·그림자 없음 (CLAUDE.md 규칙7).
 // 팔레트 엄수: docs/VISUAL.md §7-1. breadArt와 동일 톤(따뜻한 베이지·갈색) 위에 재료별 색만 추가.
+//
+// ⚠ **임시 플레이스홀더다.** 재료 아트의 정본 경로는 그록 생성 이미지
+// (assets/prompts/INGREDIENTS_PASTE.md → assets/ingredients/src/)이고, 이미지가 들어오는 시점에
+// 빵 썸네일과 같은 파이프라인으로 교체된다(breadArt가 PNG 실패 시 SVG로 폴백하는 그 구조).
+// 여기에 신규 재료 SVG를 늘리지 말 것 — 늘리면 교체 시점에 버릴 코드만 쌓인다.
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 

@@ -3,7 +3,7 @@
 // 정본: docs/GDD.md §6·§10, docs/VISUAL.md §7, 확장기획 §8.
 import { copy } from '../copy';
 import { toast } from '../components/toast';
-import { openModal } from '../components/modal';
+import { openModal, confirmModal } from '../components/modal';
 import { openStarterGift } from '../components/ingredientPicker';
 import { untilText } from '../format';
 import { breadArt } from './breadArt';
@@ -11,7 +11,7 @@ import { ingredientArt } from './ingredientArt';
 import type { GameApi } from '../gameApi';
 import type { CollectionEntry, CompatibilityRule, RecipeDef, SimEvent, Snapshot } from '../../sim';
 import {
-  INGREDIENTS, RECIPES, SEED_G, FLOAT_OK_ACTIVITY, rulesForBase, variantIdOf,
+  INGREDIENTS, RECIPES, FLOAT_OK_ACTIVITY, rulesForBase, variantIdOf,
   INGREDIENT_FLOUR_COST, FLOUR_PER_INGREDIENT, INGREDIENT_SOFT_CAP, MISSION_REWARD_FLOUR,
   STAGE_REWARD_FLOUR, RECIPE_REWARD_FLOUR,
 } from '../../sim';
@@ -168,7 +168,6 @@ export function createRecipesScreen(
 
   // ── 굽기 모달 — "기본 + 재료 추가" 옵션 리스트 (home.ts 비율 모달 패턴) ──
   function openBakeModal(recipe: RecipeDef): void {
-    const snap = api.getSnapshot();
     const name = copy.recipes.names[recipe.id];
     const collection = getCollection();
     const inv = api.inventory();
@@ -218,9 +217,9 @@ export function createRecipesScreen(
     }
     items.get('base')?.classList.add('selected');
 
-    // 빵은 mass 게이트 사전 안내 (기존 관행)
-    if (recipe.kind === 'bread' && snap.mass < recipe.cost + SEED_G) {
-      toast(copy.recipes.needMass);
+    // 빵은 보관 통 게이트 사전 안내 (기존 mass 게이트 자리 — 원가가 통으로 옮겨졌다, GDD §6-2)
+    if (recipe.kind === 'bread' && api.pantry() < recipe.cost) {
+      toast(copy.pantry.notEnough(recipe.cost));
       return;
     }
 
@@ -229,8 +228,7 @@ export function createRecipesScreen(
     const ok = document.createElement('button');
     ok.className = 'btn btn-primary';
     ok.textContent = copy.actions.bake;
-    ok.addEventListener('click', () => {
-      handle.close();
+    const runBake = (): void => {
       const events: SimEvent[] = selected === 'base'
         ? api.dispatch(recipe.kind === 'bread'
             ? { type: 'bake', recipeId: recipe.id }
@@ -244,7 +242,7 @@ export function createRecipesScreen(
           blocked.reason === 'cooldown' ? copy.recipes.discardCooldown
           : blocked.reason === 'ingredient' ? copy.recipes.needIngredient(
               copy.recipes.ingredientNames[(selected as CompatibilityRule).ingredientId])
-          : blocked.reason === 'mass' ? copy.recipes.needMass
+          : blocked.reason === 'pantry' ? copy.pantry.notEnough(recipe.cost)
           : copy.recipes.lockedHint(copy.stage.names[recipe.stage]),
         );
         return;
@@ -259,6 +257,20 @@ export function createRecipesScreen(
       if (events.some((e) => e.type === 'bakedDiscard')) {
         showResult(recipe.id, vLabel ? `${vLabel} — ${copy.recipes.discardDone}` : copy.recipes.discardDone);
       }
+    };
+    ok.addEventListener('click', () => {
+      handle.close();
+      // 이 빵으로 통이 정확히 빈다 — 되돌릴 수 없으니 먼저 알린다 (중앙 팝업, 규칙 5)
+      if (recipe.kind === 'bread' && api.pantry() - recipe.cost <= 0) {
+        confirmModal({
+          body: copy.pantry.lastWarn,
+          confirmLabel: copy.actions.bake,
+          cancelLabel: '다음에요',
+          onConfirm: runBake,
+        });
+        return;
+      }
+      runBake();
     });
     actions.appendChild(ok);
     wrapEl.appendChild(actions);

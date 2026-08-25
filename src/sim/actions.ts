@@ -12,6 +12,7 @@ import {
   RATIOS,
   REVIVE_GAP_H,
   SEED_G,
+  SPLIT_MIN_G,
 } from './constants';
 import { activityAt, clamp, effSinceFeedMs, phaseAt, rateMult, stageOf } from './derive';
 import { canBakeBread, canBakeDiscard, bakeScore, gradeOf, recipeById } from './recipes';
@@ -111,9 +112,26 @@ function bake(state: SimState, recipeId: string, now: number, variantId?: string
   if (gate !== 'ok') return { state, events: [{ type: 'bakeBlocked', reason: gate }] };
 
   // 도감 기록은 전역(집의 기록) — store가 baked 이벤트로 갱신한다 (확장기획 §5-4)
+  // 그램 원가도 마찬가지로 store 소관: 빵은 보관 통에서 나가고 르방이의 mass는 변하지 않는다.
+  // 판정만 여기서 — 통은 양(재고)이고 등급은 오늘 이 르방이의 발효력이다 (GDD §6-2)
   const grade = gradeOf(bakeScore(recipe, activityAt(state, now), state.acidity, state.flour));
-  const next: SimState = { ...state, mass: state.mass - recipe.cost };
-  return { state: next, events: [{ type: 'baked', recipeId, grade, ...(variantId ? { variantId } : {}) }] };
+  return { state, events: [{ type: 'baked', recipeId, grade, ...(variantId ? { variantId } : {}) }] };
+}
+
+/**
+ * 떼어내기 — 씨앗만 남기고 보관 통으로 (GDD §6-2). 통 적립은 store가 split 이벤트로 한다.
+ * 게이트가 유효시간인 이유: 급여는 mass를 리셋하므로(withFeed) 시간 게이트가 없으면
+ * 밥 연타 → 떼기 연타로 무한 적립된다. phase==='active'는 단조가 아니라 피크를 놓친
+ * 플레이어가 회수를 못 하므로 쓰지 않는다 — 한 번 열리면 다음 급여까지 닫히지 않아야 한다.
+ */
+function split(state: SimState, now: number): ActionResult {
+  const amount = state.mass - SEED_G;
+  if (amount < SPLIT_MIN_G) return { state, events: [{ type: 'splitBlocked', reason: 'mass' }] };
+  if (effSinceFeedMs(state, now) < MATURITY_MIN_GAP_H * HOUR) {
+    return { state, events: [{ type: 'splitBlocked', reason: 'tooSoon' }] };
+  }
+  const next: SimState = { ...state, mass: SEED_G };
+  return { state: next, events: [{ type: 'split', amount }] };
 }
 
 function bakeDiscard(state: SimState, recipeId: string, now: number, variantId?: string): ActionResult {
@@ -187,6 +205,7 @@ export function applyAction(state: SimState, action: Action, now: number): Actio
     case 'setLocation': return setLocation(state, action.to, now);
     case 'bake': return bake(state, action.recipeId, now, action.variantId);
     case 'bakeDiscard': return bakeDiscard(state, action.recipeId, now, action.variantId);
+    case 'split': return split(state, now);
     case 'makeFlake': return makeFlake(state, now);
     case 'discardStarter': return discardStarter(state, now);
     case 'restoreFlake': return restoreFlake(state, now);

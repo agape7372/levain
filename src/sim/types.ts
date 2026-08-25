@@ -70,6 +70,7 @@ export type Action =
   // 재료 검증·차감은 store 소관 (gameStore.bakeVariant)
   | { type: 'bake'; recipeId: string; variantId?: string }
   | { type: 'bakeDiscard'; recipeId: string; variantId?: string } // variantId 규약은 bake와 동일
+  | { type: 'split' }           // 떼어내기 — 씨앗만 남기고 보관 통으로 (GDD §6-2, 적립은 store 소관)
   | { type: 'makeFlake' }       // 얇게 펴 말리기 — 죽음 보험 (3단계 해금, 활발, -20g)
   | { type: 'discardStarter' }  // 곰팡이 확정 후 폐기 — 새 개체 (도감은 전역이라 자동 보존)
   | { type: 'restoreFlake' };   // 곰팡이 확정 후 플레이크 복원 — 같은 계보 (부활 의식 경유)
@@ -86,7 +87,10 @@ export type SimEvent =
   | { type: 'locationLocked' }  // 냉장 미해금
   | { type: 'baked'; recipeId: string; grade: BakeGrade; variantId?: string }
   | { type: 'bakedDiscard'; recipeId: string; variantId?: string }
-  | { type: 'bakeBlocked'; reason: 'mass' | 'stage' | 'cooldown' | 'unknownRecipe' | 'ingredient' }
+  // reason 'pantry' = 보관 통 부족. sim은 통을 모르므로 이 사유만 store가 낸다 (gameStore.doDispatch)
+  | { type: 'bakeBlocked'; reason: 'pantry' | 'stage' | 'cooldown' | 'unknownRecipe' | 'ingredient' }
+  | { type: 'split'; amount: number }
+  | { type: 'splitBlocked'; reason: 'mass' | 'tooSoon' }
   | { type: 'labeled' }
   | { type: 'labelLocked' }
   // 경제(§9) — sim이 아니라 store가 낸다. labeled/labelLocked와 같은 선례:
@@ -135,6 +139,8 @@ export interface Snapshot {
   /** kahm 효모 막(무해 — 오판 유발) — 창가×시큼 구간 파생 */
   kahm: boolean;
   hasFlake: boolean;
+  /** 떼어내기 가능 — 유효 6h 경과 + 씨앗 위로 최소량 이상 남음 (GDD §6-2) */
+  canSplit: boolean;
 }
 
 export interface NotifySlot {

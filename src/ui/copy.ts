@@ -1,5 +1,6 @@
 // 사용자 대면 문구 전체 — 이 파일 한 곳 (전수 감수용). 정본: docs/GDD.md §10.
 // 담백한 한 문장. 시스템어·내부 용어·죄책감 유발·느낌표 남발 금지. 빨강 경고 시맨틱 없음.
+import { SEED_G } from '../sim';
 
 export const copy = {
   app: { name: '르방이' },
@@ -46,6 +47,22 @@ export const copy = {
   },
 
   // 건조 플레이크 — 죽음 보험 (실제 관행: 얇게 펴 말려 보관)
+  // 보관 통 — 떼어낸 르방이 쌓이는 곳. 빵은 여기서 나간다 (GDD §6-2)
+  split: {
+    action: '떼어내기',
+    confirm: (g: number) => `씨앗 ${SEED_G}g만 남기고 ${g}g을 떼어 보관할까요?`,
+    done: (g: number) => `${g}g을 떼어 보관해두었어요`,
+    blockedTooSoon: '조금 더 부풀면 떼어낼 수 있어요',
+    blockedMass: '아직 떼어낼 만큼은 아니에요. 밥을 주고 불려 보세요',
+  },
+  pantry: {
+    label: (g: number) => `보관 ${g}g`,
+    // 통은 양(재고)이고, 굽는 등급은 오늘 이 르방이의 발효력이다 — 그 프레이밍을 여기서 잡는다
+    hint: '떼어둔 르방으로 빵을 구워요',
+    lastWarn: '이걸 구우면 보관해둔 르방이 다 없어져요',
+    notEnough: (need: number) => `보관해둔 르방이 ${need}g 필요해요`,
+  },
+
   flake: {
     action: '말려두기',
     confirm: '얇게 펴서 말려둘까요? 르방 20g을 써요',
@@ -161,7 +178,6 @@ export const copy = {
   recipes: {
     lockedHint: (stageName: string) => `${stageName} 단계가 되면 열려요`,
     discardCooldown: '다음 밥을 준 뒤에 또 만들 수 있어요',
-    needMass: '르방이 조금 부족해요. 밥을 주고 불려 보세요',
     discardDone: '따끈하게 구웠어요',
     madeCount: (n: number) => `${n}번 만들었어요`,
     costSuffix: (g: number) => `르방 ${g}g`,

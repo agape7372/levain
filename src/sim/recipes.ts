@@ -1,6 +1,6 @@
 // 레시피 데이터·해금·판정 — 정본: docs/GDD.md §6
 import type { BakeGrade, Flour, RecipeDef, SimState } from './types';
-import { BAKE_ACTIVITY_W, BAKE_SOUR_W, FLOUR_AFFINITY_BONUS, GRADE_BEST, GRADE_GOOD, SEED_G } from './constants';
+import { BAKE_ACTIVITY_W, BAKE_SOUR_W, FLOUR_AFFINITY_BONUS, GRADE_BEST, GRADE_GOOD } from './constants';
 import { clamp, stageOf } from './derive';
 
 /** 감점 기울기: 관대 0.015 / 보통 0.025 / 엄격 0.04 (선호 범위 밖 산미 1당) */
@@ -13,7 +13,7 @@ export const RECIPES: readonly RecipeDef[] = [
   { id: 'pancake', kind: 'discard', cost: 0, stage: 2, sourRange: null, slope: 0 },
   { id: 'cracker', kind: 'discard', cost: 0, stage: 2, sourRange: null, slope: 0 },
   { id: 'scone', kind: 'discard', cost: 0, stage: 3, sourRange: null, slope: 0 },
-  // 빵 — mass 소모 + 판정
+  // 빵 — 보관 통 그램(cost) 소모 + 판정. cost는 통에서 나간다(르방이의 mass가 아니다)
   { id: 'flatbread', kind: 'bread', cost: 30, stage: 3, sourRange: [0, 60], slope: LENIENT },
   { id: 'focaccia', kind: 'bread', cost: 50, stage: 3, sourRange: [0, 40], slope: LENIENT },
   { id: 'loaf', kind: 'bread', cost: 80, stage: 4, sourRange: [0, 30], slope: NORMAL },
@@ -50,11 +50,14 @@ const GRADE_ORDER: Record<BakeGrade, number> = { flat: 0, good: 1, best: 2 };
 export const betterGrade = (a: BakeGrade | null, b: BakeGrade): BakeGrade =>
   a !== null && GRADE_ORDER[a] >= GRADE_ORDER[b] ? a : b;
 
-/** 굽기 게이트: 단계 + mass ≥ 비용 + 씨앗 60g (씨앗 소모 불가 — 영구 사망 없음의 물리 보장) */
+/**
+ * 굽기 게이트: 단계만. 그램 원가는 보관 통(집 소유·전역)에서 나가므로 sim이 모른다 —
+ * 통 잔량 게이트는 store(gameStore.doDispatch) 소관이다. 이 분리 덕에 굽기는 르방이의
+ * mass를 아예 건드리지 않고, "어떤 액션도 르방이를 죽일 수 없다"가 더 단단해진다 (GDD §6-2).
+ */
 export function canBakeBread(state: SimState, recipe: RecipeDef, now: number):
-  'ok' | 'stage' | 'mass' {
+  'ok' | 'stage' {
   if (stageOf(state, now) < recipe.stage) return 'stage';
-  if (state.mass < recipe.cost + SEED_G) return 'mass';
   return 'ok';
 }
 

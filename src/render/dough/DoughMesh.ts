@@ -260,6 +260,15 @@ export class DoughMesh {
     return fill * (1 - 0.1 * (this.params?.levelness ?? 0.5));
   }
 
+  /**
+   * 지금 이 프레임의 몸통 XZ 반경 (오브젝트 공간) — 입력 히트 테스트 전용.
+   * 고정 상한(R_XZ_MAX_BASE)을 쓰면 유리 접촉 확장(uRBody)과 숨쉬기 배율이 빠져
+   * 화면상 반죽 위인데도 "배경"으로 판정돼 스와이프로 새어 나간다 (2026-08-25).
+   */
+  bodyRadius(): number {
+    return (this.material.uniforms.uRBody.value as number) ?? R_XZ_MAX_BASE;
+  }
+
   /** 반죽 꼭대기 월드 y — hooch 층·레이캐스트 평면 배치용. 바닥 고정 피벗 기준 */
   topY(): number {
     return this.fillWorldY(this.fillEff());

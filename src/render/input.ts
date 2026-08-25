@@ -10,7 +10,7 @@
 // grab 놓기 = pointerup/cancel (M2 해소 — 80ms 정지 판정은 stir 전용).
 // pointermove는 rAF 코얼레싱 — 프레임당 1회만 레이캐스트.
 import * as THREE from 'three';
-import { R_XZ_MAX_BASE, XZ_SCALE, type DoughMesh } from './dough/DoughMesh';
+import { XZ_SCALE, type DoughMesh } from './dough/DoughMesh';
 
 const TAP_MAX_MS = 250;
 const TAP_MAX_PX = 8;
@@ -23,8 +23,8 @@ const GRAB_MAX_PX_PER_MS = 1.6;
 /** 좌우 스와이프(르방 전환) 최소 이동 · 수평 우세비 (§5-5) */
 const SWIPE_MIN_PX = 48;
 const SWIPE_H_RATIO = 1.5;
-/** 반죽 위 판정 반경 (오브젝트 공간) — 실루엣 반경 상한과 동기 (드리프트 방지) */
-const DOUGH_R = R_XZ_MAX_BASE;
+/** 반죽 위 판정 여유 — 실측 몸통 반경(DoughMesh.bodyRadius)에 곱한다. 경계는 반죽 쪽으로 */
+const DOUGH_HIT_MARGIN = 1.15;
 
 export interface InputHooks {
   /** 덮개가 덮여 있는가 — true면 반죽 조작 대신 걷기 제스처만 받는다 */
@@ -68,8 +68,13 @@ export function attachInput(
   let downY = 0;
   let downAt = 0;
   let moved = false;
-  let mode: 'grab' | 'stir' | 'swipe' | null = null;
+  // swipeCandidate = 배경에서 시작해 수평 우세지만 **아직 확정 전**. 젓기는 계속 흘려보낸다.
+  // 확정(isSwipeCommit)되는 순간에만 'swipe'로 승격하고 그때 젓기를 취소한다 —
+  // 8px 시점에 잠가 버리면 반죽을 젓다가 옆 르방으로 넘어간다 (2026-08-25 실기기 신고)
+  let mode: 'grab' | 'stir' | 'swipe' | 'swipeCandidate' | null = null;
   let downOnDough = false;
+  /** 제스처 소유 포인터 — 기기를 쥔 엄지가 스쳐도 진행 중인 제스처를 뺏기지 않는다 */
+  let activeId: number | null = null;
   let downHitX = 0;
   let downHitZ = 0;
   let coveredGesture = false;
@@ -99,7 +104,7 @@ export function attachInput(
   };
 
   const endDrag = (): void => {
-    if (mode === 'stir') hooks.onStirEnd?.();
+    if (mode === 'stir' || mode === 'swipeCandidate') hooks.onStirEnd?.();
     if (mode === 'grab') {
       dough.grabEnd();
       hooks.onGrabEnd?.();
@@ -127,17 +132,23 @@ export function attachInput(
           dough.grabStart(downHitX, downHitZ);
           hooks.onGrabStart?.();
         } else if (
-          // 배경 시작 + 수평 우세 → 스와이프 후보. 확정은 up에서 누적 이동으로 (§5-5)
+          // 배경 시작 + 수평 우세 → 스와이프 **후보**. 확정은 아래 승격 지점에서만 (§5-5)
           !downOnDough &&
           (hooks.canSwipe?.() ?? false) &&
           Math.abs(dxT) > Math.abs(dyT)
         ) {
-          mode = 'swipe';
+          mode = 'swipeCandidate';
+          hooks.onStirStart?.(); // 미달로 끝나면 그냥 젓기였던 셈 — 반죽 밖 시작이라 손실 없다
         } else {
           mode = 'stir';
           hooks.onStirStart?.();
         }
       }
+    }
+    // 후보 → 확정 승격. 여기서만 반죽에서 손을 뗀다
+    if (mode === 'swipeCandidate' && isSwipeCommit(e.clientX - downX, e.clientY - downY)) {
+      hooks.onStirEnd?.();
+      mode = 'swipe';
     }
     if (mode === 'swipe') return; // 반죽에 손대지 않는다 — 레이캐스트도 생략
     if (!raycast(e)) return;
@@ -148,7 +159,7 @@ export function attachInput(
     if (mode === 'grab') {
       dough.grabMove(ox, oz);
       hooks.onGrabMove?.(dough.grabStretch01());
-    } else if (mode === 'stir') {
+    } else if (mode === 'stir' || mode === 'swipeCandidate') {
       const vx = (ox - lastHitX) / dt;
       const vz = (oz - lastHitZ) / dt;
       dough.setStirInput(ox, oz, vx, vz);
@@ -161,6 +172,10 @@ export function attachInput(
   };
 
   const onDown = (e: PointerEvent): void => {
+    // 이미 제스처가 진행 중이면 두 번째 손가락은 무시한다. 예전엔 down/mode/downOnDough를
+    // 통째로 덮어써서, 기기를 쥔 엄지가 캔버스에 스치는 것만으로 젓기가 스와이프로 재분류됐다
+    if (down && activeId !== null && e.pointerId !== activeId) return;
+    activeId = e.pointerId;
     down = true;
     downX = e.clientX;
     downY = e.clientY;
@@ -176,7 +191,9 @@ export function attachInput(
       lastHitT = performance.now() / 1000;
       downHitX = lastHitX;
       downHitZ = lastHitZ;
-      downOnDough = Math.hypot(downHitX, downHitZ) < DOUGH_R;
+      // 실측 반경 + 여유 마진. 경계에서 애매하면 **반죽 쪽으로** 기울인다 —
+      // 젓다가 화면이 넘어가는 쪽이, 스와이프가 한 번 안 먹는 쪽보다 나쁘다
+      downOnDough = Math.hypot(downHitX, downHitZ) < dough.bodyRadius() * DOUGH_HIT_MARGIN;
     }
     clearHold();
     holdTimer = setTimeout(() => {
@@ -186,15 +203,16 @@ export function attachInput(
   };
 
   const onMove = (e: PointerEvent): void => {
-    if (!down) return;
+    if (!down || (activeId !== null && e.pointerId !== activeId)) return;
     if (!e.buttons && e.pointerType !== 'touch') return;
     pendingMove = e;
     if (rafId === 0) rafId = requestAnimationFrame(processMove);
   };
 
   const onUp = (e: PointerEvent): void => {
-    if (!down) return;
+    if (!down || (activeId !== null && e.pointerId !== activeId)) return;
     down = false;
+    activeId = null;
     clearHold();
     const dtMs = performance.now() - downAt;
     const dy = e.clientY - downY;
@@ -226,6 +244,7 @@ export function attachInput(
 
   const onCancel = (): void => {
     down = false;
+    activeId = null;
     coveredGesture = false;
     clearHold();
     endDrag();

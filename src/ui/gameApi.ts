@@ -48,6 +48,8 @@ export interface GameApi {
 
   /** 재료함 (§8-2 — 전역 수량) */
   inventory(): Record<IngredientId, number>;
+  /** 보관 통 잔량(g) — 빵 원가가 여기서 나간다 (GDD §6-2) */
+  pantry(): number;
   /** 변형 굽기 — 원자 해금·차단 규칙은 store가 판정 (gameStore.bakeVariant 주석) */
   bakeVariant(variantId: string): SimEvent[];
   /** 활성 르방 표시명 — starterId로 도감 기록의 "사용 르방" 표기용. 미지 id는 null */
