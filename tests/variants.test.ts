@@ -42,9 +42,9 @@ function matureStore(): GameStore {
  * 배치 병합이 행을 조용히 더하거나 빠뜨리는 걸 잡는 유일한 장치다.
  */
 const EXPECTED = {
-  total: 194,
-  verified: 78,
-  conditional: 76,
+  total: 200,
+  verified: 81,
+  conditional: 79,
   experimental: 39,
   blocked: 1,
   /** §18 재구성분(2026-08-24) — **영구 동결**. URL 재조작 금지 원칙이라 다시 늘지 않는다 */
@@ -64,7 +64,7 @@ describe('카탈로그 무결성 (§18 전사 — 재구성 검증)', () => {
 
   it('집계 체크섬', () => {
     const count = (s: string): number => COMPATIBILITY.filter((r) => r.status === s).length;
-    // §18 재구성 46행(27/13/5/1) + 확장 8종 43행(18/14/11/0) + 확장 18종 105행(33/49/23/0).
+    // §18 재구성 46행(27/13/5/1) + 확장 8종 43행(18/14/11/0) + 확장 18종 111행(36/52/23/0).
     expect(count('verified')).toBe(EXPECTED.verified);
     expect(count('conditional')).toBe(EXPECTED.conditional);
     expect(count('experimental')).toBe(EXPECTED.experimental);

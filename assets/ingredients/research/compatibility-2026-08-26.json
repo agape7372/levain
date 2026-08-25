@@ -800,6 +800,30 @@
   "demoted": true
  },
  {
+  "baseRecipeId": "loaf",
+  "ingredientId": "beet",
+  "form": "puree",
+  "status": "verified",
+  "sourceRef": "https://breadtopia.com/beetroot-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "rye",
+  "ingredientId": "beet",
+  "form": "puree",
+  "status": "verified",
+  "sourceRef": "https://www.starchefs.com/recipes/beet-rye-bread",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "wholewheat",
+  "ingredientId": "beet",
+  "form": "puree",
+  "status": "verified",
+  "sourceRef": "https://breadtopia.com/beetroot-sourdough-bread/",
+  "demoted": false
+ },
+ {
   "baseRecipeId": "campagne",
   "ingredientId": "beet",
   "form": "fresh",
@@ -810,31 +834,55 @@
  {
   "baseRecipeId": "focaccia",
   "ingredientId": "beet",
-  "form": "fresh",
+  "form": "puree",
   "status": "conditional",
-  "sourceRef": "https://www.ourhomesteadonthehill.com/homestead/sourdough-beet-focaccia/",
+  "sourceRef": "https://wavesinthekitchen.com/beet-focaccia/",
   "demoted": false
  },
  {
-  "baseRecipeId": "loaf",
+  "baseRecipeId": "flatbread",
+  "ingredientId": "beet",
+  "form": "puree",
+  "status": "conditional",
+  "sourceRef": "https://www.pipercooks.com/beetroot-flatbread-recipe/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "cracker",
+  "ingredientId": "beet",
+  "form": "puree",
+  "status": "conditional",
+  "sourceRef": "https://moorlandseater.com/beetroot-crackers-with-nigella-seeds/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "beet",
+  "form": "puree",
+  "status": "conditional",
+  "sourceRef": "https://whiteblankspace.com/beet-pancakes/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "scone",
   "ingredientId": "beet",
   "form": "fresh",
   "status": "conditional",
-  "sourceRef": "https://passionspoon.com/beetroot-sourdough-bread/",
+  "sourceRef": "https://www.raspberriesandkohlrabi.com/sourdough-discard-scones/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "baguette",
+  "ingredientId": "beet",
+  "form": "puree",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
   "demoted": false
  },
  {
   "baseRecipeId": "campagne",
   "ingredientId": "beet",
   "form": "roasted",
-  "status": "experimental",
-  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
-  "demoted": false
- },
- {
-  "baseRecipeId": "wholewheat",
-  "ingredientId": "beet",
-  "form": "fresh",
   "status": "experimental",
   "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
   "demoted": false

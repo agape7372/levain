@@ -20,7 +20,13 @@ const HOLLOW_COLOR = scaleHex(BARK_COLOR, 0.42); // 유도: 롤 중심 구멍의
 const SPIRAL_DARK_COLOR = scaleHex(BARK_COLOR, 0.68); // 유도: 나선 밴드용 — bark 자체보다 한 단 더
 // 어둡게(§8) 잡아 SCROLL_LIGHT_COLOR와의 명암비를 키운다. debug-1/2 실측: bark vs light만으로는
 // 끝면 조명 각도(그늘)에 묻혀 나선이 거의 안 보였다.
-const POWDER_COLOR = 0x8c4e2a; // "a deeper red-brown powder heap"
+// ★v2 (2026-08-26, 64px 판독 애매 수정): 가루를 스틱에서 **색으로** 떼어냈다.
+// 원래 `#8C4E2A`("a deeper red-brown powder heap")는 스틱 `#9A5B34`와 명도·색상이 거의 같아
+// 64px 다운샘플에서 둘이 하나로 붙었다 — "덩어리 + 막대"가 아니라 "갈색 뭉치"로 읽혔다.
+// 나선 텍스처는 그 배율에서 어차피 증발하니 정체성을 실루엣이 아니라 **2원 색 대비**로 옮긴다.
+// 프롬프트 산문의 "deeper red-brown"에서 벗어나지만, 실제 계피 가루는 스틱보다 밝고 붉다 —
+// 관찰이 산문을 이긴다(레포 선례: 2026-08-25 specStr 판정). tri는 1도 안 늘었다.
+const POWDER_COLOR = 0xc9773d; // 밝은 황토빛 계피 가루 — 스틱(#9A5B34)과 명도차를 벌린다
 // 더스팅 하이라이트(#A9683C, "a paler dusting on its lit upper slope")는 드롭 — 런타임 키라이트의
 // N·L 감쇠가 둔덕 위쪽 면을 이미 밝게 비춘다(올리브 그늘진 아랫면 드롭과 대칭적인 이유).
 // bark(#9A5B34) vs powder(#8C4E2A) 대비를 지켜야 가루 더미가 세 번째 스틱처럼 안 보인다(advisor).

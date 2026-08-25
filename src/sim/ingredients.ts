@@ -6,11 +6,11 @@
 //   `§18-x`  = 2026-08-24 재구성분 46행. §18 조사 원문(판정표)이 유실돼 기획서 §18-1(형태 서열)·
 //              §18-2(예시 검증)·§18-3(verified 명시 목록)에서 복원했다. URL 재조작 금지 원칙으로
 //              절 번호만 쓴다. 명시 목록 우선이라 집계가 §18 요약(24/16/5/1)과 다르다: 27/13/5/1.
-//   `https://` = 2026-08-25 확장 8종 43행 + 2026-08-26 확장 18종 105행. **실제로 연 페이지만**
+//   `https://` = 2026-08-25 확장 8종 43행 + 2026-08-26 확장 18종 111행. **실제로 연 페이지만**
 //              verified/conditional이고, URL 없으면 experimental이다.
 //              이 계약은 tests/variants.test.ts가 강제한다.
-// 합계 194행 = verified 78 / conditional 76 / experimental 39 / blocked 1.
-// 노출(verified+conditional) = 154종 변형. 재료 30종.
+// 합계 200행 = verified 81 / conditional 79 / experimental 39 / blocked 1.
+// 노출(verified+conditional) = 160종 변형. 재료 30종.
 import type { RecipeDef } from './types';
 import { RECIPES } from './recipes';
 
@@ -78,7 +78,11 @@ export const INGREDIENTS: readonly IngredientDef[] = [
   { id: 'lemon', forms: ['slice'] },
   { id: 'banana', forms: ['slice'] },
   { id: 'apricot', forms: ['dried'] },
-  { id: 'beet', forms: ['fresh', 'roasted'] },
+  // beet: 조사 전제였던 `roasted`가 **실측으로 뒤집혔다** — 반죽에 실제로 혼입되는 사례는 전부
+  // puree(삶거나 구운 뒤 퓌레화)·juice·grated(fresh)였고, 구운 통조각이 반죽에 들어간 레시피는 0건이다
+  // (roasted 웨지는 완성품 위 토핑으로만 등장 → 그 행은 기각). `roasted`는 아트 축으로만 남긴다
+  // (프롬프트 hero_form이 구운 반쪽이라 — 단호박 선례와 같은 아트≠호환 축 분리).
+  { id: 'beet', forms: ['puree', 'fresh', 'roasted'] },
   { id: 'coconut', forms: ['dried'] },
   { id: 'pistachio', forms: ['piece'] },
   { id: 'oat', forms: ['flake'] },
@@ -114,7 +118,7 @@ const R = (
   status: RuleStatus, sourceRef: string,
 ): CompatibilityRule => ({ baseRecipeId, ingredientId, form, status, sourceRef });
 
-/** 판정표 89행. 무효 조합은 여기 없음 = 시도 자체가 차단 (§8-2) */
+/** 판정표 200행. 무효 조합은 여기 없음 = 시도 자체가 차단 (§8-2) */
 export const COMPATIBILITY: readonly CompatibilityRule[] = [
   // ── verified 27 (§18-3 명시 목록) ──
   R('focaccia', 'olive', 'flesh', 'verified', '§18-2·§18-3'),
@@ -240,6 +244,7 @@ export const COMPATIBILITY: readonly CompatibilityRule[] = [
   // piece가 아니었다(§18-1 "재료가 아니라 형태에 등급을 매긴다"의 적용).
   // ★조사 한계: **웨이백 머신이 이 환경에서 열리지 않아** KAB 403 우회로가 없다.
   //   2026-08-25 메모가 "재조사 1순위"로 지목한 항목인데, 수단이 없다는 게 이번 결론이다.
+
   // 건포도 — 노출 5/6
   R('loaf', 'raisin', 'flesh', 'verified', 'https://homegrownhappiness.com/sourdough-cinnamon-raisin-bread/'),
   R('wholewheat', 'raisin', 'flesh', 'verified', 'https://journeytotheeternalcity.com/whole-wheat-cinnamon-swirl-raisin-bread-recipe/'),
@@ -270,12 +275,18 @@ export const COMPATIBILITY: readonly CompatibilityRule[] = [
   R('scone', 'apricot', 'dried', 'conditional', 'https://victoriamag.com/dried-apricot-scones-recipe/'),
   R('wholewheat', 'apricot', 'dried', 'conditional', 'https://www.theperfectloaf.com/apricot-and-thyme-sourdough-bread/'),
 
-  // 비트 — 노출 3/5
+  // 비트 — 노출 9/11
   R('campagne', 'beet', 'fresh', 'verified', 'https://sammywongskitchen.com/beet-chia-sourdough-bread/'),
-  R('focaccia', 'beet', 'fresh', 'conditional', 'https://www.ourhomesteadonthehill.com/homestead/sourdough-beet-focaccia/'),
-  R('loaf', 'beet', 'fresh', 'conditional', 'https://passionspoon.com/beetroot-sourdough-bread/'),
+  R('loaf', 'beet', 'puree', 'verified', 'https://breadtopia.com/beetroot-sourdough-bread/'),
+  R('rye', 'beet', 'puree', 'verified', 'https://www.starchefs.com/recipes/beet-rye-bread'),
+  R('wholewheat', 'beet', 'puree', 'verified', 'https://breadtopia.com/beetroot-sourdough-bread/'),
+  R('cracker', 'beet', 'puree', 'conditional', 'https://moorlandseater.com/beetroot-crackers-with-nigella-seeds/'),
+  R('flatbread', 'beet', 'puree', 'conditional', 'https://www.pipercooks.com/beetroot-flatbread-recipe/'),
+  R('focaccia', 'beet', 'puree', 'conditional', 'https://wavesinthekitchen.com/beet-focaccia/'),
+  R('pancake', 'beet', 'puree', 'conditional', 'https://whiteblankspace.com/beet-pancakes/'),
+  R('scone', 'beet', 'fresh', 'conditional', 'https://www.raspberriesandkohlrabi.com/sourdough-discard-scones/'),
+  R('baguette', 'beet', 'puree', 'experimental', '조사 2026-08-26 · 실 레시피 미발견'),
   R('campagne', 'beet', 'roasted', 'experimental', '조사 2026-08-26 · 실 레시피 미발견'),
-  R('wholewheat', 'beet', 'fresh', 'experimental', '조사 2026-08-26 · 실 레시피 미발견'),
 
   // 코코넛 — 노출 5/5
   R('flatbread', 'coconut', 'dried', 'verified', 'https://www.thefreshloaf.com/node/70288/pol-roti-coconut-roti-sd-discard-chimichurri-and-lil-extra'),

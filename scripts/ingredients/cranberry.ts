@@ -30,8 +30,10 @@ const BODY_COLOR = 0xb3324a; // "a deep saturated crimson body"
 
 // 실측 비율 (assets/ingredients/src/cranberry.png 3/4 · cranberry-2.png 정면 · cranberry-3.png 탑다운).
 // 절대 스케일은 무의미 — 런타임이 군집 전체 최장축을 1.6으로 리핏한다 (types.ts §6).
-const CRANBERRY_RADIUS = 0.5;
-const CRANBERRY_HALF_LENGTH = 0.56; // length:width ~= 1.12:1 — 통통하고 살짝만 길쭉 (cranberry-3.png)
+// v4: 알을 6개 → 3개로 줄이면서 반지름을 키웠다(0.5 → 0.62). 개수를 줄이기만 하면 프레임이
+// 비어 리핏이 확대해 버리고, 그러면 "작은 열매 여럿"이라는 인상이 사라진다 — 크기로 채운다.
+const CRANBERRY_RADIUS = 0.62;
+const CRANBERRY_HALF_LENGTH = 0.69; // length:width ~= 1.12:1 유지 — 통통하고 살짝만 길쭉 (cranberry-3.png)
 const CRANBERRY_SEGMENTS = 10;
 
 type ProfilePoint = readonly [number, number];
@@ -72,13 +74,20 @@ interface BerryDef {
 }
 
 // assets/ingredients/work/cranberry/object-sculpt-spec.json BERRIES 전사.
-const BERRIES: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f', BerryDef> = {
-  a: { offset: [-0.86, -0.42], yaw: 0.35, tiltZ: 0.0 },
-  b: { offset: [0.02, -0.5], yaw: -0.7, tiltZ: 0.0 },
-  c: { offset: [0.88, -0.4], yaw: 1.1, tiltZ: 0.0 },
-  d: { offset: [-0.46, 0.42], yaw: -1.3, tiltZ: 0.0 },
-  e: { offset: [0.42, 0.46], yaw: 0.55, tiltZ: 0.0 },
-  f: { offset: [1.15, 0.34], yaw: 2.0, tiltZ: 0.18 },
+//
+// ★v4 (2026-08-26, 64px 판독 실패 수정): 알 **6개 → 3개**, 간격 확대.
+// 6개를 2줄로 촘촘히 놓으니 64px 다운샘플에서 개별 경계가 전부 사라지고 **붉은 얼룩 하나**로
+// 뭉쳤다("과일"이라는 인상 자체가 약했다). tri·KB·roundtrip은 다 통과한 상태였는데도 그랬다 —
+// 숫자 예산이 판독을 보증하지 않는다는 CRIB 최종 게이트가 정확히 이 사례다.
+//
+// 고친 방향은 폴리곤이 아니라 **실루엣**이다(CRIB 규칙 그대로): 개수를 줄이고 하나를 키우고,
+// 알 사이에 네거티브 스페이스를 확보해 경계가 축소본에서도 살아남게 했다.
+// 같은 군집 재료들이 전부 3개인 것과도 맞다(olive 3알 · blueberry 3알 · cheese 3큐브).
+// 납작함(FLATTEN_X)과 V자 주름은 그대로 — 블루베리(매끈·구형·왕관)와의 형태 대비가 정체성이다.
+const BERRIES: Record<'a' | 'b' | 'c', BerryDef> = {
+  a: { offset: [-0.78, -0.20], yaw: 0.35, tiltZ: 0.0 },
+  b: { offset: [0.78, -0.12], yaw: 1.1, tiltZ: 0.0 },
+  c: { offset: [0.0, 0.72], yaw: -0.7, tiltZ: 0.14 },
 };
 
 /**
