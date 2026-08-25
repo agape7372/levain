@@ -1,0 +1,802 @@
+[
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "redbean",
+  "form": "swirl",
+  "status": "verified",
+  "sourceRef": "https://halicopteraway.com/2021/01/13/black-sesame-and-red-bean-sourdough/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "redbean",
+  "form": "swirl",
+  "status": "conditional",
+  "sourceRef": "https://www.jessicasdinnerparty.com/2020/11/adzuki-red-bean-scones/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "redbean",
+  "form": "swirl",
+  "status": "conditional",
+  "sourceRef": "https://www.justonecookbook.com/dorayaki-japanese-red-bean-pancake/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "flatbread",
+  "ingredientId": "redbean",
+  "form": "swirl",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "redbean",
+  "form": "swirl",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "wholewheat",
+  "ingredientId": "redbean",
+  "form": "swirl",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "sweetpotato",
+  "form": "puree",
+  "status": "verified",
+  "sourceRef": "https://breadtopia.com/purple-sweet-potato-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "sweetpotato",
+  "form": "puree",
+  "status": "verified",
+  "sourceRef": "https://www.bakewithpaws.com/2024/04/purple-sweet-potato-sourdough-focaccia.html",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "sweetpotato",
+  "form": "roasted",
+  "status": "conditional",
+  "sourceRef": "https://www.butterforall.com/traditional-cooking-traditional-living/sweet-potato-sourdough-pancakes/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "sweetpotato",
+  "form": "roasted",
+  "status": "conditional",
+  "sourceRef": "https://makeitdough.com/sweet-potato-sourdough-biscuits/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "flatbread",
+  "ingredientId": "sweetpotato",
+  "form": "puree",
+  "status": "conditional",
+  "sourceRef": "https://www.occasionallyeggs.com/sweet-potato-naan-vegan-whole-grain/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "matcha",
+  "form": "ground",
+  "status": "verified",
+  "sourceRef": "https://somebodyfeedseb.com/matcha-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "matcha",
+  "form": "ground",
+  "status": "conditional",
+  "sourceRef": "https://amandawarrenblog.com/blog/2026/4/8/fluffy-matcha-sourdough-discard-pancakes-easy-zero-waste-recipe",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "matcha",
+  "form": "ground",
+  "status": "conditional",
+  "sourceRef": "https://gardengrubblog.com/the-best-matcha-focaccia-recipe-2-ways-sweet-or-savory/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "matcha",
+  "form": "ground",
+  "status": "conditional",
+  "sourceRef": "https://tokyopony.com/index.php/2020/12/07/matcha-scones-with-yuzu-drizzle-sweet-red-bean-jam/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "rye",
+  "ingredientId": "matcha",
+  "form": "ground",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "cracker",
+  "ingredientId": "matcha",
+  "form": "ground",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "blackgarlic",
+  "form": "piece",
+  "status": "verified",
+  "sourceRef": "https://brodandtaylor.com/blogs/recipes/black-garlic-sourdough-focaccia",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "blackgarlic",
+  "form": "piece",
+  "status": "conditional",
+  "sourceRef": "https://natashasbaking.com/black-garlic-sourdough-bread/",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "blackgarlic",
+  "form": "piece",
+  "status": "conditional",
+  "sourceRef": "https://sourdoughtalk.com/black-garlic-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "cracker",
+  "ingredientId": "blackgarlic",
+  "form": "piece",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "flatbread",
+  "ingredientId": "blackgarlic",
+  "form": "piece",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "rye",
+  "ingredientId": "blackgarlic",
+  "form": "piece",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "yuzu",
+  "form": "piece",
+  "status": "conditional",
+  "sourceRef": "https://kankitsulabo.com/blogs/sweets/candied-yuzu-peel-scones",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "yuzu",
+  "form": "fresh",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "yuzu",
+  "form": "fresh",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "yuzu",
+  "form": "fresh",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "wholewheat",
+  "ingredientId": "poppyseed",
+  "form": "seed",
+  "status": "verified",
+  "sourceRef": "https://www.aheadofthyme.com/seeded-whole-wheat-sourdough-bread-small-batch/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "poppyseed",
+  "form": "seed",
+  "status": "verified",
+  "sourceRef": "https://breadtopia.com/seeded-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "cracker",
+  "ingredientId": "poppyseed",
+  "form": "seed",
+  "status": "conditional",
+  "sourceRef": "https://pantrymama.com/seeded-sourdough-discard-crackers/",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "poppyseed",
+  "form": "seed",
+  "status": "verified",
+  "sourceRef": "https://amybakesbread.com/lemon-poppy-seed-sourdough-scones/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "poppyseed",
+  "form": "seed",
+  "status": "verified",
+  "sourceRef": "https://farmhouseharvest.net/sourdough-lemon-poppy-seed-pancakes-2/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "poppyseed",
+  "form": "seed",
+  "status": "conditional",
+  "sourceRef": "https://brodandtaylor.com/blogs/recipes/poppy-sunflower-sourdough",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "poppyseed",
+  "form": "seed",
+  "status": "conditional",
+  "sourceRef": "https://healingslice.com/everything-bagel-sourdough-focaccia-with-cheese-bacon",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "flatbread",
+  "ingredientId": "poppyseed",
+  "form": "seed",
+  "status": "conditional",
+  "sourceRef": "https://cleoscooking.com/recipe-items/sesame-poppy-seed-flatbread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "wholewheat",
+  "ingredientId": "sunflowerseed",
+  "form": "seed",
+  "status": "verified",
+  "sourceRef": "https://www.aheadofthyme.com/seeded-whole-wheat-sourdough-bread-small-batch/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "sunflowerseed",
+  "form": "seed",
+  "status": "verified",
+  "sourceRef": "https://somebodyfeedseb.com/sunflower-seed-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "rye",
+  "ingredientId": "sunflowerseed",
+  "form": "seed",
+  "status": "verified",
+  "sourceRef": "https://bubblingstarter.com/healthy-and-delicious-100-rye-super-seed-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "cracker",
+  "ingredientId": "sunflowerseed",
+  "form": "seed",
+  "status": "verified",
+  "sourceRef": "https://www.theperfectloaf.com/seeded-sourdough-discard-crackers/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "sunflowerseed",
+  "form": "seed",
+  "status": "conditional",
+  "sourceRef": "https://brodandtaylor.com/blogs/recipes/poppy-sunflower-sourdough",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "sunflowerseed",
+  "form": "seed",
+  "status": "conditional",
+  "sourceRef": "https://californiaish.substack.com/p/salted-and-seeded-focaccia",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "baguette",
+  "ingredientId": "sunflowerseed",
+  "form": "seed",
+  "status": "conditional",
+  "sourceRef": "https://web.archive.org/web/20231123031223/https://tonyfitzgeraldphotography.com/2021/07/28/sunflower-seed-baguette/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "wholewheat",
+  "ingredientId": "flaxseed",
+  "form": "seed",
+  "status": "verified",
+  "sourceRef": "https://www.aheadofthyme.com/seeded-whole-wheat-sourdough-bread-small-batch/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "rye",
+  "ingredientId": "flaxseed",
+  "form": "seed",
+  "status": "verified",
+  "sourceRef": "https://bubblingstarter.com/healthy-and-delicious-100-rye-super-seed-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "cracker",
+  "ingredientId": "flaxseed",
+  "form": "seed",
+  "status": "conditional",
+  "sourceRef": "https://pantrymama.com/seeded-sourdough-discard-crackers/",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "flaxseed",
+  "form": "seed",
+  "status": "verified",
+  "sourceRef": "https://recipes.macd.us.com/recipes/sourdough-bread-w-flaxseed-sunflower-seeds-oats/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "flaxseed",
+  "form": "ground",
+  "status": "conditional",
+  "sourceRef": "https://www.parsnipsandparsimony.com/sourdough-discard-whole-grain-pancakes/",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "flaxseed",
+  "form": "seed",
+  "status": "verified",
+  "sourceRef": "https://web.archive.org/web/20260711114112/https://www.kingarthurbaking.com/pro/formulas/sourdough-seed-bread",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "flaxseed",
+  "form": "seed",
+  "status": "conditional",
+  "sourceRef": "https://californiaish.substack.com/p/salted-and-seeded-focaccia",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "raisin",
+  "form": "dried",
+  "status": "conditional",
+  "sourceRef": "https://amybakesbread.com/cinnamon-raisin-sourdough-bread/",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "raisin",
+  "form": "dried",
+  "status": "verified",
+  "sourceRef": "https://homegrownhappiness.com/sourdough-cinnamon-raisin-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "wholewheat",
+  "ingredientId": "raisin",
+  "form": "dried",
+  "status": "verified",
+  "sourceRef": "https://journeytotheeternalcity.com/whole-wheat-cinnamon-swirl-raisin-bread-recipe/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "raisin",
+  "form": "dried",
+  "status": "conditional",
+  "sourceRef": "https://www.thenfeedthem.com/post/how-to-make-quick-sourdough-golden-raisin-scones-with-your-discard",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "rye",
+  "ingredientId": "raisin",
+  "form": "dried",
+  "status": "conditional",
+  "sourceRef": "https://www.virtuousbread.com/bread-recipe/wonderful-recipe-for-delicious-sourdough-rye-and-raisin-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "raisin",
+  "form": "dried",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "lemon",
+  "form": "slice",
+  "status": "verified",
+  "sourceRef": "https://somebodyfeedseb.com/sourdough-focaccia-with-feta-and-lemon/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "lemon",
+  "form": "slice",
+  "status": "conditional",
+  "sourceRef": "https://sourdoughbrandon.com/preserved-lemon-and-rosemary-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "lemon",
+  "form": "slice",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "flatbread",
+  "ingredientId": "lemon",
+  "form": "slice",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "cracker",
+  "ingredientId": "lemon",
+  "form": "slice",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "lemon",
+  "form": "slice",
+  "status": "conditional",
+  "sourceRef": "https://www.thekitchenmagpie.com/glazed-meyer-lemon-scones/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "banana",
+  "form": "slice",
+  "status": "conditional",
+  "sourceRef": "https://sourdoughbrandon.com/sourdough-banana-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "banana",
+  "form": "slice",
+  "status": "conditional",
+  "sourceRef": "https://homegrownhappiness.com/sourdough-banana-pancakes/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "flatbread",
+  "ingredientId": "banana",
+  "form": "slice",
+  "status": "conditional",
+  "sourceRef": "https://gayathriscookspot.com/2019/06/roti-gulay-banana-roti-thai-roti-thai-banana-roti-recipe/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "banana",
+  "form": "slice",
+  "status": "conditional",
+  "sourceRef": "https://butternutbakeryblog.com/banana-scones-with-cinnamon-maple-glaze/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "banana",
+  "form": "slice",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "apricot",
+  "form": "dried",
+  "status": "verified",
+  "sourceRef": "https://www.theperfectloaf.com/apricot-and-thyme-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "wholewheat",
+  "ingredientId": "apricot",
+  "form": "dried",
+  "status": "conditional",
+  "sourceRef": "https://www.theperfectloaf.com/apricot-and-thyme-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "apricot",
+  "form": "dried",
+  "status": "conditional",
+  "sourceRef": "https://victoriamag.com/dried-apricot-scones-recipe/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "rye",
+  "ingredientId": "apricot",
+  "form": "dried",
+  "status": "conditional",
+  "sourceRef": "https://web.archive.org/web/20190709011852/http://www.thefreshloaf.com/node/52716/oat-and-apricot-bread",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "apricot",
+  "form": "dried",
+  "status": "conditional",
+  "sourceRef": "https://web.archive.org/web/20260711165109/https://www.kingarthurbaking.com/recipes/sourdough-apricot-oat-bread-recipe",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "pistachio",
+  "form": "piece",
+  "status": "verified",
+  "sourceRef": "https://natashasbaking.com/pistachios-dried-cranberries-sourdough-loaf/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "pistachio",
+  "form": "piece",
+  "status": "conditional",
+  "sourceRef": "https://www.umami.recipes/recipe/LKAXFQ802QwP87plJAOH",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "pistachio",
+  "form": "piece",
+  "status": "conditional",
+  "sourceRef": "https://sourdoughbagelsrecipes.substack.com/p/sourdough-strawberry-pistachio-scones",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "pistachio",
+  "form": "piece",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "rye",
+  "ingredientId": "pistachio",
+  "form": "piece",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "cracker",
+  "ingredientId": "pistachio",
+  "form": "piece",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "maple",
+  "form": "piece",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "maple",
+  "form": "piece",
+  "status": "conditional",
+  "sourceRef": "https://enwnutrition.com/maple-oat-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "maple",
+  "form": "piece",
+  "status": "conditional",
+  "sourceRef": "https://vanillaandbean.com/maple-oat-sourdough-sandwich-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "maple",
+  "form": "piece",
+  "status": "conditional",
+  "sourceRef": "https://actsofsourdough.com/maple-bacon-focaccia/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "maple",
+  "form": "piece",
+  "status": "experimental",
+  "sourceRef": "조사 2026-08-26 · 실 레시피 미발견",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "focaccia",
+  "ingredientId": "honey",
+  "form": "jam",
+  "status": "verified",
+  "sourceRef": "https://actsofsourdough.com/maple-bacon-focaccia/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "honey",
+  "form": "jam",
+  "status": "verified",
+  "sourceRef": "https://idiesfarm.com/sourdough-oatmeal-bread-soft-honey-oat-sandwich-loaf/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "wholewheat",
+  "ingredientId": "honey",
+  "form": "jam",
+  "status": "verified",
+  "sourceRef": "https://amybakesbread.com/honey-whole-wheat-sourdough-artisan-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "rye",
+  "ingredientId": "honey",
+  "form": "jam",
+  "status": "verified",
+  "sourceRef": "https://keepitsweetkitchen.com/honey-rye-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "cracker",
+  "ingredientId": "honey",
+  "form": "jam",
+  "status": "conditional",
+  "sourceRef": "https://www.baking-sense.com/2021/09/09/sourdough-oatmeal-crisps/",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "honey",
+  "form": "jam",
+  "status": "conditional",
+  "sourceRef": "https://bronwyns.ca/honey-pistachio-sourdough-bread-recipe/",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "honey",
+  "form": "jam",
+  "status": "conditional",
+  "sourceRef": "https://dontwastethecrumbs.com/yummy-recipe-toasted-coconut-and-banana-sourdough-pancakes/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "oat",
+  "form": "flake",
+  "status": "verified",
+  "sourceRef": "https://enwnutrition.com/maple-oat-sourdough-bread/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "oat",
+  "form": "flake",
+  "status": "verified",
+  "sourceRef": "https://idiesfarm.com/sourdough-oatmeal-bread-soft-honey-oat-sandwich-loaf/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "cracker",
+  "ingredientId": "oat",
+  "form": "flake",
+  "status": "conditional",
+  "sourceRef": "https://www.baking-sense.com/2021/09/09/sourdough-oatmeal-crisps/",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "oat",
+  "form": "flake",
+  "status": "verified",
+  "sourceRef": "https://enwnutrition.com/sourdough-oatmeal-pancakes/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "oat",
+  "form": "flake",
+  "status": "verified",
+  "sourceRef": "https://www.theperfectloaf.com/sourdough-starter-discard-scones/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "wholewheat",
+  "ingredientId": "oat",
+  "form": "flake",
+  "status": "conditional",
+  "sourceRef": "https://web.archive.org/web/20260711184327/https://www.kingarthurbaking.com/recipes/vermont-whole-wheat-oatmeal-honey-bread-recipe",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "campagne",
+  "ingredientId": "coconut",
+  "form": "dried",
+  "status": "conditional",
+  "sourceRef": "https://www.thefreshloaf.com/node/66291/evas-coconut-sourdough",
+  "demoted": true
+ },
+ {
+  "baseRecipeId": "scone",
+  "ingredientId": "coconut",
+  "form": "dried",
+  "status": "verified",
+  "sourceRef": "https://unhurriedhomemaker.com/2025/06/10/sourdough-blackberry-coconut-scones-made-with-discard/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "flatbread",
+  "ingredientId": "coconut",
+  "form": "dried",
+  "status": "verified",
+  "sourceRef": "https://www.thefreshloaf.com/node/70288/pol-roti-coconut-roti-sd-discard-chimichurri-and-lil-extra",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "loaf",
+  "ingredientId": "coconut",
+  "form": "dried",
+  "status": "conditional",
+  "sourceRef": "https://makeitdough.com/sourdough-pan-de-coco/",
+  "demoted": false
+ },
+ {
+  "baseRecipeId": "pancake",
+  "ingredientId": "coconut",
+  "form": "dried",
+  "status": "conditional",
+  "sourceRef": "https://dontwastethecrumbs.com/yummy-recipe-toasted-coconut-and-banana-sourdough-pancakes/",
+  "demoted": true
+ }
+]
