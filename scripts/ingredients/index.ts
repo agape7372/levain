@@ -30,6 +30,7 @@ import { createSweetpotato } from './sweetpotato';
 import { createYuzu } from './yuzu';
 import { createHoney } from './honey';
 import { createMaple } from './maple';
+import { createPistachio } from './pistachio';
 
 export const INGREDIENT_BUILDERS: Record<string, IngredientBuilder> = {
   olive: createOlive,
@@ -60,9 +61,18 @@ export const INGREDIENT_BUILDERS: Record<string, IngredientBuilder> = {
   yuzu: createYuzu,
   honey: createHoney,
   maple: createMaple,
+  pistachio: createPistachio,
 };
 
-/** src/sim/ingredients.ts INGREDIENTS 순서. 미등록 id는 하네스 드롭다운에 "(미등록)"으로 뜬다. */
+/**
+ * src/sim/ingredients.ts의 INGREDIENTS 순서 그대로 — 도감 카드 순서와 같다.
+ * 미등록 id는 하네스 드롭다운에 "(미등록)"으로 뜬다.
+ *
+ * ⚠ 2026-08-26 실사고: 4팀이 동시에 index를 편집하면서 BUILDERS에만 넣고 여기 빠뜨린 게
+ *   9종까지 쌓였다(하네스 드롭다운에서 안 보였다). BUILDERS는 export가 즉시 못 찾아 터지지만
+ *   ORDER 누락은 **아무것도 안 터진다** — 드롭다운에서 조용히 사라질 뿐이다.
+ *   재료를 추가하면 여기도 넣어라. 순서는 sim 정본을 따른다.
+ */
 export const INGREDIENT_ORDER = [
   'olive',
   'choco',
@@ -82,7 +92,16 @@ export const INGREDIENT_ORDER = [
   'apricot',
   'beet',
   'coconut',
+  'pistachio',
+  'oat',
+  'poppyseed',
+  'sunflowerseed',
+  'flaxseed',
+  'maple',
+  'redbean',
   'sweetpotato',
+  'matcha',
+  'blackgarlic',
   'yuzu',
   'honey',
 ] as const;
