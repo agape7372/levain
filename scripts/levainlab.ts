@@ -13,6 +13,7 @@ import {
   SCHEMA_VERSION, emptyInventory, migrate, save, validateAndClamp, type SaveEnvelope,
 } from '../src/store/persistence';
 import { emptyEconomy } from '../src/store/economy';
+import { copy } from '../src/ui/copy';
 import {
   DAY, HOUR, INGREDIENTS, advance, deriveSnapshot, initialState, planNotificationsAll,
 } from '../src/sim';
@@ -159,9 +160,11 @@ panel.appendChild(multiActions);
 // 2b) 재료 지급 (Phase 6 — 프로덕션 획득 경로는 Phase 7. Lab 특권 진입로)
 panel.appendChild(h3('재료 지급 (+3씩 — 변형 해금 QA)'));
 const grant = row();
-const ING_LABEL: Record<string, string> = { olive: '올리브', choco: '초콜릿', strawberry: '딸기', chestnut: '밤' };
+// ⚠ 이름 테이블을 여기 다시 쓰지 마라. 4종 시절 하드코딩(`ING_LABEL`)이 남아 있어서
+//   12종 확장 때부터 신규 재료가 전부 "undefined +3"으로 떴다 — 조용히 깨져 있었다.
+//   정본은 copy.ts 하나뿐이고(GDD §10), Lab도 예외가 아니다.
 for (const ing of INGREDIENTS) {
-  grant.appendChild(btn(`${ING_LABEL[ing.id]} +3`, () => {
+  grant.appendChild(btn(`${copy.recipes.ingredientNames[ing.id] ?? ing.id} +3`, () => {
     store.grantIngredient(ing.id, 3);
     refreshDump();
   }));
