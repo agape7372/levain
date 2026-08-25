@@ -2,8 +2,11 @@
 // (도감 카드 순서 = 이 순서). 빌더가 생기는 대로 여기 등록.
 // breadlab(?family=ingredient)·export-breads가 이 레지스트리만 본다.
 import type { IngredientBuilder } from './types';
+import { createOlive } from './olive';
 
-export const INGREDIENT_BUILDERS: Record<string, IngredientBuilder> = {};
+export const INGREDIENT_BUILDERS: Record<string, IngredientBuilder> = {
+  olive: createOlive,
+};
 
 /** src/sim/ingredients.ts INGREDIENTS 순서. 미등록 id는 하네스 드롭다운에 "(미등록)"으로 뜬다. */
 export const INGREDIENT_ORDER = [

@@ -1,0 +1,3258 @@
+{
+  "targetName": "Olive Cluster",
+  "targetId": "olive-cluster",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\olive.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved and deliberately not matched to the reference. The review camera is fixed by the consumer harness (scripts/breadlab.ts applyView)."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "small cluster of three whole black olives",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "repeated instances",
+        "discrete resting cluster"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat color facets only -- prompt JSON explicitly excludes any shine ('never as shine'). Consumer runtime is a stylized low-poly showcase, so target look is faceted matte clay rather than food photorealism."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 1,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 1,
+        "materialLayerCount": 1,
+        "localDetailDensity": 1,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 3,
+        "mesoComponents": 3,
+        "microFeatureGroups": 0,
+        "materialLayers": 2,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Three near-identical macro bodies (olive-a/b/c) differing only in XZ offset, yaw and one extra tilt, so componentCount scores 1 rather than 3.",
+        "Silhouette is three smooth prolate ellipsoids with only a mild asymmetric taper, scoring silhouetteComplexity 1.",
+        "Repetition density scores 1: only 3 instances (lower than pancake's ~40-pit micro field), placed by hand rather than a scatter system.",
+        "One material family in two albedo zones (body vs upper-face cap), so materialLayerCount scores 1.",
+        "Local detail density scores 1: the pit-cavity opening visible in the reference is deliberately dropped (see spec risks) as sub-legibility at the 64px thumbnail target, leaving only the tilt orientation and taper asymmetry as authored cues.",
+        "Occlusion risk scores 1: the back olive's far side is hidden but fully inferable by radial symmetry.",
+        "Action readiness scores 0: static turntable showcase prop, no pivots/sockets/colliders beyond a bounding proxy.",
+        "Aggregate 7/24 with no axis above 1 confirms the simple tier."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": false,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier by part count, but still needs meso depth (each olive's cap patch is a separately shaded, separately masked sub-region) and one repetition system for the 3-instance cluster placement."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerated by hand from the three supplied reference views rather than by build_detail_inventory.py (a 3x3 grid scan would emit nine crops of the same three simple bodies and add no detail the curated prompt spec does not already name) -- CRIB.md skip rule for single-repeated-system objects.",
+      "details": [
+        {
+          "id": "two-tone-facet-split",
+          "zone": "upper mid-length patch of every olive",
+          "observation": "A muted olive-green facet region (#5C6B3E) sits on the upper-facing surface of each olive, distinct from the dominant deep aubergine-black body (#3B2F2F), as a hard facet edge with no gradient.",
+          "inference": "Stylized key-light-catching highlight rendered as flat color rather than shading.",
+          "confidence": 0.9,
+          "evidenceRef": "olive.png full frame",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "olive-a-cap-upper-patch",
+            "note": ""
+          }
+        },
+        {
+          "id": "tilted-blunt-end-orientation",
+          "zone": "front-left olive",
+          "observation": "One olive (front-left in the reference) is rotated so its broader, more rounded (blunt) end points toward the camera rather than lying broadside like the other two.",
+          "inference": "Compositional choice to demonstrate the asymmetric taper / pit-end silhouette.",
+          "confidence": 0.85,
+          "evidenceRef": "olive.png front-left instance",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "olive-a-tilted-orientation",
+            "note": ""
+          }
+        },
+        {
+          "id": "asymmetric-pole-taper",
+          "zone": "per-olive profile, both poles",
+          "observation": "Each olive's two ends are not mirror-symmetric: one end (blunt) stays wide over more of the length, the other (stem) narrows sharply.",
+          "inference": "Natural olive morphology -- stem attachment point tapers faster than the blossom end.",
+          "confidence": 0.75,
+          "evidenceRef": "olive-2.png front elevation, all three instances",
+          "kind": "ridge",
+          "mapsTo": {
+            "ref": "olive-a-asymmetric-taper",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/olive.png"
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 3,
+      "microFeatureGroups": 0,
+      "materialLayers": 2,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.75,
+    "mustMatch": [
+      "three-olive cluster silhouette with all three individually readable",
+      "length:width ratio ~1.55:1 per olive",
+      "asymmetric taper: blunt end broader for longer, stem end narrows sharper",
+      "two-tone body/cap facet split, surviving the runtime Lambert swap",
+      "one olive tilted to show its blunt end",
+      "faceted flat shading baked into geometry"
+    ],
+    "niceToHave": [
+      "exact green-cap patch boundary position",
+      "the reference's pit-cavity opening at one olive's blunt tip -- deliberately dropped, see spec risks"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "three-olive-cluster-silhouette",
+      "name": "Three-olive cluster silhouette, mutually readable",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "olive-a",
+        "olive-b",
+        "olive-c"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "asymmetric-taper-profile",
+      "name": "Asymmetric blunt/stem pole taper",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "olive-a",
+        "olive-b",
+        "olive-c"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "two-tone-facet-split",
+      "name": "Body/cap two-tone facet split",
+      "tier": "critical",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "olive-a-cap",
+        "olive-b-cap",
+        "olive-c-cap"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "tilted-blunt-end-cue",
+      "name": "One olive tilted to show its blunt end",
+      "tier": "important",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "olive-a"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "shared-ground-plane",
+      "name": "All three olives rest on the shared ground, no floating parts",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass"
+      ],
+      "minimumScore": 0.85,
+      "mustPass": true,
+      "componentRefs": [
+        "olive-a",
+        "olive-b",
+        "olive-c"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "baked-faceting",
+      "name": "Faceted flat shading baked into geometry",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "olive-a",
+        "olive-b",
+        "olive-c"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "form-refinement",
+    "completedPasses": [
+      "blockout",
+      "structural-pass"
+    ],
+    "lastCompletedPass": "structural-pass",
+    "blockedReason": "",
+    "nextRequiredEvidence": [
+      "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+      "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+      "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold.",
+      "attachment contracts for child appendages/connectors",
+      "no floating child roots/joints in the browser screenshot",
+      "browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet for AI vision review",
+      "banded interior difference vs the reference baseline (forge/stage4_review/interior_difference.py --from/--to per region)",
+      "AI vision score at or above the visual acceptance threshold",
+      "all critical semantic feature scores from the shared image pair at or above their thresholds",
+      "self-correction review appended with action=continue before the next pass"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model (spec.lookDevTargets.lightingPass.authority)",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy; preSpecAssessment scores actionReadinessNeed 0"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "See qualityContract.featureGroups.reference-lookdev.documentedLimitation: the consumer runtime keeps only map and color, and the repo bans PBR maps outright, so every channel these fields describe is inert. All of it is moved into geometry."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer, not authored here: scripts/breadlab.ts mirrors scripts/thumbsHarness.ts with a warm directional key 0xffe2b0 at (-2, 6, 2) intensity 1.4, an ambient 0xfff0dc at 0.75 and a cool fill 0xdce8ff at (2.5, 3, -2) intensity 0.2.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The far side of the back olive (olive-c) is never directly visible at any reviewed azimuth above the horizon; resolved by construction (full radial symmetry per shell before jitter).",
+    "The runtime normalizes the cluster's longest axis to 1.6, so absolute dimensions are arbitrary and only the authored ratios/offsets carry meaning.",
+    "The green cap patch position is not identity-critical at pixel precision; its presence, tonal contrast, and mid-length placement are what the review scores."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "OLIVE_RADIUS = 0.44 relative unit at each olive's own equator. Absolute scale is meaningless: the consumer runtime refits the cluster's longest axis to 1.6, so only ratios and relative offsets matter (types.ts section 7)."
+  },
+  "silhouette": {
+    "boundingShape": "compact triangular cluster of three prolate ellipsoids, roughly 2.0 wide by 1.15 tall by 1.7 deep in relative units",
+    "aspectRatios": [
+      {
+        "id": "olive-length-over-width",
+        "value": 1.55,
+        "source": "olive-2.png front elevation"
+      },
+      {
+        "id": "widest-point-offset",
+        "value": -0.08,
+        "source": "olive-2.png: widest point sits slightly toward the blunt end, not at heightFraction 0"
+      }
+    ],
+    "symmetry": "each olive is approximately radially symmetric about its own long axis (broken slightly by surface jitter); the cluster as a whole is asymmetric",
+    "dominantCurves": [
+      "smooth convex taper from equator to each pole, asymmetric rate"
+    ],
+    "negativeSpaces": [
+      "shallow contact creases where olives touch -- the only negative space in the group silhouette"
+    ],
+    "landmarks": [
+      "widest point near heightFraction -0.08 of each olive",
+      "green cap patch confined to a mid-length upper band, never reaching either pole",
+      "front-left olive's blunt pole tilted toward the camera"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "three plump prolate-ellipsoid olives resting together, touching but not overlapping the group silhouette",
+        "front-left olive is tilted so its blunt end (rounder, broader taper) points toward the camera",
+        "each olive carries a muted olive-green facet patch on its upper-facing surface, never a full ring"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "each olive's length:width ratio is roughly 1.55:1",
+        "widest point sits slightly toward the blunt end, not at the exact midpoint",
+        "blunt end tapers more gradually than the stem end (broader for longer)"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "three olives form a compact triangular footprint, all mutually touching",
+        "no olive fully hides another's footprint from directly above"
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Olive Cluster",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the three olive bodies; it emits no geometry of its own. Its primitive mirrors its children's so no other primitive family is implied.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.0,
+        "height": 1.15,
+        "depth": 1.7,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Ellipsoid bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "olive-body"
+        }
+      },
+      "material": "olive-body",
+      "materialLayers": [
+        "olive-body",
+        "olive-cap"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(59, 47, 47, 1.0)",
+        "secondaryAlbedo": "rgba(92, 107, 62, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe. The reference explicitly excludes glossy/oil-sheen response.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/olive.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cluster-arrangement",
+          "name": "Three-olive resting cluster",
+          "kind": "contour",
+          "description": "Three olives placed with independent XZ offsets and yaw so each remains individually readable in the group silhouette (types.ts R1); all three share the ground plane at world Y=0 after each instance's own bounding-box floor correction.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; underside darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished olive carries no wear",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "cluster-arrangement"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "olive-a",
+      "name": "Olive body (a)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous, smoothly varying rotationally symmetric mass -- a prolate-ellipsoid shell revolved from a single monotonic profile, poles at each tip. Decision tree step 6. Not a sphere primitive because the reference shows a clear asymmetric taper (blunt end broader, stem end narrower), which only a custom profile carries.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.775
+            ],
+            [
+              0.242,
+              -0.62
+            ],
+            [
+              0.396,
+              -0.3565
+            ],
+            [
+              0.44,
+              -0.062
+            ],
+            [
+              0.3872,
+              0.1705
+            ],
+            [
+              0.2552,
+              0.4185
+            ],
+            [
+              0.0968,
+              0.62
+            ],
+            [
+              0.0,
+              0.775
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.016,
+            "notes": "Uniform per-vertex position noise, amplitude 0.016 (0.036 of equatorial radius), applied while the shell is still indexed so the cap/body shared triangle boundary moves together and never tears (R1)."
+          }
+        ],
+        "uvStrategy": "top-planar projection per material bucket (scripts/breads/lib.ts uvTopPlanar) -- no texture is emitted, UVs exist only for merge attribute consistency",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.88,
+        "height": 1.55,
+        "depth": 0.88,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          -0.62,
+          0.0,
+          0.3
+        ],
+        "rotation": [
+          0.32,
+          -0.55,
+          1.5707963267948966
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Ellipsoid bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "olive-a",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "olive-body"
+        }
+      },
+      "material": "olive-body",
+      "materialLayers": [
+        "olive-body",
+        "olive-cap"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(59, 47, 47, 1.0)",
+        "secondaryAlbedo": "rgba(92, 107, 62, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe. The reference explicitly excludes glossy/oil-sheen response.",
+        "zone": "full body, dominant tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/olive.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "olive-a-cap-boundary",
+          "kind": "material-boundary",
+          "notes": "Boundary between olive-body and olive-cap is a triangle-index split on one shared indexed shell (splitTrianglesByVertexMask), not a separate geometry -- watertight by construction, no seam-overlap risk."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "olive-a-asymmetric-taper",
+          "name": "Asymmetric pole taper",
+          "kind": "ridge",
+          "description": "Blunt pole (heightFraction -1) tapers gradually (radius stays above 0.55 until heightFraction -0.80); stem pole (+1) tapers sharply (radius drops below 0.22 by heightFraction 0.80).",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "olive-a-tilted-orientation",
+          "name": "Tilted to show blunt end",
+          "kind": "contour",
+          "description": "This instance carries an extra rotation.z (tiltZ) beyond the shared lay-down rotation, lifting its blunt pole toward the three-quarter camera so the broader taper reads clearly, per geometry.silhouette in assets/prompts/ingredients/olive.json.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; underside darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished olive carries no wear",
+        "notes": "Body tone covers the lower/shaded majority of the shell. The runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "olive-a-asymmetric-taper",
+        "olive-a-tilted-orientation"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "olive-a-cap",
+      "name": "Olive upper-face color cap (a)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.85,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Not a separate solid -- a subset of the parent olive-body's own triangles, selected by a per-vertex mask (local Y above threshold, local X inside a mid-length band) after the shared shell is built and jittered, then split by triangle index. Recorded as its own component because it carries a distinct material and a distinct evidence-backed region, mirroring how pancake.ts models disk-*-face as a child of disk-*.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.775
+            ],
+            [
+              0.242,
+              -0.62
+            ],
+            [
+              0.396,
+              -0.3565
+            ],
+            [
+              0.44,
+              -0.062
+            ],
+            [
+              0.3872,
+              0.1705
+            ],
+            [
+              0.2552,
+              0.4185
+            ],
+            [
+              0.0968,
+              0.62
+            ],
+            [
+              0.0,
+              0.775
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "cap-facet-mask",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.0,
+            "notes": "Zero-displacement classification mask, not a geometry change: a vertex belongs to the cap bucket when local Y (post lay-down rotation) > 0.1 * OLIVE_RADIUS AND local X in [-0.5, 0.42] * OLIVE_HALF_LENGTH. A triangle is assigned to the cap bucket if any of its three vertices matches (lib.splitTrianglesByVertexMask), giving a mid-length upper patch that never reaches either pole -- matching olive.png where the green cast stops short of both tips."
+          }
+        ],
+        "uvStrategy": "top-planar projection per material bucket (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals inherited from the parent shell's split-vertex facet bake"
+      },
+      "parent": "olive-a",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.528,
+        "height": 0.713,
+        "depth": 0.396,
+        "units": "relative",
+        "confidence": 0.75
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Ellipsoid bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "olive-a-cap",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "olive-body"
+        }
+      },
+      "material": "olive-cap",
+      "materialLayers": [
+        "olive-cap"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(92, 107, 62, 1.0)",
+        "secondaryAlbedo": "rgba(59, 47, 47, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe. The reference explicitly excludes glossy/oil-sheen response.",
+        "zone": "upper-facing mid-length patch",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/olive.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "cap-facet-mask"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "olive-a-cap-boundary",
+          "kind": "material-boundary",
+          "notes": "Shares the parent shell's own triangles at the mask boundary; watertight because both buckets come from one indexed geometry split after jitter, never two independently built solids."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "olive-a-cap-upper-patch",
+          "name": "Olive-green upper-face patch",
+          "kind": "seam",
+          "description": "Muted olive-green cast (#5C6B3E) confined to a mid-length upper patch on every olive, expressed purely as a flat color facet region, never a gradient or specular highlight.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; underside darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished olive carries no wear",
+        "notes": "assets/prompts/ingredients/olive.json geometry.surface: the green cast is identity-critical for reading 'olive' rather than a generic dark berry at 64px thumbnail scale."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [
+        "olive-a-cap-upper-patch"
+      ],
+      "fidelityTier": "surface-pass"
+    },
+    {
+      "id": "olive-b",
+      "name": "Olive body (b)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous, smoothly varying rotationally symmetric mass -- a prolate-ellipsoid shell revolved from a single monotonic profile, poles at each tip. Decision tree step 6. Not a sphere primitive because the reference shows a clear asymmetric taper (blunt end broader, stem end narrower), which only a custom profile carries.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.775
+            ],
+            [
+              0.242,
+              -0.62
+            ],
+            [
+              0.396,
+              -0.3565
+            ],
+            [
+              0.44,
+              -0.062
+            ],
+            [
+              0.3872,
+              0.1705
+            ],
+            [
+              0.2552,
+              0.4185
+            ],
+            [
+              0.0968,
+              0.62
+            ],
+            [
+              0.0,
+              0.775
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.016,
+            "notes": "Uniform per-vertex position noise, amplitude 0.016 (0.036 of equatorial radius), applied while the shell is still indexed so the cap/body shared triangle boundary moves together and never tears (R1)."
+          }
+        ],
+        "uvStrategy": "top-planar projection per material bucket (scripts/breads/lib.ts uvTopPlanar) -- no texture is emitted, UVs exist only for merge attribute consistency",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.88,
+        "height": 1.55,
+        "depth": 0.88,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.6,
+          0.0,
+          0.22
+        ],
+        "rotation": [
+          0.0,
+          0.3,
+          1.5707963267948966
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Ellipsoid bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "olive-b",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "olive-body"
+        }
+      },
+      "material": "olive-body",
+      "materialLayers": [
+        "olive-body",
+        "olive-cap"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(59, 47, 47, 1.0)",
+        "secondaryAlbedo": "rgba(92, 107, 62, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe. The reference explicitly excludes glossy/oil-sheen response.",
+        "zone": "full body, dominant tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/olive.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "olive-b-cap-boundary",
+          "kind": "material-boundary",
+          "notes": "Boundary between olive-body and olive-cap is a triangle-index split on one shared indexed shell (splitTrianglesByVertexMask), not a separate geometry -- watertight by construction, no seam-overlap risk."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "olive-b-asymmetric-taper",
+          "name": "Asymmetric pole taper",
+          "kind": "ridge",
+          "description": "Blunt pole (heightFraction -1) tapers gradually (radius stays above 0.55 until heightFraction -0.80); stem pole (+1) tapers sharply (radius drops below 0.22 by heightFraction 0.80).",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; underside darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished olive carries no wear",
+        "notes": "Body tone covers the lower/shaded majority of the shell. The runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "olive-b-asymmetric-taper"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "olive-b-cap",
+      "name": "Olive upper-face color cap (b)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.85,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Not a separate solid -- a subset of the parent olive-body's own triangles, selected by a per-vertex mask (local Y above threshold, local X inside a mid-length band) after the shared shell is built and jittered, then split by triangle index. Recorded as its own component because it carries a distinct material and a distinct evidence-backed region, mirroring how pancake.ts models disk-*-face as a child of disk-*.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.775
+            ],
+            [
+              0.242,
+              -0.62
+            ],
+            [
+              0.396,
+              -0.3565
+            ],
+            [
+              0.44,
+              -0.062
+            ],
+            [
+              0.3872,
+              0.1705
+            ],
+            [
+              0.2552,
+              0.4185
+            ],
+            [
+              0.0968,
+              0.62
+            ],
+            [
+              0.0,
+              0.775
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "cap-facet-mask",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.0,
+            "notes": "Zero-displacement classification mask, not a geometry change: a vertex belongs to the cap bucket when local Y (post lay-down rotation) > 0.1 * OLIVE_RADIUS AND local X in [-0.5, 0.42] * OLIVE_HALF_LENGTH. A triangle is assigned to the cap bucket if any of its three vertices matches (lib.splitTrianglesByVertexMask), giving a mid-length upper patch that never reaches either pole -- matching olive.png where the green cast stops short of both tips."
+          }
+        ],
+        "uvStrategy": "top-planar projection per material bucket (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals inherited from the parent shell's split-vertex facet bake"
+      },
+      "parent": "olive-b",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.528,
+        "height": 0.713,
+        "depth": 0.396,
+        "units": "relative",
+        "confidence": 0.75
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Ellipsoid bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "olive-b-cap",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "olive-body"
+        }
+      },
+      "material": "olive-cap",
+      "materialLayers": [
+        "olive-cap"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(92, 107, 62, 1.0)",
+        "secondaryAlbedo": "rgba(59, 47, 47, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe. The reference explicitly excludes glossy/oil-sheen response.",
+        "zone": "upper-facing mid-length patch",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/olive.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "cap-facet-mask"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "olive-b-cap-boundary",
+          "kind": "material-boundary",
+          "notes": "Shares the parent shell's own triangles at the mask boundary; watertight because both buckets come from one indexed geometry split after jitter, never two independently built solids."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "olive-b-cap-upper-patch",
+          "name": "Olive-green upper-face patch",
+          "kind": "seam",
+          "description": "Muted olive-green cast (#5C6B3E) confined to a mid-length upper patch on every olive, expressed purely as a flat color facet region, never a gradient or specular highlight.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; underside darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished olive carries no wear",
+        "notes": "assets/prompts/ingredients/olive.json geometry.surface: the green cast is identity-critical for reading 'olive' rather than a generic dark berry at 64px thumbnail scale."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [
+        "olive-b-cap-upper-patch"
+      ],
+      "fidelityTier": "surface-pass"
+    },
+    {
+      "id": "olive-c",
+      "name": "Olive body (c)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous, smoothly varying rotationally symmetric mass -- a prolate-ellipsoid shell revolved from a single monotonic profile, poles at each tip. Decision tree step 6. Not a sphere primitive because the reference shows a clear asymmetric taper (blunt end broader, stem end narrower), which only a custom profile carries.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.775
+            ],
+            [
+              0.242,
+              -0.62
+            ],
+            [
+              0.396,
+              -0.3565
+            ],
+            [
+              0.44,
+              -0.062
+            ],
+            [
+              0.3872,
+              0.1705
+            ],
+            [
+              0.2552,
+              0.4185
+            ],
+            [
+              0.0968,
+              0.62
+            ],
+            [
+              0.0,
+              0.775
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.016,
+            "notes": "Uniform per-vertex position noise, amplitude 0.016 (0.036 of equatorial radius), applied while the shell is still indexed so the cap/body shared triangle boundary moves together and never tears (R1)."
+          }
+        ],
+        "uvStrategy": "top-planar projection per material bucket (scripts/breads/lib.ts uvTopPlanar) -- no texture is emitted, UVs exist only for merge attribute consistency",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.88,
+        "height": 1.55,
+        "depth": 0.88,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.02,
+          0.0,
+          -0.55
+        ],
+        "rotation": [
+          0.0,
+          1.55,
+          1.5707963267948966
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Ellipsoid bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "olive-c",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "olive-body"
+        }
+      },
+      "material": "olive-body",
+      "materialLayers": [
+        "olive-body",
+        "olive-cap"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(59, 47, 47, 1.0)",
+        "secondaryAlbedo": "rgba(92, 107, 62, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe. The reference explicitly excludes glossy/oil-sheen response.",
+        "zone": "full body, dominant tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/olive.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "olive-c-cap-boundary",
+          "kind": "material-boundary",
+          "notes": "Boundary between olive-body and olive-cap is a triangle-index split on one shared indexed shell (splitTrianglesByVertexMask), not a separate geometry -- watertight by construction, no seam-overlap risk."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "olive-c-asymmetric-taper",
+          "name": "Asymmetric pole taper",
+          "kind": "ridge",
+          "description": "Blunt pole (heightFraction -1) tapers gradually (radius stays above 0.55 until heightFraction -0.80); stem pole (+1) tapers sharply (radius drops below 0.22 by heightFraction 0.80).",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; underside darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished olive carries no wear",
+        "notes": "Body tone covers the lower/shaded majority of the shell. The runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "olive-c-asymmetric-taper"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "olive-c-cap",
+      "name": "Olive upper-face color cap (c)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.85,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Not a separate solid -- a subset of the parent olive-body's own triangles, selected by a per-vertex mask (local Y above threshold, local X inside a mid-length band) after the shared shell is built and jittered, then split by triangle index. Recorded as its own component because it carries a distinct material and a distinct evidence-backed region, mirroring how pancake.ts models disk-*-face as a child of disk-*.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.775
+            ],
+            [
+              0.242,
+              -0.62
+            ],
+            [
+              0.396,
+              -0.3565
+            ],
+            [
+              0.44,
+              -0.062
+            ],
+            [
+              0.3872,
+              0.1705
+            ],
+            [
+              0.2552,
+              0.4185
+            ],
+            [
+              0.0968,
+              0.62
+            ],
+            [
+              0.0,
+              0.775
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "cap-facet-mask",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.0,
+            "notes": "Zero-displacement classification mask, not a geometry change: a vertex belongs to the cap bucket when local Y (post lay-down rotation) > 0.1 * OLIVE_RADIUS AND local X in [-0.5, 0.42] * OLIVE_HALF_LENGTH. A triangle is assigned to the cap bucket if any of its three vertices matches (lib.splitTrianglesByVertexMask), giving a mid-length upper patch that never reaches either pole -- matching olive.png where the green cast stops short of both tips."
+          }
+        ],
+        "uvStrategy": "top-planar projection per material bucket (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals inherited from the parent shell's split-vertex facet bake"
+      },
+      "parent": "olive-c",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.528,
+        "height": 0.713,
+        "depth": 0.396,
+        "units": "relative",
+        "confidence": 0.75
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Ellipsoid bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "olive-c-cap",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "olive-body"
+        }
+      },
+      "material": "olive-cap",
+      "materialLayers": [
+        "olive-cap"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(92, 107, 62, 1.0)",
+        "secondaryAlbedo": "rgba(59, 47, 47, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe. The reference explicitly excludes glossy/oil-sheen response.",
+        "zone": "upper-facing mid-length patch",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/olive.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "cap-facet-mask"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "olive-c-cap-boundary",
+          "kind": "material-boundary",
+          "notes": "Shares the parent shell's own triangles at the mask boundary; watertight because both buckets come from one indexed geometry split after jitter, never two independently built solids."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "olive-c-cap-upper-patch",
+          "name": "Olive-green upper-face patch",
+          "kind": "seam",
+          "description": "Muted olive-green cast (#5C6B3E) confined to a mid-length upper patch on every olive, expressed purely as a flat color facet region, never a gradient or specular highlight.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; underside darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished olive carries no wear",
+        "notes": "assets/prompts/ingredients/olive.json geometry.surface: the green cast is identity-critical for reading 'olive' rather than a generic dark berry at 64px thumbnail scale."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [
+        "olive-c-cap-upper-patch"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "olive-body",
+      "name": "Olive body (deep aubergine-black)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#3B2F2F",
+      "color": "#3B2F2F",
+      "albedo": {
+        "dominant": "#3B2F2F",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/olive.json geometry.surface, the curated prompt that generated these reference images. Deliberately NOT sampled from reference pixels, which carry the generator's baked key light."
+      },
+      "colorVariation": {
+        "palette": [
+          "#3B2F2F"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only to satisfy the merge step's attribute-consistency requirement (scripts/ingredients/types.ts inherited section 4)."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "revolved asymmetric-taper profile",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 3.0,
+          "amplitude": 0.036,
+          "role": "surface jitter noise",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "lower/shaded majority of every olive",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "underside-natural-darkening",
+          "name": "Underside key-light falloff",
+          "maskSource": "geometry",
+          "description": "No AO/dirt map is authored; the shaded lower-half hue (#4A3A36, prompts/ingredients/olive.json) is deliberately NOT painted as a second material -- the runtime key light already darkens the convex shell's underside via N.L falloff, so this is the equivalent effect achieved through geometry+lighting rather than a texture mask (see spec risk shaded-underside-hue-dropped).",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "olive-a",
+            "olive-b",
+            "olive-c"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}), so vertex colors are silently discarded.",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "lower/shaded majority of every olive. Two solid colors are enough for the whole cluster, so no texture is emitted at all (types.ts inherited section 9)."
+    },
+    {
+      "id": "olive-cap",
+      "name": "Olive upper-face cast (muted olive-green)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#5C6B3E",
+      "color": "#5C6B3E",
+      "albedo": {
+        "dominant": "#5C6B3E",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/olive.json geometry.surface, the curated prompt that generated these reference images. Deliberately NOT sampled from reference pixels, which carry the generator's baked key light."
+      },
+      "colorVariation": {
+        "palette": [
+          "#5C6B3E"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only to satisfy the merge step's attribute-consistency requirement (scripts/ingredients/types.ts inherited section 4)."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "revolved asymmetric-taper profile",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 3.0,
+          "amplitude": 0.036,
+          "role": "surface jitter noise",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "mid-length upper patch of every olive",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "cap-facet-boundary",
+          "name": "Body/cap facet boundary",
+          "maskSource": "geometry",
+          "description": "The boundary is a per-vertex position mask (local Y + local X band) applied to the shared indexed shell before triangle-index splitting -- a hard geometric edge between two meshes, not a texture boundary and not a vertex-color ramp.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "olive-a-cap",
+            "olive-b-cap",
+            "olive-c-cap"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}), so vertex colors are silently discarded.",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "mid-length upper patch of every olive. Two solid colors are enough for the whole cluster, so no texture is emitted at all (types.ts inherited section 9)."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "olive-cluster",
+      "name": "Three-olive resting cluster",
+      "level": "macro",
+      "hostComponents": [
+        "root"
+      ],
+      "elementComponentIds": [
+        "olive-a",
+        "olive-b",
+        "olive-c"
+      ],
+      "elementKind": "repeated macro body, each with its own body+cap child pair",
+      "count": 3,
+      "distribution": {
+        "mode": "hand-placed XZ offsets with independent yaw and one tilted instance",
+        "offsets": {
+          "a": [
+            -0.62,
+            0.3
+          ],
+          "b": [
+            0.6,
+            0.22
+          ],
+          "c": [
+            0.02,
+            -0.55
+          ]
+        },
+        "yaw": {
+          "a": -0.55,
+          "b": 0.3,
+          "c": 1.55
+        },
+        "note": "Offsets read off olive-3.png (top-down footprint); yaw differs per instance so no two olives share a facing direction."
+      },
+      "sizeClasses": [
+        {
+          "id": "olive",
+          "radius": 0.44,
+          "halfLength": 0.775
+        }
+      ],
+      "seedRule": "Offsets/yaw are fixed authored values (read off the reference), not random; only the surface-jitter deformation consumes the builder rng, so the exported GLB is byte-deterministic.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-25T16:50:30.982967+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.72,
+      "aiVisionScore": 0.72,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.85,
+        "formDetail": 0.65,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.7
+      },
+      "featureReviews": [
+        {
+          "id": "three-olive-cluster-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "All three olives individually readable at every azimuth (0/90/180/270), confirmed by diagnose_render_multi_angle.py (no degenerate view, area ratios 1.03/1.17/1.07). At 64px downscale (roundtrip-64-preview.png) the cluster still reads as three dark ellipsoids, not a single blob."
+        },
+        {
+          "id": "asymmetric-taper-profile",
+          "score": 0.75,
+          "tier": "critical",
+          "notes": "Blunt end stays wide longer, stem end narrows sharply, visible on all three instances in shot-90/180/270 and the front-elevation compare. Exact taper curvature is an approximation from a single front view, not independently confirmed."
+        },
+        {
+          "id": "two-tone-facet-split",
+          "score": 0.78,
+          "tier": "critical",
+          "notes": "Body/cap split survives the runtime MeshLambertMaterial swap (stats.roundtrip=true). After two mask-sizing iterations (cmp-1 47% coverage too broad, cmp-3 20.8% still band-like, final single-ring/single-sector mask 6.9% tri share) the cap now reads as a contained patch matching the reference's proportion, confirmed in roundtrip.png."
+        },
+        {
+          "id": "tilted-blunt-end-cue",
+          "score": 0.55,
+          "tier": "important",
+          "notes": "olive-a carries tiltZ=0.32 but the tilt reads subtly at the harness's fixed camera angle -- not a strong visual cue. Not re-iterated further; important tier, not mustPass."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "tier": "critical",
+          "notes": "Each instance's own post-rotation bounding-box floor is translated to world Y=0 (Box3.setFromObject per sub-group before merge) -- no floating parts in any shot."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "tier": "important",
+          "notes": "facet() applied after jitter on every part; flat shading visible and consistent across all azimuths and after the runtime material swap."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/ref-aligned.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/roundtrip-aligned.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/cmp-sheet.png",
+      "cameraView": "three-quarter (harness fixed camera, azimuth 0)",
+      "notes": "Silhouette, taper asymmetry and two-tone facet split all read correctly at both full-size and a 64px downscale test (roundtrip-64-preview.png); arrangement and pit-cavity gaps are accepted, documented tradeoffs, not defects to refine further within this pilot's iteration budget.",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-25T16:53:20.459539+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.72,
+      "aiVisionScore": 0.72,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.85,
+        "formDetail": 0.65,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.7
+      },
+      "featureReviews": [
+        {
+          "id": "three-olive-cluster-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "All three olives individually readable at every azimuth (0/90/180/270), confirmed by diagnose_render_multi_angle.py (no degenerate view, area ratios 1.03/1.17/1.07). At 64px downscale (roundtrip-64-preview.png) the cluster still reads as three dark ellipsoids, not a single blob."
+        },
+        {
+          "id": "asymmetric-taper-profile",
+          "score": 0.75,
+          "tier": "critical",
+          "notes": "Blunt end stays wide longer, stem end narrows sharply, visible on all three instances in shot-90/180/270 and the front-elevation compare. Exact taper curvature is an approximation from a single front view, not independently confirmed."
+        },
+        {
+          "id": "two-tone-facet-split",
+          "score": 0.78,
+          "tier": "critical",
+          "notes": "Body/cap split survives the runtime MeshLambertMaterial swap (stats.roundtrip=true). After two mask-sizing iterations (cmp-1 47% coverage too broad, cmp-3 20.8% still band-like, final single-ring/single-sector mask 6.9% tri share) the cap now reads as a contained patch matching the reference's proportion, confirmed in roundtrip.png."
+        },
+        {
+          "id": "tilted-blunt-end-cue",
+          "score": 0.55,
+          "tier": "important",
+          "notes": "olive-a carries tiltZ=0.32 but the tilt reads subtly at the harness's fixed camera angle -- not a strong visual cue. Not re-iterated further; important tier, not mustPass."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "tier": "critical",
+          "notes": "Each instance's own post-rotation bounding-box floor is translated to world Y=0 (Box3.setFromObject per sub-group before merge) -- no floating parts in any shot."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "tier": "important",
+          "notes": "facet() applied after jitter on every part; flat shading visible and consistent across all azimuths and after the runtime material swap."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/ref-aligned.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/roundtrip-aligned.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/cmp-sheet.png",
+      "cameraView": "three-quarter (harness fixed camera, azimuth 0)",
+      "notes": "No structural change from blockout; re-confirming the same evidence is still valid.",
+      "aiVisionNotes": ""
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-25T16:50:30.982967+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.72,
+      "aiVisionScore": 0.72,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.85,
+        "formDetail": 0.65,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.7
+      },
+      "featureReviews": [
+        {
+          "id": "three-olive-cluster-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "All three olives individually readable at every azimuth (0/90/180/270), confirmed by diagnose_render_multi_angle.py (no degenerate view, area ratios 1.03/1.17/1.07). At 64px downscale (roundtrip-64-preview.png) the cluster still reads as three dark ellipsoids, not a single blob."
+        },
+        {
+          "id": "asymmetric-taper-profile",
+          "score": 0.75,
+          "tier": "critical",
+          "notes": "Blunt end stays wide longer, stem end narrows sharply, visible on all three instances in shot-90/180/270 and the front-elevation compare. Exact taper curvature is an approximation from a single front view, not independently confirmed."
+        },
+        {
+          "id": "two-tone-facet-split",
+          "score": 0.78,
+          "tier": "critical",
+          "notes": "Body/cap split survives the runtime MeshLambertMaterial swap (stats.roundtrip=true). After two mask-sizing iterations (cmp-1 47% coverage too broad, cmp-3 20.8% still band-like, final single-ring/single-sector mask 6.9% tri share) the cap now reads as a contained patch matching the reference's proportion, confirmed in roundtrip.png."
+        },
+        {
+          "id": "tilted-blunt-end-cue",
+          "score": 0.55,
+          "tier": "important",
+          "notes": "olive-a carries tiltZ=0.32 but the tilt reads subtly at the harness's fixed camera angle -- not a strong visual cue. Not re-iterated further; important tier, not mustPass."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "tier": "critical",
+          "notes": "Each instance's own post-rotation bounding-box floor is translated to world Y=0 (Box3.setFromObject per sub-group before merge) -- no floating parts in any shot."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "tier": "important",
+          "notes": "facet() applied after jitter on every part; flat shading visible and consistent across all azimuths and after the runtime material swap."
+        }
+      ],
+      "action": "continue",
+      "summary": "Own-vision inspection of cmp-sheet.png (aligned ref vs roundtrip render): three-olive cluster silhouette reads correctly, asymmetric-taper profile visible, two-tone body/cap facet split holds after runtime Lambert swap (roundtrip=true), no degenerate orbit view. Deliberate scope gaps (pit-cavity, exact triangular stacking arrangement) accepted per spec risks, not implementation defects.",
+      "matched": [
+        "three discrete olive silhouettes, clearly separated and individually readable",
+        "asymmetric pole taper (blunt end broader than stem end) visible in profile",
+        "body/cap two-tone split survives MeshLambertMaterial swap (roundtrip stats.roundtrip=true)",
+        "no degenerate view across azimuth 0/90/180/270",
+        "budget 432 tri / 42.6KB well under 700tri/68KB cluster target"
+      ],
+      "mismatches": [
+        "cluster arrangement reads more side-by-side than the reference's tighter triangular/vertically-stacked pile",
+        "reference's visible pit-cavity opening at one olive's blunt tip is not modeled (documented risk pit-cavity-dropped, budget/legibility tradeoff)",
+        "body hue reads slightly warmer/less purple than the reference pixels (expected -- albedo is sourced from prompts/ingredients/olive.json hex, not reference pixel sampling, per types.ts sec.7 policy)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/cmp-sheet.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/roundtrip.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/shot-270.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/roundtrip.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/ref-aligned.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/roundtrip-aligned.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/cmp-sheet.png",
+        "cameraView": "three-quarter (harness fixed camera, azimuth 0)",
+        "notes": "Silhouette, taper asymmetry and two-tone facet split all read correctly at both full-size and a 64px downscale test (roundtrip-64-preview.png); arrangement and pit-cavity gaps are accepted, documented tradeoffs, not defects to refine further within this pilot's iteration budget.",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-25T16:53:20.459539+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.72,
+      "aiVisionScore": 0.72,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.85,
+        "formDetail": 0.65,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.7
+      },
+      "featureReviews": [
+        {
+          "id": "three-olive-cluster-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "All three olives individually readable at every azimuth (0/90/180/270), confirmed by diagnose_render_multi_angle.py (no degenerate view, area ratios 1.03/1.17/1.07). At 64px downscale (roundtrip-64-preview.png) the cluster still reads as three dark ellipsoids, not a single blob."
+        },
+        {
+          "id": "asymmetric-taper-profile",
+          "score": 0.75,
+          "tier": "critical",
+          "notes": "Blunt end stays wide longer, stem end narrows sharply, visible on all three instances in shot-90/180/270 and the front-elevation compare. Exact taper curvature is an approximation from a single front view, not independently confirmed."
+        },
+        {
+          "id": "two-tone-facet-split",
+          "score": 0.78,
+          "tier": "critical",
+          "notes": "Body/cap split survives the runtime MeshLambertMaterial swap (stats.roundtrip=true). After two mask-sizing iterations (cmp-1 47% coverage too broad, cmp-3 20.8% still band-like, final single-ring/single-sector mask 6.9% tri share) the cap now reads as a contained patch matching the reference's proportion, confirmed in roundtrip.png."
+        },
+        {
+          "id": "tilted-blunt-end-cue",
+          "score": 0.55,
+          "tier": "important",
+          "notes": "olive-a carries tiltZ=0.32 but the tilt reads subtly at the harness's fixed camera angle -- not a strong visual cue. Not re-iterated further; important tier, not mustPass."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "tier": "critical",
+          "notes": "Each instance's own post-rotation bounding-box floor is translated to world Y=0 (Box3.setFromObject per sub-group before merge) -- no floating parts in any shot."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "tier": "important",
+          "notes": "facet() applied after jitter on every part; flat shading visible and consistent across all azimuths and after the runtime material swap."
+        }
+      ],
+      "action": "continue",
+      "summary": "Structural pass: no additional authorable hierarchy beyond blockout. Root assembly + 3x(olive-body,olive-cap) is the full structure; there is no second tier to build (mirrors pancake structural-pass precedent -- object IS three revolved-shell instances, fully present the moment blockout renders).",
+      "matched": [
+        "component hierarchy matches spec exactly: root -> olive-{a,b,c} -> olive-{a,b,c}-cap",
+        "each instance's own bounding-box floor independently corrected to world Y=0 (shared-ground-plane featureReviewTarget)"
+      ],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/cmp-sheet.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/roundtrip.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/roundtrip.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/ref-aligned.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/roundtrip-aligned.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/olive/cmp-sheet.png",
+        "cameraView": "three-quarter (harness fixed camera, azimuth 0)",
+        "notes": "No structural change from blockout; re-confirming the same evidence is still valid.",
+        "aiVisionNotes": ""
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 450,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Hard consumer budget for the 'cluster' ingredient group: <=700 tri and <=68KB target (types.ts R2), hard ceiling <=2500 tri and <=100KB (scripts/check-budget.mjs). Target reached by construction (12 segments x 8 profile rings x 3 olives = 432 tri before any mask split, mask split adds zero triangles), not by decimation."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, upper-left -- the same relationship as the reference's 'single soft key light upper-left'.",
+      "usage": "Fixed by scripts/breadlab.ts, mirrored from scripts/thumbsHarness.ts. Not authored by the model.",
+      "exposure": "no exposure control and no tone mapping -- authored albedo lands on screen almost unchanged."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75 -- a high ambient ratio, which is why the underside darkening relies on the shell's own curvature turning away from the key light rather than a painted shadow tone.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none -- no shadow map, no ground plane rendered. The reference's contact shadow between touching olives is a known, accepted delta."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2, opposite the key.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping (three.js default); no AO available on the runtime Lambert material."
+    }
+  ],
+  "proceduralStrategy": [
+    "Revolve each olive's shell from the shared asymmetric-taper profile at the shared segment count.",
+    "Jitter vertices while the shell is still indexed, so the cap/body split never tears.",
+    "Classify triangles into the cap bucket by a local-space vertex mask (Y above threshold, X inside a mid-length band), never by vertex color.",
+    "Bake faceting by splitting vertices and recomputing normals; never request flatShading.",
+    "Project top-planar UVs per bucket, then merge all three olives by material into exactly two meshes.",
+    "Lay each shell on its side (fixed 90deg Z rotation baked before per-instance placement), add per-instance yaw and (for olive-a only) an extra tiltZ, then translate each instance's own bounding box floor to world Y=0."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-cluster rotation for the showcase turntable",
+    "each olive is a named instance, so a future 'add an olive' animation can translate one instance without rebuilding the shared shell logic"
+  ],
+  "destructionAnchors": [
+    "each olive is its own fractureGroup; the only plausible break is one olive rolling away from the cluster, not a shattered olive"
+  ],
+  "risks": [
+    {
+      "id": "shaded-underside-hue-dropped",
+      "severity": "medium",
+      "description": "assets/prompts/ingredients/olive.json names a third hue (#4A3A36) for the shaded lower half, which this spec does not wire to a material bucket.",
+      "mitigation": "mesh<=2 budget forces a 2-bucket split (types.ts section 1); the runtime key light already darkens the underside of a convex shell for free via N.L falloff, so painting a second dark tone into geometry would double-darken rather than add fidelity. Body bucket carries #3B2F2F everywhere except the cap patch."
+    },
+    {
+      "id": "pit-cavity-dropped",
+      "severity": "low",
+      "description": "olive.png shows a small dark octagonal recessed opening at one olive's blunt tip (a pit-cavity look). This spec does not model it as geometry.",
+      "mitigation": "At the 300-700 tri cluster budget and the ~64px final thumbnail read distance, a sub-tip cavity is below the silhouette-legibility threshold; the orientation cue (tilt toward camera) is kept as the identity signal instead. Recorded here rather than silently dropped."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-color-based region paint is silently discarded by the runtime's MeshLambertMaterial swap, collapsing the two-tone split to one flat tone.",
+      "mitigation": "The body/cap split is carried by two separate materials on two separate triangle buckets from one shared indexed shell, split geometrically. No vertexPaint block is authored anywhere in this spec."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "A flatShading flag is not inherited by the runtime material swap, so a model relying on it renders smooth.",
+      "mitigation": "Faceting is baked into geometry by splitting vertices (scripts/breads/lib.ts facet) before export."
+    },
+    {
+      "id": "seam-tear",
+      "severity": "medium",
+      "description": "Body and cap triangles come from the same shell; jittering after the mask split (rather than before) would let the shared boundary vertices move independently and open a crack.",
+      "mitigation": "Jitter runs once, on the whole indexed shell, before the mask/split step -- both buckets read the same already-jittered positions."
+    },
+    {
+      "id": "merge-attribute-mismatch",
+      "severity": "medium",
+      "description": "mergeByMaterial throws when geometries in one bucket carry different attribute sets.",
+      "mitigation": "Every geometry gets exactly position, normal and uv; no color attribute is ever created; all six per-olive part geometries (3 olives x {body,cap}) route through the same uvTopPlanar call."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Olive Cluster",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": [
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      }
+    ]
+  },
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.4669,
+        "aspectRatioDelta": 0.7701,
+        "scaleDelta": 0.4734,
+        "bilateralSymmetryError": 0.0981,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 10.34,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.34
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.467 is below threshold 0.85",
+        "aspect-ratio delta 0.770 exceeds threshold 0.05",
+        "scale delta 0.473 exceeds threshold 0.08",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [],
+      "renderHash": "9286aa3102c86783",
+      "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5989,
+        "aspectRatioDelta": 0.1855,
+        "scaleDelta": 0.1742,
+        "bilateralSymmetryError": 0.1483,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 10.3,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.599 is below threshold 0.85",
+        "aspect-ratio delta 0.185 exceeds threshold 0.05",
+        "scale delta 0.174 exceeds threshold 0.08",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [],
+      "renderHash": "c78f167733e1eec4",
+      "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5989,
+        "aspectRatioDelta": 0.1855,
+        "scaleDelta": 0.1742,
+        "bilateralSymmetryError": 0.1483,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 10.3,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.599 is below threshold 0.85",
+        "aspect-ratio delta 0.185 exceeds threshold 0.05",
+        "scale delta 0.174 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "c78f167733e1eec4",
+      "passId": "structural-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5989,
+        "aspectRatioDelta": 0.1855,
+        "scaleDelta": 0.1742,
+        "bilateralSymmetryError": 0.1483,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 10.3,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.599 is below threshold 0.85",
+        "aspect-ratio delta 0.185 exceeds threshold 0.05",
+        "scale delta 0.174 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "c78f167733e1eec4",
+      "passId": "form-refinement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5989,
+        "aspectRatioDelta": 0.1855,
+        "scaleDelta": 0.1742,
+        "bilateralSymmetryError": 0.1483,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 10.3,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.599 is below threshold 0.85",
+        "aspect-ratio delta 0.185 exceeds threshold 0.05",
+        "scale delta 0.174 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "c78f167733e1eec4",
+      "passId": "form-refinement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5989,
+        "aspectRatioDelta": 0.1855,
+        "scaleDelta": 0.1742,
+        "bilateralSymmetryError": 0.1483,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 10.3,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.3
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.599 is below threshold 0.85",
+        "aspect-ratio delta 0.185 exceeds threshold 0.05",
+        "scale delta 0.174 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "c78f167733e1eec4",
+      "passId": "form-refinement"
+    }
+  ]
+}
