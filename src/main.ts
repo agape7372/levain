@@ -36,7 +36,7 @@ if (q.has('demo')) {
     const acid = q.get('acid');
     if (acid !== null) state = { ...state, acidity: Number(acid) };
 
-    scene.setMoldSeed(state.createdAt); // 곰팡이 단계 튜닝(demo=170+)에도 반점 자리 고정
+    scene.setSeed(state.createdAt); // 곰팡이 단계 튜닝(demo=170+)에도 반점 자리 고정
     scene.snapParams(toRenderParams(sim.deriveSnapshot(state, now)));
     setInterval(() => {
       state = sim.advance(state, Date.now());

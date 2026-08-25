@@ -1,0 +1,53 @@
+{
+  "id": "cinnamon",
+  "version": 1,
+  "name_ko": "계피",
+  "hero_form": "ground",
+  "subject": "two rolled cinnamon quills beside a small mound of ground cinnamon",
+  "geometry": {
+    "silhouette": "two hollow bark tubes of slightly different length lying side by side at a shallow angle, each rolled inward from both edges into a double scroll at the ends, with a low soft heap of powder resting in front of them",
+    "surface": [
+      "a warm russet bark (#9A5B34) on the outside with a lighter tan (#B87A4C) inside the rolled scroll ends, and a deeper red-brown powder heap (#8C4E2A) with a paler dusting (#A9683C) on its lit upper slope — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "star anise",
+    "cloves",
+    "coffee beans",
+    "sugar",
+    "spoon",
+    "jar",
+    "bowl",
+    "steam"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of two rolled cinnamon quills beside a small mound of ground cinnamon, a single game asset object on a plain backdrop. Geometry: two hollow bark tubes of slightly different length lying side by side at a shallow angle, each rolled inward from both edges into a double scroll at the ends, with a low soft heap of powder resting in front of them. Surface: a warm russet bark (#9A5B34) on the outside with a lighter tan (#B87A4C) inside the rolled scroll ends, and a deeper red-brown powder heap (#8C4E2A) with a paler dusting (#A9683C) on its lit upper slope — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no star anise, no cloves, no coffee beans, no sugar, no spoon, no jar, no bowl, no steam, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact two rolled cinnamon quills beside a small mound of ground cinnamon, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact two rolled cinnamon quills beside a small mound of ground cinnamon, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "게임의 형태는 ground·swirl이지만 아이콘으로는 **스틱 + 가루** 둘을 함께 둔다 — 가루만 놓으면 흑설탕 더미와 구분이 안 된다. 다른 향신료(팔각·정향)는 negative로 막았다."
+}

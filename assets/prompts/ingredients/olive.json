@@ -1,0 +1,51 @@
+{
+  "id": "olive",
+  "version": 1,
+  "name_ko": "올리브",
+  "hero_form": "flesh",
+  "subject": "a small cluster of three whole black olives",
+  "geometry": {
+    "silhouette": "three plump oval olives resting together in a low group, one tilted to show its blunt end, none overlapping the group's silhouette",
+    "surface": [
+      "a deep aubergine-black body (#3B2F2F) with a slightly warmer brown-black (#4A3A36) on the shaded lower halves and a muted olive-green cast (#5C6B3E) catching the upper faces — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "cheese topping",
+    "tomato slices",
+    "extra glossy oil sheen",
+    "brine liquid",
+    "jar",
+    "bowl"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a small cluster of three whole black olives, a single game asset object on a plain backdrop. Geometry: three plump oval olives resting together in a low group, one tilted to show its blunt end, none overlapping the group's silhouette. Surface: a deep aubergine-black body (#3B2F2F) with a slightly warmer brown-black (#4A3A36) on the shaded lower halves and a muted olive-green cast (#5C6B3E) catching the upper faces — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no cheese topping, no tomato slices, no extra glossy oil sheen, no brine liquid, no jar, no bowl, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a small cluster of three whole black olives, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a small cluster of three whole black olives, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "배이스 빵 focaccia--olive-flesh.json의 과육 색(#3B2F2F)을 그대로 계승했다. '올리브'가 지중해식 토핑(치즈·토마토)을 연상시키기 쉬워 negative로 명시 차단했고, 병·그릇도 막았다(단일 오브젝트 규칙)."
+}

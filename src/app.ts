@@ -33,7 +33,7 @@ import { createShowcaseScreen } from './ui/screens/showcase';
 import { mountOnboarding } from './ui/screens/onboarding';
 import { openStarterGift } from './ui/components/ingredientPicker';
 import type { GameApi } from './ui/gameApi';
-import { LABEL_STAGE, RECIPES } from './sim';
+import { LABEL_STAGE, RECIPES, INGREDIENTS } from './sim';
 import { basesCompleted, missionViews } from './store/economy';
 import type { BakeGrade, SimEvent } from './sim';
 
@@ -66,7 +66,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   scene.mount();
   scene.snapParams(toRenderParams(store.getSnapshot())); // 앱 오픈 = 즉시 스냅
   scene.start();
-  scene.setMoldSeed(store.getActiveStarter().sim.createdAt); // 반점 자리 = 개체 정체성
+  scene.setSeed(store.getActiveStarter().sim.createdAt); // 반점 자리 = 개체 정체성
 
   // 햅틱 예산: 젓기 세션당 첫 팝 1회만 — '희소' 규칙 (VISUAL §5 개정)
   let stirHapticUsed = false;
@@ -114,10 +114,14 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       scene.skipSequence(); // 연출 중 전환 금지(§5-5) — 남은 연출은 스킵으로 정리
       const index = Math.max(0, env.starters.findIndex((r) => r.id === env.activeStarterId));
       const next = env.starters[(index + dir + env.starters.length) % env.starters.length];
-      if (!store.switchStarter(next.id)) return;
-      // switchStarter 호출자 계약 — 전환은 재생 없이 컷: 즉시 스냅 + 개체 반점 시드 재설정
-      scene.snapParams(toRenderParams(store.getSnapshot()));
-      scene.setMoldSeed(store.getActiveStarter().sim.createdAt);
+      // 캔버스를 방향대로 밀어내고 화면 밖에서 교체한다 — 이름만으로 르방을 구별하기 어렵다는
+      // 피드백의 절반은 전환이 무예고 컷이라서다(§5-5가 처방했으나 실장 안 됨). 나머지 절반은 개체 지문.
+      scene.slideSwap(dir, () => {
+        if (!store.switchStarter(next.id)) return;
+        // 컷 계약은 그대로 — 경과 시간을 재생하지 않는다: 즉시 스냅 + 개체 시드 재설정
+        scene.snapParams(toRenderParams(store.getSnapshot()));
+        scene.setSeed(store.getActiveStarter().sim.createdAt);
+      });
     },
     location: () => store.getActiveStarter().sim.location,
     flakeMadeAt: () => store.getActiveStarter().sim.flake?.madeAt ?? null,
@@ -134,7 +138,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       if (rec === null) return false;
       // addStarter는 새 르방을 활성으로 전환한다 — 씬 컷 계약 동일 적용
       scene.snapParams(toRenderParams(store.getSnapshot()));
-      scene.setMoldSeed(store.getActiveStarter().sim.createdAt);
+      scene.setSeed(store.getActiveStarter().sim.createdAt);
       return true;
     },
     economy: () => {
@@ -156,7 +160,8 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     dev: {
       matureActive: () => store.devMatureActive(),
       grantAllIngredients: () => {
-        for (const id of ['olive', 'choco', 'strawberry', 'chestnut'] as const) store.grantIngredient(id, 9);
+        // 카탈로그에서 뽑는다 — 하드코딩하면 재료를 늘릴 때마다 개발자 모드가 조용히 낡는다
+        for (const ing of INGREDIENTS) store.grantIngredient(ing.id, 9);
       },
       completeCollection: () => store.devCompleteCollection(),
     },
@@ -351,7 +356,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
           break;
         case 'starterDiscarded':
           scene.snapParams(toRenderParams(store.getSnapshot())); // 새 반죽 — 즉시 스냅
-          scene.setMoldSeed(store.getActiveStarter().sim.createdAt); // 새 개체 = 새 반점 자리
+          scene.setSeed(store.getActiveStarter().sim.createdAt); // 새 개체 = 새 반점 자리
           break;
         case 'moldBlocked':
           openMoldModal(api); // 다른 일은 없다 — 종결 모달로 되돌린다

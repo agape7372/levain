@@ -1,0 +1,17 @@
+{
+  "id": "shared-style-ingredient-v1",
+  "inherits": "shared-style-v2",
+  "keywords": [
+    "low-poly faceted geometry",
+    "soft clay-like matte shading",
+    "saturated jewel-tone ingredient color against the warm pastel scene palette",
+    "miniature diorama feel",
+    "flat color facets",
+    "clean simple silhouette",
+    "stylized 3D game asset render"
+  ],
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background",
+  "negative_tail": "Stylized matte render only — no photorealism, no glossy plastic, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "notes_ko": "빵 프롬프트(shared-style-v2)에서 **딱 한 줄만** 바꿨다: keywords의 'warm pastel palette' → 'saturated jewel-tone ingredient color against the warm pastel scene palette'. 재료는 더 다채롭고 비비드해도 된다는 사용자 지시(2026-08-25)를 반영하되, 배경·조명·카메라·네거티브 꼬리는 v2와 문자 단위로 동일하게 둔다 — 그 조항들은 취향이 아니라 3D 변환 시 실루엣 오염을 막는 기술 레일이다(README v2 변경 요지 참조).\n\n광택은 여전히 금지다. 채도를 올리는 것과 광택을 넣는 것은 다른 문제이고, 하이라이트는 알베도에 흰 얼룩으로 구워진다. 그래서 각 재료 JSON의 surface 서술은 전부 'expressed purely as flat color facets, never as shine'로 끝난다.\n\n재료당 JSON 1개 = **대표 형태 하나만**. 형태(과육/오일/가루…)는 호환성 데이터의 축이지 아이콘의 축이 아니다 — 형태마다 자산을 만들면 개수가 3배가 되고 도감에서 서로 구분도 안 된다. 각 파일의 hero_form 필드가 어떤 형태를 그린 것인지 기록한다."
+}

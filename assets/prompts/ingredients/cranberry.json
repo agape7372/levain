@@ -1,0 +1,52 @@
+{
+  "id": "cranberry",
+  "version": 1,
+  "name_ko": "크램베리",
+  "hero_form": "dried",
+  "subject": "a small heap of dried cranberries",
+  "geometry": {
+    "silhouette": "five to seven plump oval berries clustered in a low mound, each slightly wrinkled and flattened on one side, none overlapping the mound's silhouette",
+    "surface": [
+      "a deep saturated crimson body (#B3324A) with a slightly deeper red (#8E2438) in the wrinkle creases and a warm pale blush (#D9707F) on the upper faces where light lands — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "wet syrup coating",
+    "sauce",
+    "juice",
+    "sugar crystals",
+    "bowl",
+    "leaves",
+    "stems"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a small heap of dried cranberries, a single game asset object on a plain backdrop. Geometry: five to seven plump oval berries clustered in a low mound, each slightly wrinkled and flattened on one side, none overlapping the mound's silhouette. Surface: a deep saturated crimson body (#B3324A) with a slightly deeper red (#8E2438) in the wrinkle creases and a warm pale blush (#D9707F) on the upper faces where light lands — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no wet syrup coating, no sauce, no juice, no sugar crystals, no bowl, no leaves, no stems, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a small heap of dried cranberries, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a small heap of dried cranberries, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "건조 크램베리는 실물이 끈적해 생성기가 광택을 넣기 쉬우므로 wet syrup coating을 명시 차단했다. 주름은 음영이 아니라 같은 붉은 계열의 진한 색으로만 표현한다."
+}

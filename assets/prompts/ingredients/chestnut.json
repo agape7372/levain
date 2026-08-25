@@ -1,0 +1,51 @@
+{
+  "id": "chestnut",
+  "version": 1,
+  "name_ko": "밤",
+  "hero_form": "piece",
+  "subject": "a single roasted chestnut",
+  "geometry": {
+    "silhouette": "one plump nut with a broad rounded dome on top narrowing to a flat oval base, and a small pointed tuft at the very top",
+    "surface": [
+      "a warm russet-brown shell (#7A5638) with a darker brown (#5E4029) in the shaded lower half, a pale oatmeal patch (#D9C4A0) across the flat base where the shell meets the ground, and a single shallow split line (#C68B5B) running down one side — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "spiky husk",
+    "burr",
+    "green shell",
+    "leaves",
+    "basket",
+    "bowl"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a single roasted chestnut, a single game asset object on a plain backdrop. Geometry: one plump nut with a broad rounded dome on top narrowing to a flat oval base, and a small pointed tuft at the very top. Surface: a warm russet-brown shell (#7A5638) with a darker brown (#5E4029) in the shaded lower half, a pale oatmeal patch (#D9C4A0) across the flat base where the shell meets the ground, and a single shallow split line (#C68B5B) running down one side — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no spiky husk, no burr, no green shell, no leaves, no basket, no bowl, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a single roasted chestnut, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a single roasted chestnut, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "가시 껍질(burr)을 negative로 막았다 — '밤'은 가시집 달린 모습으로 나오기 쉬운데, 그러면 실루에이 과잡해져 3D 변환이 깨진다."
+}

@@ -284,7 +284,15 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     if (multi) {
       // ‹ 르방이 2 · 2/3 › — 빈 이름은 표시 시점 파생 (§5-3, 저장 안 함)
       const name = st.name ?? copy.starter.defaultName(st.ordinal);
-      chip.textContent = `${name} · ${st.index + 1}/${st.count}`;
+      const next = copy.starter.pill(name, st.index, st.count);
+      // 전환 방향으로 살짝 밀리며 교체 — 캔버스 슬라이드(SceneHost.slideSwap)와 같은 문법.
+      // 칩이 제자리에서 글자만 바뀌면 '다른 르방으로 왔다'가 안 읽힌다
+      if (chip.textContent !== next && chip.textContent !== '') {
+        chip.classList.remove('chip-swap');
+        void chip.offsetWidth; // 재트리거용 리플로우
+        chip.classList.add('chip-swap');
+      }
+      chip.textContent = next;
     } else {
       chip.textContent = st.name
         ? `${st.name} · ${copy.stage.names[snap.stage]}`

@@ -155,6 +155,18 @@ html {
   40% { transform: scale(1.06); }
   100% { transform: scale(1); }
 }
+/* 르방 전환 — 이름 칩이 살짝 뜨며 교체된다. 캔버스 슬라이드(SceneHost.slideSwap)와 같은 이징 */
+.hud-stage-chip.chip-swap { animation: chip-swap 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes chip-swap {
+  0% { opacity: 0; transform: translateY(-4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* 모션 감소 — 전환·펄스 연출을 끈다 (§16 수용 기준. 이전까지 레포에 처리가 0건이었다) */
+  .hud-stage-chip.chip-swap,
+  .hud-stage-chip.pulse,
+  .recipe-card.just-unlocked { animation: none; }
+}
 
 .hud-corner {
   position: absolute;

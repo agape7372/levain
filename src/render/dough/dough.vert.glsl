@@ -24,12 +24,17 @@ uniform float uTrailAmp[4];
 uniform float uTrailK[4];  // 실 능선 첨도 — 나이 들수록 퍼진다(점성 기억)
 uniform float uRipe;
 uniform float uCollapse;
-uniform float uLiquid;     // 0=고체(돔) ~ 1=액체(병을 채운 수평면)
+uniform float uLevel;      // (구 uLiquid) 0=돔(고체·마름) ~ 1=병 단면을 채운 수평면 — 형상 전용
+uniform float uFluid;      // 흐름 — 슬로싱 배분·유휴 진행파. 형상과 분리(2026-08-25)
+uniform float uRBody;      // 몸통 적도 반경(오브젝트) = R × wallFill. 프래그 밴드 정규화와 단일 소스
 uniform float uRXZMax;     // 실루엣 반경 상한 — 유리 내벽 연동(CPU 계산)
+uniform float uSeed;       // 개체 시드 — 정지 실루엣 덩어리 자리 (르방마다 다른 생김새)
 varying vec2 vXZ;
 varying float vStretch;
 varying float vTop;        // 윗면 마스크 — 기울기·파동·메니스커스용
 varying vec3 vBaseN;       // 변형 기준 노멀 — 프래그 폼셰이딩용
+varying vec2 vWallUV;      // 유리벽 기공 도메인 (월드 단위, atan 없음 = 이음매 없음)
+varying float vWallY;      // 몸통 내 정규화 높이 0~1 — 기공 크기 구배용
 
 // 무리수 회전 3옥타브 트리그 FBM — 텍스처 fetch 0 (VISUAL §8)
 float fbm(vec2 p) {
@@ -49,18 +54,30 @@ void main() {
   //    단위구 좌표라 공짜. 적도(y=0)·극(r=0)에서 스케일 1 → 반경 클램프·바닥 피벗 산수 불변,
   //    어깨(45°)만 최대 1.297배 → 평평한 윗면 + 평평한 바닥 + 둥근 어깨 ──
   vec3 q = normal;
+  float rGeo = dot(position, normal);    // = R (position = R·normal) — sqrt 없이 정확
   float rr = dot(q.xz, q.xz);
   float yy = q.y * q.y;
   float r8 = rr * rr; r8 = r8 * r8;
   float y8 = yy * yy; y8 = y8 * y8;
   float sSE = sqrt(sqrt(sqrt(r8 + y8))); // (r⁸+y⁸)^(1/8) — pow 없음
-  p *= mix(1.0, 1.0 / max(sSE, 1e-3), uLiquid);
+  p *= mix(1.0, 1.0 / max(sSE, 1e-3), uLevel);
+  // 유리에 닿는다 — 초타원 스케일은 적도에서 정확히 1이라 몸통 최대 반경이 어느 상태든 R에 묶였고,
+  // 유리 내벽(0.92)과 12.4% 틈이 영구적이었다. 소프트 니 클램프(아래)도 그래서 평생 안 눌렸다.
+  p.xz *= uRBody / rGeo;
   // 변형 방향 = 초타원체 아날리틱 노멀 ∇(r⁸+y⁸) ∝ (x·r⁶, y⁷, z·r⁶)
   float r6 = rr * rr * rr;
   vec3 nSE = normalize(vec3(q.x * r6, q.y * yy * yy * yy, q.z * r6) + vec3(0.0, 1e-6, 0.0));
-  vec3 nd = normalize(mix(q, nSE, uLiquid));
+  vec3 nd = normalize(mix(q, nSE, uLevel));
   vBaseN = nd;
   vTop = smoothstep(0.05, 0.45, p.y);
+  vWallY = clamp(p.y / (2.0 * rGeo) + 0.5, 0.0, 1.0);
+  // 벽 기공 도메인 — (수평 투영 A, 높이 + 수평 투영 B×0.55). atan을 안 쓰므로 ±π 분기컷이 없고,
+  // 나선 전단이라 정면 좌우 미러도 안 보인다. modelMatrix 스케일로 월드 단위 정규화 →
+  // fill이 변해도 셀 크기가 안 변한다(부풀면 셀이 같이 커지는 건 폼이 아니라 풍선이다)
+  float sXZ = length(modelMatrix[0].xyz);
+  float sY = length(modelMatrix[1].xyz);
+  vWallUV = vec2(dot(p.xz, vec2(0.94, 0.34)) * sXZ,
+                 p.y * sY + dot(p.xz, vec2(-0.34, 0.94)) * sXZ * 0.55);
 
   // ── grab 점탄성 변위 (확장기획 §4-2 A안) — 가장 먼저: 이후의 모든 변형장이 함께 끌린다 ──
   vStretch = 0.0;
@@ -103,13 +120,16 @@ void main() {
   p.xz += vec2(-uStirVec.y, uStirVec.x) * sfall * 0.35;
 
   // ── 슬로싱 — 액체는 수면이 기울고(§오푸스 2), 고체는 몸이 밀린다. 진동은 CPU 진동자 소관 ──
-  float rigid = (1.0 - 0.7 * uLiquid) * (0.4 + 0.6 * vTop);
+  // ⚠ 아래 2줄의 계수는 frag의 조명 기울기 짝과 반드시 같아야 한다 (dough.frag.glsl 슬로싱 항)
+  float rigid = (1.0 - 0.7 * uLevel) * (0.4 + 0.6 * vTop);
   p.x += uWobble.x * (0.12 + p.z * 0.04) * rigid;
   p.z += uWobble.y * (0.12 + p.x * 0.04) * rigid;
-  p.y += dot(p.xz, uWobble) * 0.14 * uLiquid * vTop;
+  p.y += dot(p.xz, uWobble) * 0.14 * uLevel * (0.5 + 0.5 * uFluid) * vTop;
 
-  // 정지 실루엣 — 액체는 영구 혹을 못 가진다: liquidity에 반비례
-  float silhouette = fbm(p.xz * 1.8 + vec2(3.1, 7.4)) * 0.045 * (1.0 - 0.75 * uLiquid);
+  // 정지 실루엣 — 평평할수록·흐를수록 영구 혹을 못 가진다.
+  // 피크에선 이 저주파 혹을 눌러 준다 — 안 그러면 정수리에 소프트아이스크림 꼭지가 하나 선다
+  float silhouette = fbm(p.xz * 1.8 + vec2(3.1, 7.4) + uSeed * 37.0) * 0.045
+                   * (1.0 - 0.55 * uLevel - 0.30 * uFluid) * (1.0 - 0.5 * uRipe);
   // 살아있는 표면 — 시간 흐르는 FBM
   float n = fbm(p.xz * 2.6 + vec2(uTime * 0.30 * uNoiseSpeed, -uTime * 0.24 * uNoiseSpeed));
 
@@ -126,10 +146,18 @@ void main() {
   }
   disp += length(uStirVec) * 0.35 * sfall;
 
-  // 피크 돔(uRipe) / 과숙 크레이터(uCollapse) — 중심 광폭 가우시안
+  // 피크 돔(uRipe) / 과숙 크레이터(uCollapse) — 중심 광폭 가우시안.
+  // uRBody 확장으로 p.xz 범위가 늘었으므로 커널 폭을 상대화한다 (0.3844 = R², R=0.62).
+  // ⚠ frag의 돔/크레이터 짝(계수 4.0 / 3.2)도 같은 kR을 곱해야 한다
+  float kR = 0.3844 / (uRBody * uRBody);
   float c2 = dot(p.xz, p.xz);
-  disp += uRipe * 0.05 * exp(-c2 * 2.5);
-  disp -= uCollapse * 0.08 * exp(-c2 * 2.0);
+  disp += uRipe * 0.05 * exp(-c2 * 2.5 * kR);
+  disp -= uCollapse * 0.08 * exp(-c2 * 2.0 * kR);
+
+  // 피크 정수리 크래그 — 실사진 판정 기준은 '높이'가 아니라 **'하나의 매끈한 돔이냐 잘게 부서진
+  // 기공 크러스트냐'**다(같은 높이에서도 갈린다). 도메인 5.0은 프래그의 마이크로 노멀
+  // fbmG(vXZ*5.0)와 **같은 필드** — 새 프래그 FBM 호출 0, 조명과 지오메트리가 한 소스
+  disp += fbm(p.xz * 5.0) * 0.030 * uRipe * vTop;
 
   // 탭 자국 — 첨도(uPokeK)는 액체일수록 아물며 퍼진다 (CPU 소관)
   vec2 pd = p.xz - uPokePos;
@@ -138,7 +166,7 @@ void main() {
   // 유휴 진행파 — 액체 수면 찰랑임. 실제 광은 프래그 기울기가 그린다 (위상 상수 프래그와 동기)
   float wave = sin(dot(p.xz, vec2(0.90, 0.44)) * 11.0 - uTime * 1.3)
              + 0.6 * sin(dot(p.xz, vec2(-0.50, 0.87)) * 17.0 + uTime * 1.6);
-  disp += wave * 0.009 * uLiquid * vTop;
+  disp += wave * 0.009 * uFluid * vTop;
 
   vXZ = p.xz;
   p += nd * (n * 0.035 + silhouette + disp);

@@ -1,0 +1,53 @@
+{
+  "id": "rosemary",
+  "version": 1,
+  "name_ko": "로즈마리",
+  "hero_form": "sprig",
+  "subject": "a single sprig of fresh rosemary",
+  "geometry": {
+    "silhouette": "one straight woody stem lying at a slight diagonal, with short narrow needle leaves angling upward and outward along both sides, denser toward the tip",
+    "surface": [
+      "sage-green needles (#6E8A5A) with a deeper forest green (#4F6B41) on the shaded undersides and a pale silvery green (#9BB183) catching the upper edges; the woody stem is a muted olive-tan (#7C7A54) — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "full herb bouquet",
+    "bunch",
+    "twine",
+    "many sprigs",
+    "flowers",
+    "pot",
+    "soil",
+    "bowl"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a single sprig of fresh rosemary, a single game asset object on a plain backdrop. Geometry: one straight woody stem lying at a slight diagonal, with short narrow needle leaves angling upward and outward along both sides, denser toward the tip. Surface: sage-green needles (#6E8A5A) with a deeper forest green (#4F6B41) on the shaded undersides and a pale silvery green (#9BB183) catching the upper edges; the woody stem is a muted olive-tan (#7C7A54) — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no full herb bouquet, no bunch, no twine, no many sprigs, no flowers, no pot, no soil, no bowl, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a single sprig of fresh rosemary, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a single sprig of fresh rosemary, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "**한 가지**만 — negative에 bouquet·bunch·many sprigs를 넣은 이유다. 허브는 생성기가 묶음으로 그리려 들고, 묶음은 저폴리 실루에이이 무너진다. 잎은 개별 쟎이 아니라 짧은 바늘 덩어리로."
+}

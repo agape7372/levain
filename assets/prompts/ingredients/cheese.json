@@ -1,0 +1,53 @@
+{
+  "id": "cheese",
+  "version": 1,
+  "name_ko": "치즈",
+  "hero_form": "cube",
+  "subject": "a small stack of three gouda-style cheese cubes",
+  "geometry": {
+    "silhouette": "three cubes with softly rounded edges, two resting side by side and one set on top and slightly turned, none overlapping the group's silhouette",
+    "surface": [
+      "a rich butter-yellow body (#E8B75A) with a deeper amber (#C9903A) on the shaded faces, a thin warm wax rind (#C0562F) along one edge of each cube, and two or three small round holes (#D8A448) sunk into the visible faces — expressed purely as flat color facets, never as shine"
+    ]
+  },
+  "style_ref": "shared-style-ingredient-v1",
+  "camera": "three-quarter top-front view, object centered, 15% margin",
+  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
+  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "pizza",
+    "melted stretch",
+    "cheese pull",
+    "grater",
+    "slices",
+    "crackers",
+    "board",
+    "bowl"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy low-poly stylized 3D render of a small stack of three gouda-style cheese cubes, a single game asset object on a plain backdrop. Geometry: three cubes with softly rounded edges, two resting side by side and one set on top and slightly turned, none overlapping the group's silhouette. Surface: a rich butter-yellow body (#E8B75A) with a deeper amber (#C9903A) on the shaded faces, a thin warm wax rind (#C0562F) along one edge of each cube, and two or three small round holes (#D8A448) sunk into the visible faces — expressed purely as flat color facets, never as shine. Overall style: low-poly faceted geometry, soft clay-like matte shading, saturated jewel-tone ingredient color against the warm pastel scene palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no pizza, no melted stretch, no cheese pull, no grater, no slices, no crackers, no board, no bowl, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact a small stack of three gouda-style cheese cubes, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact a small stack of three gouda-style cheese cubes, identical proportions, colors, and surface details — now shown in a top-down view (directly from above). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "melted stretch·cheese pull을 negative 상단에 둔 이유는 '치즈'가 생성기에서 녹는 장면을 강하게 끌기 때문이다. 구멍은 가장자리 어두운 테두리 없이 색으로만."
+}

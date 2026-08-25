@@ -18,10 +18,35 @@ const glassVert = /* glsl */ `
   }
 `;
 
+// 유리 자국 — 수위와 최고 수위 사이의 마른 필름 + 최고 수위 선. 앞/뒤 유리 공통 소스.
+// 실제 병에서 "여긴 발효 중이다"와 "한 번 여기까지 올라왔다 주저앉았다"를 문구 없이 말해주는
+// 유일한 다이제틱 신호다. FBM 0회(전량 sin·exp), 드로우콜 증가 0.
+const residueGlsl = /* glsl */ `
+  uniform float uMassY;   // 반죽 윗면 월드 y
+  uniform float uMarkY;   // 이번 사이클 최고 수위 월드 y
+  uniform float uResidue; // 0~1 마른 자국
+  uniform float uWetRim;  // 0~1 갓 밥준 젖은 테
+  // wy = 월드 y. 반환값 r을 alpha·tint에 섞는다
+  float residueAmt(float wy) {
+    if (uResidue <= 0.004) return 0.0;
+    float above = smoothstep(uMassY - 0.015, uMassY + 0.045, wy);
+    float below = 1.0 - smoothstep(uMarkY - 0.060, uMarkY + 0.015, wy);
+    // 앞면은 z>0 구간만 보이므로 atan 분기컷이 화면에 안 걸린다 (기존 스트릭과 같은 관행)
+    float az2 = atan(vLocal.x, vLocal.z);
+    float s = 0.5 + 0.5 * sin(az2 * 19.0 + sin(az2 * 5.0 + 1.3) * 2.1);
+    float streak = mix(0.35, 1.0, s * s);          // 흘러내린 줄 몇 개 + 넓은 얼룩 (저대비)
+    float fade = 1.0 - smoothstep(uMassY, uMarkY + 0.02, wy);
+    float film = above * below * streak * (0.30 + 0.70 * fade);
+    float line = exp(-(wy - uMarkY) * (wy - uMarkY) * 1600.0); // σ≈0.018 최고 수위 선
+    return uResidue * (film * 0.9 + line * 0.55);
+  }
+`;
+
 // 뒷면: 은은한 내벽 톤 + 하단으로 갈수록 두꺼워지는 유리 암시
 const glassBackFrag = /* glsl */ `
   precision mediump float;
   varying vec3 vLocal;
+  ${residueGlsl}
   void main() {
     float yn = clamp((vLocal.y + 0.95) / 1.9, 0.0, 1.0);
     // 림 바로 아래 내부 환형 — 원래 공식은 위로 갈수록 알파가 낮아져 배경색(#E8D9C4)이
@@ -29,6 +54,10 @@ const glassBackFrag = /* glsl */ `
     float rim = smoothstep(0.75, 1.0, yn);
     float alpha = 0.10 + 0.06 * (1.0 - yn) + 0.24 * rim;
     vec3 tint = mix(vec3(0.98, 0.94, 0.88), vec3(0.28, 0.21, 0.14), rim);
+    // 55도 부감에서 수위 위 '먼 쪽' 벽이 크게 보인다 — 자국이 가장 잘 읽히는 면이다
+    float r = residueAmt(vLocal.y + 0.95) * 0.7;
+    alpha += r * 0.30;
+    tint = mix(tint, vec3(0.90, 0.855, 0.78), clamp(r * 1.4, 0.0, 0.85));
     gl_FragColor = vec4(tint, alpha);
   }
 `;
@@ -41,6 +70,7 @@ const glassFrontFrag = /* glsl */ `
   varying vec3 vNormal;
   varying vec3 vViewDir;
   varying vec3 vLocal;
+  ${residueGlsl}
   void main() {
     float fresnel = pow(1.0 - max(0.0, dot(normalize(vNormal), normalize(vViewDir))), 2.0);
     float alpha = 0.08 + 0.45 * fresnel;
@@ -50,7 +80,14 @@ const glassFrontFrag = /* glsl */ `
     float yn = clamp((vLocal.y + 0.95) / 1.9, 0.0, 1.0);
     float vfade = smoothstep(0.03, 0.28, yn) * (1.0 - smoothstep(0.72, 0.97, yn));
     alpha += 0.10 * band * vfade;
-    gl_FragColor = vec4(1.0, 0.965, 0.91, alpha); // #FFF6E8
+    vec3 tint = vec3(1.0, 0.965, 0.91); // #FFF6E8
+    float wy = vLocal.y + 0.95;
+    float r = residueAmt(wy);
+    alpha += r * 0.30;
+    tint = mix(tint, vec3(0.90, 0.855, 0.78), clamp(r * 1.4, 0.0, 0.85)); // 마른 반죽 톤 (빨강 0)
+    // 갓 밥준 젖은 테 — 자국과 반대 신호. 수위 바로 위 얇은 광택 띠
+    alpha += exp(-pow((wy - uMassY - 0.012) * 55.0, 2.0)) * uWetRim * 0.12;
+    gl_FragColor = vec4(tint, alpha);
   }
 `;
 
@@ -59,6 +96,8 @@ export interface Jar {
   /** hooch(부유액) 층 — 방치 신호. setHooch(amt, y)로 구동 */
   hooch: THREE.Mesh;
   setHooch(amt: number, y: number, t: number): void;
+  /** 유리 자국 — 수위·최고 수위(월드 y)·자국 세기·젖은 테. 배선은 SceneHost */
+  setLevel(massY: number, markY: number, residue: number, wet: number): void;
 }
 
 const hoochVert = /* glsl */ `
@@ -99,9 +138,18 @@ export function createJar(): Jar {
   const group = new THREE.Group();
   const geo = new THREE.CylinderGeometry(JAR_RADIUS, JAR_RADIUS, JAR_HEIGHT, 48, 1, true);
 
+  // 앞·뒤 유리가 같은 자국 uniform 집합을 쓴다 — 값은 setLevel이 양쪽에 함께 넣는다
+  const residueUniforms = (): Record<string, { value: number }> => ({
+    uMassY: { value: 0 },
+    uMarkY: { value: 0 },
+    uResidue: { value: 0 },
+    uWetRim: { value: 0 },
+  });
+
   const back = new THREE.Mesh(
     geo,
     new THREE.ShaderMaterial({
+      uniforms: residueUniforms(),
       vertexShader: glassVert,
       fragmentShader: glassBackFrag,
       transparent: true,
@@ -114,6 +162,7 @@ export function createJar(): Jar {
   const front = new THREE.Mesh(
     geo,
     new THREE.ShaderMaterial({
+      uniforms: residueUniforms(),
       vertexShader: glassVert,
       fragmentShader: glassFrontFrag,
       transparent: true,
@@ -172,5 +221,15 @@ export function createJar(): Jar {
     hooch.visible = amt > 0.01;
   };
 
-  return { group, hooch, setHooch };
+  const setLevel = (massY: number, markY: number, residue: number, wet: number): void => {
+    for (const m of [back, front]) {
+      const u = (m.material as THREE.ShaderMaterial).uniforms;
+      u.uMassY.value = massY;
+      u.uMarkY.value = markY;
+      u.uResidue.value = residue;
+      u.uWetRim.value = wet;
+    }
+  };
+
+  return { group, hooch, setHooch, setLevel };
 }

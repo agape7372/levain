@@ -36,6 +36,8 @@ export class SceneHost {
    *  필드 위임인 이유: 컨텍스트 유실 복구가 dispose→mount로 attachInput을 다시 부른다 */
   canSwipe: (() => boolean) | null = null;
   onSwipe: ((dir: 1 | -1) => void) | null = null;
+  /** 전환 슬라이드 진행 중 타이머 — 연타 시 정리하고 즉시 교체 (slideSwap) */
+  private slideTimer: ReturnType<typeof setTimeout> | null = null;
   private cloth: Cloth | null = null;
   private jar: Jar | null = null;
   private showcase: BreadShowcase | null = null;
@@ -148,6 +150,52 @@ export class SceneHost {
     this.dough?.applyParams(p);
   }
 
+  /**
+   * 르방 전환 슬라이드 — 캔버스를 방향대로 밀어내고, **화면 밖에서** swap()을 실행한 뒤 되돌아온다.
+   * 스냅샷 캡처를 안 하므로 preserveDrawingBuffer가 필요 없고 WebGL 컨텍스트도 1개 그대로다.
+   * `#c`에만 transform을 걸어 레이아웃 크기가 안 변한다 — 리사이즈·DPR 로직 무사, HUD는 제자리.
+   * "전환은 컷" 계약은 유지된다 — 그 계약은 *경과 시간을 재생하지 않는다*는 뜻이지 무전환이 아니다.
+   */
+  slideSwap(dir: 1 | -1, swap: () => void): void {
+    const reduce =
+      typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // 연타 중이면 진행 중인 슬라이드를 정리하고 즉시 교체 — 애니메이션이 입력을 삼키지 않는다
+    if (reduce || this.slideTimer !== null) {
+      if (this.slideTimer !== null) {
+        clearTimeout(this.slideTimer);
+        this.slideTimer = null;
+        this.canvas.style.transition = '';
+        this.canvas.style.transform = '';
+        this.canvas.style.opacity = '';
+      }
+      swap();
+      return;
+    }
+    const OUT_MS = 130;
+    const IN_MS = 150;
+    const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+    const away = dir === 1 ? -40 : 40; // 다음(+1)이면 왼쪽으로 빠진다 — 칩 ‹ › 와 같은 방향 감각
+    this.canvas.style.transition = `transform ${OUT_MS}ms ${EASE}, opacity ${OUT_MS}ms linear`;
+    this.canvas.style.transform = `translateX(${away}%)`;
+    this.canvas.style.opacity = '0';
+    this.slideTimer = setTimeout(() => {
+      swap(); // 화면 밖에서 교체 — 컷이 안 보인다
+      this.canvas.style.transition = 'none';
+      this.canvas.style.transform = `translateX(${-away}%)`;
+      // 강제 리플로우 — 없으면 transition:none이 다음 대입과 합쳐져 되돌아오는 구간이 통째로 사라진다
+      void this.canvas.offsetWidth;
+      this.canvas.style.transition = `transform ${IN_MS}ms ${EASE}, opacity ${IN_MS}ms linear`;
+      this.canvas.style.transform = 'translateX(0)';
+      this.canvas.style.opacity = '1';
+      this.slideTimer = setTimeout(() => {
+        this.canvas.style.transition = '';
+        this.canvas.style.transform = '';
+        this.canvas.style.opacity = '';
+        this.slideTimer = null;
+      }, IN_MS);
+    }, OUT_MS);
+  }
+
   /** 밥주기 연출 2.8s — pour면 앞 1.2s에 병 기울여 hooch 따라내기 (부활 1회차) */
   playFeed(pour = false): void {
     this.feedSeq = {
@@ -176,8 +224,8 @@ export class SceneHost {
   }
 
   /** 곰팡이 반점 시드 — 개체 정체성. 배선은 app.ts (createdAt) */
-  setMoldSeed(seed: number): void {
-    this.dough?.setMoldSeed(seed);
+  setSeed(seed: number): void {
+    this.dough?.setSeed(seed);
   }
 
   /** 천 덮개 덮기 — 콜드 스타트·오랜 부재 복귀 (조건 판단은 app.ts) */
@@ -389,7 +437,15 @@ export class SceneHost {
       this.particles?.update(dt);
       if (this.dough && this.dough.bubbles.popsThisFrame > 0) this.onBubblePop?.();
       if (this.dough && this.jar && this.current) {
-        this.jar.setHooch(this.current.hoochAmt, this.dough.topY() + 0.02, t);
+        // topY를 한 번만 뽑아 둘에 공급 — hooch 층과 유리 자국이 같은 수면 좌표계를 쓴다
+        const top = this.dough.topY();
+        this.jar.setHooch(this.current.hoochAmt, top + 0.02, t);
+        this.jar.setLevel(
+          top,
+          this.dough.fillWorldY(this.dough.levelY(this.current.markFill)),
+          this.current.residue,
+          this.current.wet,
+        );
       }
       this.renderer.render(this.scene, this.camera);
       this.raf = requestAnimationFrame(loop);

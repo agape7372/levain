@@ -148,6 +148,8 @@ export const copy = {
   starter: {
     /** 이름이 없을 때 표시 파생 — 저장하지 않는다 (확장기획 §5-3) */
     defaultName: (ordinal: number) => `르방이 ${ordinal}`,
+    /** ‹ 이름 · 2/3 › — 인라인 조립을 여기로 회수 (문구는 copy.ts 한 파일, 규칙 6) */
+    pill: (name: string, index: number, count: number) => `${name} · ${index + 1}/${count}`,
     prev: '이전 르방이',
     next: '다음 르방이',
     add: '새 르방이',
@@ -196,18 +198,29 @@ export const copy = {
     bakeWithIngredient: (ing: string) => `${ing} 1개를 넣어요`,
     ingredientNames: {
       olive: '올리브', choco: '초콜릿', strawberry: '딸기', chestnut: '밤',
+      walnut: '호두', cranberry: '크랜베리', fig: '무화과', rosemary: '로즈마리',
+      cheese: '치즈', cinnamon: '계피', blueberry: '블루베리', pumpkin: '단호박',
     } as Record<string, string>,
     formNames: {
       flesh: '과육', slice: '슬라이스', oil: '오일', brine: '브라인',
       chip: '초코칩', cocoa: '코코아', filling: '초코 필링',
       fresh: '생과', roasted: '구운 과일', freezedried: '동결건조', jam: '잼',
       piece: '구운 조각', flour: '밤가루', puree: '퓌레',
+      dried: '건조', sprig: '생잎', cube: '큐브', crumble: '크럼블',
+      ground: '가루', swirl: '스월', seed: '씨앗',
     } as Record<string, string>,
     /** 변형 표시명 — 같은 재료의 형태끼리 표시가 겹치지 않아야 한다 (과육/슬라이스, 생과/구운) */
     variantName: (ingredientName: string, formName: string, baseName: string) => {
       const formFirst = ['초코칩', '코코아', '초코 필링', '밤가루'];
       if (formFirst.includes(formName)) return `${formName} ${baseName}`;
       switch (formName) {
+        // '가루'는 '구운 조각'과 기본 분기에서 표시가 겹친다 (호두 조각 / 호두 가루 → 둘 다 "호두 ~").
+        // 밤가루 선례와 같은 꼴로 붙여 쓴다 — 호두가루·치즈가루·계피가루
+        case '가루': return `${ingredientName}가루 ${baseName}`;
+        case '건조': return `말린 ${ingredientName} ${baseName}`;
+        case '크럼블': return `${ingredientName} 크럼블 ${baseName}`;
+        case '스월': return `${ingredientName} 스월 ${baseName}`;
+        case '씨앗': return `${ingredientName}씨 ${baseName}`;
         case '잼': return `${ingredientName} 스월 ${baseName}`;
         case '오일': return `${ingredientName}유 ${baseName}`;
         case '슬라이스': return `${ingredientName} 슬라이스 ${baseName}`;

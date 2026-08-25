@@ -1,7 +1,9 @@
 // 반죽 메시 — 상태 uniform + 촉감 상태기(grab 점탄성·젓기 시어장·탭 덴트·슬로싱).
 // RenderParams(순수 매핑 결과)를 받아 uniform·스케일을 구동한다. sim을 모른다.
-// 반유동체 개편(2026-08-24, 오푸스 상담 반영): liquidity 축이 실루엣(회전 초타원체)·
-// 슬로싱(감쇠 진동자)·점성 기억(poke·trail 확산 완화)·grab 릴리즈 시상수를 가른다.
+// 반유동체 개편(2026-08-24): 초타원체 실루엣·감쇠 진동자 슬로싱·점성 기억.
+// 축 개편(2026-08-25): 구 liquidity 1축이 형상과 물성을 동시에 몰던 것을 4축으로 쪼갰다 —
+// levelness(형상) / fluidity(흐름: 슬로싱 ζ·poke 아묾) / cohesion(응집: 실 능선 기억) /
+// elasticity(되돌아옴: poke 스프링·grab ζ). 한 축으로 되돌리지 말 것.
 import * as THREE from 'three';
 import vert from './dough.vert.glsl?raw';
 import frag from './dough.frag.glsl?raw';
@@ -18,7 +20,10 @@ const JAR_RADIUS = 0.92;
 
 const TRAIL_N = 4;
 const TRAIL_SAMPLE_S = 0.04; // 실 능선 샘플 간격
-const TRAIL_DECAY = 0.85;    // amp × e^(-0.85t) ≈ 1.2s 감쇠 — 점성 기억 (0.5s는 고무 문법)
+// 실 능선 감쇠 — 응집(글루텐 망)이 기억을 붙든다. 피크 0.63/s(수명 1.6s) · 갓밥준 0.89/s ·
+// 시큼 1.45/s(0.7s, 글루텐이 끊겨 자국이 안 남는다). 0.5s는 고무 문법이라 하한을 이보다 위에 둔다
+const TRAIL_DECAY_SLACK = 1.45;
+const TRAIL_DECAY_GAIN = 0.85;
 const TRAIL_K0 = 26;         // 실 능선 첨도 — 나이 들수록 퍼진다 (26 → 하한 9)
 const STIR_IDLE_S = 0.08;    // (stir 전용) 마지막 입력 후 이 시간 지나면 '놓음' — grab은 pointerup 기준
 const POKE_K0 = 30;          // 탭 덴트 첨도 — 액체일수록 아물며 퍼진다 (하한 k0/3)
@@ -58,7 +63,7 @@ export class DoughMesh {
   private stirVecVel = new THREE.Vector2();   // 놓은 뒤 damped spring 속도항
   private lastStirInputT = -Infinity;
   private stirDrivesWobble = true;
-  /** 슬로싱 진동자 속도항 — wobble은 감쇠 진동(1.5Hz), ζ는 liquidity가 정한다 */
+  /** 슬로싱 진동자 속도항 — wobble은 감쇠 진동(1.5Hz), ζ는 fluidity가 정한다 */
   private wobbleVel = new THREE.Vector2();
   private wobbleTgt = new THREE.Vector2();
   private trail: Array<{ x: number; z: number; amp: number; bornAt: number }> = [];
@@ -66,6 +71,8 @@ export class DoughMesh {
   private lastTrailT = -Infinity;
   /** 젓는 세기 0~1 — 기포 가속·젖은 광 부스트·사운드 게인의 공통 소스 */
   agitation = 0;
+  /** 개체별 호흡 위상 — 두 르방이 같은 박자로 숨쉬지 않게 한다 (setSeed) */
+  private seedPhase = 0;
 
   // ── grab 상태 — 잡은 지점이 손가락 "변위"를 따라온다 (§4-2-1. stir의 속도 채널과 별개) ──
   /** Motion Lab 전용 오버라이드 — 프로덕션 경로는 비워 둔다 */
@@ -99,7 +106,7 @@ export class DoughMesh {
         uPoreDensity: { value: 0 },
         uKahm: { value: 0 },
         uMold: { value: 0 },
-        uMoldSeed: { value: 0.37 },
+        uSeed: { value: 0.37 },
         uBumpPos: { value: bumpPos },
         uBumpAmp: { value: new Float32Array(8) },
         uBumpK: { value: new Float32Array(8) },
@@ -111,7 +118,14 @@ export class DoughMesh {
         uPokeK: { value: POKE_K0 },
         uStirPos: { value: new THREE.Vector2() },
         uStirVec: { value: new THREE.Vector2() },
-        uLiquid: { value: 0.5 },
+        // 구 uLiquid 분해 (2026-08-25) — uLevel=형상, uFluid=흐름, uCohesion=응집.
+        // 한 축으로 되돌리지 말 것: 갓 밥준 르방은 "평평하지만 되직하다"라 1축으로 표현 불가
+        uLevel: { value: 0.5 },
+        uFluid: { value: 0.3 },
+        uCohesion: { value: 0.6 },
+        // 몸통 적도 반경(오브젝트) = R × wallFill. 프래그 반경 밴드 정규화와 **단일 소스**
+        uRBody: { value: R },
+        uWallCell: { value: new THREE.Vector2(0, 60) }, // x=세기, y=주파수
         uRXZMax: { value: R_XZ_MAX_BASE },
         // 진값은 Y_SCALE·fill/XZ_SCALE ≈ 0.6·fill — 1.0에서 시작해 실기기에서 내리며 튜닝
         // (내리면 frag 범프 첨도 ×1.6 재튜닝 동반 — 오푸스 메모 §2-2b)
@@ -139,19 +153,33 @@ export class DoughMesh {
     u.uCrust.value = p.crust;
     u.uRipe.value = p.ripe;
     u.uCollapse.value = p.collapse;
-    u.uPoreDensity.value = p.bubbleDensity * 0.8;
+    // 윗면 기공도 폼 축으로 통일 — 갓 밥준에도 미세 기공이 있고, 죽은 상태에선 게이트가 닫힌다
+    // (§4-2b가 위임한 "uPoreDensity 다크 포어 재점검" 이행)
+    u.uPoreDensity.value = p.wallCells * 0.6;
     u.uKahm.value = p.kahm;
     u.uMold.value = p.mold;
-    u.uLiquid.value = p.liquidity;
+    u.uLevel.value = p.levelness;
+    u.uFluid.value = p.fluidity;
+    u.uCohesion.value = p.cohesion;
+    u.uRBody.value = R * p.wallFill;
+    (u.uWallCell.value as THREE.Vector2).set(p.wallCells, p.cellFreq);
+    this.bubbles.spawnR = 0.42 * p.wallFill;
     // uWet은 tick에서 agitation 부스트와 합성
   }
 
-  /** 곰팡이 반점 시드 — 개체 정체성(createdAt 해시). 세션 간 자리 고정 */
-  setMoldSeed(seed: number): void {
-    this.material.uniforms.uMoldSeed.value = (Math.abs(seed) % 100000) / 100000 + 0.11;
+  /**
+   * 개체 시드 — createdAt 해시. 세션 간 자리 고정 (파생 가능하므로 저장하지 않는다).
+   * 2026-08-25 일반화: 곰팡이 반점 자리에만 쓰던 것을 **정지 실루엣 FBM 오프셋**과
+   * **호흡 위상**으로 확장했다. 곰팡이는 평생 한 번 볼까 말까라 개체 식별에 기여가 0이었다 —
+   * 이제 르방마다 덩어리 생김새와 숨 타이밍이 다르다. 이름표가 아니라 얼굴이다 (§4-3).
+   */
+  setSeed(seed: number): void {
+    const s = (Math.abs(seed) % 100000) / 100000 + 0.11;
+    this.material.uniforms.uSeed.value = s;
+    this.seedPhase = s * Math.PI * 2;
   }
 
-  /** 탭 눌림(양수)·홀드 부풂(음수) — 오브젝트 공간 XZ. 복귀는 liquidity가 가른다(tick) */
+  /** 탭 눌림(양수)·홀드 부풂(음수) — 오브젝트 공간 XZ. 되튐/아묾은 elasticity가 가른다(tick) */
   pokeAt(x: number, z: number, amp = 0.06): void {
     (this.material.uniforms.uPokePos.value as THREE.Vector2).set(x, z);
     this.pokeAmp = amp;
@@ -222,27 +250,39 @@ export class DoughMesh {
     this.lastStirInputT = this.lastT;
   }
 
-  /** 액체 보정 fill — 초타원 어깨 확장분 상쇄 (fill × (1 − 0.10·liquidity)) */
+  /** 형상 보정 fill — 초타원 어깨 확장분 상쇄 (fill × (1 − 0.10·levelness)) */
   private fillEff(): number {
-    const fill = this.params?.fillY ?? 1;
-    return fill * (1 - 0.1 * (this.params?.liquidity ?? 0.5));
+    return this.levelY(this.params?.fillY ?? 1);
+  }
+
+  /** fill 값 → 형상 보정 배율. topY와 유리 자국(markFill)이 **같은 산수**를 쓰게 하는 단일 소스 */
+  levelY(fill: number): number {
+    return fill * (1 - 0.1 * (this.params?.levelness ?? 0.5));
   }
 
   /** 반죽 꼭대기 월드 y — hooch 층·레이캐스트 평면 배치용. 바닥 고정 피벗 기준 */
   topY(): number {
+    return this.fillWorldY(this.fillEff());
+  }
+
+  /** 보정된 fill 배율 → 월드 y. 유리 자국이 수면과 같은 좌표계를 쓰도록 분리 */
+  fillWorldY(levelled: number): number {
     const h = R * Y_SCALE;
-    return BASE_Y - h + 2 * h * this.fillEff();
+    return BASE_Y - h + 2 * h * levelled;
   }
 
   tick(t: number): void {
     const p = this.params;
-    const liquid = p?.liquidity ?? 0.5;
+    const level = p?.levelness ?? 0.5;
+    const fluid = p?.fluidity ?? 0.3;
+    const ela = p?.elasticity ?? 0.5;
+    const coh = p?.cohesion ?? 0.6;
     const amp = p?.breatheAmp ?? 0.04;
     const period = p?.breathePeriod ?? 3.5;
     const fill = this.fillEff();
-    const breathe = 1 + amp * (0.5 + 0.5 * Math.sin((t * Math.PI * 2) / period));
-    // 병에 갇힌 액체는 폭이 아니라 수위가 숨쉰다 — 숨은 Y 위주, XZ는 액체일수록 고정
-    const bXZ = 1 + (breathe - 1) * (1 - 0.8 * liquid);
+    const breathe = 1 + amp * (0.5 + 0.5 * Math.sin((t * Math.PI * 2) / period + this.seedPhase));
+    // 병에 갇힌 액체는 폭이 아니라 수위가 숨쉰다 — 숨은 Y 위주, XZ는 평평할수록 고정
+    const bXZ = 1 + (breathe - 1) * (1 - 0.8 * level);
     this.mesh.scale.set(XZ_SCALE * bXZ, Y_SCALE * breathe * fill, XZ_SCALE * bXZ);
     // 부풀기는 바닥 고정 — 병 바닥에 앉은 채 위로만 차오른다
     const h = R * Y_SCALE;
@@ -341,7 +381,7 @@ export class DoughMesh {
     const trailPos = u.uTrailPos.value as THREE.Vector2[];
     const trailAmp = u.uTrailAmp.value as Float32Array;
     const trailK = u.uTrailK.value as Float32Array;
-    const decay = Math.exp(-TRAIL_DECAY * dt);
+    const decay = Math.exp(-(TRAIL_DECAY_SLACK - TRAIL_DECAY_GAIN * coh) * dt);
     for (let i = 0; i < TRAIL_N; i++) {
       this.trail[i].amp *= decay;
       const age = Math.max(0, t - this.trail[i].bornAt);
@@ -371,7 +411,9 @@ export class DoughMesh {
     }
     {
       const om = 2 * Math.PI * 1.5;
-      const zeta = 0.55 - 0.45 * liquid;
+      // 흐름 축 구동 — 구 liquidity에선 갓 밥준이 0.82라 ζ 0.18(=물, 5~6회 출렁)이었다.
+      // 되직한 페이스트는 두 번 안쪽에서 멎는다. 시큼(fluidity 0.66)만 여전히 출렁의 무대
+      const zeta = 0.62 - 0.5 * fluid;
       const wax = -om * om * (this.wobble.x - this.wobbleTgt.x) - 2 * zeta * om * this.wobbleVel.x;
       const waz = -om * om * (this.wobble.y - this.wobbleTgt.y) - 2 * zeta * om * this.wobbleVel.y;
       this.wobbleVel.x += wax * dt;
@@ -394,11 +436,13 @@ export class DoughMesh {
       this.pokeAge += dt;
       const a = this.pokeAge;
       const springAmt = this.pokeAmp * Math.exp(-5 * a) * Math.cos(12 * a);
-      const tauR = 0.45 + 1.35 * liquid; // mix(0.45, 1.8, liquidity)
+      // 되직할수록(fluid 낮을수록) 자국이 오래 남는다 — 갓 밥준 τ≈1.33s, 시큼 τ≈0.77s
+      const tauR = 0.35 + 1.25 * (1 - fluid);
       const viscAmt = (this.pokeAmp * Math.exp(-a / tauR)) / (1 + a / 0.9);
-      const amt = springAmt * (1 - liquid) + viscAmt * liquid;
+      // 되튐이냐 아묾이냐를 가르는 건 흐름이 아니라 **탄성**이다 — 기공이 받쳐야 튕긴다
+      const amt = springAmt * ela + viscAmt * (1 - ela);
       u.uPokeAmt.value = Math.abs(amt) < 5e-4 && a > 1.1 ? 0 : amt;
-      u.uPokeK.value = Math.max(POKE_K0 / (1 + (a / 0.9) * liquid), POKE_K0 / 3);
+      u.uPokeK.value = Math.max(POKE_K0 / (1 + (a / 0.9) * (0.35 + 0.65 * fluid)), POKE_K0 / 3);
       if ((u.uPokeAmt.value as number) === 0) this.pokeAge = Infinity;
     } else if ((u.uPokeAmt.value as number) !== 0) {
       u.uPokeAmt.value = 0;

@@ -61,6 +61,33 @@ for (const [key] of KNOBS) {
   if (v !== null && Number.isFinite(Number(v))) overrides.set(key, Number(v));
 }
 
+// ── 시각 축 노브 (2026-08-25 축 개편) — grabTuning(DoughMesh 경로)과 **별도 채널**이다.
+// 이쪽은 RenderParams를 덮어써서 주입한다. §4-2b가 트라이포포비아 판정을 실기기 관찰로
+// 못박았으므로 wallCells·cellFreq 노브는 선택이 아니라 필수 ──
+const VIS_KNOBS = [
+  ['wallCells', '유리벽 기공', 0, 1, 0.02],
+  ['cellFreq', '기공 주파수', 30, 90, 1],
+  ['levelness', '평평함', 0, 1, 0.02],
+  ['fluidity', '흐름', 0, 1, 0.02],
+  ['cohesion', '응집', 0, 1, 0.02],
+  ['wallFill', '유리 접촉', 1, 1.15, 0.005],
+  ['residue', '유리 자국', 0, 1, 0.02],
+] as const;
+type VisKey = (typeof VIS_KNOBS)[number][0];
+const visOverrides = new Map<VisKey, number>();
+for (const [key] of VIS_KNOBS) {
+  const v = params.get(key);
+  if (v !== null && Number.isFinite(Number(v))) visOverrides.set(key, Number(v));
+}
+// 스크린샷 자동화(scripts/motionlab-shot.mjs) — UI 숨김 + 렌더 후 window.__done
+const shotMode = params.get('shot') === '1';
+declare global {
+  interface Window {
+    __done?: boolean;
+    __error?: string;
+  }
+}
+
 // ── 씬 — 프로덕션 그대로 ──
 const scene = new SceneHost(canvas, stage);
 scene.mount();
@@ -74,7 +101,11 @@ function currentTuning(): Record<string, number> {
 }
 
 function applyState(): void {
-  scene.snapParams(toRenderParams(PRESETS[preset].snap));
+  const mapped = toRenderParams(PRESETS[preset].snap);
+  // 시각 축은 매핑 결과를 덮어써서 주입 — 프리셋 물성은 그대로 두고 한 축만 흔들어 볼 수 있다
+  const vis: Record<string, number> = {};
+  for (const [key, v] of visOverrides) vis[key] = v;
+  scene.snapParams({ ...mapped, ...vis });
   dough.grabTuning = currentTuning();
   syncUrl();
   renderPresetButtons();
@@ -85,6 +116,8 @@ function syncUrl(): void {
   const q = new URLSearchParams();
   q.set('preset', preset);
   for (const [key, v] of overrides) q.set(key, String(v));
+  for (const [key, v] of visOverrides) q.set(key, String(v));
+  if (shotMode) q.set('shot', '1');
   history.replaceState(null, '', `?${q.toString()}`);
 }
 
@@ -139,6 +172,33 @@ function renderSliders(): void {
     row.append(name, input, out);
     slidersEl.appendChild(row);
   }
+  // 시각 축 — 같은 패널 아래쪽. 값을 바꾸면 스냅으로 즉시 반영(보간 대기 없음)
+  for (const [key, label, min, max, step] of VIS_KNOBS) {
+    const row = document.createElement('div');
+    row.className = 'row';
+    const name = document.createElement('span');
+    name.textContent = label;
+    const input = document.createElement('input');
+    input.type = 'range';
+    input.min = String(min);
+    input.max = String(max);
+    input.step = String(step);
+    const cur = visOverrides.get(key) ?? (mapped[key] as number);
+    input.value = String(cur);
+    const out = document.createElement('output');
+    out.textContent = cur.toFixed(2);
+    input.addEventListener('input', () => {
+      const v = Number(input.value);
+      visOverrides.set(key, v);
+      out.textContent = v.toFixed(2);
+      const next: Record<string, number> = {};
+      for (const [k, vv] of visOverrides) next[k] = vv;
+      scene.snapParams({ ...toRenderParams(PRESETS[preset].snap), ...next });
+      syncUrl();
+    });
+    row.append(name, input, out);
+    slidersEl.appendChild(row);
+  }
 }
 
 document.getElementById('copyUrl')!.addEventListener('click', () => {
@@ -153,6 +213,19 @@ document.getElementById('reset')!.addEventListener('click', () => {
 
 applyState();
 scene.start();
+
+if (shotMode) {
+  // 패널·계기판을 숨기고 몇 프레임 굴린 뒤 신호 — 셰이더 컴파일 실패는 콘솔로 새어나가므로
+  // 촬영 스크립트가 page.on('console')로 함께 받는다
+  document.getElementById('panel')?.setAttribute('style', 'display:none');
+  document.getElementById('hud')?.setAttribute('style', 'display:none');
+  let n = 0;
+  const wait = (): void => {
+    if (++n < 20) requestAnimationFrame(wait);
+    else window.__done = true;
+  };
+  requestAnimationFrame(wait);
+}
 
 // ── 계기판 — grab 상태·FPS ──
 const hud = document.getElementById('hud')!;

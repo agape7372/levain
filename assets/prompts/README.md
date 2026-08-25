@@ -1,4 +1,21 @@
-# 빵 이미지 생성 프롬프트 (v2)
+# 이미지 생성 프롬프트
+
+두 갈래다. **빵**(아래 v2 절차)과 **재료**(`ingredients/`, 2026-08-25 신설).
+
+| | 빵 | 재료 |
+|---|---|---|
+| 프롬프트 | `breads/<id>.json` | `ingredients/<id>.json` |
+| 스타일 | `style-shared.json` (shared-style-v2) | `ingredients/style-shared-ingredient-v1.json` |
+| 일괄 시트 | `GROK_PASTE.md` | `INGREDIENTS_PASTE.md` |
+| 이미지 저장 | `assets/breads/src/` | `assets/ingredients/src/` |
+| 개수 | 10종 + 변형 11종 | 12종 (재료당 대표 형태 1개) |
+
+두 갈래의 **기술 레일(배경 페일 세이지·matte·그림자 금지·단일 오브젝트·1:1 1024·같은 채팅 3뷰)은
+문자 단위로 동일**하다. 재료 쪽만 오브젝트 채도를 완화했다(사용자 지시 2026-08-25) — 광택은 여전히 금지.
+
+---
+
+## 빵 이미지 생성 프롬프트 (v2)
 
 1. `breads/<id>.json`의 `prompt_flat`을 이미지 생성기(Grok 등)에 복붙해 **1:1 1024** 이미지를 생성한다.
    비율·크기는 프롬프트가 아니라 생성기 UI에서 설정.
@@ -38,3 +55,29 @@
 | `scone--strawberry-fresh` | 딸기 스콘 | scone | 딸기 과육 청크, 생크림·클로티드 크림 없음 |
 | `campagne--strawberry-jam` | 딸기 스월 깜빠뉴 | campagne | 웨지 컷어웨이 단면에 딸기 잼 스월 |
 | `campagne--chestnut-roasted` | 밤 깜빠뉴 | campagne | 웨지 컷어웨이 단면에 구운 밤 조각 혼입 |
+
+---
+
+## 재료 목록 (12종, `ingredients/`)
+
+재료당 JSON 1개 = **대표 형태 하나만**. 형태(과육/오일/가루…)는 호환성 데이터의 축이지 아이콘의
+축이 아니다 — 형태마다 자산을 만들면 개수가 3배가 되고 도감에서 서로 구분도 안 된다.
+
+| id | name_ko | 대표 형태 | 그리는 것 |
+|---|---|---|---|
+| `olive` | 올리브 | flesh | 통 올리브 3알 (짙은 가지-검정) |
+| `choco` | 초콜릿 | chip | 초코칩 무더기 5~7개 |
+| `strawberry` | 딸기 | fresh | 꼭지 달린 딸기 1알 |
+| `chestnut` | 밤 | piece | 구운 밤 1알 (가시 껍질 없음) |
+| `walnut` | 호두 | piece | 호두 알맹이 반쪽 (껍질 아님) |
+| `cranberry` | 크랜베리 | dried | 말린 크랜베리 무더기 |
+| `fig` | 무화과 | fresh | 세로로 반 가른 단면 정면 |
+| `rosemary` | 로즈마리 | sprig | 가지 **하나** (묶음 금지) |
+| `cheese` | 치즈 | cube | 고다 큐브 3개 (녹는 장면 금지) |
+| `cinnamon` | 계피 | ground | 스틱 2개 + 가루 무더기 |
+| `blueberry` | 블루베리 | fresh | 3알, 앞 알에 꼭대기 왕관 |
+| `pumpkin` | 단호박 | roasted | 납작한 단호박, 쐐기 하나 잘림 |
+
+각 JSON의 `notes_ko`에 **왜 그 형태·그 negative인지**가 적혀 있다. 생성 결과가 어긋나면 거기부터 읽는다.
+공통 실패 패턴: 올리브→치즈·토마토 토핑 / 초콜릿→녹은 드리즐 / 딸기→크림 / 밤→가시 껍질 /
+로즈마리→묶음 / 치즈→피자 늘어짐 / **단호박→잭오랜턴 얼굴**(무캐릭터 규칙 위반).

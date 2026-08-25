@@ -28,6 +28,8 @@ export class BubbleSystem {
 
   private bubbles: Bubble[] = [];
   private nextSpawnAt = 0;
+  /** 스폰 반경(오브젝트) — 몸통이 유리까지 확장되면 함께 커진다(윗면 점유율 보존). DoughMesh가 설정 */
+  spawnR = 0.42;
 
   constructor() {
     for (let i = 0; i < DYN_SLOTS; i++) {
@@ -40,7 +42,7 @@ export class BubbleSystem {
     const slot = this.bubbles.findIndex((b) => !b.active);
     if (slot < 0) return;
     const b = this.bubbles[slot];
-    const r = Math.sqrt(Math.random()) * 0.42;
+    const r = Math.sqrt(Math.random()) * this.spawnR;
     const th = Math.random() * Math.PI * 2;
     b.active = true;
     b.x = Math.cos(th) * r;

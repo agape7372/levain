@@ -8,6 +8,7 @@ import {
 import { createGameStore, newEnvelope } from '../src/store/gameStore';
 import type { StorageAdapter } from '../src/platform/storage';
 import type { GameStore } from '../src/store/gameStore';
+import { copy } from '../src/ui/copy';
 
 const T0 = 1_700_000_000_000;
 
@@ -34,21 +35,34 @@ function matureStore(): GameStore {
 }
 
 describe('카탈로그 무결성 (§18 전사 — 재구성 검증)', () => {
-  it('총 46행, blocked는 정확히 크래커×초코칩 1건', () => {
-    expect(COMPATIBILITY.length).toBe(46);
+  it('총 89행, blocked는 정확히 크래커×초코칩 1건', () => {
+    expect(COMPATIBILITY.length).toBe(89);
     const blocked = COMPATIBILITY.filter((r) => r.status === 'blocked');
     expect(blocked).toEqual([
       expect.objectContaining({ baseRecipeId: 'cracker', ingredientId: 'choco', form: 'chip' }),
     ]);
   });
 
-  it('집계 — 재구성 편차 문서화: verified 27 / conditional 13 / experimental 5', () => {
+  it('집계 체크섬: verified 45 / conditional 27 / experimental 16 / blocked 1', () => {
     const count = (s: string): number => COMPATIBILITY.filter((r) => r.status === s).length;
-    // 기획서 §18 요약은 24/16/5/1 — §18-3 명시 목록 우선 원칙으로 27/13이 됐다
-    // (implementation-notes 2026-08-24). 이 테스트는 회귀 감지용 체크섬.
-    expect(count('verified')).toBe(27);
-    expect(count('conditional')).toBe(13);
-    expect(count('experimental')).toBe(5);
+    // §18 재구성 46행(27/13/5/1) + 확장 8종 조사 43행(18/14/11/0) = 89행.
+    // 회귀 감지용 체크섬 — 행을 늘리면 여기도 같이 올린다.
+    expect(count('verified')).toBe(45);
+    expect(count('conditional')).toBe(27);
+    expect(count('experimental')).toBe(16);
+    expect(count('blocked')).toBe(1);
+  });
+
+  it('URL sourceRef를 단 행은 verified/conditional뿐이고, 그 역도 성립한다(확장 8종)', () => {
+    // 조사 계약: **연 페이지의 URL이 없으면 verified/conditional 금지**. 개수를 채우려고
+    // 등급을 올리는 걸 구조적으로 막는다. §18 재구성분은 절 번호 참조라 이 검사에서 제외
+    const expanded = COMPATIBILITY.filter((r) => !r.sourceRef.startsWith('§'));
+    expect(expanded.length).toBe(43);
+    for (const r of expanded) {
+      const hasUrl = r.sourceRef.startsWith('https://');
+      expect(hasUrl, `${variantIdOf(r)} — ${r.status} / ${r.sourceRef}`)
+        .toBe(r.status === 'verified' || r.status === 'conditional');
+    }
   });
 
   it('모든 행이 실존 레시피·재료·형태를 가리킨다', () => {
@@ -61,10 +75,35 @@ describe('카탈로그 무결성 (§18 전사 — 재구성 검증)', () => {
     }
   });
 
-  it('중복 행 없음 + v1 노출 = verified+conditional = 40', () => {
+  it('중복 행 없음', () => {
     const ids = COMPATIBILITY.map(variantIdOf);
     expect(new Set(ids).size).toBe(ids.length);
-    expect(playableRules().length).toBe(40);
+  });
+
+  it('모든 재료가 최소 1개 놀 수 있는 조합을 갖는다 (도감에 죽은 재료 0)', () => {
+    // 재료를 늘리면서 호환 행을 안 붙이면 "가졌는데 아무 데도 못 쓰는 재료"가 생긴다.
+    // 재료는 순수 컬렉팅 축이지만, 수집한 게 아무것도 안 여는 건 다른 문제다
+    const playableIngredients = new Set(playableRules().map((r) => r.ingredientId));
+    for (const ing of INGREDIENTS) {
+      expect(playableIngredients.has(ing.id), ing.id).toBe(true);
+    }
+  });
+
+  it('표시명이 전 조합에서 유일하다 — 형태가 다른데 같은 이름이면 고를 수가 없다', () => {
+    // formNames는 재료 무관 플랫 맵이고 variantName은 한글 라벨로 분기한다 —
+    // 형태 id를 늘릴 때 조용히 겹칠 수 있는 구조라 전수로 잡는다 (예: 호두 조각 vs 호두 가루)
+    const seen = new Map<string, string>();
+    for (const rule of COMPATIBILITY) {
+      const ingName = copy.recipes.ingredientNames[rule.ingredientId];
+      const formName = copy.recipes.formNames[rule.form];
+      expect(ingName, `ingredientNames.${rule.ingredientId}`).toBeTruthy();
+      expect(formName, `formNames.${rule.form}`).toBeTruthy();
+      const baseName = copy.recipes.names[rule.baseRecipeId];
+      const label = copy.recipes.variantName(ingName, formName, baseName);
+      const prev = seen.get(label);
+      expect(prev, `표시명 충돌: "${label}" ← ${prev} / ${variantIdOf(rule)}`).toBeUndefined();
+      seen.set(label, variantIdOf(rule));
+    }
   });
 });
 

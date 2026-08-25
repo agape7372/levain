@@ -175,16 +175,21 @@ describe('§16 수용 기준 — 광고 0으로 전 변형 도달', () => {
     for (const r of RECIPES) expect(r.stage).toBeLessThanOrEqual(5);
   });
 
-  it('무료 경로만으로 변형 40종 전부 해금된다', () => {
+  it('무료 경로만으로 변형 72종 전부 해금된다', () => {
     const { store, clock } = matureStore();
     store.claimStarterGift('olive');
 
     const targets = playableRules().map((r) => variantIdOf(r));
-    expect(targets.length).toBe(40);
+    // 재료 12종 확장(2026-08-25)으로 40 → 72. 이 수치 자체가 아니라 **아래 루프가 상한 안에서
+    // 끝나는지**가 수용 기준이다 — 광고 0으로 전 변형에 도달 가능해야 한다
+    expect(targets.length).toBe(72);
     const remaining = (): string[] => targets.filter((v) => store.getCollection()[v] === undefined);
 
     let feeds = 0;
-    const MAX_FEEDS = 400; // 하루 2회면 200일 — 이 상한에 닿으면 설계가 틀린 것
+    // 실측 521회(재료 12종·변형 72종, 2026-08-25). 하루 2회면 약 260일 —
+    // 느린 동거가 컨셉이라 길이 자체는 문제가 아니고, **닿는가**가 수용 기준이다.
+    // 상한은 실측의 약 1.3배 — 여기 닿으면 무료 경로가 실제로 막힌 것이다
+    const MAX_FEEDS = 700;
     while (remaining().length > 0 && feeds < MAX_FEEDS) {
       clock.advance(6 * HOUR);
       store.dispatch({ type: 'feed', ratio: '1:5:5' }); // mass 440 회복 + discard 쿨다운 해제
