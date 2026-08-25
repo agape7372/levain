@@ -73,10 +73,15 @@ interface OliveDef {
 
 // assets/ingredients/work/olive/object-sculpt-spec.json OLIVES 전사.
 // olive-a = "one tilted to show its blunt end" (geometry.silhouette, olive.json).
+// 1회 수정(advisor 리뷰 반영, 오실레이션 아님): 최초 오프셋은 레퍼런스의 밀착된 무더기보다
+// 넓게 퍼져 있었다(cmp-sheet.png 자기 리뷰에서 지적) — 절반으로 좁혀 서로 닿게 했다.
+// tiltZ도 0.32->0.5로 올렸다 — tilted-blunt-end-cue 피처 리뷰가 0.55점(important 기준 0.65 미달).
 const OLIVES: Record<'a' | 'b' | 'c', OliveDef> = {
-  a: { offset: [-0.62, 0.3], yaw: -0.55, tiltZ: 0.32, tilted: true },
-  b: { offset: [0.6, 0.22], yaw: 0.3, tiltZ: 0.0, tilted: false },
-  c: { offset: [0.02, -0.55], yaw: 1.55, tiltZ: 0.0, tilted: false },
+  a: { offset: [-0.33, 0.18], yaw: -0.55, tiltZ: 0.5, tilted: true },
+  b: { offset: [0.33, 0.15], yaw: 0.3, tiltZ: 0.0, tilted: false },
+  // c의 Z만 -0.30 -> -0.45로 되돌림: -0.30은 a/b 사이 정중앙 뒤라 고정 카메라에서 거의 완전히
+  // 가려졌다(R1 "서로 가리지 않게" 위반, roundtrip.png 실측). 원래 -0.55보다는 여전히 좁혔다.
+  c: { offset: [0.0, -0.45], yaw: 1.55, tiltZ: 0.0, tilted: false },
 };
 
 /**

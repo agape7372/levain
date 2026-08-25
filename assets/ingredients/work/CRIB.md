@@ -4,8 +4,12 @@
 계약 정본 = `scripts/ingredients/types.ts` 주석 전체(먼저 정독). 절차 정본 = `docs/INGREDIENTS.md`.
 빵 선례 = `assets/breads/work/CRIB.md` — **거기 있는 함정은 전부 그대로 유효하다.** 이 문서는 차이분만 담는다.
 
-**파일럿 완료 (2026-08-26)**: `olive` — 432tri · 43KB · mesh 2 · roundtrip 통과 · cmp 3회(상한 준수).
+**파일럿 완료 (2026-08-26, 2회차 — 스킬 6패스 풀 루프까지 완주 후 갱신)**: `olive` — 432tri · 42.6KB ·
+mesh 2 · roundtrip 통과 · cmp 3회(상한 준수) + 스킬 내부 6패스 게이트 전량 통과.
 군집군 목표(300~700tri/≤68KB) 정중앙. 선례 코드 = `scripts/ingredients/olive.ts`(머리 주석 포함).
+★1회차는 cmp-3/roundtrip까지만 하고 스킬의 내부 6패스 루프(`next.py` form-refinement 이후)를
+안 밟았다 — 밟아보니 하드 게이트 2종이 숨어 있었다(아래 "스킬 파이프라인 실측 함정" 참조).
+다음 재료 위임 때는 **6패스를 끝까지 밟을 것을 전제**로 일정을 잡아라.
 
 ## 절차 (재료 1종당)
 
@@ -106,6 +110,46 @@ stdout `stats {json}`의 tri/kb/mesh로 판정. 어긋나면 **스펙 먼저, �
 - **비대칭 테이퍼를 프로필로 표현한다.** 올리브는 뭉툭한 끝이 완만하고 꼭지 끝이 급하게 좁아진다 —
   반지름비를 대칭으로 두면 그냥 타원이 되어 정체성이 죽는다. 프로필 `t`는 여전히 **단조** 유지.
 - **캡/패치 마스크는 양쪽 극점에 안 닿아야 한다.** 끝까지 번지면 "패치"가 아니라 "투톤 알"이 된다.
-  올리브는 로컬 Y 상단 + 로컬 X 중간 밴드(`[-0.5, 0.42]`)로 한정했다.
+- ★**좌표 임계값(로컬 Y > k·R) 마스크는 실패한다 — (링, 섹터) 격자 인덱스가 정본이다.**
+  카메라가 위에서 내려다보는 3/4 뷰라 "위를 향한 면"이 시야의 절반 가까이라, k를 0.1→0.55로
+  올려도(원주 점유율 47%→31%) 늘 보이는 중심부는 그대로 남아 렌더가 거의 안 바뀐다(cmp-1과
+  cmp-2가 거의 동일했다 — 렌더가 안 바뀌면 먼저 로직을, 그다음 캐싱을 의심하되 **바이트 비교로
+  실제 변화 여부부터 확인**하라. `a.equals(b)`로 cmp PNG를 직접 diff해서 캐싱이 아님을 확인한 뒤에야
+  진짜 원인 — 코드는 맞았는데 좌표 임계값 방식 자체가 "패치"를 못 만든다는 것 — 을 찾았다).
+  정본 대체: `buildRevolvedShell`이 돌려주는 `ringStart`로 **링 인덱스 1개 + 섹터 half-width 0**
+  (segments=12면 30도 폭)를 직접 지정한다. `splitTrianglesByVertexMask`는 OR-of-3-vertices라
+  링 N개를 마킹하면 삼각형 밴드 N+1개가 함께 걸린다 — 링 1개가 이 메커니즘의 최소 단위다.
 - **64px 판독은 별도로 렌더해서 본다** — `roundtrip-64.png`처럼 축소본을 따로 남기는 게 파일럿 방식이다.
   숫자 예산을 다 통과하고도 얼룩으로 읽히는지는 축소해 봐야 안다.
+
+## 스킬 파이프라인 실측 함정 (2회차 — form-refinement 이후 6패스 풀 루프)
+
+- ★**`form-refinement`부터 `optimization-pass`를 뺀 모든 패스가 VISUAL_PASS_IDS다.** `orchestrate_passes.py`의
+  `check_pass`는 **아직 완료 안 된 현재 패스**에 한해 `tier1Results`에 `passed:true`가 있어야 통과시킨다
+  (`has_passing_tier1_result`). AI 렌더(사진 아님) 레퍼런스는 `align_pair.py`로 정렬해도 원근 차이 때문에
+  실루엣 IoU 0.85 하드 임계에 구조적으로 못 미칠 수 있다(올리브는 최선으로 0.664) — **이건 pancake도
+  마찬가지였다**(`tier1Results` 단일 항목, `passed:false`, 그런데도 6패스 완주). 실제로 패스를 미는 건
+  tier1이 아니라 **`append_review.py`의 feature-score 게이트**다(아래 항목).
+- ★**진짜 게이트는 `append_review.py`의 important/critical 피처 평균 점수다, tier1 IoU가 아니다.**
+  `--feature-reviews-json`에서 그 패스에 `passIds`가 걸린 피처들의 평균이 important는 0.65, critical
+  mustPass는 0.8 밑이면 `ValueError`로 거부된다(트레이스백, exit 1). tier1 IoU가 낮아도 이 게이트만
+  넘으면 `orchestrate_passes.py check`가 진짜 PASS를 낸다(completed 카운트 증가) — pancake이 tier1
+  `passed:false`로도 6패스를 끝낸 이유가 이거였다. **명령 출력을 `/dev/null`로 죽이지 마라** —
+  이 실패를 한 번 통째로 놓쳐서 "리뷰가 기록됐다"고 잘못 마크했다가 나중에 `reviewHistory` 개수를
+  세어보고서야 들켰다. append 직후 `len(spec['reviewHistory'])`로 실제 반영을 확인하는 습관을 들여라.
+- **`state.py`(로컬 진행 체크리스트) 마크 순서는 실제 순서와 다르다** — `pass-gate-check`를
+  `ai-review-recorded`보다 **먼저** 마크해야 한다(체크리스트 배열 순서 그대로). 반대로 하면
+  "out-of-order" 에러가 나고, 그 상태에서 다음 패스로 넘어가면 로컬 트래커가 `ai-review-recorded`를
+  되돌려 다시 요구한다 — 실제 스킬 게이트(`orchestrate_passes.py`)와는 무관한 이 도구만의 버릇이다.
+- **author_spec.py의 `PIPELINE_OWNED`에 `tier1Results`를 반드시 넣어라.** 스펙 최상위 키(스킬 자체가
+  `sculptPipeline` 밑이 아니라 최상위에 쓴다)라, 여기 빠뜨리면 스펙 재생성마다 tier1 이력이 통째로
+  날아간다(`reviewHistory`·`sculptPipeline`만 이월하고 있었다가 실측 도중 발견).
+- **배치(오프셋)를 되돌아볼 근거는 자기 리뷰 자체다.** cmp-sheet 자기 리뷰에서 "배치가 레퍼런스보다
+  넓게 퍼졌다"고 스스로 mismatch에 적어놓고도 지오메트리를 안 고치면, 나중에 그 문장이 그대로
+  `important` 피처 게이트 미달(0.55 < 0.65)로 되돌아온다 — mismatch 기록은 그 자리에서 고치라는
+  신호다. 단 오프셋 조정은 advisor 리뷰를 거쳐 **1회로 못 박아라**(Divine Eye 캐빗이 금지하는
+  오실레이션 방지) — 그리고 조정 후 반드시 재렌더해서 **다른 인스턴스를 안 가리는지** 확인할 것
+  (올리브는 좁히자마자 뒤쪽 알 하나가 고정 카메라에서 거의 사라져서 Z만 한 번 더 미세조정했다).
+- 상세 사례는 `assets/ingredients/work/olive/object-sculpt-spec.json`의 `reviewHistory`(4개 항목,
+  각 패스의 mismatches/matched)와 `risks`(shaded-underside-hue-dropped, pit-cavity-dropped 등)에
+  전부 기록돼 있다 — 다음 재료 스펙 작성 시 같은 문서화 밀도를 유지할 것.
