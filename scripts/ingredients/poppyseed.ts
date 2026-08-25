@@ -54,10 +54,21 @@ function buildSeed(rng: () => number, radius: number): { bodyGeo: THREE.BufferGe
 }
 
 // 더미 — 낮고 넓은 힙(단일 버킷, BODY_COLOR). poppyseed.png 실측: 폭 대비 높이가 낮은 렌즈꼴.
+//
+// ★v2 (2026-08-26, 64px 판독 실패 수정): 더미를 줄이고 낱알을 키워 **비율을 뒤집었다.**
+//
+// v1은 더미 반지름 0.78 vs 낱알 0.09~0.17 — 더미가 낱알의 **5~9배**였다. 그 결과 64px에서
+// 더미가 화면을 지배하고 낱알은 꼬리처럼 붙어, "양귀비씨 무더기"가 아니라 **"검은 돌 하나"**로 읽혔다
+// (판독 검사: "딱정벌레 등껍질"). 다운샘플 전 512px 원본에서 이미 그랬다 — 해상도 문제가 아니라
+// 구도 문제였다.
+//
+// ★CRIB의 "부품 길이 : 더미 반지름 비율" 함정(coconut)과 **같은 축의 반대 방향**이다:
+// coconut은 부품이 더미보다 커서 성게 가시가 됐고, 여기는 부품이 너무 작아 더미에 먹혔다.
+// 어느 쪽이든 **둘의 비율**이 판독을 정한다.
 const MOUND_SEGMENTS = 14;
-const MOUND_RADIUS = 0.78;
-const MOUND_HALF_HEIGHT = 0.26;
-const MOUND_JITTER_AMP = 0.03;
+const MOUND_RADIUS = 0.52; // 0.78 → 낱알 대비 지배력을 낮춘다
+const MOUND_HALF_HEIGHT = 0.19; // 렌즈꼴 비율(높이/반지름 ≈ 0.33)은 유지
+const MOUND_JITTER_AMP = 0.024; // 반지름을 줄인 만큼 같이 (명도 침식 방지 — CRIB 실측)
 const MOUND_PROFILE: readonly ProfilePoint[] = [
   [0.85, -1.0],
   [1.0, -0.5],
@@ -91,10 +102,14 @@ interface SeedDef {
   radius: number;
 }
 // poppyseed.png 실측: 앞쪽 3알이 좌->우로 크기가 점증(소/중/대) — 단순 반복이 아닌 시각적 리듬.
+//
+// ★v2: 낱알을 키우고(0.09~0.17 → 0.20~0.30) 좌우로 더 벌렸다. 더미를 줄인 것과 짝이다 —
+// 이제 낱알이 더미의 **0.38~0.58배**라 "무더기 옆의 낱알들"로 읽힌다(v1은 0.12~0.22배로 부속물이었다).
+// 크기 점증 리듬은 유지하되 폭을 키워 셋이 서로 안 겹치게 했다(네거티브 스페이스 = 경계).
 const SEEDS: Record<'a' | 'b' | 'c', SeedDef> = {
-  a: { offset: [-0.62, 0.66], radius: 0.09 },
-  b: { offset: [-0.08, 0.72], radius: 0.13 },
-  c: { offset: [0.5, 0.68], radius: 0.17 },
+  a: { offset: [-0.78, 0.62], radius: 0.20 },
+  b: { offset: [-0.05, 0.74], radius: 0.25 },
+  c: { offset: [0.72, 0.6], radius: 0.30 },
 };
 
 export const createPoppyseed: IngredientBuilder = (rng) => {

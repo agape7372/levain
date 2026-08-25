@@ -31,6 +31,7 @@ import { createYuzu } from './yuzu';
 import { createHoney } from './honey';
 import { createMaple } from './maple';
 import { createPistachio } from './pistachio';
+import { createBlackgarlic } from './blackgarlic';
 
 export const INGREDIENT_BUILDERS: Record<string, IngredientBuilder> = {
   olive: createOlive,

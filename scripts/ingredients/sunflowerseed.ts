@@ -94,10 +94,28 @@ interface KernelDef {
 }
 // sunflowerseed.png/-2/-3 실측: 3알이 바짝 붙어 서로 다른 각도로 겹쳐 놓인다 — 올리브 클러스터
 // 패턴(offset/yaw/tiltZ 다양화)을 그대로 재사용하되 간격을 더 좁혀 "꽉 찬 덩어리" 인상을 준다.
+//
+// ★v2 (2026-08-26, 64px 판독 실패 수정): `flipBuckets`로 낱알별 명암을 교대시킨다.
+//
+// v1은 3알이 **전부 같은 배색**(몸통 어두움 + 같은 자리 줄무늬)이라 64px에서 낱알 경계가 사라지고
+// 하나의 하트 실루엣으로 뭉쳤다. `flaxseed`가 거의 같은 "1+n 겹침" 구성인데 통과한 이유는
+// 낱알 사이에 **명도 대비**가 있어 틈새(네거티브 스페이스)가 살아 있었기 때문이다 — 판독 검사가
+// 그 A/B를 그대로 짚었다.
+//
+// 머티리얼은 여전히 2개다(상한). **색을 늘리는 게 아니라 두 버킷의 배정을 낱알마다 뒤집는다** —
+// a·c는 어두운 몸통 + 밝은 줄무늬, b는 밝은 몸통 + 어두운 줄무늬. 인접한 알끼리 명도가 갈려
+// 경계가 스스로 드러난다. tri 0 증가.
+interface KernelDef {
+  offset: readonly [number, number];
+  yaw: number;
+  tiltZ: number;
+  /** true면 몸통·줄무늬 색을 서로 바꿔 이웃 알과 명도를 갈라 놓는다 */
+  flipBuckets: boolean;
+}
 const KERNELS: Record<'a' | 'b' | 'c', KernelDef> = {
-  a: { offset: [-0.42, 0.12], yaw: -0.4, tiltZ: 0.0 },
-  b: { offset: [0.42, 0.1], yaw: 0.45, tiltZ: 0.0 },
-  c: { offset: [0.0, -0.4], yaw: 1.6, tiltZ: 0.12 },
+  a: { offset: [-0.42, 0.12], yaw: -0.4, tiltZ: 0.0, flipBuckets: false },
+  b: { offset: [0.42, 0.1], yaw: 0.45, tiltZ: 0.0, flipBuckets: true },
+  c: { offset: [0.0, -0.4], yaw: 1.6, tiltZ: 0.12, flipBuckets: false },
 };
 
 export const createSunflowerseed: IngredientBuilder = (rng) => {
@@ -110,8 +128,9 @@ export const createSunflowerseed: IngredientBuilder = (rng) => {
     const def = KERNELS[key];
     const { bodyGeo, stripeGeo } = buildKernel(rng);
     const kernel = new THREE.Group();
-    kernel.add(new THREE.Mesh(bodyGeo, bodyMat));
-    kernel.add(new THREE.Mesh(stripeGeo, stripeMat));
+    // 배정만 뒤집는다 — 머티리얼 인스턴스는 둘 그대로라 mergeByMaterial의 ≤2 계약이 유지된다
+    kernel.add(new THREE.Mesh(bodyGeo, def.flipBuckets ? stripeMat : bodyMat));
+    kernel.add(new THREE.Mesh(stripeGeo, def.flipBuckets ? bodyMat : stripeMat));
     cluster.add(placeAndGround(kernel, def.offset, def.yaw, def.tiltZ));
   });
 
