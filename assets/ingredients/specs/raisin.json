@@ -1,0 +1,1753 @@
+{
+  "targetName": "Raisin Pile",
+  "targetId": "raisin-pile",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\raisin.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved; fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "small loose pile of three wrinkled raisins",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "repeated instances",
+        "discrete resting cluster"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading. Identity carried entirely by silhouette (full-length fluted cross-section) -- mesh=1, single color bucket (crease-shadow/ridge-highlight hues dropped, geometry+facet-normal shading covers them, olive/cranberry precedent)."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 1,
+        "materialLayerCount": 0,
+        "localDetailDensity": 1,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 3,
+        "mesoComponents": 0,
+        "microFeatureGroups": 0,
+        "materialLayers": 1,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Three near-identical macro bodies differing only in XZ offset/yaw/tiltZ, so componentCount scores 1.",
+        "Silhouette scores 2: the full-length flute is a load-bearing silhouette feature (not just a color patch), stronger than a plain smooth taper.",
+        "materialLayerCount 0: single color bucket suffices -- crease-shadow and ridge-highlight hues both dropped to facet-normal shading.",
+        "5 raisins in the prompt reduced to 3 instances -- CRIB 64px readability gate (cranberry v4 precedent: tight small clusters over 3 instances blur into a color blob at thumbnail scale)."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": false,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier, macro-only, one repetition system for the 3-instance pile."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 2,
+      "note": "Enumerated by hand from the three reference views (CRIB.md skip rule for single-repeated-system objects).",
+      "details": [
+        {
+          "id": "full-length-flute",
+          "zone": "entire body, all rings except poles",
+          "observation": "Deep alternating ridge/valley wrinkles run the raisin's full length, not localized to one groove.",
+          "inference": "Defining dried-fruit identity cue; must be strong enough to differ from the smooth-taper olive in the same batch.",
+          "confidence": 0.9,
+          "evidenceRef": "raisin.png full frame",
+          "kind": "ridge",
+          "mapsTo": {
+            "ref": "raisin-a-full-length-flute",
+            "note": ""
+          }
+        },
+        {
+          "id": "oblong-silhouette",
+          "zone": "per-raisin silhouette",
+          "observation": "Body reads oblong (length:width ~1.44:1), plumper than the flattened cranberry, less round than blueberry.",
+          "inference": "Distinguishes from the batch's other small-fruit clusters.",
+          "confidence": 0.85,
+          "evidenceRef": "raisin-2.png front elevation",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "raisin-a-oblong-silhouette",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/rosemary.png"
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 0,
+      "microFeatureGroups": 0,
+      "materialLayers": 1,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 3
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "three raisins in a loose triangular mound",
+      "full-length fluted wrinkle on every raisin, not a localized groove",
+      "one raisin tilted to show its wrinkled end",
+      "readable as wrinkled dried fruit (not smooth like olive) at 64px"
+    ],
+    "niceToHave": [
+      "exact flute-sector count/position"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "three-raisin-mound-silhouette",
+      "name": "Three-raisin mound, all individually readable",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "raisin-a",
+        "raisin-b",
+        "raisin-c"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "full-length-flute-readable",
+      "name": "Full-length fluted wrinkle reads at 64px",
+      "tier": "critical",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": true,
+      "componentRefs": [
+        "raisin-a",
+        "raisin-b",
+        "raisin-c"
+      ],
+      "evidenceRefs": [
+        "view-front",
+        "view-top"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color; PBR maps are inert."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer harness.",
+      "mustAvoid": [
+        "authoring lights into the model"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The runtime normalizes the cluster's longest axis to 1.6.",
+    "3 instances (not the prompt's 5) is not identity-critical at pixel precision; the fluted silhouette read is what the review scores."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera looks from",
+    "up": "+Y",
+    "scaleReference": "RAISIN_RADIUS = 0.5 relative unit. Absolute scale is meaningless (types.ts section 6)."
+  },
+  "silhouette": {
+    "boundingShape": "loose triangular mound of three fluted oblong raisins, roughly 2.5 wide by 0.7 tall by 2.0 deep in relative units",
+    "aspectRatios": [
+      {
+        "id": "raisin-length-over-width",
+        "value": 1.44,
+        "source": "2*0.72 / (2*0.5)"
+      }
+    ],
+    "symmetry": "each raisin is star-symmetric before jitter; the pile as a whole is asymmetric",
+    "dominantCurves": [
+      "fluted star cross-section, alternating ridge/valley"
+    ],
+    "negativeSpaces": [
+      "valley grooves between adjacent flute ridges"
+    ],
+    "landmarks": [
+      "5-ridge fluted cross-section on every raisin",
+      "one raisin tilted to show its wrinkled end"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "five small oblong raisins piled loosely, each covered edge-to-edge in deep vertical puckered wrinkles running the full length of the body, no smooth stretches anywhere on the surface"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "wrinkle ridges run parallel to the long axis end-to-end (not radiating from one pole), giving a fluted/star-like cross-section",
+        "one raisin (front-right) is tilted to show its wrinkled end cap"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "confirms the fluted cross-section -- alternating ridge/valley visible in the silhouette from every angle, not just one carved groove"
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Raisin Pile",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the three raisin bodies; emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.5,
+        "height": 0.7,
+        "depth": 2.0,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "raisin-body"
+        }
+      },
+      "material": "raisin-body",
+      "materialLayers": [
+        "raisin-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(46, 32, 24, 1.0)",
+        "secondaryAlbedo": "rgba(46, 32, 24, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference/prompt JSON explicitly excludes shine.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/raisin.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cluster-arrangement",
+          "name": "Three-raisin triangular mound",
+          "kind": "contour",
+          "description": "Three raisins placed with independent XZ offsets and yaw (cranberry's verified back-left/back-right/front-center triangle), all sharing the ground plane at world Y=0.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "inherited from children",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [
+        "cluster-arrangement"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "raisin-a",
+      "name": "Raisin (a)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass. A full-length flute (not a localized crease) is carved by pulling alternating sectors toward the axis on every non-pole ring -- generalizes cranberry's single-ring pullCrease to the entire body.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.72
+            ],
+            [
+              0.275,
+              -0.5903999999999999
+            ],
+            [
+              0.44,
+              -0.3024
+            ],
+            [
+              0.5,
+              0.0
+            ],
+            [
+              0.44,
+              0.3024
+            ],
+            [
+              0.275,
+              0.5903999999999999
+            ],
+            [
+              0.0,
+              0.72
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "full-length-flute",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.4,
+            "notes": "Sectors [0, 2, 4, 6, 8] (of 10) pulled toward the local axis by 40% of local radius on every non-pole ring -- alternating with un-pulled sectors gives a 5-point star/fluted cross-section, constant along the full length."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.014,
+            "notes": "amplitude 0.014 (2.8% of radius), applied indexed after the flute pull -- low enough to not blur the flute contour (R4)."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 0.6,
+        "depth": 1.44,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          -0.85,
+          0.0,
+          -0.28
+        ],
+        "rotation": [
+          0.0,
+          0.35,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "raisin-a",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "raisin-body"
+        }
+      },
+      "material": "raisin-body",
+      "materialLayers": [
+        "raisin-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(46, 32, 24, 1.0)",
+        "secondaryAlbedo": "rgba(46, 32, 24, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference/prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/raisin.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "full-length-flute",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "raisin-a-full-length-flute",
+          "name": "Full-length fluted wrinkle",
+          "kind": "ridge",
+          "description": "Alternating ridge/valley sectors run the raisin's entire length, giving a star-like cross-section visible from every azimuth.",
+          "evidenceRefs": [
+            "view-front",
+            "view-top"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "raisin-a-oblong-silhouette",
+          "name": "Oblong silhouette",
+          "kind": "contour",
+          "description": "Length:width ~1.44:1 -- plumper than the flattened cranberry, less round than blueberry (batch differentiation).",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the fluted ridges",
+        "displacementPattern": "flute pull toward axis on fixed (ring,sector) grid indices, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Single body tone covers every face; the flute is the only surface relief, carried entirely by geometry."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "raisin-a-full-length-flute",
+        "raisin-a-oblong-silhouette"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "raisin-b",
+      "name": "Raisin (b)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass. A full-length flute (not a localized crease) is carved by pulling alternating sectors toward the axis on every non-pole ring -- generalizes cranberry's single-ring pullCrease to the entire body.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.72
+            ],
+            [
+              0.275,
+              -0.5903999999999999
+            ],
+            [
+              0.44,
+              -0.3024
+            ],
+            [
+              0.5,
+              0.0
+            ],
+            [
+              0.44,
+              0.3024
+            ],
+            [
+              0.275,
+              0.5903999999999999
+            ],
+            [
+              0.0,
+              0.72
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "full-length-flute",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.4,
+            "notes": "Sectors [0, 2, 4, 6, 8] (of 10) pulled toward the local axis by 40% of local radius on every non-pole ring -- alternating with un-pulled sectors gives a 5-point star/fluted cross-section, constant along the full length."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.014,
+            "notes": "amplitude 0.014 (2.8% of radius), applied indexed after the flute pull -- low enough to not blur the flute contour (R4)."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 0.6,
+        "depth": 1.44,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0.85,
+          0.0,
+          -0.18
+        ],
+        "rotation": [
+          0.0,
+          -1.1,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "raisin-b",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "raisin-body"
+        }
+      },
+      "material": "raisin-body",
+      "materialLayers": [
+        "raisin-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(46, 32, 24, 1.0)",
+        "secondaryAlbedo": "rgba(46, 32, 24, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference/prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/raisin.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "full-length-flute",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "raisin-b-full-length-flute",
+          "name": "Full-length fluted wrinkle",
+          "kind": "ridge",
+          "description": "Alternating ridge/valley sectors run the raisin's entire length, giving a star-like cross-section visible from every azimuth.",
+          "evidenceRefs": [
+            "view-front",
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the fluted ridges",
+        "displacementPattern": "flute pull toward axis on fixed (ring,sector) grid indices, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Single body tone covers every face; the flute is the only surface relief, carried entirely by geometry."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "raisin-b-full-length-flute"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "raisin-c",
+      "name": "Raisin (c)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass. A full-length flute (not a localized crease) is carved by pulling alternating sectors toward the axis on every non-pole ring -- generalizes cranberry's single-ring pullCrease to the entire body.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.72
+            ],
+            [
+              0.275,
+              -0.5903999999999999
+            ],
+            [
+              0.44,
+              -0.3024
+            ],
+            [
+              0.5,
+              0.0
+            ],
+            [
+              0.44,
+              0.3024
+            ],
+            [
+              0.275,
+              0.5903999999999999
+            ],
+            [
+              0.0,
+              0.72
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "full-length-flute",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.4,
+            "notes": "Sectors [0, 2, 4, 6, 8] (of 10) pulled toward the local axis by 40% of local radius on every non-pole ring -- alternating with un-pulled sectors gives a 5-point star/fluted cross-section, constant along the full length."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.014,
+            "notes": "amplitude 0.014 (2.8% of radius), applied indexed after the flute pull -- low enough to not blur the flute contour (R4)."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 0.6,
+        "depth": 1.44,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          0.8
+        ],
+        "rotation": [
+          0.0,
+          1.35,
+          0.3
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "raisin-c",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "raisin-body"
+        }
+      },
+      "material": "raisin-body",
+      "materialLayers": [
+        "raisin-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(46, 32, 24, 1.0)",
+        "secondaryAlbedo": "rgba(46, 32, 24, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference/prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/raisin.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "full-length-flute",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "raisin-c-full-length-flute",
+          "name": "Full-length fluted wrinkle",
+          "kind": "ridge",
+          "description": "Alternating ridge/valley sectors run the raisin's entire length, giving a star-like cross-section visible from every azimuth.",
+          "evidenceRefs": [
+            "view-front",
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the fluted ridges",
+        "displacementPattern": "flute pull toward axis on fixed (ring,sector) grid indices, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Single body tone covers every face; the flute is the only surface relief, carried entirely by geometry."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "raisin-c-full-length-flute"
+      ],
+      "fidelityTier": "form-refinement"
+    }
+  ],
+  "materials": [
+    {
+      "id": "raisin-body",
+      "name": "Raisin body (near-black brown)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#2E2018",
+      "color": "#2E2018",
+      "albedo": {
+        "dominant": "#2E2018",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/raisin.json geometry.surface, not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#2E2018"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture emitted; UVs exist only for merge attribute consistency (types.ts section 4)."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "primary shape",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "full body, all instances",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "crease-shadow-highlight-dropped",
+          "name": "Groove-shadow/ridge-highlight hues dropped",
+          "maskSource": "geometry",
+          "description": "#1D130D (groove shadow) and #55402A (ridge highlight) are not painted as separate tones -- the flute is now real geometry, so facet-normal N.L falloff reproduces both for free (cranberry crease-shadow-drop precedent).",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "raisin-body"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading."
+      ],
+      "notes": "full body, all instances."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "raisin-instances",
+      "name": "Raisin pile instances",
+      "level": "macro",
+      "hostComponents": [
+        "root"
+      ],
+      "elementComponentIds": [
+        "raisin-a",
+        "raisin-b",
+        "raisin-c"
+      ],
+      "elementKind": "hand-placed macro body",
+      "count": 3,
+      "distribution": {
+        "mode": "hand-authored XZ offset + yaw + tiltZ per instance (olive/cranberry pattern), not procedural",
+        "note": "5 raisins in the prompt reduced to 3 -- CRIB 64px gate."
+      },
+      "sizeClasses": [
+        {
+          "id": "raisin",
+          "widthConstant": 1.0
+        }
+      ],
+      "seedRule": "Per-instance vertex jitter/secondary flute variance consumes the builder rng (mulberry32); placement itself is authored, not random.",
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 300,
+    "maxDrawCalls": 1,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Cluster group target 300-700tri/<=68KB (CRIB). 3 raisins x 100tri = 300tri, at the floor -- accepted per CRIB 'target floor is not a quota, 64px readability is the judge.'"
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key upper-left.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no exposure control or tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "High ambient ratio 0.75.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill opposite the key.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO on runtime Lambert."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build each raisin as a full-revolution lathe shell (lib.buildRevolvedShell), oblong profile.",
+    "Pull alternating sectors [0, 2, 4, 6, 8] toward the local axis by 0.4 on every non-pole ring -- full-length flute, not a localized crease.",
+    "Jitter (indexed) -> rotateZ(-90deg) to lay the long axis horizontal -> facet() for flat per-face normals.",
+    "Place 3 instances with hand-authored XZ offset/yaw/tiltZ (cranberry triangular-mound pattern), ground each via bounding-box Y correction, merge by material."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-pile rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single static prop; no plausible break beyond the whole object"
+  ],
+  "risks": [
+    {
+      "id": "crease-shadow-highlight-dropped",
+      "severity": "low",
+      "description": "#1D130D/#55402A not painted as separate tones.",
+      "mitigation": "Flute facets face many directions; runtime N.L falloff reproduces the contrast for free."
+    },
+    {
+      "id": "instance-count-reduced",
+      "severity": "medium",
+      "description": "5 raisins (prompt) reduced to 3.",
+      "mitigation": "CRIB 64px gate: cranberry's 6-instance attempt blurred into a red blob at thumbnail scale; 3 larger instances with visible flute read as individually-countable raisins instead."
+    },
+    {
+      "id": "partial-occlusion-b-c",
+      "severity": "low",
+      "description": "Instances b/c overlap significantly from the fixed showcase camera (cmp-3 observed).",
+      "mitigation": "Offset/tiltZ widened across 2 revision rounds; residual overlap still leaves each raisin's own flute texture visible, judged acceptable (both b and c show distinct ridge patterns even where silhouettes touch)."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "flatShading not inherited by the runtime material swap.",
+      "mitigation": "facet() bakes flat normals into geometry."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Rosemary Sprig",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  }
+}

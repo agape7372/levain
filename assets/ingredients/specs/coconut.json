@@ -1,0 +1,1407 @@
+{
+  "targetName": "Coconut Shred Pile",
+  "targetId": "coconut-shred-pile",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\coconut.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved; fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 2,
+    "silhouette_readability": 2,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "small mound of shredded dried coconut",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "repeated instances",
+        "layered heap"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading. CRIB top risk category (thin scattered strands + near-background body color) -- mitigated with a generously-sized toasted color bucket rather than relying on the near-white body hue alone."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 2,
+        "materialLayerCount": 1,
+        "localDetailDensity": 1,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 1,
+        "microFeatureGroups": 0,
+        "materialLayers": 2,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Silhouette 2: a loose scatter reads as noise, not a pile -- readability depends entirely on overlap density, which required 5 revision rounds to reach (see risks).",
+        "Repetition density 2: 28 shred instances across 3 layers, higher than the batch's typical 3-instance clusters, placed by a procedural layer-based formula rather than hand-authored per instance (rosemary needle-cluster precedent).",
+        "materialLayerCount 1: two color buckets (ivory body, toasted flecks), no texture -- unlike lemon/banana in the same batch, coconut carries no per-strand texture (would be over-budget for this many small parts).",
+        "Occlusion risk 2: dense overlapping strands in a genuine 3D heap occlude each other more than a flat cluster of discrete bodies."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier by part count, but needs a repetitionSystem for the layered shred mound and a representative meso component rather than per-instance authoring (rosemary pattern)."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 2,
+      "note": "Enumerated by hand from the three reference views (CRIB.md skip rule).",
+      "details": [
+        {
+          "id": "toasted-flecks",
+          "zone": "scattered through the pile",
+          "observation": "A minority of strands (tips or whole pieces) are toasted golden-brown against the near-white majority.",
+          "inference": "Primary color-contrast cue -- CRIB-flagged risk: the ivory body hex (#EFE6D2) is within 3-4 RGB units of the card background (#F2E6D3), so the toasted bucket carries most of the against-background legibility.",
+          "confidence": 0.9,
+          "evidenceRef": "coconut.png full frame",
+          "kind": "stain",
+          "mapsTo": {
+            "ref": "toasted-flecks-generous-share",
+            "note": ""
+          }
+        },
+        {
+          "id": "mound-silhouette",
+          "zone": "whole-pile silhouette",
+          "observation": "Pile has real 3D height, denser/narrower toward the top, wider/lower at the base.",
+          "inference": "Distinguishes a heap from a flat scatter; low-poly budget forces far fewer, chunkier strands than the reference's fine weave.",
+          "confidence": 0.8,
+          "evidenceRef": "coconut-2.png front elevation",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "mound-silhouette",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/rosemary.png"
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 1,
+      "mesoComponents": 1,
+      "microFeatureGroups": 0,
+      "materialLayers": 2,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 3
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.55,
+    "mustMatch": [
+      "a compact, densely overlapping mound (not a sparse scatter)",
+      "toasted-brown flecks visibly contrasting against the pale ivory majority"
+    ],
+    "niceToHave": [
+      "exact strand count/curl matching the reference's fine weave -- explicitly out of reach for a <=700tri budget"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "mound-not-scatter",
+      "name": "Reads as a compact overlapping mound, not scattered confetti",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.55,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "coconut-shred"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "toasted-contrast-readable",
+      "name": "Toasted flecks provide visible contrast against the pale majority and the card background",
+      "tier": "critical",
+      "passIds": [
+        "material-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.5,
+      "mustPass": true,
+      "componentRefs": [
+        "coconut-shred"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color; PBR maps are inert."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer harness.",
+      "mustAvoid": [
+        "authoring lights into the model"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The runtime normalizes the pile's longest axis to 1.6.",
+    "Exact strand count/weave is not achievable at this tri budget; the review scores overall mound cohesion and color contrast, not per-strand fidelity."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera looks from",
+    "up": "+Y",
+    "scaleReference": "SCATTER radii (0.12-0.30) are relative units. Absolute scale is meaningless (types.ts section 6)."
+  },
+  "silhouette": {
+    "boundingShape": "low 3-layer mound of overlapping shred chips, roughly 0.7 wide by 0.35 tall by 0.7 deep in relative units",
+    "aspectRatios": [
+      {
+        "id": "mound-width-over-height",
+        "value": 2.0,
+        "source": "0.7 / 0.35"
+      }
+    ],
+    "symmetry": "no strong symmetry -- procedural per-layer angular scatter",
+    "dominantCurves": [
+      "gently bent 2-segment shred chains"
+    ],
+    "negativeSpaces": [
+      "gaps between overlapping shreds -- minimized across 5 revision rounds"
+    ],
+    "landmarks": [
+      "dense overlapping core",
+      "scattered toasted-brown flecks against the pale majority"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "a dense, tightly woven low mound of thin curled ivory-white coconut shreds, overlapping and crossing at many angles with almost no visible background between them",
+        "scattered strand tips and a handful of whole flecks are toasted a light-to-deep golden brown, standing out against the pale body"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "the pile has real height (a mound, not a flat scatter) -- strands stack in visible layers with a few tips lifting above the main mass"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "confirms individual strands are numerous and thin, packed edge-to-edge -- far denser than what a low-poly budget (<=700tri) can represent 1:1"
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Coconut Shred Pile",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the 28 shred instances across 3 layers; emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 0.7,
+        "height": 0.35,
+        "depth": 0.7,
+        "units": "relative",
+        "confidence": 0.7
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "coconut-ivory"
+        }
+      },
+      "material": "coconut-ivory",
+      "materialLayers": [
+        "coconut-ivory",
+        "coconut-toasted"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(239, 230, 210, 1.0)",
+        "secondaryAlbedo": "rgba(143, 107, 60, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference/prompt JSON explicitly excludes shine.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/coconut.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "mound-silhouette",
+          "name": "3-layer cairn-style mound",
+          "kind": "contour",
+          "description": "3 concentric layers of decreasing radius and increasing height (0.30/0.14, 0.21/0.14, 0.12/0.26) -- a real 3D heap silhouette, grounded once at the pile's own lowest point (not per-shred).",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "inherited from children",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [
+        "mound-silhouette"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "coconut-shred",
+      "name": "Shred (representative)",
+      "level": "meso",
+      "role": "appendage",
+      "importance": 1.0,
+      "confidence": 0.8,
+      "primitive": "instanced-cluster",
+      "topologyClass": "fiber-strand",
+      "topologyRationale": "Each shred is a chain of 2 independent 4-vertex tetrahedra (root, tip, 2 wing points per segment) -- the same chunky 'always-visible-from-any-angle' technique as rosemary's needle, chosen specifically because a flat quad card would go invisible from back-facing angles under the runtime's single-sided material (types.ts, doubleSided does not survive the material swap). Represents the 28-instance repetitionSystem below; placement is procedural (3 layers x per-layer angle+radius+jitter), not hand-authored per instance.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 1,
+          "phiStart": 0.0,
+          "phiLength": 0.0
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "no-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              0,
+              0,
+              0
+            ],
+            "amplitude": 0.0,
+            "notes": "R4 (types.ts): shreds get zero vertex jitter, same reasoning as rosemary's needles -- thin geometry mangles under bread-scale noise. Curvature comes from the 1 gentle bend between the 2 chained segments, not per-vertex noise."
+          }
+        ],
+        "uvStrategy": "top-planar (scripts/breads/lib.ts uvTopPlanar) -- solid color, UV only for merge attribute consistency",
+        "normalStrategy": "flat normals via facet() on each segment's raw tetrahedron"
+      },
+      "parent": "root",
+      "attachment": {
+        "parentSocket": "pile-surface",
+        "localStart": [
+          0,
+          0,
+          0
+        ],
+        "localEnd": [
+          0.32,
+          0,
+          0
+        ],
+        "contactType": "surface",
+        "embedDepth": 0.01,
+        "overlap": 0.01,
+        "gapTolerance": 0.0,
+        "notes": "Each instance's root is placed by the layer distribution formula below; the whole pile is grounded once (bounding-box Y correction on the top-level group), not per-shred -- per-shred grounding would flatten the intentional layer heights."
+      },
+      "dimensions": {
+        "width": 0.19,
+        "height": 0.32,
+        "depth": 0.19,
+        "units": "relative",
+        "confidence": 0.7
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "coconut-shred",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "coconut-ivory"
+        }
+      },
+      "material": "coconut-ivory",
+      "materialLayers": [
+        "coconut-ivory",
+        "coconut-toasted"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(239, 230, 210, 1.0)",
+        "secondaryAlbedo": "rgba(143, 107, 60, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference/prompt JSON explicitly excludes shine.",
+        "zone": "each shred, per-segment material choice",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/coconut.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "no-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "shred-gentle-bend",
+          "name": "One gentle bend, not a straight card",
+          "kind": "ridge",
+          "description": "1st segment nearly horizontal, 2nd segment bends by 0.12-0.42 rad (one bend only, not per-segment random zigzag -- v3 revision after cmp-2 read as disconnected diamonds).",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.75
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "flat normals from facet(), each tetrahedron's 4 faces give independent shading per angle",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Ivory or toasted material chosen per-shred (whole-shred) or per-tip-segment (partial), not painted."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [
+        "shred-gentle-bend"
+      ],
+      "fidelityTier": "form-refinement"
+    }
+  ],
+  "materials": [
+    {
+      "id": "coconut-ivory",
+      "name": "Shred body (ivory)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#EFE6D2",
+      "color": "#EFE6D2",
+      "albedo": {
+        "dominant": "#EFE6D2",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/coconut.json geometry.surface, not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#EFE6D2"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture emitted; UVs exist only for merge attribute consistency (types.ts section 4)."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "primary shape",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "majority of shreds, full surface",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "edge-toast-dropped",
+          "name": "Bright edge-toast hue dropped",
+          "maskSource": "geometry",
+          "description": "#B08A52 (lighter edge toast) is not a separate bucket -- with only 2 material buckets available, the darker #8F6B3C flecks alone give the strongest against-card-background (#F2E6D3) contrast margin; a mid-tone would dilute it.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "coconut-ivory"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading."
+      ],
+      "notes": "majority of shreds, full surface."
+    },
+    {
+      "id": "coconut-toasted",
+      "name": "Toasted flecks (deep brown)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#8F6B3C",
+      "color": "#8F6B3C",
+      "albedo": {
+        "dominant": "#8F6B3C",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/coconut.json geometry.surface, not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#8F6B3C"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture emitted; UVs exist only for merge attribute consistency (types.ts section 4)."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "primary shape",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "toasted shred tips + whole toasted flecks",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "toasted-flecks-generous-share",
+          "name": "Generous toasted-bucket share",
+          "maskSource": "per-instance rng",
+          "description": "15% of shreds fully toasted (simulating scattered whole flecks) + 35% tip-only toasted (2-segment chain, so this colors half of that shred) -- deliberately larger than the prompt's 'a few' flecks would suggest, to compensate for the near-background ivory hue (advisor-flagged risk).",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "coconut-toasted"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading."
+      ],
+      "notes": "toasted shred tips + whole toasted flecks."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "coconut-shreds",
+      "name": "Shred mound system",
+      "level": "meso",
+      "hostComponents": [
+        "root"
+      ],
+      "elementComponentIds": [
+        "coconut-shred"
+      ],
+      "elementKind": "repeated meso appendage, 2x 4-vertex tetrahedron each",
+      "count": 28,
+      "distribution": {
+        "mode": "3 concentric layers (y=0.0/r=0.30/n=11, y=0.14/r=0.21/n=9, y=0.26/r=0.12/n=8), each shred's root placed at angle=(i/count)*2pi+jitter, radius=layer.radius*(0.35+0.65*rng) biased toward the layer center",
+        "lengthRange": [
+          0.2,
+          0.32
+        ],
+        "widthConstant": 0.19,
+        "note": "5 total revision rounds (3 numbered cmp + 2 further passes verified via production thumb bake): v1 wide spiral scatter (r=0.82) read as scattered confetti; v2 layered but still sparse/necked joints; v3 fewer/wider segments (3->2) fixed joint necking but the shred length (0.4-0.58) still exceeded the shrunken layer radii, creating a spiky starburst; v4 shortened shred length to match layer radii (0.2-0.32), finally giving a compact overlapping mound."
+      },
+      "sizeClasses": [
+        {
+          "id": "shred",
+          "widthConstant": 0.19
+        }
+      ],
+      "seedRule": "Per-instance angle jitter, radius, category (ivory/tip-toast/full-toast) and bend angle all consume the builder rng (mulberry32); deterministic, byte-stable GLB export.",
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 224,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Cluster group target 300-700tri/<=68KB (CRIB) -- measured 224tri/23.1KB, below the floor but accepted per CRIB precedent (rosemary 108tri): '64px readability is the judge, not the target floor.'"
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key upper-left.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no exposure control or tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "High ambient ratio 0.75.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill opposite the key.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO on runtime Lambert."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build each shred as a chain of 2 independent 4-vertex tetrahedra (rosemary needle technique, local reimplementation) with one gentle bend between segments (not per-segment random zigzag).",
+    "Scatter shreds across 3 concentric layers of decreasing radius and increasing height for a cairn-style mound silhouette.",
+    "Keep shred length comparable to the layer radius so shreds stay within the mound's footprint instead of poking out as spikes (v4 fix).",
+    "Ground the whole pile once via a single bounding-box Y correction on the top-level group -- never per-shred (would flatten the intentional layer heights).",
+    "Assign material per-shred (15% fully toasted) or per-tip-segment (35% tip-toasted) via rng, generously sized to compensate for the near-background ivory hue."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-pile rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single static prop; no plausible break beyond the whole object"
+  ],
+  "risks": [
+    {
+      "id": "background-color-collision",
+      "severity": "high",
+      "description": "Body hex #EFE6D2 is within 3-4 RGB units of the card background #F2E6D3 -- the highest background-collision risk in the batch (advisor-flagged before implementation).",
+      "mitigation": "Toasted bucket sized generously (50% of shreds carry some toasted color, well above the prompt's 'a few flecks') plus faceted per-tetrahedron shading naturally darkens many facets under the key light, both giving luminance separation from the flat unlit card background even where hue alone would not."
+    },
+    {
+      "id": "sparse-first-attempts",
+      "severity": "high",
+      "description": "cmp-1/cmp-2 (wide spiral scatter, then layered-but-still-sparse) both read as scattered confetti/starburst rather than a pile -- the single most iteration-heavy asset in the batch (5 total revision rounds vs the CRIB 3-cmp guideline).",
+      "mitigation": "Root-caused via the production thumb-bake pipeline (not more cmp renders, which were budget-exhausted): shred length must be comparable to the pile's own footprint radius, not independent of it -- runtime auto-refit means absolute scale is meaningless but the *ratio* between part length and cluster radius determines whether parts stay within the silhouette or poke out as spikes."
+    },
+    {
+      "id": "specific-identification-not-guaranteed",
+      "severity": "medium",
+      "description": "At 64px the pile reads as 'a small pale/brown clump' but may not be specifically identified as coconut shred without the item-name label the digest UI always shows alongside cards.",
+      "mitigation": "Accepted -- CRIB precedent (cinnamon) documents this exact honest limitation for fine-texture ingredients at thumbnail scale; the label closes the gap in the actual UI."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "flatShading not inherited by the runtime material swap.",
+      "mitigation": "facet() bakes flat normals into each tetrahedron segment."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Rosemary Sprig",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  }
+}

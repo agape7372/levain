@@ -1,0 +1,2024 @@
+{
+  "targetName": "Poppy Seed Mound",
+  "targetId": "poppy-seed-mound",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\poppyseed.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved; the review camera is fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "a mound of poppy seeds with three size-increasing seeds in front",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "repeated instances",
+        "discrete resting arrangement"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat facets, no shine, near-black body."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 3,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 2,
+        "materialLayerCount": 1,
+        "localDetailDensity": 1,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 0,
+        "microFeatureGroups": 0,
+        "materialLayers": 2,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Silhouette complexity 2: a low wide mound plus three separated dots is riskier at the 64px gate than a single compact body -- this is the set's smallest grain.",
+        "Component count 3 (not 1): the mound is a distinct macro body from the repeated seed instances.",
+        "Repetition density 2: 3 seed instances, matching the batch's established cluster count, but with a deliberate size progression rather than uniform repetition.",
+        "One material family in two zones (body, top-cap highlight) -- materialLayerCount 1.",
+        "Local detail density 1: the top-cap highlight is the only identity-critical local cue (round seeds have little else to show).",
+        "Occlusion risk 1: seed undersides and the mound's underside are never modeled/visible.",
+        "Action readiness 0: static turntable showcase prop.",
+        "Aggregate 9/24, simple tier (elevated silhouette/component/repetition axes reflect the 64px risk of the smallest grain in the set, not part-count complexity)."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier by part count, but needs a repetitionSystem for the 3-seed set (non-uniform size classes) and material-override documentation for the size progression."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerated by hand from the three reference views (CRIB.md skip rule for a small fixed part count with a curated prompt spec).",
+      "details": [
+        {
+          "id": "seed-top-highlight",
+          "zone": "each front seed's top",
+          "observation": "A slate-gray highlight catches the rounded top of each enlarged seed.",
+          "inference": "Round seed's upper hemisphere reflecting the key light more directly.",
+          "confidence": 0.85,
+          "evidenceRef": "poppyseed-2.png front elevation",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "poppyseed-seed-a-top-highlight",
+            "note": ""
+          }
+        },
+        {
+          "id": "mound-granular-surface",
+          "zone": "seed mound",
+          "observation": "Low, wide, fine-grained mound, not a tall cone.",
+          "inference": "Countless tiny seeds heaped together, stylized as a jittered low-poly lens shell.",
+          "confidence": 0.85,
+          "evidenceRef": "poppyseed.png full frame",
+          "kind": "ridge",
+          "mapsTo": {
+            "ref": "mound-jitter-surface",
+            "note": ""
+          }
+        },
+        {
+          "id": "size-progression",
+          "zone": "3 front seeds",
+          "observation": "The three enlarged seeds increase in size left to right.",
+          "inference": "Deliberate visual rhythm, not uniform repetition -- the largest establishes scale, the smallest confirms 'this is a tiny grain'.",
+          "confidence": 0.8,
+          "evidenceRef": "poppyseed.png full frame",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "mound-plus-seeds-arrangement",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/poppyseed.png"
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 0,
+      "microFeatureGroups": 0,
+      "materialLayers": 2,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.6,
+    "mustMatch": [
+      "low wide mound, not a tall cone",
+      "3 seeds clearly separated and size-increasing",
+      "reads as a clean oval + dots at 64px, not a blotch"
+    ],
+    "niceToHave": [
+      "dusty violet-gray fleck breaking up the mass -- dropped, a third hue would exceed mesh<=2 for negligible legibility gain at 64px"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "mound-plus-3-seeds-silhouette",
+      "name": "Low wide mound + 3 clearly separated size-increasing dots",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "poppyseed-mound",
+        "poppyseed-seed-a",
+        "poppyseed-seed-b",
+        "poppyseed-seed-c"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "readable-at-64px",
+      "name": "Reads as a clean dark oval mound (not a blotch) with visible dots at 64px thumbnail scale",
+      "tier": "critical",
+      "passIds": [
+        "optimization-pass"
+      ],
+      "minimumScore": 0.55,
+      "mustPass": true,
+      "componentRefs": [
+        "root"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness",
+      "interaction-pass": "static showcase prop with no sockets/hinges/colliders beyond a bounding proxy"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color; PBR maps are inert."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer harness.",
+      "mustAvoid": [
+        "authoring lights into the model"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The runtime normalizes the object's longest axis to 1.6.",
+    "The mound approximates countless individually-invisible seeds as one jittered heap; the three foreground seeds carry the 'this is poppy seed, not an amorphous grain' identity."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera looks from",
+    "up": "+Y",
+    "scaleReference": "MOUND_RADIUS = 0.78 relative unit. Absolute scale is meaningless (types.ts section 6)."
+  },
+  "silhouette": {
+    "boundingShape": "a low wide lens-shaped mound with three round dots of increasing size in front, roughly 2.0 wide by 0.52 tall by 1.7 deep in relative units",
+    "aspectRatios": [
+      {
+        "id": "mound-height-over-radius",
+        "value": 0.33,
+        "source": "poppyseed-2.png front elevation, low wide lens shape"
+      }
+    ],
+    "symmetry": "the mound is rotationally symmetric except for jitter; the three seeds break symmetry to one side",
+    "dominantCurves": [
+      "low wide jittered lens",
+      "small round seed spheres"
+    ],
+    "negativeSpaces": [
+      "gaps between the three front seeds"
+    ],
+    "landmarks": [
+      "slate-gray cap on each seed's top",
+      "size progression across the three front seeds"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "a low fine mound of countless tiny round poppy seeds heaped together",
+        "three single seeds pulled forward and shown larger, increasing in size left to right"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "the mound is low and wide, a shallow lens shape rather than a tall cone",
+        "each enlarged front seed is a plain round dot with a slate-gray highlight on its rounded top"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "roughly circular/oval mound footprint"
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Poppy Seed Mound",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the mound and the three seed instances.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.0,
+        "height": 0.52,
+        "depth": 1.7,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "poppyseed-body"
+        }
+      },
+      "material": "poppyseed-body",
+      "materialLayers": [
+        "poppyseed-body",
+        "poppyseed-highlight"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(43, 42, 56, 1.0)",
+        "secondaryAlbedo": "rgba(69, 66, 79, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference explicitly excludes shine.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/poppyseed.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "mound-plus-seeds-arrangement",
+          "name": "Mound + 3 size-increasing seeds in front",
+          "kind": "contour",
+          "description": "Three seed instances of increasing radius (0.09/0.13/0.17) placed left to right in front of the mound, matching the reference's small/medium/large rhythm rather than uniform repetition.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "mound-plus-seeds-arrangement"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "poppyseed-mound",
+      "name": "Seed mound",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.85,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A single low, wide faceted revolved heap standing in for countless individually-invisible seeds -- CRIB explicitly forbids modeling hundreds of tiny grains (they become a 64px 'blotch').",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.663,
+              -0.26
+            ],
+            [
+              0.78,
+              -0.13
+            ],
+            [
+              0.7020000000000001,
+              0.0
+            ],
+            [
+              0.42900000000000005,
+              0.117
+            ],
+            [
+              0.11699999999999999,
+              0.20800000000000002
+            ],
+            [
+              0.0,
+              0.26
+            ]
+          ],
+          "segments": 14,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "mound-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.03,
+            "notes": "Jitter (0.03) approximates the mound's granular surface without modeling individual seeds."
+          }
+        ],
+        "uvStrategy": "uvTopPlanar",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.56,
+        "height": 0.52,
+        "depth": 1.56,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          -0.1,
+          0
+        ],
+        "rotation": [
+          0,
+          0.1,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "poppyseed-mound",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "poppyseed-body"
+        }
+      },
+      "material": "poppyseed-body",
+      "materialLayers": [
+        "poppyseed-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(43, 42, 56, 1.0)",
+        "secondaryAlbedo": "rgba(69, 66, 79, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference explicitly excludes shine.",
+        "zone": "full mound, single bucket",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/poppyseed.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "mound-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "mound-jitter-surface",
+          "name": "Granular faceted surface",
+          "kind": "ridge",
+          "description": "Per-vertex jitter (0.03) gives the mound an irregular faceted surface standing in for its countless seeds, matching the reference's low wide lens-shaped silhouette (height:radius ~=0.33:1).",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Solid deep blue-black; no highlight bucket on the mound (reserved for the individual seed instances)."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "mound-jitter-surface"
+      ],
+      "fidelityTier": "material-pass"
+    },
+    {
+      "id": "poppyseed-seed-a",
+      "name": "Poppy seed (a)",
+      "level": "macro",
+      "role": "body",
+      "importance": 0.8,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A closed low-segment sphere (5-point profile, 2 poles + 3 equatorial rings) -- deliberately coarse since the seed is the smallest grain in the pantry and the round silhouette survives at any reasonable segment count.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -1.0
+            ],
+            [
+              0.85,
+              -0.6
+            ],
+            [
+              1.0,
+              0.0
+            ],
+            [
+              0.85,
+              0.6
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ],
+          "segments": 6,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "seed-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.0018,
+            "notes": "Jitter scaled to radius (0.02 of 0.09) so the smallest seed does not get a disproportionately large amplitude relative to its size."
+          }
+        ],
+        "uvStrategy": "uvDome",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.18,
+        "height": 0.18,
+        "depth": 0.18,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "poppyseed-seed-a",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "poppyseed-body"
+        }
+      },
+      "material": "poppyseed-body",
+      "materialLayers": [
+        "poppyseed-body",
+        "poppyseed-highlight"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(43, 42, 56, 1.0)",
+        "secondaryAlbedo": "rgba(69, 66, 79, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference explicitly excludes shine.",
+        "zone": "seed body (majority) + top-cap highlight (single ring near the apex pole, no sector restriction)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/poppyseed.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "seed-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "poppyseed-seed-a-highlight-boundary",
+          "kind": "material-boundary",
+          "notes": "Highlight covers ring index 3 only (the ring adjacent to the top pole, all segments -- a round seed needs no directional sector restriction, unlike the flaxseed/sunflowerseed masks). Marking that ring colors the entire top fan band via the OR-of-3-vertices mechanism."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "poppyseed-seed-a-top-highlight",
+          "name": "Slate-gray highlight catching the rounded top",
+          "kind": "seam",
+          "description": "A minimal single-ring cap (olive.ts CAP_RING_INDICES pattern, full ring not narrowed to a sector since the object is round) gives each seed a small lit-top cue without needing a texture.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Solid deep blue-black body; the top cap alone carries the slate-gray highlight."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "poppyseed-seed-a-top-highlight"
+      ],
+      "fidelityTier": "material-pass"
+    },
+    {
+      "id": "poppyseed-seed-b",
+      "name": "Poppy seed (b)",
+      "level": "macro",
+      "role": "body",
+      "importance": 0.8,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A closed low-segment sphere (5-point profile, 2 poles + 3 equatorial rings) -- deliberately coarse since the seed is the smallest grain in the pantry and the round silhouette survives at any reasonable segment count.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -1.0
+            ],
+            [
+              0.85,
+              -0.6
+            ],
+            [
+              1.0,
+              0.0
+            ],
+            [
+              0.85,
+              0.6
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ],
+          "segments": 6,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "seed-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.0026,
+            "notes": "Jitter scaled to radius (0.02 of 0.13) so the smallest seed does not get a disproportionately large amplitude relative to its size."
+          }
+        ],
+        "uvStrategy": "uvDome",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.26,
+        "height": 0.26,
+        "depth": 0.26,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "poppyseed-seed-b",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "poppyseed-body"
+        }
+      },
+      "material": "poppyseed-body",
+      "materialLayers": [
+        "poppyseed-body",
+        "poppyseed-highlight"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(43, 42, 56, 1.0)",
+        "secondaryAlbedo": "rgba(69, 66, 79, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference explicitly excludes shine.",
+        "zone": "seed body (majority) + top-cap highlight (single ring near the apex pole, no sector restriction)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/poppyseed.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "seed-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "poppyseed-seed-b-highlight-boundary",
+          "kind": "material-boundary",
+          "notes": "Highlight covers ring index 3 only (the ring adjacent to the top pole, all segments -- a round seed needs no directional sector restriction, unlike the flaxseed/sunflowerseed masks). Marking that ring colors the entire top fan band via the OR-of-3-vertices mechanism."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "poppyseed-seed-b-top-highlight",
+          "name": "Slate-gray highlight catching the rounded top",
+          "kind": "seam",
+          "description": "A minimal single-ring cap (olive.ts CAP_RING_INDICES pattern, full ring not narrowed to a sector since the object is round) gives each seed a small lit-top cue without needing a texture.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Solid deep blue-black body; the top cap alone carries the slate-gray highlight."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "poppyseed-seed-b-top-highlight"
+      ],
+      "fidelityTier": "material-pass"
+    },
+    {
+      "id": "poppyseed-seed-c",
+      "name": "Poppy seed (c)",
+      "level": "macro",
+      "role": "body",
+      "importance": 0.8,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A closed low-segment sphere (5-point profile, 2 poles + 3 equatorial rings) -- deliberately coarse since the seed is the smallest grain in the pantry and the round silhouette survives at any reasonable segment count.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -1.0
+            ],
+            [
+              0.85,
+              -0.6
+            ],
+            [
+              1.0,
+              0.0
+            ],
+            [
+              0.85,
+              0.6
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ],
+          "segments": 6,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "seed-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.0034,
+            "notes": "Jitter scaled to radius (0.02 of 0.17) so the smallest seed does not get a disproportionately large amplitude relative to its size."
+          }
+        ],
+        "uvStrategy": "uvDome",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.34,
+        "height": 0.34,
+        "depth": 0.34,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "poppyseed-seed-c",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "poppyseed-body"
+        }
+      },
+      "material": "poppyseed-body",
+      "materialLayers": [
+        "poppyseed-body",
+        "poppyseed-highlight"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(43, 42, 56, 1.0)",
+        "secondaryAlbedo": "rgba(69, 66, 79, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference explicitly excludes shine.",
+        "zone": "seed body (majority) + top-cap highlight (single ring near the apex pole, no sector restriction)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/poppyseed.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "seed-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "poppyseed-seed-c-highlight-boundary",
+          "kind": "material-boundary",
+          "notes": "Highlight covers ring index 3 only (the ring adjacent to the top pole, all segments -- a round seed needs no directional sector restriction, unlike the flaxseed/sunflowerseed masks). Marking that ring colors the entire top fan band via the OR-of-3-vertices mechanism."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "poppyseed-seed-c-top-highlight",
+          "name": "Slate-gray highlight catching the rounded top",
+          "kind": "seam",
+          "description": "A minimal single-ring cap (olive.ts CAP_RING_INDICES pattern, full ring not narrowed to a sector since the object is round) gives each seed a small lit-top cue without needing a texture.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Solid deep blue-black body; the top cap alone carries the slate-gray highlight."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "poppyseed-seed-c-top-highlight"
+      ],
+      "fidelityTier": "material-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "poppyseed-body",
+      "name": "Body (deep blue-black)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#2B2A38",
+      "color": "#2B2A38",
+      "albedo": {
+        "dominant": "#2B2A38",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/poppyseed.json geometry.surface, not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#2B2A38"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture"
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "primary shape",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "mound + seed majority",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading."
+      ],
+      "notes": "mound + seed majority."
+    },
+    {
+      "id": "poppyseed-highlight",
+      "name": "Highlight (slate-gray top cap)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#45424F",
+      "color": "#45424F",
+      "albedo": {
+        "dominant": "#45424F",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/poppyseed.json geometry.surface, not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#45424F"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture"
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "primary shape",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "seed top-cap band",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "size-increasing-seeds",
+          "name": "3 seeds sized small/medium/large",
+          "maskSource": "geometry",
+          "description": "Unlike the batch's other clusters (uniform-size instances), the reference explicitly shows the 3 enlarged front seeds increasing in size left to right -- SEEDS.a/b/c use radius 0.09/0.13/0.17 rather than a shared constant.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "poppyseed-seed-a",
+            "poppyseed-seed-b",
+            "poppyseed-seed-c"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading."
+      ],
+      "notes": "seed top-cap band."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "poppyseed-seeds",
+      "name": "Three size-increasing seed instances",
+      "level": "macro",
+      "hostComponents": [
+        "root"
+      ],
+      "elementComponentIds": [
+        "poppyseed-seed-a",
+        "poppyseed-seed-b",
+        "poppyseed-seed-c"
+      ],
+      "elementKind": "repeated macro body, low-segment sphere each",
+      "count": 3,
+      "distribution": {
+        "mode": "hand-placed XZ offsets, left-to-right size progression",
+        "note": "Radius 0.09/0.13/0.17 for a/b/c -- the only material in this batch with a deliberate non-uniform size progression across its repeated instances, matching the reference's visual rhythm."
+      },
+      "sizeClasses": [
+        {
+          "id": "seed-small",
+          "radius": 0.09
+        },
+        {
+          "id": "seed-medium",
+          "radius": 0.13
+        },
+        {
+          "id": "seed-large",
+          "radius": 0.17
+        }
+      ],
+      "seedRule": "Offsets/radii are fixed authored values, not random; only surface-jitter consumes the builder rng, so the exported GLB is byte-deterministic.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 234,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Deliberately light for the set's smallest grain -- mound(~126)+3 seeds(36 tri each=108)=~234 tri, comfortably under the old 12-item cluster band (300-700); CRIB: a lower-than-target count is correct when extra polygons would not improve 64px legibility of a tiny round dot."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key upper-left.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no exposure control or tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "High ambient ratio 0.75.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill opposite the key.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO on runtime Lambert."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build the mound as one indexed revolved shell (buildRevolvedShell), low height:radius ratio for the reference's wide lens shape, coarse jitter, single material bucket.",
+    "Build each seed as one indexed low-segment sphere shell (5-point profile: 2 poles + 3 equatorial rings, 6 segments).",
+    "Mark the ring adjacent to the top pole (index 3) as a vertex mask before jitter/facet, no sector restriction; splitTrianglesByVertexMask + pickTriangles after facet() splits the top fan band into the highlight bucket.",
+    "Scale jitter amplitude to each seed's own radius so the smallest seed is not over-jittered relative to its size.",
+    "Ground each part on y=0 via its own post-rotation bbox (R1); place the three seeds with increasing radius left to right, matching the reference's visual rhythm.",
+    "Merge all parts by material into exactly two meshes (mergeByMaterial)."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-cluster rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "mound and each seed are independent fractureGroups; no plausible break beyond one part separating from the group"
+  ],
+  "risks": [
+    {
+      "id": "crevice-shadow-dropped",
+      "severity": "low",
+      "description": "#1B1A24 near-black shadow sinking into the mound's crevices not painted as its own bucket.",
+      "mitigation": "Runtime key light N.L falloff darkens the mound's crevices for free; the body hue is already near-black so the visual difference is minimal."
+    },
+    {
+      "id": "violet-fleck-dropped",
+      "severity": "low",
+      "description": "#5A5568 dusty violet-gray fleck breaking up the mass not represented.",
+      "mitigation": "A third hue bucket would exceed mesh<=2; the fleck is a minor texture-scale variation with negligible legibility impact at 64px."
+    },
+    {
+      "id": "mound-not-individually-modeled",
+      "severity": "medium",
+      "description": "The mound is one jittered heap, not individually modeled tiny seeds.",
+      "mitigation": "CRIB explicitly forbids hundreds of individually modeled tiny pieces (they become a 64px blotch); the three foreground seed instances carry the 'round seed' identity instead."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "flatShading not inherited by the runtime material swap.",
+      "mitigation": "facet() bakes flat normals into geometry for the mound and every seed."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Vertex-color paint discarded by the runtime Lambert swap.",
+      "mitigation": "No vertexPaint authored; the highlight split is a triangle-range vertex mask, not vertex color."
+    },
+    {
+      "id": "merge-attribute-mismatch",
+      "severity": "medium",
+      "description": "mergeByMaterial throws on attribute-set mismatch within one bucket.",
+      "mitigation": "Every geometry in each bucket (mound; 3x seed body+highlight) carries position/normal/uv via uvDome/uvTopPlanar."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Poppy Seed Mound",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  }
+}

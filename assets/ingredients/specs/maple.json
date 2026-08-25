@@ -1,0 +1,2874 @@
+{
+  "targetName": "Maple Leaf Candies",
+  "targetId": "maple-leaf-candies",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\maple.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved; review camera is fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 2,
+    "depth_inference": 2,
+    "primitive_decomposition": 2,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "3-candy cluster of maple-leaf-shaped maple sugar candies",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "geometric/faceted",
+        "flat extruded prism"
+      ],
+      "structureKind": [
+        "repeated instances",
+        "discrete resting cluster"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat color facets only. Identity carried ENTIRELY by silhouette (5-lobed leaf outline) since color cannot distinguish this from chestnut/cinnamon in the same batch -- the batch's flagged hardest legibility case (CRIB.md)."
+    },
+    "complexity": {
+      "tier": "moderate",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 2,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 1,
+        "materialLayerCount": 1,
+        "localDetailDensity": 2,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 3,
+        "mesoComponents": 3,
+        "microFeatureGroups": 0,
+        "materialLayers": 2,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Three near-identical candy assemblies, each rim+body, so componentCount scores 2 (matching blueberry's body+crown scale, not choco/cranberry's flat mesh=1 bodies).",
+        "Silhouette scores 3 (highest in this sub-batch): 10-point non-circular outline with 5 asymmetric lobes and a deep stem-notch is the batch's most structurally involved silhouette -- more than redbean's near-spherical mound.",
+        "hierarchyDepth scores 2: each candy has a real meso-level plateau child (vein crease), one level deeper than a flat single-mesh body.",
+        "materialLayerCount scores 1: 2 buckets (rim + body), same scale as olive/blueberry/redbean precedent.",
+        "Local detail density scores 2: rim/plateau height step + 5-spoke vein crease are two distinct authored details.",
+        "Occlusion risk scores 1: candies overlap only at their bases (per reference), no lobe is fully hidden by another candy from the fixed camera.",
+        "Action readiness scores 0: static turntable showcase prop."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier by part count, but needs meso depth (plateau child) and material local overrides (rim-is-real-step rationale) unlike choco/cranberry's flatter mesh=1 budget."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 2,
+      "note": "Enumerated by hand from the three supplied reference views -- CRIB.md skip rule for single-repeated-system objects.",
+      "details": [
+        {
+          "id": "leaf-outline-identity",
+          "zone": "each candy's silhouette",
+          "observation": "5-lobed maple leaf outline (1 main + 2 upper-side + 2 basal tips, deep stem-notch valley at the bottom) is the sole feature distinguishing this from chestnut or cinnamon in the same batch -- color alone cannot.",
+          "inference": "Maple-leaf-shaped sugar candy, per prompt subject.",
+          "confidence": 0.95,
+          "evidenceRef": "maple.png full frame, maple-3.png top-down",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "maple-leaf-1-rim-outline",
+            "note": ""
+          }
+        },
+        {
+          "id": "rim-plateau-real-step",
+          "zone": "top face of every candy",
+          "observation": "The cream border is genuinely proud of the darker inner plateau (real height step, consistent shading discontinuity across all views), not a flat 2-color paint job.",
+          "inference": "Embossed/stamped candy mold construction.",
+          "confidence": 0.85,
+          "evidenceRef": "maple-2.png front elevation, all 3 instances",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "maple-leaf-1-rim-outline",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/maple.png"
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 3,
+      "microFeatureGroups": 2,
+      "materialLayers": 2,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "5-lobed maple leaf silhouette, distinct from chestnut/cinnamon",
+      "2-tone rim/plateau color read (flat, no height step -- see risk bevel-wall-dropped-for-rendering-bug)",
+      "faceted flat shading baked into geometry"
+    ],
+    "niceToHave": [
+      "vein crease pattern surviving to 64px",
+      "exact real-maple branching vein topology (simplified to 5 spokes here)"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "leaf-silhouette-readable",
+      "name": "5-lobed maple leaf silhouette reads clearly, distinct from chestnut/cinnamon",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "maple-leaf-1",
+        "maple-leaf-2",
+        "maple-leaf-3"
+      ],
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "rim-plateau-step-visible",
+      "name": "Rim/plateau 2-tier step reads via shading, not just flat color",
+      "tier": "important",
+      "passIds": [
+        "structural-pass",
+        "material-pass"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "maple-leaf-1-rim",
+        "maple-leaf-2-rim",
+        "maple-leaf-3-rim",
+        "maple-leaf-1-body",
+        "maple-leaf-2-body",
+        "maple-leaf-3-body"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "leaf-readable-at-64px",
+      "name": "Leaf lobe shape survives 64px thumbnail downsample",
+      "tier": "critical",
+      "passIds": [
+        "optimization-pass"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": true,
+      "componentRefs": [
+        "root"
+      ],
+      "evidenceRefs": [
+        "view-top"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color; repo bans PBR maps outright."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer: scripts/breadlab.ts mirrors scripts/thumbsHarness.ts with a warm directional key 0xffe2b0 at (-2, 6, 2) intensity 1.4, an ambient 0xfff0dc at 0.75 and a cool fill 0xdce8ff at (2.5, 3, -2) intensity 0.2.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The runtime normalizes the cluster's longest axis to 1.6, so absolute dimensions are arbitrary.",
+    "The true maple leaf vein topology (1 midrib + branching side veins) is simplified to 5 independent center-to-tip spokes -- a deliberate low-poly stylization documented as a niceToHave gap, not a measurement error.",
+    "The reference's small stem nub below the leaf's bottom point (visible faintly in maple-2.png) is NOT modeled -- omitted as a budget/legibility tradeoff, same class of honest omission as redbean's inner spiral curl."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "LEAF_RADIUS = 0.42 relative unit. Absolute scale is meaningless: the consumer runtime refits the cluster's longest axis to 1.6 (types.ts section 6)."
+  },
+  "silhouette": {
+    "boundingShape": "3 flat leaf-shaped candies loosely overlapping at their bases, roughly 1.7 wide by 0.11 tall by 1.3 deep in relative units",
+    "aspectRatios": [
+      {
+        "id": "leaf-tip-to-basal-ratio",
+        "value": 1.72,
+        "source": "maple-3.png -- main tip radius 1.0 vs basal tip radius 0.58"
+      }
+    ],
+    "symmetry": "each candy is mirror-symmetric about its own main-tip axis; the 3-candy cluster as a whole is asymmetric",
+    "dominantCurves": [
+      "flat leaf-shaped extrusion, no curvature -- entirely faceted planar surfaces"
+    ],
+    "negativeSpaces": [
+      "deep stem-notch valley at the bottom of each leaf, between the 2 basal tips",
+      "4 shallower valley sinuses between the other lobe pairs"
+    ],
+    "landmarks": [
+      "5-lobed leaf outline is the sole identity carrier -- color cannot distinguish this from chestnut/cinnamon in the same batch"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "3 maple-leaf-shaped candies resting flat, loosely overlapping at their bases in a triangular cluster",
+        "each candy is a classic 5-lobed maple leaf outline: 1 large main tip, 2 medium upper-side tips, 2 smaller basal tips, deep V stem-notch at the bottom between the basal tips",
+        "originally modeled with a real geometric 2-tier rim/plateau step (see spec risk bevel-wall-dropped-for-rendering-bug for why this was simplified to a single flat top height, color-only 2-tone)",
+        "the inner plateau carries a central-vein-to-each-tip crease pattern, darker where sunk, lighter on the raised facets between veins",
+        "visible side-wall thickness at each candy's lower edge confirms real extrusion, not a flat cutout"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "rim band width is a substantial fraction of the half-radius, not a hairline border",
+        "side wall (candy thickness) clearly visible at the bottom edge of each leaf, same cream tone as the rim"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "confirms the 5-lobe outline and deep stem-notch precisely",
+        "all 3 candies lie flat, none tilted on-edge -- the fixed 3/4 hero camera reveals edge thickness through perspective alone"
+      ],
+      "confidence": 0.95
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Maple Leaf Candies",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Transform-only assembly node carrying the 3 candy instances; emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 1.7,
+        "height": 0.1,
+        "depth": 1.3,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "maple-rim"
+        }
+      },
+      "material": "maple-rim",
+      "materialLayers": [
+        "maple-rim",
+        "maple-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(232, 199, 135, 1.0)",
+        "secondaryAlbedo": "rgba(184, 130, 58, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/maple.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "three-candy-cluster",
+          "name": "3-candy flat resting cluster",
+          "kind": "contour",
+          "description": "All 3 candies lie flat (rotation only in yaw), loosely overlapping at their bases -- CRIB.md's cluster-of-3 convention, but with NO per-instance tilt (unlike olive) since the reference itself shows all 3 flat and edge thickness reads through the fixed 3/4 camera perspective alone.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single flat top height (rim and plateau share TOP_Y, no bevel step -- risk bevel-wall-dropped-for-rendering-bug) plus a 5-spoke vertex-dip crease on the plateau -- geometric, not a mask or texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; rim/plateau and vein contrast come entirely from their own facet-normal shading and material split",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "three-candy-cluster"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "maple-leaf-1",
+      "name": "Maple candy (1)",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Transform-only per-instance assembly node carrying this candy's rim+body children.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.84,
+        "height": 0.1,
+        "depth": 0.84,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          -0.36,
+          0.0,
+          0.22
+        ],
+        "rotation": [
+          0.0,
+          0.35,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "maple-leaf-1",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "maple-rim"
+        }
+      },
+      "material": "maple-rim",
+      "materialLayers": [
+        "maple-rim",
+        "maple-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(232, 199, 135, 1.0)",
+        "secondaryAlbedo": "rgba(184, 130, 58, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "per-instance assembly, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/maple.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single flat top height (rim and plateau share TOP_Y, no bevel step -- risk bevel-wall-dropped-for-rendering-bug) plus a 5-spoke vertex-dip crease on the plateau -- geometric, not a mask or texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; rim/plateau and vein contrast come entirely from their own facet-normal shading and material split",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "maple-leaf-1-rim",
+      "name": "Maple candy rim band (1)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Custom extruded prism from a 10-point non-circular outline -- rim-top band + full outer side wall (bevel wall dropped, see risk bevel-wall-dropped-for-rendering-bug), all sharing the same material. Not a lathe (boundary is not circular); primitive=box pairs with assembled-solid per CRIB.md.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.42,
+              0.05
+            ],
+            [
+              0.231,
+              0.05
+            ],
+            [
+              0.3444,
+              0.05
+            ],
+            [
+              0.1764,
+              0.05
+            ],
+            [
+              0.2436,
+              0.05
+            ],
+            [
+              0.084,
+              0.05
+            ],
+            [
+              0.2436,
+              0.05
+            ],
+            [
+              0.1764,
+              0.05
+            ],
+            [
+              0.3444,
+              0.05
+            ],
+            [
+              0.231,
+              0.05
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices, never a flatShading flag"
+      },
+      "parent": "maple-leaf-1",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.84,
+        "height": 0.1,
+        "depth": 0.84,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "body",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "maple-leaf-1-rim",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "maple-rim"
+        }
+      },
+      "material": "maple-rim",
+      "materialLayers": [
+        "maple-rim"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(232, 199, 135, 1.0)",
+        "secondaryAlbedo": "rgba(232, 199, 135, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "rim-top band + full outer side wall (bevel wall dropped, see risk bevel-wall-dropped-for-rendering-bug)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/maple.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "maple-leaf-1-rim-outline",
+          "name": "5-lobed leaf silhouette",
+          "kind": "contour",
+          "description": "The rim band traces the true leaf outline (main/upper-side/basal tips + deep stem-notch valley) -- carries all identity since color alone cannot distinguish maple from chestnut/cinnamon in the same batch.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single flat top height (rim and plateau share TOP_Y, no bevel step -- risk bevel-wall-dropped-for-rendering-bug) plus a 5-spoke vertex-dip crease on the plateau -- geometric, not a mask or texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; rim/plateau and vein contrast come entirely from their own facet-normal shading and material split",
+        "edgeWearPattern": "none",
+        "notes": "Single flat rim color across the top band and full outer side wall (no bevel wall -- meets the plateau at one shared height, TOP_Y)."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "maple-leaf-1-rim-outline"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "maple-leaf-1-body",
+      "name": "Maple candy inner plateau (1)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.95,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Inner plateau fan (same height as the rim, TOP_Y -- no bevel step, see risk bevel-wall-dropped-for-rendering-bug) plus the flat bottom cap, both flat color. The plateau fan is subdivided at each of the 5 tip-facing spokes by a dipped vein-mid vertex (chestnut.ts CREASE technique generalized to 5 fixed directions instead of 1).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.05
+            ],
+            [
+              0.3276,
+              0.05
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "vein-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.016,
+            "notes": "5 vein-mid vertices, one per tip direction, placed at VEIN_FRAC=0.55 along the center->tip spoke and dipped an additional 0.016 in Y -- splits each of the plateau's 10 base fan triangles at its tip-adjacent edge (every triangle touches exactly one tip), producing a visible crease radiating to each lobe with zero extra material buckets."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices, never a flatShading flag"
+      },
+      "parent": "maple-leaf-1",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.6552,
+        "height": 0.1,
+        "depth": 0.6552,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "maple-leaf-1-body",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "maple-rim"
+        }
+      },
+      "material": "maple-body",
+      "materialLayers": [
+        "maple-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(184, 130, 58, 1.0)",
+        "secondaryAlbedo": "rgba(184, 130, 58, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "inner plateau top + flat bottom cap",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/maple.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "vein-crease"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "maple-leaf-1-body-veins",
+          "name": "5-spoke vein crease",
+          "kind": "seam",
+          "description": "Radiates from the plateau center to each of the 5 lobe tips, catching the key light differently at the crease edge. Simplified from the reference's true branching midrib+side-vein pattern to 5 independent spokes -- a deliberate low-poly stylization, not a mismeasurement.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-front"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single flat top height (rim and plateau share TOP_Y, no bevel step -- risk bevel-wall-dropped-for-rendering-bug) plus a 5-spoke vertex-dip crease on the plateau -- geometric, not a mask or texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; rim/plateau and vein contrast come entirely from their own facet-normal shading and material split",
+        "edgeWearPattern": "none",
+        "notes": "Single flat body color on the plateau and bottom cap; the vein pattern is entirely geometric (crease + facet shading), never painted."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "maple-leaf-1-body-veins"
+      ],
+      "fidelityTier": "surface-pass"
+    },
+    {
+      "id": "maple-leaf-2",
+      "name": "Maple candy (2)",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Transform-only per-instance assembly node carrying this candy's rim+body children.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.84,
+        "height": 0.1,
+        "depth": 0.84,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.38,
+          0.0,
+          0.18
+        ],
+        "rotation": [
+          0.0,
+          -0.5,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "maple-leaf-2",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "maple-rim"
+        }
+      },
+      "material": "maple-rim",
+      "materialLayers": [
+        "maple-rim",
+        "maple-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(232, 199, 135, 1.0)",
+        "secondaryAlbedo": "rgba(184, 130, 58, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "per-instance assembly, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/maple.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single flat top height (rim and plateau share TOP_Y, no bevel step -- risk bevel-wall-dropped-for-rendering-bug) plus a 5-spoke vertex-dip crease on the plateau -- geometric, not a mask or texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; rim/plateau and vein contrast come entirely from their own facet-normal shading and material split",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "maple-leaf-2-rim",
+      "name": "Maple candy rim band (2)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Custom extruded prism from a 10-point non-circular outline -- rim-top band + full outer side wall (bevel wall dropped, see risk bevel-wall-dropped-for-rendering-bug), all sharing the same material. Not a lathe (boundary is not circular); primitive=box pairs with assembled-solid per CRIB.md.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.42,
+              0.05
+            ],
+            [
+              0.231,
+              0.05
+            ],
+            [
+              0.3444,
+              0.05
+            ],
+            [
+              0.1764,
+              0.05
+            ],
+            [
+              0.2436,
+              0.05
+            ],
+            [
+              0.084,
+              0.05
+            ],
+            [
+              0.2436,
+              0.05
+            ],
+            [
+              0.1764,
+              0.05
+            ],
+            [
+              0.3444,
+              0.05
+            ],
+            [
+              0.231,
+              0.05
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices, never a flatShading flag"
+      },
+      "parent": "maple-leaf-2",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.84,
+        "height": 0.1,
+        "depth": 0.84,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "body",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "maple-leaf-2-rim",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "maple-rim"
+        }
+      },
+      "material": "maple-rim",
+      "materialLayers": [
+        "maple-rim"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(232, 199, 135, 1.0)",
+        "secondaryAlbedo": "rgba(232, 199, 135, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "rim-top band + full outer side wall (bevel wall dropped, see risk bevel-wall-dropped-for-rendering-bug)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/maple.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "maple-leaf-2-rim-outline",
+          "name": "5-lobed leaf silhouette",
+          "kind": "contour",
+          "description": "The rim band traces the true leaf outline (main/upper-side/basal tips + deep stem-notch valley) -- carries all identity since color alone cannot distinguish maple from chestnut/cinnamon in the same batch.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single flat top height (rim and plateau share TOP_Y, no bevel step -- risk bevel-wall-dropped-for-rendering-bug) plus a 5-spoke vertex-dip crease on the plateau -- geometric, not a mask or texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; rim/plateau and vein contrast come entirely from their own facet-normal shading and material split",
+        "edgeWearPattern": "none",
+        "notes": "Single flat rim color across the top band and full outer side wall (no bevel wall -- meets the plateau at one shared height, TOP_Y)."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "maple-leaf-2-rim-outline"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "maple-leaf-2-body",
+      "name": "Maple candy inner plateau (2)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.95,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Inner plateau fan (same height as the rim, TOP_Y -- no bevel step, see risk bevel-wall-dropped-for-rendering-bug) plus the flat bottom cap, both flat color. The plateau fan is subdivided at each of the 5 tip-facing spokes by a dipped vein-mid vertex (chestnut.ts CREASE technique generalized to 5 fixed directions instead of 1).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.05
+            ],
+            [
+              0.3276,
+              0.05
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "vein-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.016,
+            "notes": "5 vein-mid vertices, one per tip direction, placed at VEIN_FRAC=0.55 along the center->tip spoke and dipped an additional 0.016 in Y -- splits each of the plateau's 10 base fan triangles at its tip-adjacent edge (every triangle touches exactly one tip), producing a visible crease radiating to each lobe with zero extra material buckets."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices, never a flatShading flag"
+      },
+      "parent": "maple-leaf-2",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.6552,
+        "height": 0.1,
+        "depth": 0.6552,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "maple-leaf-2-body",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "maple-rim"
+        }
+      },
+      "material": "maple-body",
+      "materialLayers": [
+        "maple-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(184, 130, 58, 1.0)",
+        "secondaryAlbedo": "rgba(184, 130, 58, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "inner plateau top + flat bottom cap",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/maple.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "vein-crease"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "maple-leaf-2-body-veins",
+          "name": "5-spoke vein crease",
+          "kind": "seam",
+          "description": "Radiates from the plateau center to each of the 5 lobe tips, catching the key light differently at the crease edge. Simplified from the reference's true branching midrib+side-vein pattern to 5 independent spokes -- a deliberate low-poly stylization, not a mismeasurement.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-front"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single flat top height (rim and plateau share TOP_Y, no bevel step -- risk bevel-wall-dropped-for-rendering-bug) plus a 5-spoke vertex-dip crease on the plateau -- geometric, not a mask or texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; rim/plateau and vein contrast come entirely from their own facet-normal shading and material split",
+        "edgeWearPattern": "none",
+        "notes": "Single flat body color on the plateau and bottom cap; the vein pattern is entirely geometric (crease + facet shading), never painted."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "maple-leaf-2-body-veins"
+      ],
+      "fidelityTier": "surface-pass"
+    },
+    {
+      "id": "maple-leaf-3",
+      "name": "Maple candy (3)",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Transform-only per-instance assembly node carrying this candy's rim+body children.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.84,
+        "height": 0.1,
+        "depth": 0.84,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.02,
+          0.0,
+          -0.3
+        ],
+        "rotation": [
+          0.0,
+          3.05,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "maple-leaf-3",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "maple-rim"
+        }
+      },
+      "material": "maple-rim",
+      "materialLayers": [
+        "maple-rim",
+        "maple-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(232, 199, 135, 1.0)",
+        "secondaryAlbedo": "rgba(184, 130, 58, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "per-instance assembly, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/maple.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single flat top height (rim and plateau share TOP_Y, no bevel step -- risk bevel-wall-dropped-for-rendering-bug) plus a 5-spoke vertex-dip crease on the plateau -- geometric, not a mask or texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; rim/plateau and vein contrast come entirely from their own facet-normal shading and material split",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "maple-leaf-3-rim",
+      "name": "Maple candy rim band (3)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Custom extruded prism from a 10-point non-circular outline -- rim-top band + full outer side wall (bevel wall dropped, see risk bevel-wall-dropped-for-rendering-bug), all sharing the same material. Not a lathe (boundary is not circular); primitive=box pairs with assembled-solid per CRIB.md.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.42,
+              0.05
+            ],
+            [
+              0.231,
+              0.05
+            ],
+            [
+              0.3444,
+              0.05
+            ],
+            [
+              0.1764,
+              0.05
+            ],
+            [
+              0.2436,
+              0.05
+            ],
+            [
+              0.084,
+              0.05
+            ],
+            [
+              0.2436,
+              0.05
+            ],
+            [
+              0.1764,
+              0.05
+            ],
+            [
+              0.3444,
+              0.05
+            ],
+            [
+              0.231,
+              0.05
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices, never a flatShading flag"
+      },
+      "parent": "maple-leaf-3",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.84,
+        "height": 0.1,
+        "depth": 0.84,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "body",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "maple-leaf-3-rim",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "maple-rim"
+        }
+      },
+      "material": "maple-rim",
+      "materialLayers": [
+        "maple-rim"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(232, 199, 135, 1.0)",
+        "secondaryAlbedo": "rgba(232, 199, 135, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "rim-top band + full outer side wall (bevel wall dropped, see risk bevel-wall-dropped-for-rendering-bug)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/maple.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "maple-leaf-3-rim-outline",
+          "name": "5-lobed leaf silhouette",
+          "kind": "contour",
+          "description": "The rim band traces the true leaf outline (main/upper-side/basal tips + deep stem-notch valley) -- carries all identity since color alone cannot distinguish maple from chestnut/cinnamon in the same batch.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single flat top height (rim and plateau share TOP_Y, no bevel step -- risk bevel-wall-dropped-for-rendering-bug) plus a 5-spoke vertex-dip crease on the plateau -- geometric, not a mask or texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; rim/plateau and vein contrast come entirely from their own facet-normal shading and material split",
+        "edgeWearPattern": "none",
+        "notes": "Single flat rim color across the top band and full outer side wall (no bevel wall -- meets the plateau at one shared height, TOP_Y)."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "maple-leaf-3-rim-outline"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "maple-leaf-3-body",
+      "name": "Maple candy inner plateau (3)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.95,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Inner plateau fan (same height as the rim, TOP_Y -- no bevel step, see risk bevel-wall-dropped-for-rendering-bug) plus the flat bottom cap, both flat color. The plateau fan is subdivided at each of the 5 tip-facing spokes by a dipped vein-mid vertex (chestnut.ts CREASE technique generalized to 5 fixed directions instead of 1).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.05
+            ],
+            [
+              0.3276,
+              0.05
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "vein-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.016,
+            "notes": "5 vein-mid vertices, one per tip direction, placed at VEIN_FRAC=0.55 along the center->tip spoke and dipped an additional 0.016 in Y -- splits each of the plateau's 10 base fan triangles at its tip-adjacent edge (every triangle touches exactly one tip), producing a visible crease radiating to each lobe with zero extra material buckets."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices, never a flatShading flag"
+      },
+      "parent": "maple-leaf-3",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.6552,
+        "height": 0.1,
+        "depth": 0.6552,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "maple-leaf-3-body",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "maple-rim"
+        }
+      },
+      "material": "maple-body",
+      "materialLayers": [
+        "maple-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(184, 130, 58, 1.0)",
+        "secondaryAlbedo": "rgba(184, 130, 58, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "inner plateau top + flat bottom cap",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/maple.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "vein-crease"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "maple-leaf-3-body-veins",
+          "name": "5-spoke vein crease",
+          "kind": "seam",
+          "description": "Radiates from the plateau center to each of the 5 lobe tips, catching the key light differently at the crease edge. Simplified from the reference's true branching midrib+side-vein pattern to 5 independent spokes -- a deliberate low-poly stylization, not a mismeasurement.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-front"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single flat top height (rim and plateau share TOP_Y, no bevel step -- risk bevel-wall-dropped-for-rendering-bug) plus a 5-spoke vertex-dip crease on the plateau -- geometric, not a mask or texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; rim/plateau and vein contrast come entirely from their own facet-normal shading and material split",
+        "edgeWearPattern": "none",
+        "notes": "Single flat body color on the plateau and bottom cap; the vein pattern is entirely geometric (crease + facet shading), never painted."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "maple-leaf-3-body-veins"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "maple-rim",
+      "name": "Candy rim (pale cream)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#E8C787",
+      "color": "#E8C787",
+      "albedo": {
+        "dominant": "#E8C787",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/maple.json geometry.surface, not pixel-sampled."
+      },
+      "colorVariation": {
+        "palette": [
+          "#E8C787"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only for merge attribute consistency."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "leaf outline / rim-plateau step",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 5.0,
+          "amplitude": 0.016,
+          "role": "5-spoke vein crease",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "rim-top band + full outer side wall (bevel wall dropped, see risk bevel-wall-dropped-for-rendering-bug)",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "rim-is-real-step-not-paint",
+          "name": "Rim/plateau boundary is a real geometric step",
+          "maskSource": "geometry",
+          "description": "Unlike a flat 2-color leaf, the reference shows the rim genuinely PROUD of the recessed inner plateau (TOP_Y > TOP_Y) -- confirmed by consistent shading discontinuity at the boundary across all 3 candies and all 3 reference views, not just a flat color line.",
+          "evidenceRefs": [
+            "view-front",
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "maple-leaf-1-rim",
+            "maple-leaf-2-rim",
+            "maple-leaf-3-rim"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "rim-top band + full outer side wall (bevel wall dropped, see risk bevel-wall-dropped-for-rendering-bug). Two solid colors for the whole cluster (types.ts inherited section 9); vein-groove and raised-facet-highlight hexes are dropped (real geometric crease + free N.L falloff cover them)."
+    },
+    {
+      "id": "maple-body",
+      "name": "Candy inner plateau (caramel-tan)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#B8823A",
+      "color": "#B8823A",
+      "albedo": {
+        "dominant": "#B8823A",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/maple.json geometry.surface, not pixel-sampled."
+      },
+      "colorVariation": {
+        "palette": [
+          "#B8823A"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only for merge attribute consistency."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "leaf outline / rim-plateau step",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 5.0,
+          "amplitude": 0.016,
+          "role": "5-spoke vein crease",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "inner plateau + bottom cap",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "vein-groove-and-highlight-dropped",
+          "name": "Vein groove/highlight not painted",
+          "maskSource": "geometry",
+          "description": "assets/prompts/ingredients/maple.json names a toffee-brown vein-groove hex (#8F6224) and a honey highlight hex (#D9A85C); both are covered by the plateau's own vein-crease geometry (dark inside the crease, lit on the raised facets between veins via N.L falloff) instead of a 3rd/4th material bucket.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "maple-leaf-1-body",
+            "maple-leaf-2-body",
+            "maple-leaf-3-body"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "inner plateau + bottom cap. Two solid colors for the whole cluster (types.ts inherited section 9); vein-groove and raised-facet-highlight hexes are dropped (real geometric crease + free N.L falloff cover them)."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "maple-candy-cluster",
+      "name": "3-candy flat resting cluster",
+      "level": "macro",
+      "hostComponents": [
+        "root"
+      ],
+      "elementComponentIds": [
+        "maple-leaf-1",
+        "maple-leaf-2",
+        "maple-leaf-3"
+      ],
+      "elementKind": "repeated macro assembly, each with its own rim+body child pair",
+      "count": 3,
+      "distribution": {
+        "mode": "hand-placed XZ offsets with independent yaw, all flat (rotation.x = rotation.z = 0)",
+        "offsets": {
+          "back-left": [
+            -0.36,
+            0.22
+          ],
+          "back-right": [
+            0.38,
+            0.18
+          ],
+          "front": [
+            0.02,
+            -0.3
+          ]
+        },
+        "yaw": {
+          "back-left": 0.35,
+          "back-right": -0.5,
+          "front": 3.05
+        },
+        "note": "Offsets/yaw read off maple-3.png (top-down footprint) -- front candy's base tucks between the two back candies, matching the reference triangular overlap."
+      },
+      "sizeClasses": [
+        {
+          "id": "candy",
+          "radius": 0.42
+        }
+      ],
+      "seedRule": "All placement is fixed authored values -- no jitter anywhere in this builder (R4), so the exported GLB is byte-deterministic independent of rng.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 210,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Team-lead-assigned cluster-group budget for this batch (300-700 tri target, <=68KB target, types.ts R2 hard ceiling <=2500 tri/<=100KB). Per candy: rim=40tri (20 top band + 20 side wall, bevel wall dropped -- see risk), plateau=20tri (5-spoke crease split), bottom cap=10tri = 70tri/candy x 3 = 210tri by construction. Deliberately below the 300 floor -- thin detail-driven asset, CRIB.md explicitly allows undershoot when legibility is the limiter, not triangle count."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, upper-left.",
+      "usage": "Fixed by scripts/breadlab.ts.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build a custom indexed prism per candy from the 10-point outline: outer-top ring (TOP_Y) -> inner-top ring (TOP_Y, scaled INNER_SCALE) -> rim-top band; outer-top ring -> outer-bottom ring (BOTTOM_Y) -> side wall (both bands = maple-rim material). No bevel wall -- rim-top and plateau meet at the SAME height, TOP_Y (dropped post-implementation, see risk bevel-wall-dropped-for-rendering-bug).",
+    "Inner plateau fan (center at TOP_Y to the inner ring) with 5 vein-mid vertices splitting each of the 10 base fan triangles at its tip-adjacent center edge (chestnut.ts CREASE generalized). Flat bottom cap fan (center at BOTTOM_Y to outer-bottom ring), no vein detail (hidden underside). Both = maple-body material.",
+    "Winding verified per band via cross-product sign (cheese.ts's U x V = N method): rim-top band and inner-plateau fan need +Y normals (reversed CCW-by-angle order); bottom cap needs -Y (natural CCW-by-angle order); side wall reuses buildRevolvedShell's proven a0/b0 ring-transition index pattern for outward normals.",
+    "No jitter anywhere (JITTER_AMP=0, R4) -- thin pointed lobes at this poly budget cannot absorb even a small random perturbation without losing tip sharpness (same class of exception as cheese's box-corner jitter-skip).",
+    "sliceTriangles(0, 40) for the rim bucket, (40, 70) for the body bucket per candy (continuous-range split by construction order, never a vertex mask) -- then top-planar UV per bucket, merge all 3 candies' matching buckets across instances into exactly 2 meshes.",
+    "No lay-down rotation -- all 3 candies rest flat, local Y is world Y directly. Independent XZ offset + yaw per instance; no per-instance floor correction needed since the prism's own bottom is already flat at BOTTOM_Y for every instance (shared ground plane by construction, unlike olive's per-instance bbox snap)."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-cluster rotation for the showcase turntable",
+    "each candy is a named instance"
+  ],
+  "destructionAnchors": [
+    "each candy is its own fractureGroup; the only plausible break is one candy sliding away from the cluster"
+  ],
+  "risks": [
+    {
+      "id": "vein-groove-highlight-dropped",
+      "severity": "low",
+      "description": "assets/prompts/ingredients/maple.json names a vein-groove hex (#8F6224) and a raised-facet highlight hex (#D9A85C) this spec does not paint as separate materials.",
+      "mitigation": "Covered by the plateau's own vein-crease geometry (dark inside the crease from its own facet normals, lit on the raised facets between veins via free N.L falloff), same drop logic as olive/chestnut/redbean body precedent."
+    },
+    {
+      "id": "leaf-lobes-may-blur-at-64px",
+      "severity": "medium",
+      "description": "CRIB.md flags maple as the batch's hardest legibility case: 5 thin pointed lobes with deep sinuses risk merging into a blob at the 64px thumbnail target, same failure mode cranberry hit before its instance count was cut from 6 to 3.",
+      "mitigation": "Kept lobes bold (basal-tip radius 0.58 vs main-tip 1.0, not razor-thin) and valleys deep (bottom stem-notch at 0.20) per CRIB's 'make the leaf big, cut the count' guidance. Verify honestly at 64px (LANCZOS downsample onto card bg) before declaring pass; if it fails, the fallback is reducing the cluster from 3 candies to 2 (documented in CRIB as an acceptable batch-4 outcome), not adding more triangles."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-color-based region paint is silently discarded by the runtime's MeshLambertMaterial swap.",
+      "mitigation": "Only 2 materials total, each covering whole contiguous triangle ranges (rim / body) by construction order; no vertexPaint block is authored anywhere in this spec."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "A flatShading flag is not inherited by the runtime material swap.",
+      "mitigation": "Faceting is baked into geometry by splitting vertices (scripts/breads/lib.ts facet) before export."
+    },
+    {
+      "id": "custom-winding-error-risk",
+      "severity": "medium",
+      "description": "This is the batch's only fully hand-built (non-buildRevolvedShell) indexed geometry with several distinct band/fan types, each needing manually-verified winding -- a single flipped band would render as a hole (backface-culled), not a subtle visual bug.",
+      "mitigation": "Each band's winding was derived analytically via cross-product sign before implementation (documented in proceduralStrategy), not guessed; render inspection (missing/black faces) is the fast empirical check if one band is still wrong."
+    },
+    {
+      "id": "bevel-wall-dropped-for-rendering-bug",
+      "severity": "medium",
+      "description": "The originally-implemented 3-ring rim/bevel/plateau structure (R1 outer-top -> R2 inner-top -> R3 inner-plateau, a real proud-rim height step matching the reference) punched a background-colored hole through near whichever tip faced the harness camera, on every one of the 3 candies, across multiple independent redesigns of the crease/vein logic. Root cause NOT fully determined: DoubleSide materials ruled out backface culling, an exhaustive triangle-area check found zero degenerate triangles, and cross-product sign verification found all 3 bands (rim-top, bevel, side wall) correctly wound on all 10 segments each -- yet isolating rim-top-alone and (rim-top+bevel+side, no plateau) both rendered perfectly clean, while adding the plateau back (with or without the vein split) reintroduced the hole every time. Doubling the bevel's height (0.02 -> 0.045) did not fix it either, ruling out sub-pixel wall thinness.",
+      "mitigation": "Collapsed the 3-ring structure to 2 rings sharing one height (TOP_Y) -- rim-top band and plateau fan now meet directly with no bevel wall in between. This is the exact construct present in every failing configuration; removing it eliminated the hole in the hero shot, all 3 azimuth shots, and the roundtrip parity shot. Traded the reference's genuine raised-rim 3D relief for a flat 2-tone color split (still 2 materials, still matches the leaf's overall look) in exchange for a verified-clean render. Flagged for the delegating session: if the raised-rim look is later wanted, budget a fresh investigation rather than reintroducing this exact 3-ring pattern blind."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Maple Leaf Candies",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  }
+}

@@ -1,0 +1,1858 @@
+{
+  "targetName": "Apricot Row",
+  "targetId": "apricot-row",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\apricot.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved; fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 2,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "three dried apricot halves resting cut-side up",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "repeated instances",
+        "discrete resting row"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading. Identity carried by a deep concave pit hollow (real geometry, not a shallow dip) plus a two-color bucket (body/hollow) for shading margin -- pancake bubble-wall precedent: a shallow dip alone under-shades."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 1,
+        "materialLayerCount": 1,
+        "localDetailDensity": 2,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 3,
+        "mesoComponents": 0,
+        "microFeatureGroups": 1,
+        "materialLayers": 2,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Three near-identical macro bodies differing only in XZ offset/yaw, componentCount 1.",
+        "Silhouette 2: the deep hollow is load-bearing, not just a color patch on an otherwise plain dome.",
+        "materialLayerCount 1: two color buckets (body, hollow) -- both prompt hex used directly (unlike raisin/cranberry's single-bucket economy) because the hollow needed a hedge against shading being too subtle on a shallow-dome body.",
+        "Local detail density 2: pit hollow (geometry+color) + wrinkled rim (geometry-only, alternating sector pull on one ring)."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier, macro-only, one repetition system for the 3-instance row plus a 2-material split within each instance (sliceTriangles, not a vertex mask)."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 2,
+      "note": "Enumerated by hand from the three reference views (CRIB.md skip rule).",
+      "details": [
+        {
+          "id": "deep-pit-hollow",
+          "zone": "top face, center",
+          "observation": "Pit hollow drops from the raised rim almost to equator height -- a real depth cue, not a shallow color patch.",
+          "inference": "Decisive identity feature per team lead brief; a shallow dip reads as a flat disc, not an apricot half.",
+          "confidence": 0.9,
+          "evidenceRef": "apricot.png full frame",
+          "kind": "hole",
+          "mapsTo": {
+            "ref": "apricot-a-deep-pit-hollow",
+            "note": ""
+          }
+        },
+        {
+          "id": "wrinkled-rim",
+          "zone": "rim ring, just outside the hollow",
+          "observation": "Rim edge is softly scalloped/puckered, not a perfect circle.",
+          "inference": "Dried-fruit wrinkle cue distinguishing from a smooth cut fruit.",
+          "confidence": 0.8,
+          "evidenceRef": "apricot-3.png top-down",
+          "kind": "ridge",
+          "mapsTo": {
+            "ref": "apricot-a-wrinkled-rim",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/rosemary.png"
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 0,
+      "microFeatureGroups": 0,
+      "materialLayers": 2,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 3
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "three apricot halves in a tight row, cut-side up",
+      "deep concave pit hollow sunk near equator height on each half",
+      "scalloped wrinkled rim ring around the hollow",
+      "distinguishable from a flat orange disc at 64px"
+    ],
+    "niceToHave": [
+      "exact rim-wrinkle sector count/position"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "three-apricot-row-silhouette",
+      "name": "Three-apricot row, individually readable",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "apricot-a",
+        "apricot-b",
+        "apricot-c"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "deep-hollow-readable",
+      "name": "Pit hollow reads as a sunken center, not a flat disc",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement",
+        "surface-pass"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": true,
+      "componentRefs": [
+        "apricot-a",
+        "apricot-b",
+        "apricot-c"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color; PBR maps are inert."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer harness.",
+      "mustAvoid": [
+        "authoring lights into the model"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The runtime normalizes the cluster's longest axis to 1.6.",
+    "The hollow's exact depth is not pixel-critical; the review scores whether a sunken center reads at all versus a flat disc."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera looks from",
+    "up": "+Y",
+    "scaleReference": "APRICOT_RADIUS = 0.55 relative unit. Absolute scale is meaningless (types.ts section 6)."
+  },
+  "silhouette": {
+    "boundingShape": "tight row of three flattened-dome apricot halves, roughly 2.7 wide by 0.85 tall by 1.15 deep in relative units",
+    "aspectRatios": [
+      {
+        "id": "apricot-height-over-diameter",
+        "value": 0.764,
+        "source": "2*0.42 / (2*0.55)"
+      }
+    ],
+    "symmetry": "each half is radially symmetric before the rim wrinkle; the row as a whole is asymmetric",
+    "dominantCurves": [
+      "convex rounded underside",
+      "concave hollow on top"
+    ],
+    "negativeSpaces": [
+      "the pit hollow itself",
+      "scalloped rim wrinkle valleys"
+    ],
+    "landmarks": [
+      "deep concave pit hollow sunk near equator height",
+      "scalloped wrinkled rim ring"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "three dried apricot halves resting cut-side up in a small row, each with a deep concave pit hollow sunk well below the raised rim, and softly puckered wrinkled edges around that rim"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "rounded convex underside is noticeably larger/plumper than the shallow rim-to-hollow region on top -- equator sits below the vertical midpoint",
+        "the pit hollow's inner wall is a real depth drop, not a shallow dimple -- the hollow floor sits close to the equator height"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "confirms the oval, slightly irregular rim outline around each hollow, with the wrinkled-rim wave visible as a subtly scalloped edge"
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Apricot Row",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the three apricot-half bodies.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.7,
+        "height": 0.85,
+        "depth": 1.15,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "apricot-body"
+        }
+      },
+      "material": "apricot-body",
+      "materialLayers": [
+        "apricot-body",
+        "apricot-hollow"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(224, 160, 92, 1.0)",
+        "secondaryAlbedo": "rgba(185, 117, 56, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference/prompt JSON explicitly excludes shine.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/apricot.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "row-arrangement",
+          "name": "Three-apricot tight row",
+          "kind": "contour",
+          "description": "Three halves placed close together in a row, all flat (no tiltZ) since each rests cut-side up naturally by construction.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "inherited from children",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [
+        "row-arrangement"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "apricot-a",
+      "name": "Apricot half (a)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass, standard bowl/dish revolve profile (radius decreases monotonically toward the top pole while height dips then rises then dips again -- non-monotonic height is fine for buildRevolvedShell, which only connects adjacent rings). No lay-down rotation needed: the profile itself is built bottom-pole-down / hollow-pole-up.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.42
+            ],
+            [
+              0.33,
+              -0.3444
+            ],
+            [
+              0.49500000000000005,
+              -0.1932
+            ],
+            [
+              0.55,
+              -0.021
+            ],
+            [
+              0.5115000000000001,
+              0.168
+            ],
+            [
+              0.341,
+              0.1848
+            ],
+            [
+              0.165,
+              0.0924
+            ],
+            [
+              0.0,
+              0.012599999999999998
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "rim-wrinkle",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.14,
+            "notes": "Ring index 4 (the rim line, hFrac 0.4), alternating sectors [0, 2, 4, 6, 8, 10] of 12 pulled toward the axis by 0.14 -- shallow, localized (one ring), unlike raisin's full-length flute."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.018,
+            "notes": "amplitude 0.018 (3.3% of radius)."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar), separately on body and hollow slices",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.1,
+        "height": 0.84,
+        "depth": 1.1,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          -0.78,
+          0.0,
+          0.03
+        ],
+        "rotation": [
+          0.0,
+          0.2,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "apricot-a",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "apricot-body"
+        }
+      },
+      "material": "apricot-body",
+      "materialLayers": [
+        "apricot-body",
+        "apricot-hollow"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(224, 160, 92, 1.0)",
+        "secondaryAlbedo": "rgba(185, 117, 56, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference/prompt JSON explicitly excludes shine.",
+        "zone": "convex body + rim, most of the surface",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/apricot.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "rim-wrinkle",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "apricot-a-deep-pit-hollow",
+          "name": "Deep concave pit hollow",
+          "kind": "hole",
+          "description": "sliceTriangles bands 4..6 of the profile (past the rim line) form a separate hollow-colored mesh; the rim-to-center height drop is 0.16 relative units, close to the equator height for a strongly readable sunken center.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-front"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "apricot-a-wrinkled-rim",
+          "name": "Wrinkled rim wave",
+          "kind": "ridge",
+          "description": "One ring, alternating sectors pulled toward the axis -- a shallow scalloped rim distinct from the deep hollow.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the hollow walls",
+        "displacementPattern": "hollow sunk to near-equator height, rim wrinkle localized to one ring",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Two color buckets split by triangle-band slice (not a vertex mask) -- boundary is exact, computed from the profile's own band tri counts."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "apricot-a-deep-pit-hollow",
+        "apricot-a-wrinkled-rim"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "apricot-b",
+      "name": "Apricot half (b)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass, standard bowl/dish revolve profile (radius decreases monotonically toward the top pole while height dips then rises then dips again -- non-monotonic height is fine for buildRevolvedShell, which only connects adjacent rings). No lay-down rotation needed: the profile itself is built bottom-pole-down / hollow-pole-up.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.42
+            ],
+            [
+              0.33,
+              -0.3444
+            ],
+            [
+              0.49500000000000005,
+              -0.1932
+            ],
+            [
+              0.55,
+              -0.021
+            ],
+            [
+              0.5115000000000001,
+              0.168
+            ],
+            [
+              0.341,
+              0.1848
+            ],
+            [
+              0.165,
+              0.0924
+            ],
+            [
+              0.0,
+              0.012599999999999998
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "rim-wrinkle",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.14,
+            "notes": "Ring index 4 (the rim line, hFrac 0.4), alternating sectors [0, 2, 4, 6, 8, 10] of 12 pulled toward the axis by 0.14 -- shallow, localized (one ring), unlike raisin's full-length flute."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.018,
+            "notes": "amplitude 0.018 (3.3% of radius)."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar), separately on body and hollow slices",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.1,
+        "height": 0.84,
+        "depth": 1.1,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.02,
+          0.0,
+          -0.06
+        ],
+        "rotation": [
+          0.0,
+          -0.35,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "apricot-b",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "apricot-body"
+        }
+      },
+      "material": "apricot-body",
+      "materialLayers": [
+        "apricot-body",
+        "apricot-hollow"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(224, 160, 92, 1.0)",
+        "secondaryAlbedo": "rgba(185, 117, 56, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference/prompt JSON explicitly excludes shine.",
+        "zone": "convex body + rim, most of the surface",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/apricot.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "rim-wrinkle",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "apricot-b-deep-pit-hollow",
+          "name": "Deep concave pit hollow",
+          "kind": "hole",
+          "description": "sliceTriangles bands 4..6 of the profile (past the rim line) form a separate hollow-colored mesh; the rim-to-center height drop is 0.16 relative units, close to the equator height for a strongly readable sunken center.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the hollow walls",
+        "displacementPattern": "hollow sunk to near-equator height, rim wrinkle localized to one ring",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Two color buckets split by triangle-band slice (not a vertex mask) -- boundary is exact, computed from the profile's own band tri counts."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "apricot-b-deep-pit-hollow"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "apricot-c",
+      "name": "Apricot half (c)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass, standard bowl/dish revolve profile (radius decreases monotonically toward the top pole while height dips then rises then dips again -- non-monotonic height is fine for buildRevolvedShell, which only connects adjacent rings). No lay-down rotation needed: the profile itself is built bottom-pole-down / hollow-pole-up.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.42
+            ],
+            [
+              0.33,
+              -0.3444
+            ],
+            [
+              0.49500000000000005,
+              -0.1932
+            ],
+            [
+              0.55,
+              -0.021
+            ],
+            [
+              0.5115000000000001,
+              0.168
+            ],
+            [
+              0.341,
+              0.1848
+            ],
+            [
+              0.165,
+              0.0924
+            ],
+            [
+              0.0,
+              0.012599999999999998
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "rim-wrinkle",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.14,
+            "notes": "Ring index 4 (the rim line, hFrac 0.4), alternating sectors [0, 2, 4, 6, 8, 10] of 12 pulled toward the axis by 0.14 -- shallow, localized (one ring), unlike raisin's full-length flute."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.018,
+            "notes": "amplitude 0.018 (3.3% of radius)."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar), separately on body and hollow slices",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.1,
+        "height": 0.84,
+        "depth": 1.1,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.78,
+          0.0,
+          0.05
+        ],
+        "rotation": [
+          0.0,
+          0.65,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "apricot-c",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "apricot-body"
+        }
+      },
+      "material": "apricot-body",
+      "materialLayers": [
+        "apricot-body",
+        "apricot-hollow"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(224, 160, 92, 1.0)",
+        "secondaryAlbedo": "rgba(185, 117, 56, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference/prompt JSON explicitly excludes shine.",
+        "zone": "convex body + rim, most of the surface",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/apricot.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "rim-wrinkle",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "apricot-c-deep-pit-hollow",
+          "name": "Deep concave pit hollow",
+          "kind": "hole",
+          "description": "sliceTriangles bands 4..6 of the profile (past the rim line) form a separate hollow-colored mesh; the rim-to-center height drop is 0.16 relative units, close to the equator height for a strongly readable sunken center.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the hollow walls",
+        "displacementPattern": "hollow sunk to near-equator height, rim wrinkle localized to one ring",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Two color buckets split by triangle-band slice (not a vertex mask) -- boundary is exact, computed from the profile's own band tri counts."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "apricot-c-deep-pit-hollow"
+      ],
+      "fidelityTier": "form-refinement"
+    }
+  ],
+  "materials": [
+    {
+      "id": "apricot-body",
+      "name": "Apricot body (burnt orange)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#E0A05C",
+      "color": "#E0A05C",
+      "albedo": {
+        "dominant": "#E0A05C",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/apricot.json geometry.surface, not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#E0A05C"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture emitted; UVs exist only for merge attribute consistency (types.ts section 4)."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "primary shape",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "convex underside + rim, all instances",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "rim-highlight-dropped",
+          "name": "Wrinkled-rim amber / plump highlight hues dropped",
+          "maskSource": "geometry",
+          "description": "#C4813F (wrinkled rim) and #EFC08A (plumper-face highlight) are not separate tones -- both sit close to the body hue and the rim wrinkle + runtime N.L already carry the contrast.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "apricot-body"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading."
+      ],
+      "notes": "convex underside + rim, all instances."
+    },
+    {
+      "id": "apricot-hollow",
+      "name": "Pit hollow (deep shadowed orange)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#B97538",
+      "color": "#B97538",
+      "albedo": {
+        "dominant": "#B97538",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/apricot.json geometry.surface, not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#B97538"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture emitted; UVs exist only for merge attribute consistency (types.ts section 4)."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "primary shape",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "concave pit hollow, all instances",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading."
+      ],
+      "notes": "concave pit hollow, all instances."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "apricot-instances",
+      "name": "Apricot row instances",
+      "level": "macro",
+      "hostComponents": [
+        "root"
+      ],
+      "elementComponentIds": [
+        "apricot-a",
+        "apricot-b",
+        "apricot-c"
+      ],
+      "elementKind": "hand-placed macro body",
+      "count": 3,
+      "distribution": {
+        "mode": "hand-authored XZ offset + yaw per instance, placed close together per advisor guidance ('apricot 3개는 붙여라')",
+        "note": "No tiltZ -- all rest flat, cut-side up, by construction."
+      },
+      "sizeClasses": [
+        {
+          "id": "apricot-half",
+          "widthConstant": 1.1
+        }
+      ],
+      "seedRule": "Per-instance vertex jitter consumes the builder rng (mulberry32); placement is authored, not random.",
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 432,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Cluster group target 300-700tri/<=68KB (CRIB). 3 x 144tri = 432tri, mid-range of the target."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key upper-left.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no exposure control or tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "High ambient ratio 0.75.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill opposite the key.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO on runtime Lambert."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build each half as a full-revolution lathe shell (lib.buildRevolvedShell), bowl/dish profile: radius decreases monotonically toward the top pole while height rises to a rim then dips into the hollow.",
+    "Pull alternating sectors [0, 2, 4, 6, 8, 10] toward the axis by 0.14 on ring index 4 only (localized rim wrinkle, not full-length).",
+    "Jitter (indexed) -> facet() -> sliceTriangles the baked non-indexed geometry at band boundaries computed from the profile (84 of 144 triangles are body, the rest hollow) -- no vertex mask needed since the boundary is a clean profile-ring cut.",
+    "Place 3 instances close together (hand-authored XZ offset/yaw, no tiltZ), ground each via bounding-box Y correction, merge by material."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-row rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single static prop; no plausible break beyond the whole object"
+  ],
+  "risks": [
+    {
+      "id": "shallow-hollow-first-attempt",
+      "severity": "medium",
+      "description": "cmp-1 profile (rim 0.32, hollow center 0.2, a 0.12 drop against a 0.42 half-length) read almost flat -- the hollow barely showed.",
+      "mitigation": "Revised profile: rim pushed to 0.4, hollow center pulled down to 0.03 (near equator height), tripling the drop to 0.37 -- cmp-2 showed a clearly readable sunken hollow on 2 of 3 instances."
+    },
+    {
+      "id": "hollow-partial-readability",
+      "severity": "low",
+      "description": "Even after the v2 fix, only 2 of 3 instances show the hollow clearly in the fixed showcase camera framing (the third is angled such that its rim partially occludes the view into the hollow).",
+      "mitigation": "Accepted -- CRIB precedent (cinnamon) documents that partial per-instance readability at a fixed camera angle is an honest, acceptable limitation when the majority of instances carry the feature."
+    },
+    {
+      "id": "rim-amber-highlight-dropped",
+      "severity": "low",
+      "description": "#C4813F/#EFC08A not painted as separate tones.",
+      "mitigation": "Both are close to the body hue; rim wrinkle geometry + N.L already carry the visual distinction."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "flatShading not inherited by the runtime material swap.",
+      "mitigation": "facet() bakes flat normals into geometry for both body and hollow slices."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Rosemary Sprig",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  }
+}

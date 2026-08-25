@@ -1,0 +1,1844 @@
+{
+  "targetName": "Honeycomb Slab With Blob",
+  "targetId": "honeycomb-slab-with-blob",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\honey.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved; the review camera is fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "a honeycomb slab with a pooled honey blob at one corner",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "geometric",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "rigid block",
+        "repeated grid instances",
+        "one organic appendage"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat facets, no shine, no wet/liquid look."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 3,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 2,
+        "materialLayerCount": 1,
+        "localDetailDensity": 3,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 3,
+        "mesoComponents": 1,
+        "microFeatureGroups": 0,
+        "materialLayers": 2,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Component count 3 (slab, cell-ring repetition system, blob) -- the most structurally varied of the batch's 4 new ingredients.",
+        "Repetition density 2: 5 hex-ring instances, reduced from the reference's ~54 (CRIB fewer-bigger doctrine).",
+        "Local detail density 3 (highest in this batch): the hex-cell grid IS the ingredient's entire identity, per the team-lead brief -- highest 64px legibility risk of the 4.",
+        "One material family in two zones (body, top+blob) -- materialLayerCount 1.",
+        "Occlusion risk 1: slab underside/back never modeled beyond a solid face.",
+        "Action readiness 0: static turntable showcase prop.",
+        "Aggregate 10/24, simple tier (elevated silhouette/detail-density axes reflect the grid-identity risk flagged by the delegation brief, not part-count complexity)."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier by part count, but needs a repetitionSystem for the 5-cell grid and heavy risk documentation given this was the batch's identified hardest ingredient."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerated by hand from the three reference views (CRIB.md skip rule for a small fixed part count with a curated prompt spec).",
+      "details": [
+        {
+          "id": "hex-cell-grid",
+          "zone": "top face",
+          "observation": "A grid of hexagonal cells with light walls and darker interiors covers the top.",
+          "inference": "Honeycomb's defining structural feature -- the single most important identity cue for this ingredient.",
+          "confidence": 0.95,
+          "evidenceRef": "honey.png full frame",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "hex-grid-arrangement",
+            "note": ""
+          }
+        },
+        {
+          "id": "convex-wall-safety",
+          "zone": "each cell",
+          "observation": "Cell walls appear perfectly smooth and evenly lit, no visible artifacts.",
+          "inference": "Rigid wax structure -- also the reason raised convex geometry (not jitter, not concave pulls) was chosen.",
+          "confidence": 0.8,
+          "evidenceRef": "honey.png full frame",
+          "kind": "ridge",
+          "mapsTo": {
+            "ref": "convex-ring-relief-inversion",
+            "note": ""
+          }
+        },
+        {
+          "id": "corner-blob",
+          "zone": "one corner",
+          "observation": "A single rounded, darker amber blob sits at one corner of the slab.",
+          "inference": "Hardened pooled honey, distinct from the comb structure itself.",
+          "confidence": 0.9,
+          "evidenceRef": "honey.png full frame",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "corner-blob-placement",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/honey.png"
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 1,
+      "microFeatureGroups": 0,
+      "materialLayers": 2,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 2
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.75,
+    "mustMatch": [
+      "rectangular slab with a visible hex-cell grid",
+      "no zigzag/jagged normal-flip artifacts on the ring walls",
+      "honey blob distinct at one corner",
+      "readable as honeycomb at 64px, not a plain block"
+    ],
+    "niceToHave": [
+      "cell count/density matching the reference's dense ~54-cell grid -- deliberately reduced to 5, see spec risks"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-180"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "slab-plus-hex-grid-silhouette",
+      "name": "Rectangular slab with a visible hex-cell grid on top",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "honey-slab",
+        "honey-cell-rings"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "no-zigzag-under-oblique-camera",
+      "name": "Hex ring walls render cleanly (no jagged normal-flip artifacts) from the 3/4 hero camera",
+      "tier": "critical",
+      "passIds": [
+        "surface-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "honey-cell-rings"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "blob-distinct-corner",
+      "name": "Honey blob visible and color-distinct at one corner",
+      "tier": "important",
+      "passIds": [
+        "structural-pass",
+        "material-pass"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "honey-blob"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "readable-at-64px",
+      "name": "Hex cells and the blob both still read at 64px thumbnail scale",
+      "tier": "critical",
+      "passIds": [
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": true,
+      "componentRefs": [
+        "root"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness",
+      "interaction-pass": "static showcase prop with no sockets/hinges/colliders beyond a bounding proxy"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 128,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color; PBR maps are inert."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer harness.",
+      "mustAvoid": [
+        "authoring lights into the model"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The runtime normalizes the object's longest axis to 1.6.",
+    "The hex grid's exact cell count/density is not identity-critical at pixel precision; the overall 'grid of light-walled dark cells' impression is what the review scores."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "SLAB_HALF_X = 0.8 relative unit. Absolute scale is meaningless (types.ts section 6)."
+  },
+  "silhouette": {
+    "boundingShape": "thick rectangular slab, elongated along X, hex-cell grid visible on top, blob bulging at one corner",
+    "aspectRatios": [
+      {
+        "id": "slab-width-over-depth",
+        "value": 1.45,
+        "source": "honey.png three-quarter view"
+      }
+    ],
+    "symmetry": "no strong symmetry -- 5-cell grid plus one asymmetric corner blob",
+    "dominantCurves": [
+      "flat rectangular slab faces",
+      "hexagonal ring prisms",
+      "one small jittered organic lump"
+    ],
+    "negativeSpaces": [
+      "the empty grid slot the blob occupies"
+    ],
+    "landmarks": [
+      "5-cell hex grid on the top face",
+      "honey blob at the front-right corner"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "one thick rectangular slab of honeycomb, top face covered in a rigid grid of hexagonal cells",
+        "a single rounded blob of hardened honey pooled at one corner of the slab"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "slab reads as a chunky rectangular block, elongated along one horizontal axis"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "dense ~9x6 hex cell grid covering nearly the entire top face -- far beyond a workable tri budget at this scale, so the asset uses a sparse 5-cell grid instead"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Honeycomb Slab With Blob",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Transform-only assembly node carrying the slab faces, the 5 hex wall rings, and the honey blob -- box primitive pairs with assembled-solid, not continuous-sculpt (CRIB hard-gate).",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 1.6,
+        "height": 0.44,
+        "depth": 1.1,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "honey-body"
+        }
+      },
+      "material": "honey-body",
+      "materialLayers": [
+        "honey-body",
+        "honey-top"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(201, 154, 61, 1.0)",
+        "secondaryAlbedo": "rgba(166, 122, 40, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/honey.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "convex-ring-relief-inversion",
+          "name": "Convex hex-ring walls instead of concave cells",
+          "kind": "contour",
+          "description": "The dark-floor/light-wall relief is inverted from a literal reading of the reference: raised convex hex-ring prisms (safe under an oblique camera) sit on the slab's flat top face, and the visible top-face color between rings reads as the 'recessed cell floor' -- no actual concave geometry, sidestepping cheese's zigzag-under-oblique-camera failure mode entirely.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "convex-ring-relief-inversion"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "honey-slab",
+      "name": "Honeycomb slab body",
+      "level": "macro",
+      "role": "body",
+      "importance": 0.8,
+      "confidence": 0.85,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "6 independent flat quads (cheese.ts FACES/setAxis convention adapted to per-axis half-extents instead of a single cube half, no rounding/subdivision/holes needed here). The top face is a separate material bucket (textured) from the other 5 (solid).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 0.0
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "5 side/bottom faces: uvTopPlanar (solid color, any projection works, cheese precedent). Top face: a custom local uvTopPlanarInset(margin=0.14) -- NOT plain uvTopPlanar, since a rectangle-to-rectangle projection samples all 4 texture corners (unlike pumpkin's circular uvDome, whose corners are geometrically unreachable), so the reserved blob-color patch would otherwise bleed into the slab's own top-face sampling.",
+        "normalStrategy": "flat normals baked by splitting vertices (no jitter -- rigid geometric structure, cheese no-jitter precedent)"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.6,
+        "height": 0.44,
+        "depth": 1.1,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "honey-slab",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "honey-body"
+        }
+      },
+      "material": "honey-body",
+      "materialLayers": [
+        "honey-body",
+        "honey-top"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(201, 154, 61, 1.0)",
+        "secondaryAlbedo": "rgba(166, 122, 40, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0.",
+        "zone": "5 faces solid body color, 1 face (top) textured",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/honey.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [
+        {
+          "id": "honey-slab-top-boundary",
+          "kind": "material-boundary",
+          "notes": "Top face is a separate mesh/material from the other 5 faces -- not a shared-vertex seam (box faces never share vertices in this construction)."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "elongated-block",
+          "name": "Thick elongated rectangular block",
+          "kind": "ridge",
+          "description": "Half-extents 0.8 x 0.22 x 0.55 -- elongated along X, thick relative to its footprint ('thick rectangular slab' per prompt).",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "5 faces solid amber; the top face alone carries the cell-floor texture."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "elongated-block"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "honey-cell-rings",
+      "name": "5 hex wall rings",
+      "level": "meso",
+      "role": "surface",
+      "importance": 1.0,
+      "confidence": 0.85,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Each ring = a hand-derived annulus prism (outer-top/inner-top/outer-bottom rings, 18 verts/24 tri) -- winding verified by hand cross-product for both the top annulus cap (+Y normal) and the outer wall (radially outward normal); the inner wall face is omitted (the gap is a thin sliver, invisible at this scale and camera angle). No jitter -- an artificial angular structure, not an organic surface (reference itself shows perfectly smooth cell walls).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.13,
+              0.0
+            ],
+            [
+              0.19,
+              0.0
+            ]
+          ],
+          "segments": 6,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "uvTopPlanar (solid color bucket, any projection works)",
+        "normalStrategy": "flat normals baked by splitting vertices, no jitter"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.38,
+        "height": 0.075,
+        "depth": 0.38,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0.22,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "honey-cell-rings",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "honey-body"
+        }
+      },
+      "material": "honey-body",
+      "materialLayers": [
+        "honey-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(201, 154, 61, 1.0)",
+        "secondaryAlbedo": "rgba(166, 122, 40, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0.",
+        "zone": "5 hex-ring prisms, solid body color, sharing the slab's non-top material",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/honey.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "hex-grid-arrangement",
+          "name": "5-cell hex grid, one slot left open for the blob",
+          "kind": "contour",
+          "description": "3+2 grid layout (back row of 3, front row of 2) with the front-right slot deliberately left empty for the honey blob, matching the reference composition. Cut from the reference's dense ~54-cell grid to 5 large cells per CRIB's 'fewer, bigger reads better at 64px' doctrine.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Solid amber; no bright ridge-highlight bucket -- the flat top annulus catches more runtime key-light N.L than the vertical wall for free (olive shaded-underside-hue-dropped precedent)."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "hex-grid-arrangement"
+      ],
+      "fidelityTier": "structural-pass"
+    },
+    {
+      "id": "honey-blob",
+      "name": "Pooled honey blob",
+      "level": "macro",
+      "role": "appendage",
+      "importance": 0.8,
+      "confidence": 0.8,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Small full-revolution jittered lump (lib.buildRevolvedShell), the batch's only organic/jittered part on this otherwise rigid asset.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -1.0
+            ],
+            [
+              0.6,
+              -0.85
+            ],
+            [
+              0.9,
+              -0.5
+            ],
+            [
+              1.0,
+              -0.05
+            ],
+            [
+              0.92,
+              0.35
+            ],
+            [
+              0.65,
+              0.7
+            ],
+            [
+              0.3,
+              0.92
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "blob-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.02,
+            "notes": "Organic jitter -- the one part on this asset that should not read as machine-perfect."
+          }
+        ],
+        "uvStrategy": "constant UV pinned to the reserved patch in the top-face texture (pumpkin stem-patch pattern)",
+        "normalStrategy": "flat normals baked by splitting vertices"
+      },
+      "parent": "root",
+      "attachment": {
+        "parentSocket": "honey-slab-top-face",
+        "localStart": [
+          0,
+          -0.05,
+          0
+        ],
+        "localEnd": [
+          0,
+          0.44,
+          0
+        ],
+        "contactType": "embed",
+        "embedDepth": 0.05,
+        "gapTolerance": 0.0,
+        "notes": "Embedded into the slab top surface at the front-right corner (the grid slot deliberately left open)."
+      },
+      "dimensions": {
+        "width": 0.48,
+        "height": 0.44,
+        "depth": 0.48,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0.5,
+          0.39,
+          0.32
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "honey-blob",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "honey-body"
+        }
+      },
+      "material": "honey-top",
+      "materialLayers": [
+        "honey-top"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(143, 95, 29, 1.0)",
+        "secondaryAlbedo": "rgba(166, 122, 40, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0.",
+        "zone": "small lump at one corner, distinct deep amber tone via the top texture's reserved patch",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/honey.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "blob-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "honey-blob-slab-join",
+          "kind": "attachment",
+          "notes": "Embedded contact join, not a shared-vertex seam."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "corner-blob-placement",
+          "name": "Blob pooled at one corner, not centered",
+          "kind": "seam",
+          "description": "Positioned in the grid slot deliberately left empty rather than overlapping a hex cell, matching the reference's corner placement without needing the blob to overhang the slab edge (avoids a floating-gap risk).",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Deep amber, distinct from both the body color and the cell-floor color -- carried via a reserved texture patch, not a third material."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [
+        "corner-blob-placement"
+      ],
+      "fidelityTier": "material-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "honey-body",
+      "name": "Body (comb amber, solid)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#C99A3D",
+      "color": "#C99A3D",
+      "albedo": {
+        "dominant": "#C99A3D",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/honey.json geometry.surface, not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#C99A3D"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture"
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "primary shape",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "5 slab faces + 5 hex-ring prisms",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "ridge-highlight-hue-dropped",
+          "name": "Bright ridge highlight merged into base body tone",
+          "maskSource": "geometry",
+          "description": "Prompt's #E0B65C bright ridge highlight is not a separate bucket -- the ring prism's flat top annulus (+Y facing) catches more runtime key-light N.L than the vertical wall for free.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "honey-cell-rings"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading."
+      ],
+      "notes": "5 slab faces + 5 hex-ring prisms."
+    },
+    {
+      "id": "honey-top",
+      "name": "Top face + blob (textured: cell-floor + reserved blob patch)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#A67A28",
+      "color": "#A67A28",
+      "albedo": {
+        "dominant": "#A67A28",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/honey.json geometry.surface, not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#A67A28"
+        ],
+        "pattern": "textured",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 128,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "128px canvas texture: solid cell-floor color plus a small reserved corner patch for the blob's constant UV (texture escape hatch, types.ts R3)."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "primary shape",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "slab top face (majority) + blob (reserved corner patch)",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "top-face-patch-escape-hatch",
+          "name": "Cell-floor color + reserved blob-color patch",
+          "maskSource": "texture",
+          "description": "A 128px canvas: solid #A67A28 everywhere except a 11%-of-texture corner patch of #8F5F1D. The slab top face samples via an INSET uvTopPlanar(margin=0.14) so its own rectangle-to-rectangle projection never reaches the reserved corner (unlike pumpkin's circular uvDome, a square-to-square projection samples all 4 corners by default -- this had to be solved explicitly, see spec risks). The blob samples the patch via a constant UV.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "honey-slab",
+            "honey-blob"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading."
+      ],
+      "notes": "slab top face (majority) + blob (reserved corner patch)."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "honey-cell-ring-instances",
+      "name": "5 hex wall ring instances",
+      "level": "meso",
+      "hostComponents": [
+        "root"
+      ],
+      "elementComponentIds": [
+        "honey-cell-rings"
+      ],
+      "elementKind": "identical convex hex-ring prism, placed at 5 grid positions",
+      "count": 5,
+      "distribution": {
+        "mode": "hand-placed XZ grid (3+2 rows, front-right slot left empty)",
+        "note": "Cut from the reference's dense ~54-cell grid to 5 large, clearly-separated cells (CRIB 'fewer, bigger reads better at 64px' doctrine, cranberry 6->3 precedent applied to a tiled pattern rather than discrete instances)."
+      },
+      "sizeClasses": [
+        {
+          "id": "cell",
+          "outerRadius": 0.19,
+          "innerRadius": 0.13,
+          "wallHeight": 0.075
+        }
+      ],
+      "seedRule": "All 5 positions are fixed authored values, not random -- the slab/rings consume no rng at all; only the blob's jitter uses the builder rng, so the exported GLB is byte-deterministic.",
+      "evidenceRefs": [
+        "view-top"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 252,
+    "maxDrawCalls": 2,
+    "textureSize": 128,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Single-object group target 200-500 tri/<=48KB (types.ts R2, this batch's target bracket for all 4 new ingredients). Measured: 252 tri / 26.8KB -- slab(12) + 5 hex rings(5x24=120) + blob(~120)."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key upper-left.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no exposure control or tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "High ambient ratio 0.75.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill opposite the key.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO on runtime Lambert."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build the slab as 6 independent flat quads (cheese.ts FACES/setAxis convention, per-axis half-extents, no rounding/subdivision/holes): 5 faces in the solid body-color bucket, the top face alone in the textured bucket.",
+    "Build each hex cell as an independent convex annulus prism (outer-top/inner-top/outer-bottom rings) with hand-derived, cross-product-verified winding -- no jitter (rigid artificial structure).",
+    "Place 5 rings on a 3+2 grid, leaving the front-right slot empty for the blob.",
+    "Paint the top-face texture as solid cell-floor color plus a small reserved corner patch of blob color; project the slab's own top face with an INSET uvTopPlanar(margin) so its square-to-square projection never reaches the reserved corner.",
+    "Build the blob as a small jittered full-revolution lump, pin its UV to the reserved patch's center (pumpkin stem-patch pattern), and embed it shallowly into the slab top at the empty grid slot.",
+    "Merge all parts by material into exactly two meshes (mergeByMaterial)."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-object rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single static prop; no plausible break beyond the whole object"
+  ],
+  "risks": [
+    {
+      "id": "cell-count-reduced-9x6-to-5",
+      "severity": "medium",
+      "description": "The reference shows a dense ~9x6 (54-cell) grid; this asset uses 5 large cells.",
+      "mitigation": "CRIB's cranberry precedent (6->3 instances) established that fewer, larger repeated elements read better at 64px than many small ones crammed into budget -- applied here to a tiled pattern rather than discrete berries."
+    },
+    {
+      "id": "concave-relief-inverted-to-convex",
+      "severity": "medium",
+      "description": "The reference's cells read as physically recessed; this asset uses raised convex walls with a dark top-face color showing through the gaps instead.",
+      "mitigation": "cheese.ts's own debug history (headnote in cheese.ts) found that low-density concave pulls zigzag under an oblique camera; convex walls have no equivalent failure mode and were adopted proactively rather than discovered by trial."
+    },
+    {
+      "id": "square-uv-corner-collision",
+      "severity": "medium",
+      "description": "A first plan reused pumpkin's 'texture corners are unreachable, safe for a reserved patch' assumption -- false here, since the top face is a rectangle-to-rectangle uvTopPlanar projection (all 4 corners ARE sampled), unlike pumpkin's circular uvDome.",
+      "mitigation": "Solved before implementation (not via a cmp iteration) by inset-mapping the slab top face's own UV into [margin, 1-margin], leaving the border band exclusively for the blob's reserved patch."
+    },
+    {
+      "id": "ridge-highlight-hue-dropped",
+      "severity": "low",
+      "description": "Prompt's bright ridge highlight (#E0B65C) is not modeled as a separate bucket.",
+      "mitigation": "The ring's flat top annulus catches more runtime key-light N.L than its vertical wall for free."
+    },
+    {
+      "id": "blob-not-overhanging-edge",
+      "severity": "low",
+      "description": "The reference shows the blob partially overhanging the slab's edge; this asset keeps it within the top-face footprint.",
+      "mitigation": "Avoids a floating-geometry/no-visible-support risk for a marginal compositional gain."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "flatShading is not inherited by the runtime material swap.",
+      "mitigation": "Faceting baked into geometry via split vertices (facet())."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Vertex-color region paint is discarded by the runtime's MeshLambertMaterial swap.",
+      "mitigation": "No vertexPaint authored; all region splits are either separate meshes (slab faces, rings) or a canvas texture (top face + blob patch)."
+    },
+    {
+      "id": "merge-attribute-mismatch",
+      "severity": "medium",
+      "description": "mergeByMaterial throws on attribute-set mismatch within one bucket.",
+      "mitigation": "Every geometry in each bucket (body: 5 slab faces + 5 rings; top: 1 slab face + 1 blob) carries position/normal/uv."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "TMP_honey",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  }
+}

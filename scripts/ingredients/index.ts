@@ -14,6 +14,22 @@ import { createBlueberry } from './blueberry';
 import { createRosemary } from './rosemary';
 import { createCheese } from './cheese';
 import { createCinnamon } from './cinnamon';
+import { createPoppyseed } from './poppyseed';
+import { createSunflowerseed } from './sunflowerseed';
+import { createFlaxseed } from './flaxseed';
+import { createOat } from './oat';
+import { createMatcha } from './matcha';
+import { createRedbean } from './redbean';
+import { createRaisin } from './raisin';
+import { createLemon } from './lemon';
+import { createBanana } from './banana';
+import { createApricot } from './apricot';
+import { createCoconut } from './coconut';
+import { createBeet } from './beet';
+import { createSweetpotato } from './sweetpotato';
+import { createYuzu } from './yuzu';
+import { createHoney } from './honey';
+import { createMaple } from './maple';
 
 export const INGREDIENT_BUILDERS: Record<string, IngredientBuilder> = {
   olive: createOlive,
@@ -28,6 +44,22 @@ export const INGREDIENT_BUILDERS: Record<string, IngredientBuilder> = {
   rosemary: createRosemary,
   cheese: createCheese,
   cinnamon: createCinnamon,
+  poppyseed: createPoppyseed,
+  sunflowerseed: createSunflowerseed,
+  flaxseed: createFlaxseed,
+  oat: createOat,
+  matcha: createMatcha,
+  redbean: createRedbean,
+  raisin: createRaisin,
+  lemon: createLemon,
+  banana: createBanana,
+  apricot: createApricot,
+  coconut: createCoconut,
+  beet: createBeet,
+  sweetpotato: createSweetpotato,
+  yuzu: createYuzu,
+  honey: createHoney,
+  maple: createMaple,
 };
 
 /** src/sim/ingredients.ts INGREDIENTS 순서. 미등록 id는 하네스 드롭다운에 "(미등록)"으로 뜬다. */
@@ -44,4 +76,13 @@ export const INGREDIENT_ORDER = [
   'cinnamon',
   'blueberry',
   'pumpkin',
+  'raisin',
+  'lemon',
+  'banana',
+  'apricot',
+  'beet',
+  'coconut',
+  'sweetpotato',
+  'yuzu',
+  'honey',
 ] as const;

@@ -1,0 +1,2078 @@
+{
+  "targetName": "Rolled Oat Flakes",
+  "targetId": "rolled-oat-flakes",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\oat.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved; the review camera is fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 2,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "a mound of rolled oat flakes with three individual flakes in front",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "repeated instances",
+        "discrete resting arrangement"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat facets, no shine."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 3,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 2,
+        "materialLayerCount": 1,
+        "localDetailDensity": 2,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 0,
+        "microFeatureGroups": 0,
+        "materialLayers": 2,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Silhouette complexity 2: mound plus three separated flat flakes at varied angles is riskier at the 64px gate than a single compact body.",
+        "Component count 3 (not 1): the mound is a distinct macro body from the repeated flake instances.",
+        "Repetition density 2: 3 flake instances, matching the batch's established cluster count (olive/cranberry/blueberry/cheese precedent).",
+        "One material family in two zones (body flat faces, rim wall) -- materialLayerCount 1.",
+        "Local detail density 2: the curled rim is a dense, identity-critical local mask on every flake.",
+        "Occlusion risk 1: flake undersides and the mound's underside are never modeled/visible.",
+        "Action readiness 0: static turntable showcase prop.",
+        "Aggregate 10/24, simple tier (elevated silhouette/component/repetition axes reflect the multi-part 64px risk, not part-count complexity)."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier by part count, but needs a repetitionSystem for the 3-flake set and material-override documentation for the deliberately wide rim mask."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerated by hand from the three reference views (CRIB.md skip rule for a small fixed part count with a curated prompt spec).",
+      "details": [
+        {
+          "id": "flake-curled-rim",
+          "zone": "each flake's edge",
+          "observation": "A darker umber band traces each flake's curled rim.",
+          "inference": "Pressed/rolled edge catching a slightly different shading angle than the flat face.",
+          "confidence": 0.85,
+          "evidenceRef": "oat-2.png front elevation",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "oat-flake-a-curled-rim",
+            "note": ""
+          }
+        },
+        {
+          "id": "mound-granular-surface",
+          "zone": "flake mound",
+          "observation": "Irregular, faceted, piled-up surface, not a smooth heap.",
+          "inference": "Many overlapping flakes, stylized as a jittered low-poly shell rather than individual pieces.",
+          "confidence": 0.85,
+          "evidenceRef": "oat.png full frame",
+          "kind": "ridge",
+          "mapsTo": {
+            "ref": "mound-jitter-surface",
+            "note": ""
+          }
+        },
+        {
+          "id": "flake-thin-part",
+          "zone": "each flake",
+          "observation": "Very thin pressed disc, notably flatter than a whole grain kernel.",
+          "inference": "Rolled/pressed processing flattens the oat groat into a flake.",
+          "confidence": 0.9,
+          "evidenceRef": "oat-2.png front elevation",
+          "kind": "ridge",
+          "mapsTo": {
+            "ref": "flake-jitter",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/oat.png"
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 0,
+      "microFeatureGroups": 0,
+      "materialLayers": 2,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.6,
+    "mustMatch": [
+      "mound + 3 separated flat oval flakes, no overlap",
+      "darker rim visible on the flakes",
+      "readable as a tan flake pile at 64px"
+    ],
+    "niceToHave": [
+      "individual flake edges within the mound itself -- absorbed into the single jittered heap, not modeled per-flake (tri budget + CRIB anti-blob rule)"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "mound-plus-3-flakes-silhouette",
+      "name": "Mound + 3 clearly separated flakes, no overlap",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "oat-mound",
+        "oat-flake-a",
+        "oat-flake-b",
+        "oat-flake-c"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "flake-rim-visible",
+      "name": "Darker curled rim visible on each flake",
+      "tier": "important",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.55,
+      "mustPass": false,
+      "componentRefs": [
+        "oat-flake-a",
+        "oat-flake-b",
+        "oat-flake-c"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "readable-at-64px",
+      "name": "Reads as a tan flake pile at 64px thumbnail scale",
+      "tier": "critical",
+      "passIds": [
+        "optimization-pass"
+      ],
+      "minimumScore": 0.5,
+      "mustPass": true,
+      "componentRefs": [
+        "root"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness",
+      "interaction-pass": "static showcase prop with no sockets/hinges/colliders beyond a bounding proxy"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color; PBR maps are inert."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer harness.",
+      "mustAvoid": [
+        "authoring lights into the model"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The runtime normalizes the object's longest axis to 1.6.",
+    "The mound approximates dozens of piled flakes as one jittered heap rather than modeling them individually; the three foreground flakes carry the 'this is oat, not a generic pile' identity."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera looks from",
+    "up": "+Y",
+    "scaleReference": "MOUND_RADIUS = 0.68 relative unit. Absolute scale is meaningless (types.ts section 6)."
+  },
+  "silhouette": {
+    "boundingShape": "a low irregular mound with three flattened oval flakes scattered in front, roughly 2.4 wide by 0.68 tall by 1.9 deep in relative units",
+    "aspectRatios": [
+      {
+        "id": "flake-radius-over-thickness",
+        "value": 5.56,
+        "source": "oat.png front elevation, very thin pressed disc"
+      }
+    ],
+    "symmetry": "no strong symmetry -- mound plus three independently rotated flakes",
+    "dominantCurves": [
+      "jittered rounded mound",
+      "flat elongated oval flakes"
+    ],
+    "negativeSpaces": [
+      "gaps between the three front flakes and the mound"
+    ],
+    "landmarks": [
+      "darker rim band on each flake",
+      "granular mound surface"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "a loose mound of pressed oat flakes heaped together, individual flake edges visible across the pile",
+        "three individual flat oval flakes separated and lying in front of the mound"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "each flake is a thin pressed disc with a slightly darker curled rim tracing its edge"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "flakes are elongated ovals, not circles, scattered at varied angles"
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Rolled Oat Flakes",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the mound and the three flake instances.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.4,
+        "height": 0.68,
+        "depth": 1.9,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "oat-body"
+        }
+      },
+      "material": "oat-body",
+      "materialLayers": [
+        "oat-body",
+        "oat-rim"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(215, 199, 163, 1.0)",
+        "secondaryAlbedo": "rgba(143, 122, 84, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference explicitly excludes shine.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/oat.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "mound-plus-flakes-arrangement",
+          "name": "Mound + 3 separated flakes in front",
+          "kind": "contour",
+          "description": "Three flake instances placed with independent offset/yaw in front of the mound, spaced wide enough (0.62-0.7 apart) not to overlap each other or the mound's footprint.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "mound-plus-flakes-arrangement"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "oat-mound",
+      "name": "Flake mound",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.85,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A single faceted revolved heap approximating a pile of overlapping flakes -- CRIB forbids modeling hundreds of individual pieces (64px 'blob' failure mode); the coarse jitter itself carries the piled-flakes surface cue.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.5576,
+              -0.34
+            ],
+            [
+              0.6664,
+              -0.18700000000000003
+            ],
+            [
+              0.68,
+              -0.034
+            ],
+            [
+              0.476,
+              0.136
+            ],
+            [
+              0.21760000000000002,
+              0.255
+            ],
+            [
+              0.0,
+              0.34
+            ]
+          ],
+          "segments": 14,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "mound-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.026,
+            "notes": "Jitter (0.026) approximates piled-flake surface irregularity. cmp-1 used 0.045 which read as an almost-black rocky boulder; lowered in v2 so the tan body hue stays visible."
+          }
+        ],
+        "uvStrategy": "uvTopPlanar",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.36,
+        "height": 0.68,
+        "depth": 1.36,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0.15,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "oat-mound",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "oat-body"
+        }
+      },
+      "material": "oat-body",
+      "materialLayers": [
+        "oat-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(215, 199, 163, 1.0)",
+        "secondaryAlbedo": "rgba(143, 122, 84, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference explicitly excludes shine.",
+        "zone": "full mound, single bucket",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/oat.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "mound-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "mound-jitter-surface",
+          "name": "Granular piled-flake surface",
+          "kind": "ridge",
+          "description": "Coarse per-vertex jitter (0.026) gives the mound an irregular faceted surface standing in for individually piled flakes, without modeling them individually (tri budget).",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Solid warm tan; no rim bucket on the mound (reserved for the individual flake instances)."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [
+        "mound-jitter-surface"
+      ],
+      "fidelityTier": "material-pass"
+    },
+    {
+      "id": "oat-flake-a",
+      "name": "Oat flake (a)",
+      "level": "macro",
+      "role": "body",
+      "importance": 0.9,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A closed flattened puck solid: bottom cap -> taper -> vertical rim wall -> taper -> top cap, all from one indexed shell (no separate parts, no open zero-thickness sheet).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -1.0
+            ],
+            [
+              0.92,
+              -1.0
+            ],
+            [
+              1.0,
+              -0.5
+            ],
+            [
+              1.0,
+              0.5
+            ],
+            [
+              0.92,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "flake-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.008,
+            "notes": "Reduced jitter (0.008, types.ts R4) -- the flake is a thin part; full-scale jitter would crumple the flat top/bottom faces."
+          }
+        ],
+        "uvStrategy": "uvTopPlanar",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 0.18,
+        "depth": 0.62,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "oat-flake-a",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "oat-body"
+        }
+      },
+      "material": "oat-body",
+      "materialLayers": [
+        "oat-body",
+        "oat-rim"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(215, 199, 163, 1.0)",
+        "secondaryAlbedo": "rgba(143, 122, 84, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference explicitly excludes shine.",
+        "zone": "flat top/bottom faces (body) + vertical rim wall (rim)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/oat.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "flake-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "oat-flake-a-rim-boundary",
+          "kind": "material-boundary",
+          "notes": "Rim ring pair (profile indices 2,3, the vertical wall) marked by a vertex mask on the indexed shell, split via splitTrianglesByVertexMask + pickTriangles after facet() -- not sliceTriangles, since the OR-of-3-vertices mechanism deliberately bleeds into the adjacent taper bands to read as a wider edge ridge, not a minimal seam."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "oat-flake-a-curled-rim",
+          "name": "Darker curled rim tracing the flake's edge",
+          "kind": "seam",
+          "description": "The rim wall band (plus the OR-bleed into the adjacent top/bottom taper bands) reads as a continuous darker ridge around the flake's outline -- the single most identity-critical feature distinguishing a pressed flake from a plain disc.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "flake-jitter",
+          "name": "Reduced jitter for a thin pressed part",
+          "kind": "ridge",
+          "description": "Jitter amplitude (0.008) is reduced per types.ts R4 since the flake is a thin part -- full-scale jitter (as used on the mound) would crumple the flat top/bottom faces and destroy the pressed-disc silhouette.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Solid tan on the flat faces; the rim band alone carries the darker umber tone."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "oat-flake-a-curled-rim",
+        "flake-jitter"
+      ],
+      "fidelityTier": "material-pass"
+    },
+    {
+      "id": "oat-flake-b",
+      "name": "Oat flake (b)",
+      "level": "macro",
+      "role": "body",
+      "importance": 0.9,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A closed flattened puck solid: bottom cap -> taper -> vertical rim wall -> taper -> top cap, all from one indexed shell (no separate parts, no open zero-thickness sheet).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -1.0
+            ],
+            [
+              0.92,
+              -1.0
+            ],
+            [
+              1.0,
+              -0.5
+            ],
+            [
+              1.0,
+              0.5
+            ],
+            [
+              0.92,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "flake-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.008,
+            "notes": "Reduced jitter (0.008, types.ts R4) -- the flake is a thin part; full-scale jitter would crumple the flat top/bottom faces."
+          }
+        ],
+        "uvStrategy": "uvTopPlanar",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 0.18,
+        "depth": 0.62,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "oat-flake-b",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "oat-body"
+        }
+      },
+      "material": "oat-body",
+      "materialLayers": [
+        "oat-body",
+        "oat-rim"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(215, 199, 163, 1.0)",
+        "secondaryAlbedo": "rgba(143, 122, 84, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference explicitly excludes shine.",
+        "zone": "flat top/bottom faces (body) + vertical rim wall (rim)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/oat.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "flake-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "oat-flake-b-rim-boundary",
+          "kind": "material-boundary",
+          "notes": "Rim ring pair (profile indices 2,3, the vertical wall) marked by a vertex mask on the indexed shell, split via splitTrianglesByVertexMask + pickTriangles after facet() -- not sliceTriangles, since the OR-of-3-vertices mechanism deliberately bleeds into the adjacent taper bands to read as a wider edge ridge, not a minimal seam."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "oat-flake-b-curled-rim",
+          "name": "Darker curled rim tracing the flake's edge",
+          "kind": "seam",
+          "description": "The rim wall band (plus the OR-bleed into the adjacent top/bottom taper bands) reads as a continuous darker ridge around the flake's outline -- the single most identity-critical feature distinguishing a pressed flake from a plain disc.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "flake-jitter",
+          "name": "Reduced jitter for a thin pressed part",
+          "kind": "ridge",
+          "description": "Jitter amplitude (0.008) is reduced per types.ts R4 since the flake is a thin part -- full-scale jitter (as used on the mound) would crumple the flat top/bottom faces and destroy the pressed-disc silhouette.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Solid tan on the flat faces; the rim band alone carries the darker umber tone."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "oat-flake-b-curled-rim",
+        "flake-jitter"
+      ],
+      "fidelityTier": "material-pass"
+    },
+    {
+      "id": "oat-flake-c",
+      "name": "Oat flake (c)",
+      "level": "macro",
+      "role": "body",
+      "importance": 0.9,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A closed flattened puck solid: bottom cap -> taper -> vertical rim wall -> taper -> top cap, all from one indexed shell (no separate parts, no open zero-thickness sheet).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -1.0
+            ],
+            [
+              0.92,
+              -1.0
+            ],
+            [
+              1.0,
+              -0.5
+            ],
+            [
+              1.0,
+              0.5
+            ],
+            [
+              0.92,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "flake-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.008,
+            "notes": "Reduced jitter (0.008, types.ts R4) -- the flake is a thin part; full-scale jitter would crumple the flat top/bottom faces."
+          }
+        ],
+        "uvStrategy": "uvTopPlanar",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 0.18,
+        "depth": 0.62,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "oat-flake-c",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "oat-body"
+        }
+      },
+      "material": "oat-body",
+      "materialLayers": [
+        "oat-body",
+        "oat-rim"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(215, 199, 163, 1.0)",
+        "secondaryAlbedo": "rgba(143, 122, 84, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, opaque dielectric, roughness 1.0 -- reference explicitly excludes shine.",
+        "zone": "flat top/bottom faces (body) + vertical rim wall (rim)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/oat.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "flake-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "oat-flake-c-rim-boundary",
+          "kind": "material-boundary",
+          "notes": "Rim ring pair (profile indices 2,3, the vertical wall) marked by a vertex mask on the indexed shell, split via splitTrianglesByVertexMask + pickTriangles after facet() -- not sliceTriangles, since the OR-of-3-vertices mechanism deliberately bleeds into the adjacent taper bands to read as a wider edge ridge, not a minimal seam."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "oat-flake-c-curled-rim",
+          "name": "Darker curled rim tracing the flake's edge",
+          "kind": "seam",
+          "description": "The rim wall band (plus the OR-bleed into the adjacent top/bottom taper bands) reads as a continuous darker ridge around the flake's outline -- the single most identity-critical feature distinguishing a pressed flake from a plain disc.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "flake-jitter",
+          "name": "Reduced jitter for a thin pressed part",
+          "kind": "ridge",
+          "description": "Jitter amplitude (0.008) is reduced per types.ts R4 since the flake is a thin part -- full-scale jitter (as used on the mound) would crumple the flat top/bottom faces and destroy the pressed-disc silhouette.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Solid tan on the flat faces; the rim band alone carries the darker umber tone."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "oat-flake-c-curled-rim",
+        "flake-jitter"
+      ],
+      "fidelityTier": "material-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "oat-body",
+      "name": "Body (warm tan)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#D7C7A3",
+      "color": "#D7C7A3",
+      "albedo": {
+        "dominant": "#D7C7A3",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/oat.json geometry.surface, not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#D7C7A3"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture"
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "primary shape",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "mound + flake flat faces",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading."
+      ],
+      "notes": "mound + flake flat faces."
+    },
+    {
+      "id": "oat-rim",
+      "name": "Rim (darker umber edge)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#8F7A54",
+      "color": "#8F7A54",
+      "albedo": {
+        "dominant": "#8F7A54",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/oat.json geometry.surface, not sampled from reference pixels."
+      },
+      "colorVariation": {
+        "palette": [
+          "#8F7A54"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture"
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "primary shape",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "flake vertical rim wall band",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "rim-band-widened",
+          "name": "Rim mask deliberately bleeds into adjacent bands",
+          "maskSource": "geometry",
+          "description": "Marking both rings that bound the vertical wall (not just one) lets the OR-of-3-vertices mechanism color part of the neighboring top/bottom taper bands too, producing a visibly thicker edge ridge that traces the whole rim -- CRIB's ring-index technique used deliberately wide rather than minimal.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "oat-flake-a",
+            "oat-flake-b",
+            "oat-flake-c"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial roughness 1, metalness 0.",
+        "Never set vertexColors or flatShading."
+      ],
+      "notes": "flake vertical rim wall band."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "oat-flakes",
+      "name": "Three separated flake instances",
+      "level": "macro",
+      "hostComponents": [
+        "root"
+      ],
+      "elementComponentIds": [
+        "oat-flake-a",
+        "oat-flake-b",
+        "oat-flake-c"
+      ],
+      "elementKind": "repeated macro body, flattened puck disc each",
+      "count": 3,
+      "distribution": {
+        "mode": "hand-placed XZ offsets with independent yaw",
+        "note": "Matches the batch's established 3-instance cluster count (olive/cranberry/blueberry/cheese precedent) rather than the prompt's unbounded 'loose mound' -- individual pieces beyond 3 are absorbed into the single jittered mound body."
+      },
+      "sizeClasses": [
+        {
+          "id": "flake",
+          "radius": 0.5,
+          "aspect": 0.62
+        }
+      ],
+      "seedRule": "Offsets/yaw are fixed authored values, not random; only surface-jitter consumes the builder rng, so the exported GLB is byte-deterministic.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 366,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Cluster group target 300-700 tri/<=68KB (types.ts R2). Construction gives mound(~186)+3 flakes(60 tri each=180)=~366 tri, near the middle of target."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key upper-left.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no exposure control or tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "High ambient ratio 0.75.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill opposite the key.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO on runtime Lambert."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build the mound as one indexed revolved shell (buildRevolvedShell) with coarse jitter and a single material bucket.",
+    "Build each flake as one indexed 'puck' shell: pole -> bottom face rim -> rim wall lower -> rim wall upper -> top face rim -> pole, no rotate needed (the profile's own height axis is already the flake's thin vertical axis).",
+    "Mark the two rim-wall rings as a vertex mask before jitter/facet; splitTrianglesByVertexMask + pickTriangles after facet() splits the wall (and part of the adjacent taper bands) into the rim bucket.",
+    "Apply reduced jitter (types.ts R4) to each flake since it is a thin part; apply coarse jitter to the mound since it is not.",
+    "Ground each part on y=0 via its own post-rotation bbox (R1); space the three flakes wide enough apart (radius-vs-offset check) that they read as 3 distinct pieces, not one blob (cmp-1 revision).",
+    "Merge all parts by material into exactly two meshes (mergeByMaterial)."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-cluster rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "mound and each flake are independent fractureGroups; no plausible break beyond one part separating from the group"
+  ],
+  "risks": [
+    {
+      "id": "pressed-fold-shadow-dropped",
+      "severity": "low",
+      "description": "#B8A47D deeper toasted-oat shadow pooling in pressed folds not painted as its own bucket.",
+      "mitigation": "Runtime key light N.L falloff darkens the mound's shadowed facets for free."
+    },
+    {
+      "id": "cream-highlight-dropped",
+      "severity": "low",
+      "description": "#EDE0C4 pale cream highlight on flattened top faces not painted as its own bucket.",
+      "mitigation": "The rim bucket already carries the second color slot (mesh<=2); N.L lighting brightens the lit top faces for free."
+    },
+    {
+      "id": "mound-not-individually-modeled",
+      "severity": "medium",
+      "description": "The mound is one jittered heap, not dozens of distinct flake shapes.",
+      "mitigation": "CRIB explicitly forbids hundreds of individually modeled tiny pieces (64px blob failure mode); the three foreground flake instances carry the shape identity instead."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "flatShading not inherited by the runtime material swap.",
+      "mitigation": "facet() bakes flat normals into geometry for the mound and every flake."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Vertex-color paint discarded by the runtime Lambert swap.",
+      "mitigation": "No vertexPaint authored; the rim split is a triangle-range vertex mask, not vertex color."
+    },
+    {
+      "id": "merge-attribute-mismatch",
+      "severity": "medium",
+      "description": "mergeByMaterial throws on attribute-set mismatch within one bucket.",
+      "mitigation": "Every geometry in each bucket (mound; 3x flake body+rim) carries position/normal/uv via uvTopPlanar."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Rolled Oat Flakes",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  }
+}

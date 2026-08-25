@@ -1,0 +1,2064 @@
+{
+  "targetName": "Redbean Swirl",
+  "targetId": "redbean-swirl",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\redbean.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved; review camera is fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "single swirled mound of red bean paste with bean accents",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "single macro body",
+        "small surface-attached accent bodies"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat color facets only. Identity carried primarily by the bean color contrast (decisive per prompt notes_ko), secondarily by the spiral seam (geometric displacement, no separate material, may not survive 64px -- honest limitation, same class as cinnamon)."
+    },
+    "complexity": {
+      "tier": "moderate",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 2,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 1,
+        "materialLayerCount": 1,
+        "localDetailDensity": 2,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 1,
+        "mesoComponents": 3,
+        "microFeatureGroups": 0,
+        "materialLayers": 2,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "One macro mound plus 3 meso bean accents, so componentCount scores 2 (not 1 -- unlike choco/cranberry's flat single-level bodies).",
+        "Silhouette scores 2: the spiral seam is a real, if secondary, silhouette-adjacent surface feature (radius pull is visible from outside the profile at the affected sectors), more involved than a plain smooth mound.",
+        "hierarchyDepth scores 2: beans are true meso children attached to the mound's surface, not a mask or a separate top-level instance.",
+        "materialLayerCount scores 1: 2 buckets (body + bean), same scale as olive/blueberry precedent.",
+        "Local detail density scores 2: spiral-seam displacement + bean placement are two distinct authored details.",
+        "Occlusion risk scores 1: mound's far side is hidden but inferable by near-radial symmetry; all 3 beans stay visible from the fixed camera by construction (angles spread ~150-200 deg apart along the spiral).",
+        "Action readiness scores 0: static turntable showcase prop."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier by part count, but needs meso depth (bean accents) and material local overrides (drop-rule rationale for shadow/ridge hues) unlike choco/cranberry's flatter mesh=1 budget."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 2,
+      "note": "Enumerated by hand from the three supplied reference views -- CRIB.md skip rule for single-repeated-system objects.",
+      "details": [
+        {
+          "id": "spiral-seam-across-top",
+          "zone": "top surface of the mound",
+          "observation": "A narrow sunken line winds inward from near the rim, ~1.2-1.75 turns, ending in a small hooked curl short of the exact top pole.",
+          "inference": "Rolled/coiled paste construction -- the identity marker that reads as 'swirled' rather than a plain lump.",
+          "confidence": 0.9,
+          "evidenceRef": "redbean.png full frame, redbean-3.png top-down",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "redbean-mound-spiral-seam",
+            "note": ""
+          }
+        },
+        {
+          "id": "bean-color-contrast",
+          "zone": "3 points along the seam",
+          "observation": "3 small near-black ellipsoid bumps sit proud of the lighter maroon paste, spread from near the rim to near the center.",
+          "inference": "Whole beans folded into the paste before rolling -- the decisive legibility cue at small scale per prompt notes_ko.",
+          "confidence": 0.9,
+          "evidenceRef": "redbean.png full frame, all 3 views",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "redbean-bean-1-contrast",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/redbean.png"
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 1,
+      "mesoComponents": 3,
+      "microFeatureGroups": 2,
+      "materialLayers": 2,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.75,
+    "mustMatch": [
+      "near-spherical resting mound silhouette",
+      "3 near-black bean accents clearly contrasting the paste",
+      "faceted flat shading baked into geometry"
+    ],
+    "niceToHave": [
+      "spiral seam reading as a winding line rather than isolated dimples"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "mound-silhouette",
+      "name": "Near-spherical resting mound silhouette",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "redbean-mound"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ]
+    },
+    {
+      "id": "bean-contrast-visible",
+      "name": "3 near-black bean accents clearly contrast against the paste",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass",
+        "material-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "redbean-bean-1",
+        "redbean-bean-2",
+        "redbean-bean-3"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "spiral-seam-visible",
+      "name": "Spiral seam reads as a winding line on the top surface",
+      "tier": "important",
+      "passIds": [
+        "form-refinement",
+        "surface-pass"
+      ],
+      "minimumScore": 0.55,
+      "mustPass": false,
+      "componentRefs": [
+        "redbean-mound"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "beans-on-seam",
+      "name": "Beans sit on/near the seam path, spread across radius",
+      "tier": "important",
+      "passIds": [
+        "structural-pass"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "redbean-bean-1",
+        "redbean-bean-2",
+        "redbean-bean-3"
+      ],
+      "evidenceRefs": [
+        "view-top"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color; repo bans PBR maps outright."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer: scripts/breadlab.ts mirrors scripts/thumbsHarness.ts with a warm directional key 0xffe2b0 at (-2, 6, 2) intensity 1.4, an ambient 0xfff0dc at 0.75 and a cool fill 0xdce8ff at (2.5, 3, -2) intensity 0.2.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The runtime normalizes the longest axis to 1.6, so absolute dimensions are arbitrary.",
+    "Bean surface placement uses hFrac-interpolation of the mound's OWN profile (monotonic in the groove's hFrac sub-range only), not a general-purpose surface-projection utility.",
+    "The spiral's inner hooked-curl terminus (visible in the reference near the top pole) is not separately modeled -- omitted as a budget/legibility tradeoff, same class of honest omission as cinnamon's spiral texture."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "MOUND_RADIUS = 0.5 relative unit. Absolute scale is meaningless: the consumer runtime refits the longest axis to 1.6 (types.ts section 6)."
+  },
+  "silhouette": {
+    "boundingShape": "single near-spherical mound, roughly 1.0 wide by 0.9 tall by 1.0 deep in relative units, plus 3 small bean bumps riding its top surface",
+    "aspectRatios": [
+      {
+        "id": "mound-height-width-ratio",
+        "value": 0.9,
+        "source": "redbean-2.png -- height slightly under width"
+      }
+    ],
+    "symmetry": "mound is radially symmetric about its vertical axis except for the spiral seam and the 3 asymmetrically-placed beans",
+    "dominantCurves": [
+      "smooth convex dome, widest near the lower-mid height, tapering to a flat-ish resting base and a rounded top pole"
+    ],
+    "negativeSpaces": [
+      "narrow sunken spiral seam across the top surface"
+    ],
+    "landmarks": [
+      "3 near-black bean bumps along the seam",
+      "spiral seam itself, secondary to the beans"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "one rounded mound, near-circular footprint, gently domed top",
+        "a narrow sunken seam winds inward from near the rim in a tightening spiral, ending in a small hooked curl short of the exact top pole",
+        "3 small dark ellipsoid beans sit proud of the surface along the seam: one near the rim (outer), one at mid-radius, one close to the center (inner)",
+        "beans read as a near-black deep red, sharply contrasting against the lighter maroon paste -- the single strongest legibility cue"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "mound is close to a flattened sphere, height slightly under the width (~0.9:1)",
+        "no distinct shadow/highlight patch beyond smooth gradient shading"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "near-circular footprint confirms near-spherical body",
+        "spiral seam and all 3 beans fully visible from directly above, confirming placement order outer->mid->inner along the winding seam"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Redbean Swirl",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the mound and its 3 bean accents; emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 0.9,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "redbean-body"
+        }
+      },
+      "material": "redbean-body",
+      "materialLayers": [
+        "redbean-body",
+        "redbean-bean"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(107, 46, 46, 1.0)",
+        "secondaryAlbedo": "rgba(61, 24, 24, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/redbean.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "single-mound-with-accents",
+          "name": "Single mound with 3 seam-riding bean accents",
+          "kind": "contour",
+          "description": "Not a discrete-instance cluster like olive/blueberry -- one macro body plus 3 small accent bodies sharing its ground plane by construction (accents are placed on the mound's own surface, no separate floor-snap needed).",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single ring-sector pulled inward + down per ring transition, the target sector advancing each ring to trace a spiral -- real geometric displacement, not a mask, not a texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; groove contrast comes entirely from its own facet-normal shading at the displaced edge",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "single-mound-with-accents"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "redbean-mound",
+      "name": "Redbean paste mound",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass from bottom pole through 8 rings to top pole; the spiral seam is a per-ring vertex displacement on this SAME indexed shell (chestnut.ts CREASE pattern, sector generalized to advance per ring), not a separate solid, mask, or SDF cavity.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.36,
+              0.072
+            ],
+            [
+              0.47,
+              0.18
+            ],
+            [
+              0.5,
+              0.27
+            ],
+            [
+              0.47,
+              0.378
+            ],
+            [
+              0.42,
+              0.486
+            ],
+            [
+              0.34,
+              0.594
+            ],
+            [
+              0.24,
+              0.702
+            ],
+            [
+              0.12,
+              0.81
+            ],
+            [
+              0.0,
+              0.9
+            ]
+          ],
+          "segments": 16,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.018,
+            "notes": "amplitude 0.018 (0.036 of radius), applied after the spiral displacement (R4)."
+          },
+          {
+            "id": "spiral-seam",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.28,
+            "notes": "For each ring with hFrac in (0.3, 0.9), pull the sector nearest grooveTargetAngleDeg(hFrac) (and its +-1 neighbors) inward by 28% radius and down by 0.03 (absolute), target angle sweeping 1.2 turns from 150.0 deg at the outer ring to the inner ring -- traces a spiral seam across the upper dome surface."
+          }
+        ],
+        "uvStrategy": "dome polar projection (scripts/breads/lib.ts uvDome)",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 0.9,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "body",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "redbean-mound",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "redbean-body"
+        }
+      },
+      "material": "redbean-body",
+      "materialLayers": [
+        "redbean-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(107, 46, 46, 1.0)",
+        "secondaryAlbedo": "rgba(107, 46, 46, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "entire mound surface, single dominant tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/redbean.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter",
+        "spiral-seam"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "redbean-mound-spiral-seam",
+          "name": "Spiral seam across the top surface",
+          "kind": "seam",
+          "description": "A narrow sunken line winding ~1.2 turns from near the rim inward, catching the key light differently at its displaced edge. Identity-relevant but secondary to the bean contrast at 64px thumbnail scale (same honest-limitation class as cinnamon's spiral texture -- risk spiral-may-not-survive-64px).",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.75
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single ring-sector pulled inward + down per ring transition, the target sector advancing each ring to trace a spiral -- real geometric displacement, not a mask, not a texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; groove contrast comes entirely from its own facet-normal shading at the displaced edge",
+        "edgeWearPattern": "none",
+        "notes": "Single color bucket covers the whole mound; all shape relief (spiral seam) is geometric, not painted."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "redbean-mound-spiral-seam"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "redbean-bean-1",
+      "name": "Redbean whole-bean accent (1)",
+      "level": "meso",
+      "role": "accent",
+      "importance": 0.9,
+      "confidence": 0.85,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Small independent lathe ellipsoid (pole-ring-ring-pole), laid on its side (rotateZ -90deg, same lay-down convention as olive.ts) and placed at a surface point read off the parent mound's own profile via hFrac-interpolation -- an added convex accent, not a subtracted feature, so no cavity/recess token risk.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.11
+            ],
+            [
+              0.0525,
+              -0.066
+            ],
+            [
+              0.075,
+              0.0
+            ],
+            [
+              0.0525,
+              0.066
+            ],
+            [
+              0.0,
+              0.11
+            ]
+          ],
+          "segments": 8,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "dome polar projection (scripts/breads/lib.ts uvDome)",
+        "normalStrategy": "flat normals baked by splitting vertices (no jitter -- small accent piece, R4 thin/small-part rule)"
+      },
+      "parent": "redbean-mound",
+      "attachment": {
+        "hostId": "redbean-mound",
+        "hFrac": 0.3,
+        "note": "Surface position = (rFracAtHFrac(hFrac)*MOUND_RADIUS, hFrac*MOUND_HEIGHT + lift) at grooveTargetAngleDeg(hFrac) -- same spiral function that drives the seam, so beans always sit on the seam by construction. Orientation (rotation.y) is NOT the spiral tangent, though -- a fixed broadside yaw near the hero camera's own azimuth (BEAN_YAW_DEG=125), revised after tangent-alignment put one bean edge-on to camera (spec risk bean-tangent-orientation-edge-on)."
+      },
+      "dimensions": {
+        "width": 0.22,
+        "height": 0.15,
+        "depth": 0.15,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "accent",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "redbean-bean-1",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "redbean-body"
+        }
+      },
+      "material": "redbean-bean",
+      "materialLayers": [
+        "redbean-bean"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(61, 24, 24, 1.0)",
+        "secondaryAlbedo": "rgba(61, 24, 24, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "whole bean accent, near-black deep red",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/redbean.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "redbean-bean-1-contrast",
+          "name": "Near-black bean vs. lighter paste",
+          "kind": "contour",
+          "description": "The decisive identity cue at small scale per prompt notes_ko -- more load-bearing than the spiral seam.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single ring-sector pulled inward + down per ring transition, the target sector advancing each ring to trace a spiral -- real geometric displacement, not a mask, not a texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; groove contrast comes entirely from its own facet-normal shading at the displaced edge",
+        "edgeWearPattern": "none",
+        "notes": "Single flat color; no relief beyond the ellipsoid form itself."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "redbean-bean-1-contrast"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "redbean-bean-2",
+      "name": "Redbean whole-bean accent (2)",
+      "level": "meso",
+      "role": "accent",
+      "importance": 0.9,
+      "confidence": 0.85,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Small independent lathe ellipsoid (pole-ring-ring-pole), laid on its side (rotateZ -90deg, same lay-down convention as olive.ts) and placed at a surface point read off the parent mound's own profile via hFrac-interpolation -- an added convex accent, not a subtracted feature, so no cavity/recess token risk.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.11
+            ],
+            [
+              0.0525,
+              -0.066
+            ],
+            [
+              0.075,
+              0.0
+            ],
+            [
+              0.0525,
+              0.066
+            ],
+            [
+              0.0,
+              0.11
+            ]
+          ],
+          "segments": 8,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "dome polar projection (scripts/breads/lib.ts uvDome)",
+        "normalStrategy": "flat normals baked by splitting vertices (no jitter -- small accent piece, R4 thin/small-part rule)"
+      },
+      "parent": "redbean-mound",
+      "attachment": {
+        "hostId": "redbean-mound",
+        "hFrac": 0.58,
+        "note": "Surface position = (rFracAtHFrac(hFrac)*MOUND_RADIUS, hFrac*MOUND_HEIGHT + lift) at grooveTargetAngleDeg(hFrac) -- same spiral function that drives the seam, so beans always sit on the seam by construction. Orientation (rotation.y) is NOT the spiral tangent, though -- a fixed broadside yaw near the hero camera's own azimuth (BEAN_YAW_DEG=125), revised after tangent-alignment put one bean edge-on to camera (spec risk bean-tangent-orientation-edge-on)."
+      },
+      "dimensions": {
+        "width": 0.22,
+        "height": 0.15,
+        "depth": 0.15,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "accent",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "redbean-bean-2",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "redbean-body"
+        }
+      },
+      "material": "redbean-bean",
+      "materialLayers": [
+        "redbean-bean"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(61, 24, 24, 1.0)",
+        "secondaryAlbedo": "rgba(61, 24, 24, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "whole bean accent, near-black deep red",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/redbean.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "redbean-bean-2-contrast",
+          "name": "Near-black bean vs. lighter paste",
+          "kind": "contour",
+          "description": "The decisive identity cue at small scale per prompt notes_ko -- more load-bearing than the spiral seam.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single ring-sector pulled inward + down per ring transition, the target sector advancing each ring to trace a spiral -- real geometric displacement, not a mask, not a texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; groove contrast comes entirely from its own facet-normal shading at the displaced edge",
+        "edgeWearPattern": "none",
+        "notes": "Single flat color; no relief beyond the ellipsoid form itself."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "redbean-bean-2-contrast"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "redbean-bean-3",
+      "name": "Redbean whole-bean accent (3)",
+      "level": "meso",
+      "role": "accent",
+      "importance": 0.9,
+      "confidence": 0.85,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Small independent lathe ellipsoid (pole-ring-ring-pole), laid on its side (rotateZ -90deg, same lay-down convention as olive.ts) and placed at a surface point read off the parent mound's own profile via hFrac-interpolation -- an added convex accent, not a subtracted feature, so no cavity/recess token risk.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.11
+            ],
+            [
+              0.0525,
+              -0.066
+            ],
+            [
+              0.075,
+              0.0
+            ],
+            [
+              0.0525,
+              0.066
+            ],
+            [
+              0.0,
+              0.11
+            ]
+          ],
+          "segments": 8,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "dome polar projection (scripts/breads/lib.ts uvDome)",
+        "normalStrategy": "flat normals baked by splitting vertices (no jitter -- small accent piece, R4 thin/small-part rule)"
+      },
+      "parent": "redbean-mound",
+      "attachment": {
+        "hostId": "redbean-mound",
+        "hFrac": 0.7,
+        "note": "Surface position = (rFracAtHFrac(hFrac)*MOUND_RADIUS, hFrac*MOUND_HEIGHT + lift) at grooveTargetAngleDeg(hFrac) -- same spiral function that drives the seam, so beans always sit on the seam by construction. Orientation (rotation.y) is NOT the spiral tangent, though -- a fixed broadside yaw near the hero camera's own azimuth (BEAN_YAW_DEG=125), revised after tangent-alignment put one bean edge-on to camera (spec risk bean-tangent-orientation-edge-on)."
+      },
+      "dimensions": {
+        "width": 0.22,
+        "height": 0.15,
+        "depth": 0.15,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "accent",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "redbean-bean-3",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "redbean-body"
+        }
+      },
+      "material": "redbean-bean",
+      "materialLayers": [
+        "redbean-bean"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(61, 24, 24, 1.0)",
+        "secondaryAlbedo": "rgba(61, 24, 24, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine (glossy highlights in the AI reference render are a rendering artifact, not material).",
+        "zone": "whole bean accent, near-black deep red",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/redbean.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "redbean-bean-3-contrast",
+          "name": "Near-black bean vs. lighter paste",
+          "kind": "contour",
+          "description": "The decisive identity cue at small scale per prompt notes_ko -- more load-bearing than the spiral seam.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single ring-sector pulled inward + down per ring transition, the target sector advancing each ring to trace a spiral -- real geometric displacement, not a mask, not a texture",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; groove contrast comes entirely from its own facet-normal shading at the displaced edge",
+        "edgeWearPattern": "none",
+        "notes": "Single flat color; no relief beyond the ellipsoid form itself."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "redbean-bean-3-contrast"
+      ],
+      "fidelityTier": "form-refinement"
+    }
+  ],
+  "materials": [
+    {
+      "id": "redbean-body",
+      "name": "Redbean paste (deep maroon-red)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#6B2E2E",
+      "color": "#6B2E2E",
+      "albedo": {
+        "dominant": "#6B2E2E",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/redbean.json geometry.surface, not pixel-sampled."
+      },
+      "colorVariation": {
+        "palette": [
+          "#6B2E2E"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only for merge attribute consistency."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "mound / bean silhouette profile",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 3.0,
+          "amplitude": 0.02,
+          "role": "surface jitter noise / spiral seam",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "entire mound surface",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "shadow-ridge-natural-gradient",
+          "name": "No painted shadow/ridge patch",
+          "maskSource": "geometry",
+          "description": "assets/prompts/ingredients/redbean.json names a groove-shadow hex (#522020) and a lit-ridge hex (#85453B); the actual reference render shows a smooth N.L gradient with no distinct patch for either, so neither is painted (same drop logic as olive/chestnut/blueberry body). See spec risk shadow-ridge-hues-dropped.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "redbean-mound"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "entire mound surface. Two solid colors total (types.ts inherited section 9); groove-shadow and lit-ridge hexes are dropped (confirmed smooth N.L gradient in the actual reference render, no distinct painted patch)."
+    },
+    {
+      "id": "redbean-bean",
+      "name": "Whole bean accent (near-black deep red)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#3D1818",
+      "color": "#3D1818",
+      "albedo": {
+        "dominant": "#3D1818",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/redbean.json geometry.surface, not pixel-sampled."
+      },
+      "colorVariation": {
+        "palette": [
+          "#3D1818"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only for merge attribute consistency."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "mound / bean silhouette profile",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 3.0,
+          "amplitude": 0.02,
+          "role": "surface jitter noise / spiral seam",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "bean accents on the seam",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "bean-identity-critical-kept",
+          "name": "Bean color kept as the decisive identity cue",
+          "maskSource": "geometry",
+          "description": "Per prompt notes_ko, the whole-bean-vs-smooth-paste contrast is more decisive for legibility at small scale than the spiral seam itself. Kept as its own material bucket deliberately.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "redbean-bean-1",
+            "redbean-bean-2",
+            "redbean-bean-3"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "bean accents on the seam. Two solid colors total (types.ts inherited section 9); groove-shadow and lit-ridge hexes are dropped (confirmed smooth N.L gradient in the actual reference render, no distinct painted patch)."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "redbean-bean-accents",
+      "name": "3 bean accents riding the spiral seam",
+      "level": "meso",
+      "hostComponents": [
+        "redbean-mound"
+      ],
+      "elementComponentIds": [
+        "redbean-bean-1",
+        "redbean-bean-2",
+        "redbean-bean-3"
+      ],
+      "elementKind": "repeated small accent body, surface-attached to the parent mound",
+      "count": 3,
+      "distribution": {
+        "mode": "hFrac-interpolated surface lookup along the same spiral angle function that drives the seam displacement (grooveTargetAngleDeg)",
+        "hFracs": [
+          0.3,
+          0.58,
+          0.7
+        ],
+        "note": "hFracs read off redbean-3.png (top-down): outer bean near the rim where the spiral begins, mid bean partway in, inner bean close to the center."
+      },
+      "sizeClasses": [
+        {
+          "id": "bean",
+          "length": 0.11,
+          "radius": 0.075
+        }
+      ],
+      "seedRule": "hFracs/angle are fixed authored values derived from one deterministic formula; only surface-jitter on the mound consumes the builder rng, so the exported GLB is byte-deterministic.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 400,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Team-lead-assigned cluster-group budget for this batch (300-700 tri, <=68KB target, types.ts R2 hard ceiling <=2500 tri/<=100KB). Mound: 9 ring transitions x 16 segments = ~256 tri. Beans: 4 transitions x 8 segments x 3 beans = ~144 tri. Total ~400 tri by construction, not decimation."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, upper-left.",
+      "usage": "Fixed by scripts/breadlab.ts.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build one continuous indexed shell for the mound: bottom pole -> 8 rings -> top pole (buildRevolvedShell).",
+    "For each ring with hFrac in the groove range, pull the sector nearest grooveTargetAngleDeg(hFrac) (+- half-width neighbors) inward and down -- chestnut.ts's fixed-sector crease generalized to an advancing sector, tracing a spiral (spiral-seam deformation).",
+    "Jitter vertices while still indexed (R4 ratio).",
+    "Bake faceting by splitting vertices and recomputing normals; never request flatShading.",
+    "Project dome-polar UVs, single material bucket -- no sliceTriangles/vertex-mask split needed since the seam carries no separate color.",
+    "Build 3 small independent bean ellipsoids (buildRevolvedShell laid on its side via rotateZ(-90deg), olive.ts convention), placed at (rFracAtHFrac(hFrac)*MOUND_RADIUS, hFrac*MOUND_HEIGHT+lift) at grooveTargetAngleDeg(hFrac) -- the same spiral function drives both the seam and the bean placement, so they stay consistent by construction.",
+    "No lay-down rotation needed for the mound -- it stands upright, local Y is world Y directly. Single bounding-box floor correction covers the whole group (mound + beans), since beans are surface-attached, not independently floor-snapped."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-object rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single static prop; no plausible break beyond a bean rolling off"
+  ],
+  "risks": [
+    {
+      "id": "shadow-ridge-hues-dropped",
+      "severity": "low",
+      "description": "assets/prompts/ingredients/redbean.json names a groove-shadow hex (#522020) and a lit-ridge hex (#85453B) this spec does not paint.",
+      "mitigation": "Close inspection of the actual reference render shows smooth N.L gradients for both, already free via the runtime key light and the seam's own facet-normal contrast."
+    },
+    {
+      "id": "spiral-may-not-survive-64px",
+      "severity": "medium",
+      "description": "CONFIRMED at implementation time (LANCZOS 512->64 downsample onto card bg, CRIB.md procedure): the seam does not read as a spiral line at 64px, and bean color contrast is only weakly legible too -- the thumbnail mostly reads as 'a rounded maroon lump' rather than clearly 'swirled paste with beans'.",
+      "mitigation": "Same honest-limitation class as cinnamon's spiral texture -- accepted rather than chasing further tri budget against it, since the object still reads correctly as a food-like mound at 512px (roundtrip.png) and passes all 4 product gates (parity/budget/mesh<=2). Flagged for the delegating session to decide whether it needs a redesign pass."
+    },
+    {
+      "id": "bean-tangent-orientation-edge-on",
+      "severity": "low",
+      "description": "First attempt oriented each bean's long axis tangent to the spiral (rotation.y = angle+90deg). For the inner bean (theta~222deg) this put its long axis nearly parallel to the harness hero camera's view axis (edge-on zone ~theta=212deg for this camera position), so it rendered as a thin spike/horn instead of a plump oval (cmp-3, shot-90 both showed this before the fix).",
+      "mitigation": "Beans use a fixed broadside yaw (BEAN_YAW_DEG=125, +12deg per index for slight variety) instead of the spiral tangent -- always presents close to full width to the fixed hero camera regardless of spiral position."
+    },
+    {
+      "id": "inner-bean-oversized-vs-local-radius",
+      "severity": "low",
+      "description": "First attempt placed the inner bean at hFrac 0.84 (local mound radius only 0.18), comparable to the bean's own half-length (0.11) -- it visibly poked out past the mound's silhouette there, reinforcing the horn/spike misread.",
+      "mitigation": "Moved to hFrac 0.70 (local mound radius 0.31, roughly 3x the bean half-length) so the bean stays proportionate to the surface it sits on."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-color-based region paint is silently discarded by the runtime's MeshLambertMaterial swap.",
+      "mitigation": "Only 2 materials total, each covering a whole component (mound / beans); no vertexPaint block is authored anywhere in this spec."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "A flatShading flag is not inherited by the runtime material swap.",
+      "mitigation": "Faceting is baked into geometry by splitting vertices (scripts/breads/lib.ts facet) before export."
+    },
+    {
+      "id": "bean-name-cavity-gate",
+      "severity": "low",
+      "description": "Bean components could easily be misnamed with a recessed-feature token (e.g. 'bean socket', 'bean recess') and trip validate_sculpt_spec.py --strict-quality's SDF-subtract gate, since they are visually nestled into the surface.",
+      "mitigation": "Named as an added convex accent ('whole-bean accent') throughout id/name/role -- beans are ADDED geometry (small ellipsoids placed proud of the surface), never a subtracted cavity."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Redbean Swirl",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  }
+}
