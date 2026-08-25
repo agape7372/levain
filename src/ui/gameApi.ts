@@ -1,5 +1,5 @@
 // UI ↔ store 결합 절단면 — 화면은 이 인터페이스만 안다. 배선은 app.ts (ARCHITECTURE §5).
-import type { Action, IngredientId, Location, SimEvent, Snapshot } from '../sim';
+import type { Action, FeedRatio, IngredientId, Location, SimEvent, Snapshot } from '../sim';
 
 /** 누적 미션 한 줄 — 리셋·기한 없음. remaining은 다음 보상까지 남은 횟수(1~step) */
 export interface MissionProgress {
@@ -50,6 +50,12 @@ export interface GameApi {
   inventory(): Record<IngredientId, number>;
   /** 보관 통 잔량(g) — 빵 원가가 여기서 나간다 (GDD §6-2) */
   pantry(): number;
+  /**
+   * 현재 급여 비율 — 상단 타임라인이 RATIOS에서 축 눈금을 읽는다(표시 전용 패스스루).
+   * Snapshot의 peakAt/peakEndAt을 쓰지 않는 이유: wallFor의 clamp 때문에 피크가 지나면
+   * 둘 다 locAnchorAt으로 붕괴해 밴드 폭이 0이 된다 (derive.ts wallFor).
+   */
+  feedRatio(): FeedRatio;
   /** 변형 굽기 — 원자 해금·차단 규칙은 store가 판정 (gameStore.bakeVariant 주석) */
   bakeVariant(variantId: string): SimEvent[];
   /** 활성 르방 표시명 — starterId로 도감 기록의 "사용 르방" 표기용. 미지 id는 null */

@@ -129,6 +129,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     subscribe: (fn) => store.subscribe(fn),
     inventory: () => store.getInventory(),
     pantry: () => store.getPantry(),
+    feedRatio: () => store.getActiveStarter().sim.feedRatio,
     bakeVariant: (variantId) => store.bakeVariant(variantId),
     starterNameOf: (id) => {
       const rec = store.getEnvelope().starters.find((r) => r.id === id);

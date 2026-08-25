@@ -1,7 +1,11 @@
-// 관찰 카드 — 정보만, 조작 없음 (GDD §5). 상태 문구 탭으로 진입.
+// 관찰 카드 — 정보 + 그 정보에 대한 응답 **1개**(말려두기)까지 (GDD §5, 개정 2026-08-25).
+// 상태 문구 탭으로 진입. ★조작 1개 상한: 여기를 액션 서랍으로 만들지 말 것.
+// 말려두기가 여기 있는 이유 = 이 카드가 "잃을 수도 있다"를 말하는 유일한 화면이고,
+// 말려두기는 그에 대한 유일한 응답이기 때문이다. 다른 액션은 자기 자리를 따로 찾을 것.
 import { copy } from '../copy';
 import { agoText, untilText } from '../format';
-import { openModal } from './modal';
+import { confirmModal, openModal } from './modal';
+import { FLAKE_COST_G, FLAKE_STAGE, SEED_G } from '../../sim';
 import type { GameApi } from '../gameApi';
 
 export function openObserveCard(api: GameApi): void {
@@ -53,5 +57,29 @@ export function openObserveCard(api: GameApi): void {
     wrap.appendChild(row);
   }
 
-  openModal(wrap, { title: copy.actions.observe });
+  // 말려두기 — 3단계 전엔 행 자체가 없다(초반 카드는 개정 전과 동일).
+  // 게이트는 홈에 있던 것과 **같은 쌍**이다: 노출만 옮기고 비활성 조건을 빠뜨리면
+  // 휴면·곰팡이에서 늘 눌리는데 조용히 아무 일도 안 하는 버튼이 된다(flakeBlocked를 아무도 안 읽는다).
+  let actions: HTMLDivElement | null = null;
+  if (snap.stage >= FLAKE_STAGE) {
+    actions = document.createElement('div');
+    actions.className = 'modal-actions observe-actions';
+    const flakeBtn = document.createElement('button');
+    flakeBtn.className = 'btn btn-ghost';
+    flakeBtn.textContent = copy.flake.action;
+    flakeBtn.disabled = snap.phase !== 'active' || snap.mass < SEED_G + FLAKE_COST_G;
+    flakeBtn.addEventListener('click', () => {
+      handle.close(); // 모달 위 모달 금지 — 닫고 나서 확인 (recipes.ts 굽기 흐름과 같은 순서)
+      confirmModal({
+        body: copy.flake.confirm,
+        confirmLabel: copy.flake.action,
+        cancelLabel: '다음에요',
+        onConfirm: () => void api.dispatch({ type: 'makeFlake' }),
+      });
+    });
+    actions.appendChild(flakeBtn);
+  }
+
+  const handle = openModal(wrap, { title: copy.actions.observe });
+  if (actions) wrap.appendChild(actions);
 }

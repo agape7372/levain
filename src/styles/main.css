@@ -113,6 +113,11 @@ html {
 
 /* ── 홈 HUD ──────────────────────────────────────────── */
 /* 인셋: 구형 WebView는 Capacitor가 네이티브 패딩으로 처리(env 0), 신형은 env() 실값 — 이중 패딩 금지 */
+/* ⚠ pointer-events: left/right 절대배치라 이 박스는 화면 폭 전체(≈358px)를 덮는다.
+   .screen--overlay > * 가 auto라, 문구가 없는 빈 여백까지 캔버스 탭을 삼켜 왔다
+   (2026-08-25 QA에서 실측: (300,55)·(360,55) 전부 hud-top 반환, canvas 아님).
+   타임라인이 높이를 14px 늘리며 그 죽은 영역이 더 커져 발견됐다 — 컨테이너는 통과시키고
+   실제로 눌러야 하는 자식(버튼)만 받는다. .hud-corner와 같은 수법. */
 .hud-top {
   position: absolute;
   top: calc(14px + env(safe-area-inset-top, 0px));
@@ -121,9 +126,67 @@ html {
   flex-direction: column;
   gap: 4px;
   text-align: center;
+  pointer-events: none;
 }
+.hud-top button { pointer-events: auto; }
 .hud-status { font-size: 17px; font-weight: 600; color: var(--ink); }
 .hud-sub { font-size: 13px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+/* 발효 타임라인 — sub 문장의 그림이지 게이지가 아니다.
+   가로축 = 시간(세로 부피 아님), 채우지 않고 점 하나로만 '지금'을 찍는다.
+   폐기된 고무줄 마커·병 눈금(VISUAL §1-2)의 부활이 아니다 — 병 위가 아니라 텍스트 스택 안에 산다. */
+.hud-timeline {
+  --p: 0;
+  position: relative;
+  align-self: center;
+  width: min(78%, 280px);
+  height: 10px;
+  margin-top: 2px;
+  pointer-events: none;   /* 상태 문구 탭(관찰 카드)을 절대 가로채지 않는다 */
+  opacity: 0;             /* 기본 숨김 — 자리는 남겨 둔다(칩이 위아래로 안 튄다) */
+  transition: opacity 0.25s;
+}
+.hud-timeline.on { opacity: 1; }
+/* 트랙 — 머리카락 한 줄. 눈금 0개, 채움 0개.
+   양 끝은 예보라 단정하지 않는다: 끝점 눈금 대신 페이드(오른쪽=배고픔이 더 불확실 → 더 길게) */
+.hud-timeline::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 1.5px;
+  margin-top: -0.75px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--ink-faint) 22%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 8px, #000 calc(100% - 12px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 8px, #000 calc(100% - 12px), transparent 100%);
+}
+/* 한창때 — 관찰 카드의 "가장 부풀어요"(peakStart~peakEnd)와 같은 정의.
+   경계가 흐린 건 정답 시간을 단정하지 않기 위해서다 (§19-1) */
+.tl-peak {
+  --from: 0.32; --to: 0.43;
+  position: absolute;
+  top: 50%;
+  left: calc(var(--from) * 100%);
+  width: calc((var(--to) - var(--from)) * 100%);
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 1.5px;
+  background: color-mix(in srgb, var(--accent) 45%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4px, #000 calc(100% - 4px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 4px, #000 calc(100% - 4px), transparent 100%);
+}
+/* 지금 — 관측된 사실이라 유일하게 선명하다(예보는 전부 흐리다).
+   ★위치 트윈 금지: 재개·르방 전환에서 점이 축을 가로지르면 그게 곧 경과 재생이다
+   (이 레포는 "경과를 애니메이션으로 재생하지 않는다"가 계약). 그래서 reduced-motion 대응도 0줄. */
+.tl-now {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--p) * 100%);
+  width: 5px; height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
 .hud-stage-chip {
   align-self: center;
   margin-top: 2px;
@@ -166,14 +229,92 @@ html {
   .hud-stage-chip.chip-swap,
   .hud-stage-chip.pulse,
   .recipe-card.just-unlocked { animation: none; }
+  /* 보관 통 — 수위 차오름·뚜껑 들림도 연출이다. 값은 그대로 반영되고 전환만 사라진다 */
+  .jar-body,
+  .jar-lid { transition: none; }
 }
 
+/* 우상단 코너 — 설정 + 보관 통(세로 스택).
+   ⚠ pointer-events: 위 .screen--overlay > * 가 auto라, 세로 스택이 되면 자식 사이 gap이
+   캔버스 탭을 삼켜 그 영역의 젓기·스와이프가 죽는다. 컨테이너는 통과시키고 자식만 받는다
+   (109-110행과 같은 수법 — 명시도는 같고 이쪽이 뒤라 이긴다). */
 .hud-corner {
   position: absolute;
   top: calc(12px + env(safe-area-inset-top, 0px));
   right: 12px;
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none;
+}
+.hud-corner .icon-btn,
+.hud-corner .pantry-jar { pointer-events: auto; }
+
+/* 보관 통 — 떼어내기 버튼·잔량 칩·힌트를 흡수한 오브젝트 (GDD §6-2).
+   잔량을 숫자가 아니라 수위로 읽힌다. 진행바가 아니라 병으로 보이게 하는 건 세 겹이다:
+   립이 몸통보다 넓고 · 바닥만 크게 둥글고 · 뚜껑이 얹혀 있다. */
+.pantry-jar {
+  width: 56px; height: 70px;      /* 탭 타깃 — 두 축 모두 44px 초과 */
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+}
+.jar-lid {
+  width: 44px; height: 7px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--bg-deep) 88%, var(--ink-faint));
+  transform: translateY(-4px);     /* 살짝 들린 뚜껑 = 열 수 있다는 어포던스 */
+  transition: transform 0.2s, opacity 0.2s;
+}
+/* 비활성은 뚜껑에만 준다 — 몸통(재고 readout)은 계속 또렷해야 한다.
+   canSplit이 급여 후 6h 게이트라 자주 false인데 그때마다 잔량까지 흐려지면 안 된다. */
+.pantry-jar:disabled { cursor: default; }
+.pantry-jar:disabled .jar-lid { transform: none; opacity: 0.42; }
+.jar-body {
+  --fill: 0%;
+  position: relative;
+  width: 40px; height: 54px;
+  border-radius: 4px 4px 14px 14px;  /* 바닥만 크게 — 진행바는 상하 대칭이다 */
+  /* 수위 = background-size의 세로 %. 반죽 그라디언트의 100% 지점이 곧 수면이다.
+     ★빈 쪽은 크림보다 **어두워야** 한다 — 처음엔 bg-soft 62%로 뒀더니 크림과 값이 너무 가까워
+     10%/45%/100%가 픽셀 단위로 구분이 안 됐다(2026-08-25 QA 실측). 빈 유리는 속 그늘이
+     비쳐 어둡다는 게 실물이기도 하다. 수면은 그 명암 경계로 읽힌다.
+     ⚠ background-size 목록과 background-image 레이어 수가 어긋나면 전환이 조용히 죽는다. */
+  background-image:
+    linear-gradient(to top,
+      color-mix(in srgb, var(--cream) 70%, var(--crust)) 0%,
+      color-mix(in srgb, var(--cream) 90%, var(--crust)) 40%,
+      var(--cream) 92%,
+      color-mix(in srgb, var(--cream) 55%, var(--bg-soft)) 100%),
+    linear-gradient(color-mix(in srgb, var(--bg-deep) 82%, var(--ink-faint)) 0 100%);
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-size: 100% var(--fill), 100% 100%;
+  transition: background-size 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* 립 — 몸통보다 확실히 넓어야 메이슨자로 읽힌다(3px씩은 40px 폭에서 안 보였다) */
+.jar-body::before {
+  content: '';
+  position: absolute;
+  left: -6px; right: -6px; top: -1px;
+  height: 6px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--bg-soft) 62%, var(--ink-faint));
+}
+.pantry-hint {
+  max-width: 104px;
+  text-align: right;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--ink-faint);
+  pointer-events: none;
 }
 .icon-btn {
   width: 38px; height: 38px;
@@ -249,28 +390,8 @@ html {
   border-radius: 999px;
   color: var(--ink-soft);
 }
-/* 보조 행 — 떼어내기·말려두기·보관 잔량. 밥 주기보다 한 단 낮은 위계 */
-.hud-subactions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-  margin-top: 6px;
-  min-height: 22px;
-}
-.pantry-chip {
-  color: var(--ink-faint);
-  font-size: 13px;
-  padding: 0 4px;
-}
-.btn-flake,
-.btn-split {
-  background: color-mix(in srgb, var(--bg-soft) 85%, transparent);
-  color: var(--ink-soft);
-  font-size: 14px;
-  /* 세로 14px = 높이 44px — 터치 타깃 하한. 12px면 40px라 폰에서 빗나간다 */
-  padding: 14px 16px;
-}
+/* 보조 행은 폐지됐다 (2026-08-25) — 떼어내기는 우상단 보관 통, 말려두기는 관찰 카드로.
+   하단 3행 밀집이 사용자 불만의 본체였다. 셋째 행을 되살리지 말 것. */
 
 /* ── 모달 (중앙 팝업 고정 — 바닥 시트 금지) ─────────────── */
 .modal-backdrop {
@@ -311,6 +432,8 @@ html {
   margin-top: 8px;
 }
 .modal-actions .btn { padding: 11px 20px; font-size: 15px; }
+/* 관찰 카드의 말려두기 — 기본 modal-actions는 높이 43px라 터치 타깃 하한(44px)에 못 미친다 */
+.observe-actions .btn { padding: 13px 22px; }
 
 /* 선택 리스트 (밥 비율 등) */
 .option-list { display: flex; flex-direction: column; gap: 8px; }
@@ -337,9 +460,9 @@ html {
 .toast-container {
   position: absolute;
   left: 0; right: 0;
-  /* hud-bottom(위치 세그먼트+밥 버튼+보조 행 ≈160px) 위로 — 버튼과 겹치면 조작을 가린다.
-     보조 행(떼어내기·말려두기·보관 잔량)이 생기면서 한 단 더 올렸다 (2026-08-25) */
-  bottom: calc(52px + 190px + env(safe-area-inset-bottom));
+  /* hud-bottom(위치 세그먼트 + 밥 버튼 2행 ≈111px) 위로 — 버튼과 겹치면 조작을 가린다.
+     보조 행 폐지로 64px(gap 10 + margin 6 + 버튼 48) 줄어 190 → 130 (2026-08-25 오후) */
+  bottom: calc(52px + 130px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
