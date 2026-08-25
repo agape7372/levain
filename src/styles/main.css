@@ -10,6 +10,11 @@
   --cream:       #F4EAD4;  /* 반죽색 — 게이지·강조면 */
   --crust:       #A9713F;  /* 구운 빵·완료 뱃지 */
   --hooch:       #9C927F;  /* 배고픔·휴면 정보 톤 (경고 아님) */
+
+  /* 우상단 오브젝트 컬럼 폭 = ? + ⚙ 가로 두 개(38 + 8 + 38). 항아리(56)보다 이쪽이 넓다.
+     .hud-top이 이 값만큼 오른쪽을 비워 둔다 — 한 숫자가 두 곳을 지배해야 글자가
+     아이콘 밑으로 파고드는 일이 다시 안 생긴다. 코너에 물건을 더하면 여기부터 고칠 것. */
+  --hud-corner-w: 84px;
 }
 
 html, body {
@@ -118,31 +123,57 @@ html {
    (2026-08-25 QA에서 실측: (300,55)·(360,55) 전부 hud-top 반환, canvas 아님).
    타임라인이 높이를 14px 늘리며 그 죽은 영역이 더 커져 발견됐다 — 컨테이너는 통과시키고
    실제로 눌러야 하는 자식(버튼)만 받는다. .hud-corner와 같은 수법. */
+/* 왼쪽 = 말(글자 스택) / 오른쪽 = 물건(?·⚙·항아리). 정렬 기준을 둘로 줄인 게 이 배치의 요점이다.
+   가운데 정렬로 되돌리지 말 것 — 오른쪽 코너가 비대칭이라 가운데축이 늘 어긋난다. */
 .hud-top {
   position: absolute;
   top: calc(14px + env(safe-area-inset-top, 0px));
-  left: 16px; right: 16px;
+  left: 16px;
+  right: calc(24px + var(--hud-corner-w));
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  text-align: center;
+  align-items: flex-start;
+  gap: 0;                 /* 리듬은 행별 margin으로 — 행마다 필요한 간격이 다르다 */
+  text-align: left;
   pointer-events: none;
 }
 .hud-top button { pointer-events: auto; }
-.hud-status { font-size: 17px; font-weight: 600; color: var(--ink); }
-.hud-sub { font-size: 13px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+/* ⚠ 2026-08-26까지 이 규칙은 죽어 있었다: home.ts가 style.cssText로 font:inherit·color:inherit를
+   인라인으로 박아 제목이 16px/400/--ink-soft로 렌더됐다(스크린샷 실측으로 확인).
+   버튼 리셋을 여기로 회수했으니 home.ts에 인라인 style을 되살리지 말 것. */
+.hud-status {
+  font-family: inherit;   /* 버튼은 UA 폰트라 이게 없으면 Pretendard가 안 걸린다 */
+  font-size: 20px;        /* VISUAL §7-2 제목 토큰 */
+  font-weight: 600;
+  color: var(--ink);
+  text-align: left;       /* UA button{text-align:center}는 상속을 이긴다 — 큰 글자 배율에서 물린다 */
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  /* 탭 타깃 44px 확보. 위아래 음수 margin으로 보이는 리듬은 그대로 두고 누를 면적만 키운다 */
+  padding: 10px 12px 10px 0;
+  margin: -6px 0;
+}
+.hud-status:active { opacity: 0.6; }   /* 관찰 카드로 가는 유일한 문 — 눌리는 느낌은 있어야 한다 */
+.hud-sub {
+  display: flex;
+  flex-direction: column;  /* 두 마디를 줄로 나눈다(home.ts) — ' · '로 이으면 술어가 찢긴다 */
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
 /* 발효 타임라인 — sub 문장의 그림이지 게이지가 아니다.
    가로축 = 시간(세로 부피 아님), 채우지 않고 점 하나로만 '지금'을 찍는다.
    폐기된 고무줄 마커·병 눈금(VISUAL §1-2)의 부활이 아니다 — 병 위가 아니라 텍스트 스택 안에 산다. */
 .hud-timeline {
   --p: 0;
   position: relative;
-  align-self: center;
-  width: min(78%, 280px);
+  align-self: stretch;    /* 문장과 같은 폭·같은 시작점이라야 "이 문장의 그림"으로 읽힌다 */
   height: 10px;
-  margin-top: 2px;
+  margin-top: 8px;
   pointer-events: none;   /* 상태 문구 탭(관찰 카드)을 절대 가로채지 않는다 */
-  opacity: 0;             /* 기본 숨김 — 자리는 남겨 둔다(칩이 위아래로 안 튄다) */
+  opacity: 0;             /* 기본 숨김 — 자리는 남겨 둔다(숨김/노출이 레이아웃을 흔들지 않게) */
   transition: opacity 0.25s;
 }
 .hud-timeline.on { opacity: 1; }
@@ -187,22 +218,26 @@ html {
   background: var(--ink);
 }
 
+/* 머리글 — 이름·순번. 알약 배경을 뺐다(상자를 하나 줄여야 상단이 조용해진다).
+   배경을 빼면 padding도 같이 빼야 한다 — 안 그러면 글자가 왼쪽 기준선에서 10px 들어간다. */
 .hud-stage-chip {
-  align-self: center;
-  margin-top: 2px;
-  font-size: 12px;
-  color: var(--ink-faint);
-  background: color-mix(in srgb, var(--bg-soft) 72%, transparent);
-  padding: 3px 10px;
-  border-radius: 999px;
+  font-size: 13px;              /* VISUAL §7-2 캡션 하한 */
+  color: var(--ink-soft);       /* 아래 문장(--ink-faint)과 갈라야 머리글로 읽힌다 */
+  min-width: 0;                 /* 이름이 길면 두 줄로 깨지지 말고 끝만 잘리게 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform-origin: left center; /* chip-pulse의 scale이 왼쪽 기준선을 밀지 않도록 */
 }
 .hud-stage-chip.pulse { animation: chip-pulse 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
 /* 멀티 르방 전환 행 — 칩 좌우 ‹ › (한 마리면 버튼 숨김, home.ts) */
 .hud-chip-row {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 2px;
+  max-width: 100%;
+  min-height: 38px;   /* ⚙·? 와 같은 높이의 줄 — 두 컬럼이 같은 선에서 시작한다 */
 }
 .chip-nav {
   border: 0;
@@ -240,12 +275,19 @@ html {
    (109-110행과 같은 수법 — 명시도는 같고 이쪽이 뒤라 이긴다). */
 .hud-corner {
   position: absolute;
-  top: calc(12px + env(safe-area-inset-top, 0px));
+  top: calc(14px + env(safe-area-inset-top, 0px));  /* 머리글 줄과 같은 선에서 시작 */
   right: 12px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 10px;
+  pointer-events: none;
+}
+/* 설명서(?)와 설정(⚙)은 가로 한 줄 — 세로로 쌓으면 항아리가 밀려 내려가 상단이 다시 길어진다.
+   폭(38+8+38)이 --hud-corner-w의 근거다. 여기 아이콘을 더하면 그 변수부터 고칠 것. */
+.hud-corner-btns {
+  display: flex;
+  gap: 8px;
   pointer-events: none;
 }
 .hud-corner .icon-btn,
@@ -273,10 +315,11 @@ html {
   transform: translateY(-4px);     /* 살짝 들린 뚜껑 = 열 수 있다는 어포던스 */
   transition: transform 0.2s, opacity 0.2s;
 }
-/* 비활성은 뚜껑에만 준다 — 몸통(재고 readout)은 계속 또렷해야 한다.
-   canSplit이 급여 후 6h 게이트라 자주 false인데 그때마다 잔량까지 흐려지면 안 된다. */
-.pantry-jar:disabled { cursor: default; }
-.pantry-jar:disabled .jar-lid { transform: none; opacity: 0.42; }
+/* 잠금 표시는 뚜껑에만 준다 — 몸통(재고 readout)은 계속 또렷해야 한다.
+   canSplit이 급여 후 6h 게이트라 자주 false인데 그때마다 잔량까지 흐려지면 안 된다.
+   ★:disabled가 아니라 .is-locked인 이유: disabled면 클릭 이벤트가 아예 안 떠서
+   "왜 안 되는지"를 말할 기회가 없다(2026-08-25~26 실제 결함). 병은 항상 눌린다. */
+.pantry-jar.is-locked .jar-lid { transform: none; opacity: 0.42; }
 .jar-body {
   --fill: 0%;
   position: relative;
@@ -308,14 +351,8 @@ html {
   border-radius: 3px;
   background: color-mix(in srgb, var(--bg-soft) 62%, var(--ink-faint));
 }
-.pantry-hint {
-  max-width: 104px;
-  text-align: right;
-  font-size: 12px;
-  line-height: 1.35;
-  color: var(--ink-faint);
-  pointer-events: none;
-}
+/* .pantry-hint는 삭제했다(2026-08-26) — 항아리 밑에 붙던 두 줄짜리 설명.
+   물건이 놓여 있으면 눌러본다. 설명은 탭 응답과 설명서(?)가 맡는다. 되살리지 말 것. */
 .icon-btn {
   width: 38px; height: 38px;
   border: 0;
@@ -435,6 +472,29 @@ html {
 /* 관찰 카드의 말려두기 — 기본 modal-actions는 높이 43px라 터치 타깃 하한(44px)에 못 미친다 */
 .observe-actions .btn { padding: 13px 22px; }
 
+/* ── 설명서 (우상단 ?) ─────────────────────────────
+   읽기 전용이라 버튼이 없다. 여기에 조작을 달지 말 것 — 관찰 카드와 같은 규칙(GDD §5). */
+.help-intro { margin: 0 0 18px; font-size: 14px; color: var(--ink-faint); }
+.help-sec { margin: 0 0 18px; }
+.help-sec:last-child { margin-bottom: 0; }
+.help-q { margin: 0 0 6px; font-size: 15px; font-weight: 600; color: var(--ink); }
+.help-a { margin: 0; font-size: 14px; line-height: 1.65; color: var(--ink-soft); }
+/* 축소판 타임라인 — 홈의 .hud-timeline을 그대로 쓴다(같은 그림이라야 배운 게 옮겨간다) */
+.help-figure { margin: 14px 0 0; }
+.help-figure .hud-timeline { margin-top: 0; }
+.help-tl-legend {
+  position: relative;
+  height: 17px;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+/* 각 이름표가 자기가 가리키는 지점 아래에 서야 한다 — 균등 분배로는 밴드를 못 가리킨다 */
+.help-tl-legend span { position: absolute; top: 0; white-space: nowrap; }
+.help-tl-legend .at-start { left: 0; }
+.help-tl-legend .at-peak { left: 37.5%; transform: translateX(-50%); }  /* 밴드 0.32~0.43의 중심 */
+.help-tl-legend .at-end { right: 0; }
+
 /* 선택 리스트 (밥 비율 등) */
 .option-list { display: flex; flex-direction: column; gap: 8px; }
 .option-item {
@@ -460,9 +520,14 @@ html {
 .toast-container {
   position: absolute;
   left: 0; right: 0;
-  /* hud-bottom(위치 세그먼트 + 밥 버튼 2행 ≈111px) 위로 — 버튼과 겹치면 조작을 가린다.
-     보조 행 폐지로 64px(gap 10 + margin 6 + 버튼 48) 줄어 190 → 130 (2026-08-25 오후) */
-  bottom: calc(52px + 130px + env(safe-area-inset-bottom));
+  /* 상단 HUD 바로 아래 = 르방이 위 빈 공간 (2026-08-26, 사용자 지정 자리).
+     하단에 있을 땐 밥 버튼·세그먼트를 안 가리려고 오프셋을 계속 재야 했다(190 → 130).
+     그 자리 자체가 조작 구역이라 행 수가 바뀔 때마다 다시 어긋난다 — 위는 원래 비어 있다.
+     ★높이는 상수로 못 박는다: 문장 1줄/2줄·큰 글자 배율에 따라 변한다.
+     home.ts의 ResizeObserver가 --hud-top-h에 실측값을 넣는다(폴백 120px = 활성 상태 실측치).
+     ★max(…, 118px): 글자 블록만 피하면 안 된다 — 오른쪽 코너(?⚙ 38 + gap 10 + 항아리 70 = 118)가
+     더 길어서, 문장이 한 줄인 상태(실측 105px)에선 토스트가 항아리 바닥과 1px까지 붙었다. */
+  top: calc(14px + env(safe-area-inset-top, 0px) + max(var(--hud-top-h, 120px), 118px) + 14px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -477,7 +542,7 @@ html {
   padding: 10px 18px;
   border-radius: 999px;
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(-6px);   /* 위에 사니 위에서 내려온다 (하단이었을 땐 +6px로 올라왔다) */
   transition: opacity 0.25s, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   max-width: 85%;
   text-align: center;

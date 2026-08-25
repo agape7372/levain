@@ -2,6 +2,7 @@
 import { copy } from '../copy';
 import { agoText, untilText } from '../format';
 import { confirmModal, openModal } from '../components/modal';
+import { openHelp } from '../components/helpModal';
 import { openMoldModal } from '../components/moldModal';
 import { openObserveCard } from '../components/observeCard';
 import { openSettings } from '../components/settingsModal';
@@ -9,12 +10,12 @@ import { toast } from '../components/toast';
 import type { GameApi } from '../gameApi';
 import type { FeedRatio, Flour, Location, SimEvent, Snapshot } from '../../sim';
 import {
-  RATIOS, FRIDGE_STAGE, SEED_G,
+  RATIOS, FRIDGE_STAGE, SEED_G, SPLIT_MIN_G,
   FLOUR_STAGE, HOUR, rateMult,
 } from '../../sim';
-// MASS_MAX는 sim/index가 재수출하지 않는다 — persistence.ts:10과 같은 직접 임포트
+// MASS_MAX·MATURITY_MIN_GAP_H는 sim/index가 재수출하지 않는다 — persistence.ts:10과 같은 직접 임포트
 // (ESLint no-restricted-imports는 src/sim/** 안쪽에만 걸린다)
-import { MASS_MAX } from '../../sim/constants';
+import { MASS_MAX, MATURITY_MIN_GAP_H } from '../../sim/constants';
 import type { Screen } from '../router';
 
 const LOCATIONS: Location[] = ['room', 'window', 'fridge'];
@@ -28,9 +29,16 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
   top.className = 'hud-top';
   const status = document.createElement('button');
   status.className = 'hud-status';
-  status.style.cssText = 'border:0;background:transparent;font:inherit;color:inherit;cursor:pointer';
+  // ★인라인 style을 되살리지 말 것 — 여기 있던 `font:inherit;color:inherit`가 .hud-status 규칙을
+  // 통째로 덮어 제목이 17px/600이 아니라 16px/400/--ink-soft로 렌더됐다(2026-08-26 발견).
+  // 버튼 리셋은 전부 main.css .hud-status에 있다.
   const sub = document.createElement('div');
   sub.className = 'hud-sub';
+  // 두 마디를 ' · '로 잇지 않고 줄로 나눈다 — 좁아진 좌측 컬럼에서 자연 줄바꿈은
+  // "…뒤쯤 / 배고파질 거예요"로 술어를 찢는다. 문구 자체는 copy.ts 그대로(규칙 6).
+  const subFed = document.createElement('span');
+  const subNext = document.createElement('span');
+  sub.append(subFed, subNext);
   const chip = document.createElement('div');
   chip.className = 'hud-stage-chip';
   // 멀티 르방 전환 — 스와이프의 접근성 대체이자 v1 진입로(§5-5). 한 마리면 숨김
@@ -75,23 +83,43 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
   nowDot.className = 'tl-now';
   timeline.append(peakBand, nowDot);
 
-  top.append(status, sub, timeline, chipRow);
+  // 칩 줄이 맨 위(머리글) — 이름·순번은 제목보다 낮은 정보다. 제목이 그 아래에서 가장 크다.
+  top.append(chipRow, status, sub, timeline);
   status.addEventListener('click', () => openObserveCard(api));
 
-  // ── 우상단: 설정 + 보관 통 ──
+  // 토스트가 이 블록 바로 아래(르방이 위 빈 공간)에 서려면 실제 높이를 알아야 한다.
+  // 문장 1줄/2줄·큰 글자 배율에 따라 변하므로 상수로 박지 않고 실측해 CSS 변수로 넘긴다.
+  // 해제 안 함 — 홈은 루트 화면이라 살아 있는 동안 계속 필요하다(onHide 주석과 같은 이유).
+  new ResizeObserver(() => {
+    document.documentElement.style.setProperty(
+      '--hud-top-h', `${Math.round(top.getBoundingClientRect().height)}px`);
+  }).observe(top);
+
+  // ── 우상단: 설명서 · 설정 + 보관 통 ──
   // 하단 = 세션마다 반복되는 조작의 자리(위 chipRow 주석), 여기 = 저빈도·읽기 위주 오브젝트의 자리.
   // 떼어내기는 canSplit이 유효 6h를 요구해 구조상 하루 1~2회가 상한이고, 잔량은 보기만 해도
   // 읽히므로 엄지 비용이 0이다 — 두 주석은 충돌이 아니라 같은 규칙의 양면이다.
   const corner = document.createElement('div');
   corner.className = 'hud-corner';
+  // 아이콘 두 개는 가로로 — 세로로 쌓으면 코너가 항아리를 밀어내리고, 상단이 다시 길어진다
+  const cornerBtns = document.createElement('div');
+  cornerBtns.className = 'hud-corner-btns';
+  const helpBtn = document.createElement('button');
+  helpBtn.className = 'icon-btn';
+  helpBtn.textContent = '?';
+  helpBtn.setAttribute('aria-label', copy.help.button);
+  helpBtn.addEventListener('click', () => openHelp());
   const settingsBtn = document.createElement('button');
   settingsBtn.className = 'icon-btn';
   settingsBtn.textContent = '⚙';
   settingsBtn.setAttribute('aria-label', copy.settings.title);
   settingsBtn.addEventListener('click', () => openSettings(api));
+  cornerBtns.append(helpBtn, settingsBtn);
 
   // 보관 통 — 떼어내기 버튼·잔량 칩·힌트 셋을 흡수한 오브젝트 (GDD §6-2).
   // 잔량은 수위로 읽힌다: 숫자 없이 양이 보이는 게 요점이라 라벨은 aria에만 둔다.
+  // ★항상 눌린다(disabled 금지, 2026-08-26). 잠긴 건 뚜껑 모양으로 보여 주고,
+  // 눌렀을 때 이유와 남은 시간을 말한다 — disabled면 클릭 이벤트 자체가 안 뜬다.
   const pantryJar = document.createElement('button');
   pantryJar.className = 'pantry-jar';
   const jarLid = document.createElement('span');
@@ -100,7 +128,28 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
   jarBody.className = 'jar-body';
   pantryJar.append(jarLid, jarBody);
   pantryJar.addEventListener('click', () => {
-    const g = api.getSnapshot().mass - SEED_G;
+    const snap = api.getSnapshot();
+    const now = api.now();
+    // 잠긴 이유는 canSplit(derive.ts)과 같은 항을 UI가 다시 읽어 가른다.
+    // 게이트 정의가 바뀌면 여기도 같이 고칠 것 — 어긋나면 "된다는데 안 되는" 병이 된다.
+    if (snap.phase === 'dormant' || snap.phase === 'moldy') {
+      toast(copy.split.blockedDormant);
+      return;
+    }
+    if (snap.mass - SEED_G < SPLIT_MIN_G) {
+      toast(copy.split.blockedMass);
+      return;
+    }
+    if (!snap.canSplit) {
+      // 남은 시간은 실제 시계로 환산해 말한다 — 유효시간을 그대로 말하면 냉장고에선 거짓말이 된다.
+      // 이 식은 derive.ts의 wallFor와 대수적으로 같다:
+      //   now + (T − effMs)/mult ≡ locAnchorAt + (T − effBaseMs)/mult
+      const mult = rateMult({ location: api.location(), flour: snap.flour });
+      const readyAt = now + Math.max(0, MATURITY_MIN_GAP_H * HOUR - snap.effSinceFeedMs) / mult;
+      toast(copy.split.blockedTooSoon(untilText(readyAt, now)));
+      return;
+    }
+    const g = snap.mass - SEED_G;
     confirmModal({
       body: copy.split.confirm(g),
       confirmLabel: copy.split.action,
@@ -113,12 +162,9 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     });
   });
 
-  // 빈 통일 때만 뜨는 한 줄 — 병이 물건이 된 이상 "이게 뭐냐"에 답할 책임이 생긴다
-  const pantryHint = document.createElement('span');
-  pantryHint.className = 'pantry-hint';
-  pantryHint.textContent = copy.pantry.hint;
-
-  corner.append(settingsBtn, pantryJar, pantryHint);
+  // 힌트 문구는 없앴다(2026-08-26) — 항아리가 물건으로 놓여 있으면 눌러본다.
+  // "이게 뭐냐"는 탭 응답과 설명서(?)가 답한다. 라벨로 답하면 우상단이 다시 지저분해진다.
+  corner.append(cornerBtns, pantryJar);
 
   // ── 하단: 위치 세그먼트 + 밥 버튼 ──
   const bottom = document.createElement('div');
@@ -311,11 +357,10 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
           : snap.phase;
     status.textContent = copy.phase[phaseKey];
 
-    if (snap.phase === 'active') {
-      sub.textContent = `${copy.observe.lastFed(agoText(api.lastFedAt(), now))} · ${copy.observe.nextFeed(untilText(snap.nextFeedAt, now) + ' 뒤')}`;
-    } else {
-      sub.textContent = copy.observe.lastFed(agoText(api.lastFedAt(), now));
-    }
+    subFed.textContent = copy.observe.lastFed(agoText(api.lastFedAt(), now));
+    const twoPart = snap.phase === 'active';
+    subNext.textContent = twoPart ? copy.observe.nextFeed(untilText(snap.nextFeedAt, now) + ' 뒤') : '';
+    subNext.style.display = twoPart ? '' : 'none';
 
     // 타임라인은 sub가 두 마디일 때만 산다 — 같은 문장의 그림이라 조건도 같다.
     // peak에서도 스타일은 안 바꾼다: 점이 밴드 안에 있다는 기하가 곧 신호다.
@@ -363,16 +408,15 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     const showJar = snap.phase !== 'moldy' && (splittable || pantry > 0);
     pantryJar.style.display = showJar ? '' : 'none';
     // 뚜껑 = 조작 어포던스, 몸통 = 재고 readout. canSplit이 급여 후 6h 게이트라 자주 false인데
-    // 그때마다 재고 표시까지 죽으면 안 된다 — 비활성은 뚜껑에만 준다(CSS가 분리 처리).
-    pantryJar.disabled = !snap.canSplit || !splittable;
+    // 그때마다 재고 표시까지 죽으면 안 된다 — 잠금 표시는 뚜껑에만 준다(CSS가 분리 처리).
+    // ★disabled를 쓰지 않는다: 그러면 클릭 이벤트가 안 떠서 "왜 안 되는지"를 말할 기회가 없다.
+    pantryJar.classList.toggle('is-locked', !snap.canSplit || !splittable);
+    pantryJar.setAttribute('aria-disabled', String(!snap.canSplit || !splittable));
     // 수위 = 병 용량(MASS_MAX) 대비. 1:1:1 한 판(120g) = 25% → 네 사이클이면 가득.
     // 하한 10%는 굽기 잔돈 구간에서 "조금 남았다"와 "다 썼다"를 가른다.
     const fill = pantry === 0 ? 0 : Math.min(100, Math.max(10, (pantry / MASS_MAX) * 100));
     jarBody.style.setProperty('--fill', `${fill.toFixed(1)}%`);
     pantryJar.setAttribute('aria-label', pantry > 0 ? copy.pantry.label(pantry) : copy.pantry.empty);
-    // 힌트는 빈 통일 때만 — 병이 뭘 하는 물건인지 한 번은 말해 줘야 발견이 막히지 않는다
-    const showHint = showJar && pantry === 0;
-    pantryHint.style.display = showHint ? '' : 'none';
 
     // 위치 세그먼트 — 냉장은 3단계 해금 전 비활성 (문구 대신 옅은 비활성 — 사용자 규칙)
     const loc = api.location();
