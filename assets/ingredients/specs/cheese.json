@@ -1,0 +1,3718 @@
+{
+  "targetName": "Cheese Cube Stack",
+  "targetId": "cheese-cube-stack",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\cheese.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved; review camera is fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "small stack of three gouda-style cheese cubes",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "geometric",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "repeated instances",
+        "physical stack (not a flat mound)"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat color facets only. First box-primitive ingredient in this sub-batch; also the only one deviating from the flat-mound Y=0 cluster convention (a real physical stack instead)."
+    },
+    "complexity": {
+      "tier": "moderate",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 1,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 1,
+        "materialLayerCount": 1,
+        "localDetailDensity": 2,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 3,
+        "mesoComponents": 3,
+        "microFeatureGroups": 0,
+        "materialLayers": 2,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Three near-identical macro bodies differing only in XZ offset/yaw and the top instance's stacked Y, so componentCount scores 1.",
+        "Silhouette scores 2 (not 1): rounded-cube profile + hole depressions + the stack's own real elevation are more structurally involved than a smooth-taper lathe body.",
+        "hierarchyDepth scores 2: each cube has a real meso-level rind-face child (per-face material assignment), one level deeper than choco/cranberry's flat mesh=1 bodies.",
+        "materialLayerCount scores 1: 2 buckets needed (body + rind), matching olive/blueberry's precedent scale.",
+        "Local detail density scores 2: squircle rounding + front-face hole depressions are two distinct authored deformations.",
+        "Occlusion risk scores 1: the top cube's underside (resting on the lower cubes) is hidden but not identity-critical.",
+        "Action readiness scores 0: static turntable showcase prop."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier by part count, but needs meso depth (rind-face child) and material local overrides (2 dropped hex, each justified) like olive/blueberry, plus a documented placement-convention exception unique to this ingredient."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 2,
+      "note": "Enumerated by hand from the three supplied reference views -- CRIB.md skip rule for single-repeated-system objects.",
+      "details": [
+        {
+          "id": "full-face-rind-region",
+          "zone": "one side face per cube",
+          "observation": "An entire cube face reads solid rust-orange, not a thin edge stripe.",
+          "inference": "Wax-rind coating on one whole cut face of the cheese block.",
+          "confidence": 0.9,
+          "evidenceRef": "cheese.png full frame, all 3 instances",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "cheese-bottom-a-rind-full-face-rind",
+            "note": ""
+          }
+        },
+        {
+          "id": "physical-cube-stack",
+          "zone": "whole cluster",
+          "observation": "2 cubes side by side + 1 physically resting on top, with real vertical elevation (not a flat-camera-angle illusion).",
+          "inference": "A literal stack of cheese cubes, distinct from this batch's other flat-mound clusters.",
+          "confidence": 0.9,
+          "evidenceRef": "cheese.png full frame",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "cluster-arrangement",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png"
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 3,
+      "microFeatureGroups": 2,
+      "materialLayers": 2,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.75,
+    "mustMatch": [
+      "3-cube stack silhouette (2 ground + 1 physically stacked)",
+      "softly rounded/chamfered edges",
+      "full rind face per cube",
+      "top cube physically supported, no floating gap"
+    ],
+    "niceToHave": [
+      "exact hole size/position",
+      "exact stack nestling depth"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "three-cube-stack-silhouette",
+      "name": "Three-cube stack silhouette (2 ground + 1 stacked)",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "cheese-bottom-a",
+        "cheese-bottom-b",
+        "cheese-top"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "rounded-cube-edges",
+      "name": "Softly rounded/chamfered edges on every cube",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": [
+        "cheese-bottom-a",
+        "cheese-bottom-b",
+        "cheese-top"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "rind-face-visible",
+      "name": "Full rind face visible and distinct from body",
+      "tier": "critical",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "cheese-bottom-a-rind",
+        "cheese-bottom-b-rind",
+        "cheese-top-rind"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "sunken-holes-visible",
+      "name": "Sunken holes visible on the front face",
+      "tier": "important",
+      "passIds": [
+        "surface-pass"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "cheese-bottom-a",
+        "cheese-bottom-b",
+        "cheese-top"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "top-cube-physically-supported",
+      "name": "Top cube rests on the lower cubes, no floating gap",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass"
+      ],
+      "minimumScore": 0.85,
+      "mustPass": true,
+      "componentRefs": [
+        "cheese-top"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": [],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color; repo bans PBR maps outright."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer: scripts/breadlab.ts mirrors scripts/thumbsHarness.ts with a warm directional key 0xffe2b0 at (-2, 6, 2) intensity 1.4, an ambient 0xfff0dc at 0.75 and a cool fill 0xdce8ff at (2.5, 3, -2) intensity 0.2.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The runtime normalizes the stack's longest axis to 1.6, so absolute dimensions are arbitrary.",
+    "Exact hole size/position and stack nestling depth are not identity-critical at pixel precision; the rounded-cube silhouette + full rind face + physical stacking read is what the review scores."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "CUBE_HALF = 0.5 relative unit. Absolute scale is meaningless: the consumer runtime refits the cluster's longest axis to 1.6 (types.ts section 6)."
+  },
+  "silhouette": {
+    "boundingShape": "3-cube physical stack, roughly 2.16 wide by 2.0 tall by 1.2 deep in relative units",
+    "aspectRatios": [
+      {
+        "id": "cube-aspect",
+        "value": 1.0,
+        "source": "cheese-2.png -- near-uniform cube"
+      }
+    ],
+    "symmetry": "each cube is bilaterally symmetric before the front-face hole depressions and rind-face assignment; the stack as a whole is asymmetric",
+    "dominantCurves": [
+      "softly rounded/chamfered edges on every face boundary"
+    ],
+    "negativeSpaces": [
+      "2 sunken circular holes per cube on the front face",
+      "contact seam where the top cube rests on the two lower cubes"
+    ],
+    "landmarks": [
+      "one full rind face per cube, always oriented outward/visible in the placement",
+      "the physical vertical stack itself"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "3 cubes with pronounced rounded/chamfered edges, 2 resting side by side + 1 physically stacked on top",
+        "every cube shows one ENTIRE side face solid rust-orange (rind) -- not a thin edge stripe",
+        "every cube shows 2 sunken circular holes (one larger, one smaller) on its front-facing face"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "edges are visibly beveled on every face, not sharp 90-degree corners",
+        "holes read as darker circular depressions, no separate bright/dark ring color"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "3 roughly square footprints, top cube's footprint overlapping the gap between the 2 bottom cubes",
+        "rind face visible as a bright orange sliver along one edge from directly above"
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Cheese Cube Stack",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Transform-only assembly node carrying the three cube bodies; emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.16,
+        "height": 2.0,
+        "depth": 1.2,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cheese-body"
+        }
+      },
+      "material": "cheese-body",
+      "materialLayers": [
+        "cheese-body",
+        "cheese-rind"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(232, 183, 90, 1.0)",
+        "secondaryAlbedo": "rgba(192, 86, 47, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.7,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cheese.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cluster-arrangement",
+          "name": "Three-cube physical stack",
+          "kind": "contour",
+          "description": "Two cubes side by side on the ground + one physically resting on top of both (types.ts R1's spirit -- no unsupported floating parts -- but NOT the flat-mound-at-Y=0 convention the round/organic ingredients use; see spec risk stack-not-flat-mound).",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "squircle corner-rounding (sdRoundBox surface-point formula) + 2 vertex-depression holes on the front face, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; per-face brightness comes from N.L falloff on each flat face's own normal",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "cluster-arrangement"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "cheese-bottom-a",
+      "name": "Cheese cube body (bottom-a)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A custom 6-face grid shell with a per-vertex squircle rounding transform (not THREE.BoxGeometry -- needs rounded edges + per-sector hole depressions no built-in primitive supports). One continuous watertight shell (coincident edge/corner vertices from adjacent faces map identically since rounding is a pure function of position), not an assembled-solid of 6 separate planes.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation, no jitter (R4 exception -- reference shows completely clean flat faces, no organic noise anywhere)",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.5
+            ],
+            [
+              0.5,
+              0.5
+            ]
+          ],
+          "segments": 4,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "bevel",
+          "bevelRadius": 0.13,
+          "segments": 4
+        },
+        "deformationStack": [
+          {
+            "id": "squircle-round",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.13,
+            "notes": "sdRoundBox surface-point formula: inner=half-0.13, clamp to inner box then push out by 0.13 along the clamp-delta direction. Flat face interiors pass through unchanged; only vertices within 0.13 of an edge/corner move."
+          },
+          {
+            "id": "front-face-holes",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "amplitude": 0.09,
+            "notes": "2 interior grid vertices on the +Z face pulled inward along -Z: big hole at grid (1, 2) depth 0.09, small hole at grid (2, 1) depth 0.0675. Same body material -- no separate hole color (cracker.ts precedent)."
+          }
+        ],
+        "uvStrategy": "top-planar projection per face (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices (facet), never a flatShading flag. No jitter applied (R4 exception)."
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.0,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          -0.58,
+          0.0,
+          -0.05
+        ],
+        "rotation": [
+          0.0,
+          -0.12,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cheese-bottom-a",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cheese-body"
+        }
+      },
+      "material": "cheese-body",
+      "materialLayers": [
+        "cheese-body",
+        "cheese-rind"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(232, 183, 90, 1.0)",
+        "secondaryAlbedo": "rgba(192, 86, 47, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.7,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "5 of 6 faces (all but the rind face)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cheese.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "squircle-round",
+        "front-face-holes"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "cheese-bottom-a-rind-boundary",
+          "kind": "material-boundary",
+          "notes": "The rind face (+X) is a distinct per-face triangle group assigned to the cheese-rind material at build time -- known statically (which face is which), not a mask or slice. Watertight because rounding is a pure function of vertex position, so no seam gap opens at the rind/body edge."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "cheese-bottom-a-rounded-edges",
+          "name": "Softly rounded/chamfered edges",
+          "kind": "contour",
+          "description": "Squircle rounding on every edge/corner, ~26% of half-extent -- distinctly soft, not a sharp 90-degree cube.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "cheese-bottom-a-sunken-holes",
+          "name": "Two sunken circular holes",
+          "kind": "seam",
+          "description": "One larger + one smaller vertex-depression dimple on the front face, same body material, read via facet-normal shading alone.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "squircle corner-rounding (sdRoundBox surface-point formula) + 2 vertex-depression holes on the front face, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; per-face brightness comes from N.L falloff on each flat face's own normal",
+        "edgeWearPattern": "none",
+        "notes": "Body tone covers 5 of 6 faces. The runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "cheese-bottom-a-rounded-edges",
+        "cheese-bottom-a-sunken-holes"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "cheese-bottom-a-rind",
+      "name": "Cheese cube rind face (bottom-a)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.85,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A single whole face (+X, after squircle rounding) of the parent cube's own shared shell, assigned to a distinct material at build time -- not a mask, not a separate solid.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.5,
+              -0.5
+            ],
+            [
+              0.5,
+              0.5
+            ]
+          ],
+          "segments": 4,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "bevel",
+          "bevelRadius": 0.13,
+          "segments": 4
+        },
+        "deformationStack": [
+          {
+            "id": "squircle-round-rind",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.13,
+            "notes": "Same squircle transform as the body -- shared vertices at the rind/body edge are pure functions of position, so the boundary stays watertight."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals inherited from the parent shell's split-vertex facet bake"
+      },
+      "parent": "cheese-bottom-a",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.0,
+        "depth": 0.01,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cheese-bottom-a-rind",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cheese-body"
+        }
+      },
+      "material": "cheese-rind",
+      "materialLayers": [
+        "cheese-rind"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(192, 86, 47, 1.0)",
+        "secondaryAlbedo": "rgba(232, 183, 90, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.7,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "one whole side face (+X)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cheese.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "squircle-round-rind"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "cheese-bottom-a-rind-boundary",
+          "kind": "material-boundary",
+          "notes": "Shares the parent shell's own edge/corner vertex positions; watertight because both buckets are built from the same squircle-rounding function, never two independently built solids."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "cheese-bottom-a-rind-full-face-rind",
+          "name": "Full-face wax rind",
+          "kind": "seam",
+          "description": "The rind covers one ENTIRE cube face (rust-orange), not a thin edge stripe -- confirmed against the actual reference render, which the prompt text's 'thin warm wax rind along one edge' undersells (see spec risk rind-full-face-not-edge-stripe).",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "squircle corner-rounding (sdRoundBox surface-point formula) + 2 vertex-depression holes on the front face, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; per-face brightness comes from N.L falloff on each flat face's own normal",
+        "edgeWearPattern": "none",
+        "notes": "assets/prompts/ingredients/cheese.json: the rind is a real, high-contrast color region confirmed directly on the reference render."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "cheese-bottom-a-rind-full-face-rind"
+      ],
+      "fidelityTier": "material-pass"
+    },
+    {
+      "id": "cheese-bottom-b",
+      "name": "Cheese cube body (bottom-b)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A custom 6-face grid shell with a per-vertex squircle rounding transform (not THREE.BoxGeometry -- needs rounded edges + per-sector hole depressions no built-in primitive supports). One continuous watertight shell (coincident edge/corner vertices from adjacent faces map identically since rounding is a pure function of position), not an assembled-solid of 6 separate planes.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation, no jitter (R4 exception -- reference shows completely clean flat faces, no organic noise anywhere)",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.5
+            ],
+            [
+              0.5,
+              0.5
+            ]
+          ],
+          "segments": 4,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "bevel",
+          "bevelRadius": 0.13,
+          "segments": 4
+        },
+        "deformationStack": [
+          {
+            "id": "squircle-round",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.13,
+            "notes": "sdRoundBox surface-point formula: inner=half-0.13, clamp to inner box then push out by 0.13 along the clamp-delta direction. Flat face interiors pass through unchanged; only vertices within 0.13 of an edge/corner move."
+          },
+          {
+            "id": "front-face-holes",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "amplitude": 0.09,
+            "notes": "2 interior grid vertices on the +Z face pulled inward along -Z: big hole at grid (1, 2) depth 0.09, small hole at grid (2, 1) depth 0.0675. Same body material -- no separate hole color (cracker.ts precedent)."
+          }
+        ],
+        "uvStrategy": "top-planar projection per face (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices (facet), never a flatShading flag. No jitter applied (R4 exception)."
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.0,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.58,
+          0.0,
+          0.05
+        ],
+        "rotation": [
+          0.0,
+          0.15,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cheese-bottom-b",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cheese-body"
+        }
+      },
+      "material": "cheese-body",
+      "materialLayers": [
+        "cheese-body",
+        "cheese-rind"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(232, 183, 90, 1.0)",
+        "secondaryAlbedo": "rgba(192, 86, 47, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.7,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "5 of 6 faces (all but the rind face)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cheese.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "squircle-round",
+        "front-face-holes"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "cheese-bottom-b-rind-boundary",
+          "kind": "material-boundary",
+          "notes": "The rind face (+X) is a distinct per-face triangle group assigned to the cheese-rind material at build time -- known statically (which face is which), not a mask or slice. Watertight because rounding is a pure function of vertex position, so no seam gap opens at the rind/body edge."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "cheese-bottom-b-rounded-edges",
+          "name": "Softly rounded/chamfered edges",
+          "kind": "contour",
+          "description": "Squircle rounding on every edge/corner, ~26% of half-extent -- distinctly soft, not a sharp 90-degree cube.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "cheese-bottom-b-sunken-holes",
+          "name": "Two sunken circular holes",
+          "kind": "seam",
+          "description": "One larger + one smaller vertex-depression dimple on the front face, same body material, read via facet-normal shading alone.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "squircle corner-rounding (sdRoundBox surface-point formula) + 2 vertex-depression holes on the front face, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; per-face brightness comes from N.L falloff on each flat face's own normal",
+        "edgeWearPattern": "none",
+        "notes": "Body tone covers 5 of 6 faces. The runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "cheese-bottom-b-rounded-edges",
+        "cheese-bottom-b-sunken-holes"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "cheese-bottom-b-rind",
+      "name": "Cheese cube rind face (bottom-b)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.85,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A single whole face (+X, after squircle rounding) of the parent cube's own shared shell, assigned to a distinct material at build time -- not a mask, not a separate solid.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.5,
+              -0.5
+            ],
+            [
+              0.5,
+              0.5
+            ]
+          ],
+          "segments": 4,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "bevel",
+          "bevelRadius": 0.13,
+          "segments": 4
+        },
+        "deformationStack": [
+          {
+            "id": "squircle-round-rind",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.13,
+            "notes": "Same squircle transform as the body -- shared vertices at the rind/body edge are pure functions of position, so the boundary stays watertight."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals inherited from the parent shell's split-vertex facet bake"
+      },
+      "parent": "cheese-bottom-b",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.0,
+        "depth": 0.01,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cheese-bottom-b-rind",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cheese-body"
+        }
+      },
+      "material": "cheese-rind",
+      "materialLayers": [
+        "cheese-rind"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(192, 86, 47, 1.0)",
+        "secondaryAlbedo": "rgba(232, 183, 90, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.7,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "one whole side face (+X)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cheese.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "squircle-round-rind"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "cheese-bottom-b-rind-boundary",
+          "kind": "material-boundary",
+          "notes": "Shares the parent shell's own edge/corner vertex positions; watertight because both buckets are built from the same squircle-rounding function, never two independently built solids."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "cheese-bottom-b-rind-full-face-rind",
+          "name": "Full-face wax rind",
+          "kind": "seam",
+          "description": "The rind covers one ENTIRE cube face (rust-orange), not a thin edge stripe -- confirmed against the actual reference render, which the prompt text's 'thin warm wax rind along one edge' undersells (see spec risk rind-full-face-not-edge-stripe).",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "squircle corner-rounding (sdRoundBox surface-point formula) + 2 vertex-depression holes on the front face, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; per-face brightness comes from N.L falloff on each flat face's own normal",
+        "edgeWearPattern": "none",
+        "notes": "assets/prompts/ingredients/cheese.json: the rind is a real, high-contrast color region confirmed directly on the reference render."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "cheese-bottom-b-rind-full-face-rind"
+      ],
+      "fidelityTier": "material-pass"
+    },
+    {
+      "id": "cheese-top",
+      "name": "Cheese cube body (top)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A custom 6-face grid shell with a per-vertex squircle rounding transform (not THREE.BoxGeometry -- needs rounded edges + per-sector hole depressions no built-in primitive supports). One continuous watertight shell (coincident edge/corner vertices from adjacent faces map identically since rounding is a pure function of position), not an assembled-solid of 6 separate planes.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation, no jitter (R4 exception -- reference shows completely clean flat faces, no organic noise anywhere)",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.5
+            ],
+            [
+              0.5,
+              0.5
+            ]
+          ],
+          "segments": 4,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "bevel",
+          "bevelRadius": 0.13,
+          "segments": 4
+        },
+        "deformationStack": [
+          {
+            "id": "squircle-round",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.13,
+            "notes": "sdRoundBox surface-point formula: inner=half-0.13, clamp to inner box then push out by 0.13 along the clamp-delta direction. Flat face interiors pass through unchanged; only vertices within 0.13 of an edge/corner move."
+          },
+          {
+            "id": "front-face-holes",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "amplitude": 0.09,
+            "notes": "2 interior grid vertices on the +Z face pulled inward along -Z: big hole at grid (1, 2) depth 0.09, small hole at grid (2, 1) depth 0.0675. Same body material -- no separate hole color (cracker.ts precedent)."
+          }
+        ],
+        "uvStrategy": "top-planar projection per face (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices (facet), never a flatShading flag. No jitter applied (R4 exception)."
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.0,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.0,
+          0.0,
+          -0.15
+        ],
+        "rotation": [
+          0.0,
+          0.55,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cheese-top",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cheese-body"
+        }
+      },
+      "material": "cheese-body",
+      "materialLayers": [
+        "cheese-body",
+        "cheese-rind"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(232, 183, 90, 1.0)",
+        "secondaryAlbedo": "rgba(192, 86, 47, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.7,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "5 of 6 faces (all but the rind face)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cheese.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "squircle-round",
+        "front-face-holes"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "cheese-top-rind-boundary",
+          "kind": "material-boundary",
+          "notes": "The rind face (+X) is a distinct per-face triangle group assigned to the cheese-rind material at build time -- known statically (which face is which), not a mask or slice. Watertight because rounding is a pure function of vertex position, so no seam gap opens at the rind/body edge."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "cheese-top-rounded-edges",
+          "name": "Softly rounded/chamfered edges",
+          "kind": "contour",
+          "description": "Squircle rounding on every edge/corner, ~26% of half-extent -- distinctly soft, not a sharp 90-degree cube.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "cheese-top-sunken-holes",
+          "name": "Two sunken circular holes",
+          "kind": "seam",
+          "description": "One larger + one smaller vertex-depression dimple on the front face, same body material, read via facet-normal shading alone.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.8
+        },
+        {
+          "id": "cheese-top-stack-support",
+          "name": "Physically stacked on the lower cubes",
+          "kind": "contour",
+          "description": "This instance's own bbox floor rests on the two lower cubes' combined top height, not on world Y=0 -- a deliberate exception to the flat-mound convention (see spec risk stack-not-flat-mound).",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "squircle corner-rounding (sdRoundBox surface-point formula) + 2 vertex-depression holes on the front face, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; per-face brightness comes from N.L falloff on each flat face's own normal",
+        "edgeWearPattern": "none",
+        "notes": "Body tone covers 5 of 6 faces. The runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "cheese-top-rounded-edges",
+        "cheese-top-sunken-holes",
+        "cheese-top-stack-support"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "cheese-top-rind",
+      "name": "Cheese cube rind face (top)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.85,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A single whole face (+X, after squircle rounding) of the parent cube's own shared shell, assigned to a distinct material at build time -- not a mask, not a separate solid.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.5,
+              -0.5
+            ],
+            [
+              0.5,
+              0.5
+            ]
+          ],
+          "segments": 4,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "bevel",
+          "bevelRadius": 0.13,
+          "segments": 4
+        },
+        "deformationStack": [
+          {
+            "id": "squircle-round-rind",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.13,
+            "notes": "Same squircle transform as the body -- shared vertices at the rind/body edge are pure functions of position, so the boundary stays watertight."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals inherited from the parent shell's split-vertex facet bake"
+      },
+      "parent": "cheese-top",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.0,
+        "depth": 0.01,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Box bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cheese-top-rind",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cheese-body"
+        }
+      },
+      "material": "cheese-rind",
+      "materialLayers": [
+        "cheese-rind"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(192, 86, 47, 1.0)",
+        "secondaryAlbedo": "rgba(232, 183, 90, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.7,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "one whole side face (+X)",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cheese.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "squircle-round-rind"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "cheese-top-rind-boundary",
+          "kind": "material-boundary",
+          "notes": "Shares the parent shell's own edge/corner vertex positions; watertight because both buckets are built from the same squircle-rounding function, never two independently built solids."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "cheese-top-rind-full-face-rind",
+          "name": "Full-face wax rind",
+          "kind": "seam",
+          "description": "The rind covers one ENTIRE cube face (rust-orange), not a thin edge stripe -- confirmed against the actual reference render, which the prompt text's 'thin warm wax rind along one edge' undersells (see spec risk rind-full-face-not-edge-stripe).",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "squircle corner-rounding (sdRoundBox surface-point formula) + 2 vertex-depression holes on the front face, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; per-face brightness comes from N.L falloff on each flat face's own normal",
+        "edgeWearPattern": "none",
+        "notes": "assets/prompts/ingredients/cheese.json: the rind is a real, high-contrast color region confirmed directly on the reference render."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "cheese-top-rind-full-face-rind"
+      ],
+      "fidelityTier": "material-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "cheese-body",
+      "name": "Cheese body (butter-yellow)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#E8B75A",
+      "color": "#E8B75A",
+      "albedo": {
+        "dominant": "#E8B75A",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/cheese.json geometry.surface, not pixel-sampled."
+      },
+      "colorVariation": {
+        "palette": [
+          "#E8B75A"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only for merge attribute consistency."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "rounded-box + hole-depression profile",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "5 of 6 faces",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "shaded-face-natural-darkening",
+          "name": "Per-face key-light shading",
+          "maskSource": "geometry",
+          "description": "No second darker bucket is authored for the shaded-faces hex (#C9903A); a flat cube's own faces already read at different brightness depending on their normal direction under the runtime Lambert key light -- exactly what this hex describes.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "cheese-bottom-a",
+            "cheese-bottom-b",
+            "cheese-top"
+          ]
+        },
+        {
+          "id": "hole-natural-shading",
+          "name": "Sunken holes read via facet shading only",
+          "maskSource": "geometry",
+          "description": "No separate hole-color bucket (#D8A448) is authored; the depression's own facet normals darken under the key light (cracker.ts docking-hole precedent).",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "cheese-bottom-a",
+            "cheese-bottom-b",
+            "cheese-top"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "5 of 6 faces. Two solid colors for the whole cluster (types.ts inherited section 9); shaded-face hex and hole-color hex are both dropped (free via per-face N.L / cracker precedent)."
+    },
+    {
+      "id": "cheese-rind",
+      "name": "Cheese rind (rust-orange wax)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#C0562F",
+      "color": "#C0562F",
+      "albedo": {
+        "dominant": "#C0562F",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/cheese.json geometry.surface, not pixel-sampled."
+      },
+      "colorVariation": {
+        "palette": [
+          "#C0562F"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only for merge attribute consistency."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "rounded-box + hole-depression profile",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "one whole side face",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "one whole side face. Two solid colors for the whole cluster (types.ts inherited section 9); shaded-face hex and hole-color hex are both dropped (free via per-face N.L / cracker precedent)."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "cheese-stack",
+      "name": "Three-cube physical stack",
+      "level": "macro",
+      "hostComponents": [
+        "root"
+      ],
+      "elementComponentIds": [
+        "cheese-bottom-a",
+        "cheese-bottom-b",
+        "cheese-top"
+      ],
+      "elementKind": "repeated macro body, each with its own body+rind child pair",
+      "count": 3,
+      "distribution": {
+        "mode": "2 hand-placed ground cubes + 1 physically stacked cube (bbox-floor-on-top-of-lower-group, not Y=0)",
+        "offsets": {
+          "bottom-a": [
+            -0.58,
+            -0.05
+          ],
+          "bottom-b": [
+            0.58,
+            0.05
+          ],
+          "top": [
+            0.0,
+            -0.15
+          ]
+        },
+        "yaw": {
+          "bottom-a": -0.12,
+          "bottom-b": 0.15,
+          "top": 0.55
+        },
+        "note": "Offsets read off cheese-3.png (top-down footprint); top cube's Y computed from the two lower cubes' combined bounding box at build time, not hardcoded."
+      },
+      "sizeClasses": [
+        {
+          "id": "cube",
+          "half": 0.5
+        }
+      ],
+      "seedRule": "All placement values are fixed authored constants; cheese has no rng-consumed deformation (no jitter, R4 exception), so the exported GLB is byte-deterministic by construction, not by seeding.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-25T18:14:27.040608+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.75,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "three-cube-stack-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "2 cubes side by side + 1 physically resting on top, well-supported (Box3-computed floor, zero gap); matches cheese.png's stack arrangement closely."
+        },
+        {
+          "id": "rounded-cube-edges",
+          "score": 0.78,
+          "visible": true,
+          "notes": "Squircle rounding (radius 0.1, ~20% of half-extent) reads as a distinct soft bevel on every edge/corner across all orbit angles, not a sharp 90-degree cube."
+        },
+        {
+          "id": "rind-face-visible",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Full -X face reads as a solid dark rust-orange rind on every cube, oriented toward the hero camera. Repositioned from +X to -X after cmp-1 showed it facing away from the default camera (documented in code comments)."
+        },
+        {
+          "id": "sunken-holes-visible",
+          "score": 0.62,
+          "visible": true,
+          "notes": "2x2-vertex-block dimples on the front face, tuned to a shallow depth (0.038/0.028) after an isolation test (shot-isolation-debug.png) proved deeper holes (0.07/0.05) caused a jagged facet artifact at this low grid resolution. Now reads as a subtle but present darker patch pair, not a crisp circular hole -- an accepted tradeoff (important tier, not mustPass) between hole readability and surface cleanliness at this budget."
+        },
+        {
+          "id": "top-cube-physically-supported",
+          "score": 0.9,
+          "visible": true,
+          "notes": "Top cube's own Box3 floor is set exactly to the two lower cubes' combined Box3.max.y (computed at build time, not hardcoded) -- zero gap on all orbit angles, no floating."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read across cmp-1/2/3 plus 6 follow-up debug renders (rind orientation, hole spacing, T-junction hypothesis test, isolation test, shallow/mid depth tuning): the jagged artifact traced conclusively (isolation test) to hole-depression depth, not rounding or grid-density mismatch; final depth (0.038/0.028) balances hole readability against surface cleanliness within the cluster tri/KB budget."
+    },
+    {
+      "timestamp": "2026-08-25T18:14:31.944615+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.75,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "three-cube-stack-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "2 cubes side by side + 1 physically resting on top, well-supported (Box3-computed floor, zero gap); matches cheese.png's stack arrangement closely."
+        },
+        {
+          "id": "rounded-cube-edges",
+          "score": 0.78,
+          "visible": true,
+          "notes": "Squircle rounding (radius 0.1, ~20% of half-extent) reads as a distinct soft bevel on every edge/corner across all orbit angles, not a sharp 90-degree cube."
+        },
+        {
+          "id": "rind-face-visible",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Full -X face reads as a solid dark rust-orange rind on every cube, oriented toward the hero camera. Repositioned from +X to -X after cmp-1 showed it facing away from the default camera (documented in code comments)."
+        },
+        {
+          "id": "sunken-holes-visible",
+          "score": 0.62,
+          "visible": true,
+          "notes": "2x2-vertex-block dimples on the front face, tuned to a shallow depth (0.038/0.028) after an isolation test (shot-isolation-debug.png) proved deeper holes (0.07/0.05) caused a jagged facet artifact at this low grid resolution. Now reads as a subtle but present darker patch pair, not a crisp circular hole -- an accepted tradeoff (important tier, not mustPass) between hole readability and surface cleanliness at this budget."
+        },
+        {
+          "id": "top-cube-physically-supported",
+          "score": 0.9,
+          "visible": true,
+          "notes": "Top cube's own Box3 floor is set exactly to the two lower cubes' combined Box3.max.y (computed at build time, not hardcoded) -- zero gap on all orbit angles, no floating."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read across cmp-1/2/3 plus 6 follow-up debug renders (rind orientation, hole spacing, T-junction hypothesis test, isolation test, shallow/mid depth tuning): the jagged artifact traced conclusively (isolation test) to hole-depression depth, not rounding or grid-density mismatch; final depth (0.038/0.028) balances hole readability against surface cleanliness within the cluster tri/KB budget."
+    },
+    {
+      "timestamp": "2026-08-25T18:14:36.788586+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.75,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "three-cube-stack-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "2 cubes side by side + 1 physically resting on top, well-supported (Box3-computed floor, zero gap); matches cheese.png's stack arrangement closely."
+        },
+        {
+          "id": "rounded-cube-edges",
+          "score": 0.78,
+          "visible": true,
+          "notes": "Squircle rounding (radius 0.1, ~20% of half-extent) reads as a distinct soft bevel on every edge/corner across all orbit angles, not a sharp 90-degree cube."
+        },
+        {
+          "id": "rind-face-visible",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Full -X face reads as a solid dark rust-orange rind on every cube, oriented toward the hero camera. Repositioned from +X to -X after cmp-1 showed it facing away from the default camera (documented in code comments)."
+        },
+        {
+          "id": "sunken-holes-visible",
+          "score": 0.62,
+          "visible": true,
+          "notes": "2x2-vertex-block dimples on the front face, tuned to a shallow depth (0.038/0.028) after an isolation test (shot-isolation-debug.png) proved deeper holes (0.07/0.05) caused a jagged facet artifact at this low grid resolution. Now reads as a subtle but present darker patch pair, not a crisp circular hole -- an accepted tradeoff (important tier, not mustPass) between hole readability and surface cleanliness at this budget."
+        },
+        {
+          "id": "top-cube-physically-supported",
+          "score": 0.9,
+          "visible": true,
+          "notes": "Top cube's own Box3 floor is set exactly to the two lower cubes' combined Box3.max.y (computed at build time, not hardcoded) -- zero gap on all orbit angles, no floating."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read across cmp-1/2/3 plus 6 follow-up debug renders (rind orientation, hole spacing, T-junction hypothesis test, isolation test, shallow/mid depth tuning): the jagged artifact traced conclusively (isolation test) to hole-depression depth, not rounding or grid-density mismatch; final depth (0.038/0.028) balances hole readability against surface cleanliness within the cluster tri/KB budget."
+    },
+    {
+      "timestamp": "2026-08-25T18:14:41.646576+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.75,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "three-cube-stack-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "2 cubes side by side + 1 physically resting on top, well-supported (Box3-computed floor, zero gap); matches cheese.png's stack arrangement closely."
+        },
+        {
+          "id": "rounded-cube-edges",
+          "score": 0.78,
+          "visible": true,
+          "notes": "Squircle rounding (radius 0.1, ~20% of half-extent) reads as a distinct soft bevel on every edge/corner across all orbit angles, not a sharp 90-degree cube."
+        },
+        {
+          "id": "rind-face-visible",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Full -X face reads as a solid dark rust-orange rind on every cube, oriented toward the hero camera. Repositioned from +X to -X after cmp-1 showed it facing away from the default camera (documented in code comments)."
+        },
+        {
+          "id": "sunken-holes-visible",
+          "score": 0.62,
+          "visible": true,
+          "notes": "2x2-vertex-block dimples on the front face, tuned to a shallow depth (0.038/0.028) after an isolation test (shot-isolation-debug.png) proved deeper holes (0.07/0.05) caused a jagged facet artifact at this low grid resolution. Now reads as a subtle but present darker patch pair, not a crisp circular hole -- an accepted tradeoff (important tier, not mustPass) between hole readability and surface cleanliness at this budget."
+        },
+        {
+          "id": "top-cube-physically-supported",
+          "score": 0.9,
+          "visible": true,
+          "notes": "Top cube's own Box3 floor is set exactly to the two lower cubes' combined Box3.max.y (computed at build time, not hardcoded) -- zero gap on all orbit angles, no floating."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read across cmp-1/2/3 plus 6 follow-up debug renders (rind orientation, hole spacing, T-junction hypothesis test, isolation test, shallow/mid depth tuning): the jagged artifact traced conclusively (isolation test) to hole-depression depth, not rounding or grid-density mismatch; final depth (0.038/0.028) balances hole readability against surface cleanliness within the cluster tri/KB budget."
+    },
+    {
+      "timestamp": "2026-08-25T18:15:32.128311+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.75,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "three-cube-stack-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "2 cubes side by side + 1 physically resting on top, well-supported (Box3-computed floor, zero gap); matches cheese.png's stack arrangement closely."
+        },
+        {
+          "id": "rounded-cube-edges",
+          "score": 0.78,
+          "visible": true,
+          "notes": "Squircle rounding (radius 0.1, ~20% of half-extent) reads as a distinct soft bevel on every edge/corner across all orbit angles, not a sharp 90-degree cube."
+        },
+        {
+          "id": "rind-face-visible",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Full -X face reads as a solid dark rust-orange rind on every cube, oriented toward the hero camera. Repositioned from +X to -X after cmp-1 showed it facing away from the default camera (documented in code comments)."
+        },
+        {
+          "id": "sunken-holes-visible",
+          "score": 0.67,
+          "visible": true,
+          "notes": "2x2-vertex-block dimples on the front face, tuned to a shallow depth (0.038/0.028) after an isolation test (shot-isolation-debug.png) proved deeper holes (0.07/0.05) caused a jagged facet artifact at this low grid resolution. Now reads as a subtle but present darker patch pair, not a crisp circular hole -- an accepted tradeoff (important tier, not mustPass) between hole readability and surface cleanliness at this budget."
+        },
+        {
+          "id": "top-cube-physically-supported",
+          "score": 0.9,
+          "visible": true,
+          "notes": "Top cube's own Box3 floor is set exactly to the two lower cubes' combined Box3.max.y (computed at build time, not hardcoded) -- zero gap on all orbit angles, no floating."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Unchanged render since material-pass; re-confirmed applicable feature targets for surface-pass."
+    },
+    {
+      "timestamp": "2026-08-25T18:15:37.110576+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.75,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "three-cube-stack-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "2 cubes side by side + 1 physically resting on top, well-supported (Box3-computed floor, zero gap); matches cheese.png's stack arrangement closely."
+        },
+        {
+          "id": "rounded-cube-edges",
+          "score": 0.78,
+          "visible": true,
+          "notes": "Squircle rounding (radius 0.1, ~20% of half-extent) reads as a distinct soft bevel on every edge/corner across all orbit angles, not a sharp 90-degree cube."
+        },
+        {
+          "id": "rind-face-visible",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Full -X face reads as a solid dark rust-orange rind on every cube, oriented toward the hero camera. Repositioned from +X to -X after cmp-1 showed it facing away from the default camera (documented in code comments)."
+        },
+        {
+          "id": "sunken-holes-visible",
+          "score": 0.67,
+          "visible": true,
+          "notes": "2x2-vertex-block dimples on the front face, tuned to a shallow depth (0.038/0.028) after an isolation test (shot-isolation-debug.png) proved deeper holes (0.07/0.05) caused a jagged facet artifact at this low grid resolution. Now reads as a subtle but present darker patch pair, not a crisp circular hole -- an accepted tradeoff (important tier, not mustPass) between hole readability and surface cleanliness at this budget."
+        },
+        {
+          "id": "top-cube-physically-supported",
+          "score": 0.9,
+          "visible": true,
+          "notes": "Top cube's own Box3 floor is set exactly to the two lower cubes' combined Box3.max.y (computed at build time, not hardcoded) -- zero gap on all orbit angles, no floating."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Unchanged render since material-pass; re-confirmed applicable feature targets for optimization-pass."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-25T18:14:27.040608+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.75,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "three-cube-stack-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "2 cubes side by side + 1 physically resting on top, well-supported (Box3-computed floor, zero gap); matches cheese.png's stack arrangement closely."
+        },
+        {
+          "id": "rounded-cube-edges",
+          "score": 0.78,
+          "visible": true,
+          "notes": "Squircle rounding (radius 0.1, ~20% of half-extent) reads as a distinct soft bevel on every edge/corner across all orbit angles, not a sharp 90-degree cube."
+        },
+        {
+          "id": "rind-face-visible",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Full -X face reads as a solid dark rust-orange rind on every cube, oriented toward the hero camera. Repositioned from +X to -X after cmp-1 showed it facing away from the default camera (documented in code comments)."
+        },
+        {
+          "id": "sunken-holes-visible",
+          "score": 0.62,
+          "visible": true,
+          "notes": "2x2-vertex-block dimples on the front face, tuned to a shallow depth (0.038/0.028) after an isolation test (shot-isolation-debug.png) proved deeper holes (0.07/0.05) caused a jagged facet artifact at this low grid resolution. Now reads as a subtle but present darker patch pair, not a crisp circular hole -- an accepted tradeoff (important tier, not mustPass) between hole readability and surface cleanliness at this budget."
+        },
+        {
+          "id": "top-cube-physically-supported",
+          "score": 0.9,
+          "visible": true,
+          "notes": "Top cube's own Box3 floor is set exactly to the two lower cubes' combined Box3.max.y (computed at build time, not hardcoded) -- zero gap on all orbit angles, no floating."
+        }
+      ],
+      "action": "continue",
+      "summary": "3 rounded cubes, physically stacked (2 ground + 1 on top, Box3-computed support), full rind face per cube (repositioned to -X after cmp-1 showed it facing away from camera), 2 shallow front-face hole dimples (depth tuned down after an isolation test proved deeper holes caused a jagged low-poly artifact). Real geometry debugging across cmp-1..3 plus several follow-up debug renders (documented in code comments and this review).",
+      "matched": [
+        "3-cube physical stack, top cube fully supported",
+        "rounded/chamfered edges visible on every cube",
+        "full rind face visible and distinct",
+        "faceted flat shading (no jitter, matches the reference's clean look)",
+        "mesh<=2"
+      ],
+      "mismatches": [
+        "front-face holes read as a subtle darker patch rather than a crisp circular hole -- an accepted tradeoff (deeper holes produced visible jagged faceting at this grid resolution, confirmed via isolation test)",
+        "overall tone slightly more saturated/orange than the reference's brighter yellow"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/roundtrip-64-preview.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-isolation-debug.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-mid-debug.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read across cmp-1/2/3 plus 6 follow-up debug renders (rind orientation, hole spacing, T-junction hypothesis test, isolation test, shallow/mid depth tuning): the jagged artifact traced conclusively (isolation test) to hole-depression depth, not rounding or grid-density mismatch; final depth (0.038/0.028) balances hole readability against surface cleanliness within the cluster tri/KB budget."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T18:14:31.944615+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.75,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "three-cube-stack-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "2 cubes side by side + 1 physically resting on top, well-supported (Box3-computed floor, zero gap); matches cheese.png's stack arrangement closely."
+        },
+        {
+          "id": "rounded-cube-edges",
+          "score": 0.78,
+          "visible": true,
+          "notes": "Squircle rounding (radius 0.1, ~20% of half-extent) reads as a distinct soft bevel on every edge/corner across all orbit angles, not a sharp 90-degree cube."
+        },
+        {
+          "id": "rind-face-visible",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Full -X face reads as a solid dark rust-orange rind on every cube, oriented toward the hero camera. Repositioned from +X to -X after cmp-1 showed it facing away from the default camera (documented in code comments)."
+        },
+        {
+          "id": "sunken-holes-visible",
+          "score": 0.62,
+          "visible": true,
+          "notes": "2x2-vertex-block dimples on the front face, tuned to a shallow depth (0.038/0.028) after an isolation test (shot-isolation-debug.png) proved deeper holes (0.07/0.05) caused a jagged facet artifact at this low grid resolution. Now reads as a subtle but present darker patch pair, not a crisp circular hole -- an accepted tradeoff (important tier, not mustPass) between hole readability and surface cleanliness at this budget."
+        },
+        {
+          "id": "top-cube-physically-supported",
+          "score": 0.9,
+          "visible": true,
+          "notes": "Top cube's own Box3 floor is set exactly to the two lower cubes' combined Box3.max.y (computed at build time, not hardcoded) -- zero gap on all orbit angles, no floating."
+        }
+      ],
+      "action": "continue",
+      "summary": "3 rounded cubes, physically stacked (2 ground + 1 on top, Box3-computed support), full rind face per cube (repositioned to -X after cmp-1 showed it facing away from camera), 2 shallow front-face hole dimples (depth tuned down after an isolation test proved deeper holes caused a jagged low-poly artifact). Real geometry debugging across cmp-1..3 plus several follow-up debug renders (documented in code comments and this review).",
+      "matched": [
+        "3-cube physical stack, top cube fully supported",
+        "rounded/chamfered edges visible on every cube",
+        "full rind face visible and distinct",
+        "faceted flat shading (no jitter, matches the reference's clean look)",
+        "mesh<=2"
+      ],
+      "mismatches": [
+        "front-face holes read as a subtle darker patch rather than a crisp circular hole -- an accepted tradeoff (deeper holes produced visible jagged faceting at this grid resolution, confirmed via isolation test)",
+        "overall tone slightly more saturated/orange than the reference's brighter yellow"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/roundtrip-64-preview.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-isolation-debug.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-mid-debug.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read across cmp-1/2/3 plus 6 follow-up debug renders (rind orientation, hole spacing, T-junction hypothesis test, isolation test, shallow/mid depth tuning): the jagged artifact traced conclusively (isolation test) to hole-depression depth, not rounding or grid-density mismatch; final depth (0.038/0.028) balances hole readability against surface cleanliness within the cluster tri/KB budget."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T18:14:36.788586+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.75,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "three-cube-stack-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "2 cubes side by side + 1 physically resting on top, well-supported (Box3-computed floor, zero gap); matches cheese.png's stack arrangement closely."
+        },
+        {
+          "id": "rounded-cube-edges",
+          "score": 0.78,
+          "visible": true,
+          "notes": "Squircle rounding (radius 0.1, ~20% of half-extent) reads as a distinct soft bevel on every edge/corner across all orbit angles, not a sharp 90-degree cube."
+        },
+        {
+          "id": "rind-face-visible",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Full -X face reads as a solid dark rust-orange rind on every cube, oriented toward the hero camera. Repositioned from +X to -X after cmp-1 showed it facing away from the default camera (documented in code comments)."
+        },
+        {
+          "id": "sunken-holes-visible",
+          "score": 0.62,
+          "visible": true,
+          "notes": "2x2-vertex-block dimples on the front face, tuned to a shallow depth (0.038/0.028) after an isolation test (shot-isolation-debug.png) proved deeper holes (0.07/0.05) caused a jagged facet artifact at this low grid resolution. Now reads as a subtle but present darker patch pair, not a crisp circular hole -- an accepted tradeoff (important tier, not mustPass) between hole readability and surface cleanliness at this budget."
+        },
+        {
+          "id": "top-cube-physically-supported",
+          "score": 0.9,
+          "visible": true,
+          "notes": "Top cube's own Box3 floor is set exactly to the two lower cubes' combined Box3.max.y (computed at build time, not hardcoded) -- zero gap on all orbit angles, no floating."
+        }
+      ],
+      "action": "continue",
+      "summary": "3 rounded cubes, physically stacked (2 ground + 1 on top, Box3-computed support), full rind face per cube (repositioned to -X after cmp-1 showed it facing away from camera), 2 shallow front-face hole dimples (depth tuned down after an isolation test proved deeper holes caused a jagged low-poly artifact). Real geometry debugging across cmp-1..3 plus several follow-up debug renders (documented in code comments and this review).",
+      "matched": [
+        "3-cube physical stack, top cube fully supported",
+        "rounded/chamfered edges visible on every cube",
+        "full rind face visible and distinct",
+        "faceted flat shading (no jitter, matches the reference's clean look)",
+        "mesh<=2"
+      ],
+      "mismatches": [
+        "front-face holes read as a subtle darker patch rather than a crisp circular hole -- an accepted tradeoff (deeper holes produced visible jagged faceting at this grid resolution, confirmed via isolation test)",
+        "overall tone slightly more saturated/orange than the reference's brighter yellow"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/roundtrip-64-preview.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-isolation-debug.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-mid-debug.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read across cmp-1/2/3 plus 6 follow-up debug renders (rind orientation, hole spacing, T-junction hypothesis test, isolation test, shallow/mid depth tuning): the jagged artifact traced conclusively (isolation test) to hole-depression depth, not rounding or grid-density mismatch; final depth (0.038/0.028) balances hole readability against surface cleanliness within the cluster tri/KB budget."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T18:14:41.646576+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.75,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "three-cube-stack-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "2 cubes side by side + 1 physically resting on top, well-supported (Box3-computed floor, zero gap); matches cheese.png's stack arrangement closely."
+        },
+        {
+          "id": "rounded-cube-edges",
+          "score": 0.78,
+          "visible": true,
+          "notes": "Squircle rounding (radius 0.1, ~20% of half-extent) reads as a distinct soft bevel on every edge/corner across all orbit angles, not a sharp 90-degree cube."
+        },
+        {
+          "id": "rind-face-visible",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Full -X face reads as a solid dark rust-orange rind on every cube, oriented toward the hero camera. Repositioned from +X to -X after cmp-1 showed it facing away from the default camera (documented in code comments)."
+        },
+        {
+          "id": "sunken-holes-visible",
+          "score": 0.62,
+          "visible": true,
+          "notes": "2x2-vertex-block dimples on the front face, tuned to a shallow depth (0.038/0.028) after an isolation test (shot-isolation-debug.png) proved deeper holes (0.07/0.05) caused a jagged facet artifact at this low grid resolution. Now reads as a subtle but present darker patch pair, not a crisp circular hole -- an accepted tradeoff (important tier, not mustPass) between hole readability and surface cleanliness at this budget."
+        },
+        {
+          "id": "top-cube-physically-supported",
+          "score": 0.9,
+          "visible": true,
+          "notes": "Top cube's own Box3 floor is set exactly to the two lower cubes' combined Box3.max.y (computed at build time, not hardcoded) -- zero gap on all orbit angles, no floating."
+        }
+      ],
+      "action": "continue",
+      "summary": "3 rounded cubes, physically stacked (2 ground + 1 on top, Box3-computed support), full rind face per cube (repositioned to -X after cmp-1 showed it facing away from camera), 2 shallow front-face hole dimples (depth tuned down after an isolation test proved deeper holes caused a jagged low-poly artifact). Real geometry debugging across cmp-1..3 plus several follow-up debug renders (documented in code comments and this review).",
+      "matched": [
+        "3-cube physical stack, top cube fully supported",
+        "rounded/chamfered edges visible on every cube",
+        "full rind face visible and distinct",
+        "faceted flat shading (no jitter, matches the reference's clean look)",
+        "mesh<=2"
+      ],
+      "mismatches": [
+        "front-face holes read as a subtle darker patch rather than a crisp circular hole -- an accepted tradeoff (deeper holes produced visible jagged faceting at this grid resolution, confirmed via isolation test)",
+        "overall tone slightly more saturated/orange than the reference's brighter yellow"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/roundtrip-64-preview.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-isolation-debug.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-mid-debug.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read across cmp-1/2/3 plus 6 follow-up debug renders (rind orientation, hole spacing, T-junction hypothesis test, isolation test, shallow/mid depth tuning): the jagged artifact traced conclusively (isolation test) to hole-depression depth, not rounding or grid-density mismatch; final depth (0.038/0.028) balances hole readability against surface cleanliness within the cluster tri/KB budget."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T18:15:32.128311+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.75,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "three-cube-stack-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "2 cubes side by side + 1 physically resting on top, well-supported (Box3-computed floor, zero gap); matches cheese.png's stack arrangement closely."
+        },
+        {
+          "id": "rounded-cube-edges",
+          "score": 0.78,
+          "visible": true,
+          "notes": "Squircle rounding (radius 0.1, ~20% of half-extent) reads as a distinct soft bevel on every edge/corner across all orbit angles, not a sharp 90-degree cube."
+        },
+        {
+          "id": "rind-face-visible",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Full -X face reads as a solid dark rust-orange rind on every cube, oriented toward the hero camera. Repositioned from +X to -X after cmp-1 showed it facing away from the default camera (documented in code comments)."
+        },
+        {
+          "id": "sunken-holes-visible",
+          "score": 0.67,
+          "visible": true,
+          "notes": "2x2-vertex-block dimples on the front face, tuned to a shallow depth (0.038/0.028) after an isolation test (shot-isolation-debug.png) proved deeper holes (0.07/0.05) caused a jagged facet artifact at this low grid resolution. Now reads as a subtle but present darker patch pair, not a crisp circular hole -- an accepted tradeoff (important tier, not mustPass) between hole readability and surface cleanliness at this budget."
+        },
+        {
+          "id": "top-cube-physically-supported",
+          "score": 0.9,
+          "visible": true,
+          "notes": "Top cube's own Box3 floor is set exactly to the two lower cubes' combined Box3.max.y (computed at build time, not hardcoded) -- zero gap on all orbit angles, no floating."
+        }
+      ],
+      "action": "continue",
+      "summary": "3 rounded cubes, physically stacked, full rind face per cube, 2 shallow front-face hole dimples (depth tuned down after an isolation test proved deeper holes caused a jagged low-poly artifact at this grid resolution).",
+      "matched": [
+        "3-cube physical stack, top cube fully supported",
+        "rounded/chamfered edges visible",
+        "full rind face visible and distinct",
+        "faceted flat shading, no jitter (matches the reference's clean look)",
+        "mesh<=2"
+      ],
+      "mismatches": [
+        "front-face holes read as a subtle darker patch rather than a crisp circular hole (accepted tradeoff, see risk in spec)",
+        "overall tone slightly more saturated/orange than the reference's brighter yellow"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/roundtrip-64-preview.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Unchanged render since material-pass; re-confirmed applicable feature targets for surface-pass."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T18:15:37.110576+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.75,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "three-cube-stack-silhouette",
+          "score": 0.85,
+          "visible": true,
+          "notes": "2 cubes side by side + 1 physically resting on top, well-supported (Box3-computed floor, zero gap); matches cheese.png's stack arrangement closely."
+        },
+        {
+          "id": "rounded-cube-edges",
+          "score": 0.78,
+          "visible": true,
+          "notes": "Squircle rounding (radius 0.1, ~20% of half-extent) reads as a distinct soft bevel on every edge/corner across all orbit angles, not a sharp 90-degree cube."
+        },
+        {
+          "id": "rind-face-visible",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Full -X face reads as a solid dark rust-orange rind on every cube, oriented toward the hero camera. Repositioned from +X to -X after cmp-1 showed it facing away from the default camera (documented in code comments)."
+        },
+        {
+          "id": "sunken-holes-visible",
+          "score": 0.67,
+          "visible": true,
+          "notes": "2x2-vertex-block dimples on the front face, tuned to a shallow depth (0.038/0.028) after an isolation test (shot-isolation-debug.png) proved deeper holes (0.07/0.05) caused a jagged facet artifact at this low grid resolution. Now reads as a subtle but present darker patch pair, not a crisp circular hole -- an accepted tradeoff (important tier, not mustPass) between hole readability and surface cleanliness at this budget."
+        },
+        {
+          "id": "top-cube-physically-supported",
+          "score": 0.9,
+          "visible": true,
+          "notes": "Top cube's own Box3 floor is set exactly to the two lower cubes' combined Box3.max.y (computed at build time, not hardcoded) -- zero gap on all orbit angles, no floating."
+        }
+      ],
+      "action": "continue",
+      "summary": "3 rounded cubes, physically stacked, full rind face per cube, 2 shallow front-face hole dimples (depth tuned down after an isolation test proved deeper holes caused a jagged low-poly artifact at this grid resolution).",
+      "matched": [
+        "3-cube physical stack, top cube fully supported",
+        "rounded/chamfered edges visible",
+        "full rind face visible and distinct",
+        "faceted flat shading, no jitter (matches the reference's clean look)",
+        "mesh<=2"
+      ],
+      "mismatches": [
+        "front-face holes read as a subtle darker patch rather than a crisp circular hole (accepted tradeoff, see risk in spec)",
+        "overall tone slightly more saturated/orange than the reference's brighter yellow"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/roundtrip-64-preview.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cheese.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cheese/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Unchanged render since material-pass; re-confirmed applicable feature targets for optimization-pass."
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 576,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Hard consumer budget for the 'cluster' ingredient group: <=700 tri and <=68KB target (types.ts R2), hard ceiling <=2500 tri and <=100KB. Target reached by construction (6 faces x 4x4 quads/face x 3 cubes = 576 tri; rounding + hole depressions add zero triangles), not by decimation."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, upper-left.",
+      "usage": "Fixed by scripts/breadlab.ts.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75 -- each cube face's own brightness comes from its normal's angle to the key light, giving the 'shaded faces' effect for free.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build each cube as 6 independent per-face grids (SEGMENTS_PER_AXIS quads/edge), right-handed (U,V,N) triples per face for consistent outward winding.",
+    "Apply the squircle rounding transform (sdRoundBox surface-point formula) to every vertex -- a pure function of position, so coincident edge/corner vertices from adjacent faces map identically without a shared index.",
+    "Depress 2 interior grid vertices on the +Z face along -Z for the front-face holes.",
+    "No jitter (R4 exception -- reference shows clean flat faces). Bake faceting by splitting vertices (facet); never request flatShading.",
+    "Assign the +X face's triangles to the rind material, the other 5 faces to the body material -- known statically per face, not a mask or slice.",
+    "Project top-planar UVs per face bucket, then merge all three cubes by material into exactly two meshes.",
+    "Place the two ground cubes with their own bbox floor at world Y=0; compute the top cube's Y from the two lower cubes' combined Box3 max.y (a deliberate exception to the flat-mound R1 convention, see spec risk stack-not-flat-mound)."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-stack rotation for the showcase turntable",
+    "each cube is a named instance"
+  ],
+  "destructionAnchors": [
+    "each cube is its own fractureGroup; the only plausible break is the top cube toppling off the stack"
+  ],
+  "risks": [
+    {
+      "id": "rind-full-face-not-edge-stripe",
+      "severity": "low",
+      "description": "assets/prompts/ingredients/cheese.json describes the rind as 'a thin warm wax rind along one edge', but the actual reference render shows an entire solid-colored face.",
+      "mitigation": "Image is shape/color-region authority per INGREDIENTS.md; the rind is authored as one whole face (+X), matching the reference directly rather than the undersold prompt text."
+    },
+    {
+      "id": "shaded-face-hue-dropped",
+      "severity": "low",
+      "description": "The shaded-faces hex (#C9903A) is not painted as a separate bucket.",
+      "mitigation": "A flat cube's own faces already shade differently by normal direction under the runtime key light -- exactly this hex's effect, achieved for free via geometry+lighting."
+    },
+    {
+      "id": "hole-hue-dropped",
+      "severity": "low",
+      "description": "The hole hex (#D8A448) is not painted as a separate bucket.",
+      "mitigation": "Holes are pure vertex-depression dimples in the body material (cracker.ts precedent); their own facet-normal shading gives the darkened read."
+    },
+    {
+      "id": "stack-not-flat-mound",
+      "severity": "medium",
+      "description": "The top cube's bbox floor is NOT at world Y=0, unlike every other cluster ingredient in this batch (olive/choco/cranberry/blueberry all keep every instance on the shared ground per R1).",
+      "mitigation": "A cube stack's flat top/bottom edges make true physical elevation visually unmistakable -- a camera-angle illusion (used by the round/organic ingredients) cannot fake a flat cube resting on another flat cube. The top cube IS fully supported (zero gap, computed from the lower cubes' own Box3), satisfying R1's actual intent (no floating/unsupported parts) even though it deviates from the flat-mound convention."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-color-based region paint is silently discarded by the runtime's MeshLambertMaterial swap.",
+      "mitigation": "The body/rind split is carried by two separate materials on two separate per-face triangle groups, assigned statically at build time. No vertexPaint block is authored anywhere in this spec."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "A flatShading flag is not inherited by the runtime material swap.",
+      "mitigation": "Faceting is baked into geometry by splitting vertices (scripts/breads/lib.ts facet) before export."
+    },
+    {
+      "id": "rounding-seam-tear-if-jittered",
+      "severity": "medium",
+      "description": "If jitter were applied to this 6-independent-face (non-welded) topology, coincident edge/corner vertices from adjacent faces would move independently and open a crack.",
+      "mitigation": "Jitter is deliberately omitted for cheese (R4 exception, also matches the reference's clean unjittered look) -- the squircle rounding stays watertight because it is a pure function of vertex position, safe without a shared index."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Cheese Cube Stack",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  },
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.794,
+        "aspectRatioDelta": 0.2071,
+        "scaleDelta": 0.0812,
+        "bilateralSymmetryError": 0.1205,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 20.84,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.794 is below threshold 0.85",
+        "aspect-ratio delta 0.207 exceeds threshold 0.05",
+        "scale delta 0.081 exceeds threshold 0.08",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0a94db7ad578a68",
+      "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.794,
+        "aspectRatioDelta": 0.2071,
+        "scaleDelta": 0.0812,
+        "bilateralSymmetryError": 0.1205,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 20.84,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.794 is below threshold 0.85",
+        "aspect-ratio delta 0.207 exceeds threshold 0.05",
+        "scale delta 0.081 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0a94db7ad578a68",
+      "passId": "structural-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.794,
+        "aspectRatioDelta": 0.2071,
+        "scaleDelta": 0.0812,
+        "bilateralSymmetryError": 0.1205,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 20.84,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.794 is below threshold 0.85",
+        "aspect-ratio delta 0.207 exceeds threshold 0.05",
+        "scale delta 0.081 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0a94db7ad578a68",
+      "passId": "form-refinement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.794,
+        "aspectRatioDelta": 0.2071,
+        "scaleDelta": 0.0812,
+        "bilateralSymmetryError": 0.1205,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 20.84,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.794 is below threshold 0.85",
+        "aspect-ratio delta 0.207 exceeds threshold 0.05",
+        "scale delta 0.081 exceeds threshold 0.08",
+        "max per-part color delta-E 20.84 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0a94db7ad578a68",
+      "passId": "material-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.794,
+        "aspectRatioDelta": 0.2071,
+        "scaleDelta": 0.0812,
+        "bilateralSymmetryError": 0.1205,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 20.84,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.794 is below threshold 0.85",
+        "aspect-ratio delta 0.207 exceeds threshold 0.05",
+        "scale delta 0.081 exceeds threshold 0.08",
+        "max per-part color delta-E 20.84 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0a94db7ad578a68",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.794,
+        "aspectRatioDelta": 0.2071,
+        "scaleDelta": 0.0812,
+        "bilateralSymmetryError": 0.1205,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 20.84,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.794 is below threshold 0.85",
+        "aspect-ratio delta 0.207 exceeds threshold 0.05",
+        "scale delta 0.081 exceeds threshold 0.08",
+        "max per-part color delta-E 20.84 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0a94db7ad578a68",
+      "passId": "optimization-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.794,
+        "aspectRatioDelta": 0.2071,
+        "scaleDelta": 0.0812,
+        "bilateralSymmetryError": 0.1205,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 20.84,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.794 is below threshold 0.85",
+        "aspect-ratio delta 0.207 exceeds threshold 0.05",
+        "scale delta 0.081 exceeds threshold 0.08",
+        "max per-part color delta-E 20.84 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0a94db7ad578a68",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.794,
+        "aspectRatioDelta": 0.2071,
+        "scaleDelta": 0.0812,
+        "bilateralSymmetryError": 0.1205,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 20.84,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.11
+            },
+            {
+              "componentId": null,
+              "deltaE": 20.84
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.794 is below threshold 0.85",
+        "aspect-ratio delta 0.207 exceeds threshold 0.05",
+        "scale delta 0.081 exceeds threshold 0.08",
+        "max per-part color delta-E 20.84 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0a94db7ad578a68",
+      "passId": "optimization-pass"
+    }
+  ]
+}

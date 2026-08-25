@@ -1,0 +1,1694 @@
+{
+  "targetName": "Walnut",
+  "targetId": "walnut",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\walnut.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved and deliberately not matched to the reference. The review camera is fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 2,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "single walnut kernel half",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "single revolved body with bilateral fold"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat color facets only. Consumer runtime is a stylized low-poly showcase."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 0,
+        "materialLayerCount": 1,
+        "localDetailDensity": 1,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 1,
+        "mesoComponents": 1,
+        "microFeatureGroups": 0,
+        "materialLayers": 2,
+        "repetitionSystems": 0
+      },
+      "reasoning": [
+        "Single macro body (walnut-kernel) with one meso sub-region (walnut-rim), scoring componentCount 1.",
+        "Silhouette scores 2 (not 1): unlike chestnut/olive's near-radial forms, the bilateral two-lobe/groove fold is NOT radially symmetric and is the load-bearing identity feature.",
+        "No repetition system: a single instance, scoring repetitionDensity 0.",
+        "One material family in two albedo zones (kernel vs rim), materialLayerCount scores 1.",
+        "Local detail density scores 1: the groove/lobe fold is the one authored macro-level displacement, no additional micro details at this budget.",
+        "Occlusion risk scores 1: the true underside is hidden but assumed flat/unremarkable by construction.",
+        "Action readiness scores 0: static showcase prop.",
+        "Aggregate 6/24 stays in the simple tier despite the silhouette bump."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": false,
+      "needsMaterialLocalOverrides": false,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier by part count, but the bilateral fold needs explicit per-sector displacement authoring (not a coordinate-threshold shortcut) since it is the identity-defining feature."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerated by hand from the three supplied reference views -- CRIB.md skip rule for a single simple body.",
+      "details": [
+        {
+          "id": "two-lobe-groove-fold",
+          "zone": "domed top, full length",
+          "observation": "Two rounded lobes separated by a deep central groove running the full long-axis length, giving a wrinkled-brain-like fold.",
+          "inference": "This is the load-bearing identity cue -- a smooth dome without this fold reads as a generic brown blob, not a walnut.",
+          "confidence": 0.95,
+          "evidenceRef": "walnut.png / walnut-2.png",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "walnut-two-lobe-fold",
+            "note": ""
+          }
+        },
+        {
+          "id": "elliptical-footprint",
+          "zone": "top-down silhouette",
+          "observation": "Oval footprint, long axis roughly 1.36x the short axis, with the groove running along the long axis.",
+          "inference": "Natural walnut-kernel-half proportions.",
+          "confidence": 0.85,
+          "evidenceRef": "walnut-3.png top-down",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "walnut-elliptical-footprint",
+            "note": ""
+          }
+        },
+        {
+          "id": "rim-band",
+          "zone": "perimeter, all views",
+          "observation": "A thin darker flat band runs around the base perimeter, distinct from the lighter lobed top.",
+          "inference": "The flat underside/rim of the kernel half where it would rest on a surface.",
+          "confidence": 0.75,
+          "evidenceRef": "walnut.png / walnut-2.png",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "walnut-rim-band",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/walnut.png"
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 1,
+      "mesoComponents": 1,
+      "microFeatureGroups": 0,
+      "materialLayers": 2,
+      "repetitionSystems": 0,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.75,
+    "mustMatch": [
+      "two-lobe domed top with a valley between, not a single center peak",
+      "elliptical oval footprint ~1.36:1",
+      "kernel/rim two-tone facet split surviving the runtime Lambert swap",
+      "groove crosses the frame diagonally",
+      "faceted flat shading baked into geometry"
+    ],
+    "niceToHave": [
+      "exact groove depth/width ratio"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "two-lobe-groove-silhouette",
+      "name": "Two-lobe domed top with a valley between (not a single center peak)",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass",
+        "form-refinement"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "walnut-kernel"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ]
+    },
+    {
+      "id": "elliptical-footprint",
+      "name": "Elliptical oval footprint, long axis ~1.36x short axis",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "walnut-kernel"
+      ],
+      "evidenceRefs": [
+        "view-top"
+      ]
+    },
+    {
+      "id": "rim-facet-split",
+      "name": "Kernel/rim two-tone facet split",
+      "tier": "critical",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "walnut-rim"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "groove-diagonal-orientation",
+      "name": "Groove crosses the frame diagonally, not edge-on",
+      "tier": "important",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "walnut-kernel"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "shared-ground-plane",
+      "name": "Rests on the shared ground, no floating parts",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass"
+      ],
+      "minimumScore": 0.85,
+      "mustPass": true,
+      "componentRefs": [
+        "walnut-kernel"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "baked-faceting",
+      "name": "Faceted flat shading baked into geometry",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "walnut-kernel"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model",
+      "interaction-pass": "static showcase prop with no sockets/hinges/colliders beyond a bounding proxy; actionReadinessNeed 0"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "The consumer runtime keeps only map and color, and the repo bans PBR maps outright."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer harness (scripts/breadlab.ts / scripts/thumbsHarness.ts).",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The true underside (facing away from the camera at every reviewed azimuth) is assumed flat and unremarkable, per the rim band's flat cross-section.",
+    "The runtime normalizes the longest axis to 1.6, so absolute dimensions are arbitrary and only the authored ratios carry meaning.",
+    "The groove's exact depth/width ratio is not identity-critical at pixel precision; its presence and camera-facing orientation are what the review scores."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "RADIUS_X = 0.44 relative unit (short axis). Absolute scale is meaningless: the consumer runtime refits the longest axis to 1.6 (types.ts section 7)."
+  },
+  "silhouette": {
+    "boundingShape": "oval two-lobed dome, roughly 1.2 long by 0.88 wide by 0.62 tall in relative units",
+    "aspectRatios": [
+      {
+        "id": "long-over-short-axis",
+        "value": 1.364,
+        "source": "walnut-3.png top-down"
+      },
+      {
+        "id": "height-over-width",
+        "value": 0.705,
+        "source": "walnut-2.png front elevation"
+      }
+    ],
+    "symmetry": "bilateral about the long-axis groove plane, broken by surface jitter",
+    "dominantCurves": [
+      "smooth convex lobe bulges at the short-axis ends",
+      "continuous concave groove along the long axis"
+    ],
+    "negativeSpaces": [
+      "the groove valley itself is the one negative space"
+    ],
+    "landmarks": [
+      "two lobe crests at theta=0/180deg",
+      "groove floor along the full long axis",
+      "flat rim band around the perimeter"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "two rounded lobes on the domed top, separated by a deep central groove running the full length",
+        "a thin darker flat rim band visible all around the perimeter, distinct from the lobed top",
+        "the groove crosses the frame diagonally, not edge-on to the camera"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "two lobes of roughly equal height with a clear V-shaped valley between them, not a single center peak",
+        "overall height is roughly 60-70% of the total width",
+        "a thin flat rim/underside band runs along the base, visibly narrower/darker than the lobes above"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "oval footprint, long axis: short axis ratio roughly 1.35:1",
+        "the groove runs the full length of the oval, splitting it into left and right lobes"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Walnut",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the kernel body; it emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 1.2,
+        "height": 0.62,
+        "depth": 0.88,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Ellipsoid bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "walnut-kernel"
+        }
+      },
+      "material": "walnut-kernel",
+      "materialLayers": [
+        "walnut-kernel",
+        "walnut-rim"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(200, 155, 106, 1.0)",
+        "secondaryAlbedo": "rgba(154, 110, 66, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/walnut.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "cos(2*theta) sector-height modulation on FACE rings for the two-lobe/groove fold -- shape otherwise carried by the revolved elliptical profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; groove/underside darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished kernel half carries no wear",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "walnut-kernel",
+      "name": "Walnut kernel dome (two-lobe + groove)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Continuous domed mass revolved from an elliptical profile, with a per-sector height modulation (not a separate solid) carrying the two-lobe/groove fold -- decision tree step 6. Not a sphere/box primitive because the reference's identity-defining feature is the bilateral fold, which only a sector-varying displacement on a revolved base carries.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              1.0,
+              0.12
+            ],
+            [
+              0.88,
+              0.26
+            ],
+            [
+              0.72,
+              0.42
+            ],
+            [
+              0.52,
+              0.6
+            ],
+            [
+              0.3,
+              0.8
+            ],
+            [
+              0.0,
+              0.84
+            ]
+          ],
+          "segments": 18,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "two-lobe-groove-fold",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.09,
+            "notes": "cos(2*theta)*GROOVE_AMP*ringWeight added to Y on rings [3, 4, 5, 6] (weights [0.35, 0.65, 0.9, 1.0]), theta = sector angle before the whole-body yaw. Lobes at theta=0/180deg (world +-X), groove at theta=90/270deg (world +-Z, the long axis) -- the two groove meridians together trace the line x=0 across the whole long axis, i.e. one continuous groove."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.016,
+            "notes": "Uniform per-vertex noise, amplitude 0.016 (0.036 of short-axis radius), applied indexed so the rim/dome shared boundary never tears (R1)."
+          }
+        ],
+        "uvStrategy": "dome (polar top-down) projection per bucket (scripts/breads/lib.ts uvDome)",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never flatShading"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.2,
+        "height": 0.62,
+        "depth": 0.88,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          -0.5585053606381855,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Ellipsoid bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "walnut-kernel",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "walnut-kernel"
+        }
+      },
+      "material": "walnut-kernel",
+      "materialLayers": [
+        "walnut-kernel",
+        "walnut-rim"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(200, 155, 106, 1.0)",
+        "secondaryAlbedo": "rgba(154, 110, 66, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe.",
+        "zone": "full domed top, dominant tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/walnut.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "two-lobe-groove-fold",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "walnut-rim-boundary",
+          "kind": "material-boundary",
+          "notes": "Boundary between walnut-rim and walnut-kernel is a triangle-range slice on one shared indexed shell (lib.sliceTriangles at the rim-wall-top ring transition), watertight by construction."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "walnut-two-lobe-fold",
+          "name": "Two-lobe domed top with central groove",
+          "kind": "seam",
+          "description": "cos(2*theta) height modulation creates two rounded lobes at the short-axis ends and one continuous groove running the full long axis between them.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "walnut-elliptical-footprint",
+          "name": "Elliptical oval footprint",
+          "kind": "contour",
+          "description": "Long axis (groove direction, world Z pre-yaw) roughly 1.36x the short axis (lobe-separation direction, world X).",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "cos(2*theta) sector-height modulation on FACE rings for the two-lobe/groove fold -- shape otherwise carried by the revolved elliptical profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; groove/underside darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished kernel half carries no wear",
+        "notes": "Kernel tone covers everything above the rim boundary. The runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "walnut-two-lobe-fold",
+        "walnut-elliptical-footprint"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "walnut-rim",
+      "name": "Walnut flat rim / underside band",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.85,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Not a separate solid -- the bottom-cap fan plus the first ring-to-ring wall band of the parent shell's own indexed geometry, split by a fixed triangle-index range after facet(), mirroring scone.ts's body/top split.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              1.0,
+              0.0
+            ],
+            [
+              1.0,
+              0.12
+            ]
+          ],
+          "segments": 18,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "dome (polar top-down) projection (scripts/breads/lib.ts uvDome)",
+        "normalStrategy": "flat normals inherited from the parent shell's split-vertex facet bake"
+      },
+      "parent": "walnut-kernel",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.2,
+        "height": 0.0744,
+        "depth": 0.88,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Ellipsoid bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "walnut-rim",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "walnut-kernel"
+        }
+      },
+      "material": "walnut-rim",
+      "materialLayers": [
+        "walnut-rim"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(154, 110, 66, 1.0)",
+        "secondaryAlbedo": "rgba(200, 155, 106, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe.",
+        "zone": "flat base disk + thin rim wall",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/walnut.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [
+        {
+          "id": "walnut-rim-patch-boundary",
+          "kind": "material-boundary",
+          "notes": "Shares the parent shell's own triangles at the rim-wall-top ring; watertight because both buckets come from one indexed shell split by triangle index."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "walnut-rim-band",
+          "name": "Darker flat rim/underside band",
+          "kind": "contour",
+          "description": "Deeper amber (#9A6E42) confined to the flat base disk + thin rim wall, a hard facet edge with no gradient. RELOCATED from the prompt JSON's 'inside the folds/grooves' description to this geometrically-distinct flat rim region -- see spec risk.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-front"
+          ],
+          "confidence": 0.75
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "cos(2*theta) sector-height modulation on FACE rings for the two-lobe/groove fold -- shape otherwise carried by the revolved elliptical profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; groove/underside darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished kernel half carries no wear",
+        "notes": "assets/prompts/ingredients/walnut.json geometry.surface: the rim band is identity-critical for reading a distinct 'kernel half sitting on a base' rather than a single-tone blob."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "walnut-rim-band"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "walnut-kernel",
+      "name": "Walnut kernel (warm tan)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#C89B6A",
+      "color": "#C89B6A",
+      "albedo": {
+        "dominant": "#C89B6A",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/walnut.json geometry.surface. Deliberately NOT sampled from reference pixels, which carry the generator's baked key light."
+      },
+      "colorVariation": {
+        "palette": [
+          "#C89B6A"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only to satisfy the merge step's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "revolved elliptical profile + two-lobe fold",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 3.0,
+          "amplitude": 0.036,
+          "role": "surface jitter noise",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "domed top above the rim boundary",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "groove-natural-shading",
+          "name": "Groove/lobe key-light falloff",
+          "maskSource": "geometry",
+          "description": "No AO/dirt map is authored; the reference's deeper-amber fold hue and pale-gold ridge highlight are deliberately NOT painted as extra material buckets -- the runtime key light's N.L falloff already darkens the concave groove and brightens the convex lobe crests for free.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "walnut-kernel"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either."
+      ],
+      "notes": "domed top above the rim boundary. Two solid colors are enough for the whole body, so no texture is emitted at all."
+    },
+    {
+      "id": "walnut-rim",
+      "name": "Walnut rim / underside band (deeper amber)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#9A6E42",
+      "color": "#9A6E42",
+      "albedo": {
+        "dominant": "#9A6E42",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/walnut.json geometry.surface. Deliberately NOT sampled from reference pixels, which carry the generator's baked key light."
+      },
+      "colorVariation": {
+        "palette": [
+          "#9A6E42"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only to satisfy the merge step's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "revolved elliptical profile + two-lobe fold",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 3.0,
+          "amplitude": 0.036,
+          "role": "surface jitter noise",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "flat base disk + thin rim wall",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "rim-facet-boundary",
+          "name": "Kernel/rim facet boundary",
+          "maskSource": "geometry",
+          "description": "The boundary is a fixed triangle-index range (bottom fan + first wall band) sliced from the shared indexed shell -- a hard geometric edge, not a texture boundary and not a vertex-color ramp.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "walnut-rim"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either."
+      ],
+      "notes": "flat base disk + thin rim wall. Two solid colors are enough for the whole body, so no texture is emitted at all."
+    }
+  ],
+  "repetitionSystems": [],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 216,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Hard consumer budget for the 'single' ingredient group: 200-500 tri and <=48KB target, hard ceiling <=2500 tri/<=100KB. Target reached by construction (18 segments x 7 profile transitions = 216 tri before the groove modulation, which adds zero triangles), not by decimation."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, upper-left.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no tone mapping -- authored albedo lands on screen almost unchanged."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75 -- the groove/underside darkening relies on the shell's own curvature turning away from the key light.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2, opposite the key.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO available."
+    }
+  ],
+  "proceduralStrategy": [
+    "Revolve the shell from one elliptical profile (pole, base edge, rim-wall-top, four dome rings, crown pole).",
+    "Add cos(2*theta) height modulation on the dome rings before jitter, weighted per ring, to carve the two-lobe/groove fold.",
+    "Bake a whole-body yaw rotation so the groove crosses the review camera diagonally instead of edge-on.",
+    "Jitter vertices while the shell is still indexed, so the rim/kernel split never tears.",
+    "Bake faceting by splitting vertices and recomputing normals; never request flatShading.",
+    "Slice the rim (bottom fan + first wall band) into its own triangle range after facet() for the rim material.",
+    "Project dome UVs per bucket, then merge by material into exactly two meshes.",
+    "Translate the whole shell's own bounding box floor to world Y=0."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-body rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single fractureGroup; no plausible sub-fracture for a walnut half"
+  ],
+  "risks": [
+    {
+      "id": "rim-hue-relocated",
+      "severity": "medium",
+      "description": "assets/prompts/ingredients/walnut.json names #9A6E42 for 'inside the folds and grooves', but this spec applies it to the flat rim/underside band instead.",
+      "mitigation": "The groove is a geometric concavity that the runtime key light already darkens via N.L falloff (same as the dropped #E0C79A ridge highlight); painting the groove a second dark tone would double-darken it (olive shaded-underside precedent). The rim band is the one OTHER geometrically-distinct flat region in the reference images and reads as a consistent darker edge in all 3 views, so the hex is relocated there rather than dropped outright."
+    },
+    {
+      "id": "ridge-highlight-dropped",
+      "severity": "low",
+      "description": "assets/prompts/ingredients/walnut.json names #E0C79A for 'raised ridges', which this spec does not wire to a material bucket.",
+      "mitigation": "Convex lobe crests already catch the runtime key light more brightly via N.L falloff -- painting a highlight color would be redundant with the lighting model."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-color-based region paint is silently discarded by the runtime's MeshLambertMaterial swap.",
+      "mitigation": "The kernel/rim split is carried by two separate materials on two separate triangle ranges from one shared indexed shell. No vertexPaint block is authored anywhere."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "A flatShading flag is not inherited by the runtime material swap.",
+      "mitigation": "Faceting is baked into geometry by splitting vertices (lib.facet) before export."
+    },
+    {
+      "id": "seam-tear",
+      "severity": "medium",
+      "description": "Rim and kernel triangles come from the same shell; jittering after the triangle-range slice would let the shared boundary move independently.",
+      "mitigation": "Jitter runs once, on the whole indexed shell, before facet()/slice."
+    },
+    {
+      "id": "crown-pole-overshoot",
+      "severity": "medium",
+      "description": "If the crown pole height exceeds the modulated lobe-ring peak, the front silhouette reads as a single center spike instead of a valley between two lobes.",
+      "mitigation": "Crown pole set to heightFraction 0.84 (Y=0.521), verified below the ring6 lobe peak (0.80*0.62+0.09=0.586) by construction. Caught in pre-render review, not left to the cmp loop."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Walnut",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  }
+}

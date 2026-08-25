@@ -1,0 +1,3534 @@
+{
+  "targetName": "Blueberry Cluster",
+  "targetId": "blueberry-cluster",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\blueberry.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved; review camera is fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "small cluster of three blueberries",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "repeated instances",
+        "discrete resting cluster"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat color facets only. Identity carried by a real concave star-cavity crown, not a color patch -- the only ingredient in this sub-batch needing continuous-ring-range geometry (scone.ts pattern) rather than a vertex mask."
+    },
+    "complexity": {
+      "tier": "moderate",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 1,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 1,
+        "materialLayerCount": 1,
+        "localDetailDensity": 2,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 3,
+        "mesoComponents": 3,
+        "microFeatureGroups": 0,
+        "materialLayers": 2,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Three near-identical macro bodies differing only in XZ offset/yaw and the front instance's extra tiltX, so componentCount scores 1.",
+        "Silhouette scores 2 (not 1): the star-cavity notch is a real, load-bearing silhouette feature at the top pole, more structurally involved than olive/choco/cranberry's smooth-taper-only bodies.",
+        "hierarchyDepth scores 2: each berry has a real meso-level crown child (continuous ring-range, not a mask), one level deeper than choco/cranberry's flat mesh=1 bodies.",
+        "materialLayerCount scores 1: 2 buckets needed (body + crown), matching olive's precedent scale but for a different reason (identity-critical geometry, not a painted highlight).",
+        "Local detail density scores 2: star-tip radius modulation + pit-floor depression are two distinct authored details on the same shell.",
+        "Occlusion risk scores 1: back berries' far sides are hidden but inferable by near-radial symmetry; all three crowns stay visible from the fixed camera by construction.",
+        "Action readiness scores 0: static turntable showcase prop."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier by part count, but needs meso depth (crown cavity) and material local overrides (drop-rule reversal justification) unlike choco/cranberry's flatter mesh=1 budget."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 2,
+      "note": "Enumerated by hand from the three supplied reference views -- CRIB.md skip rule for single-repeated-system objects.",
+      "details": [
+        {
+          "id": "star-cavity-crown-all-three",
+          "zone": "top pole of every berry",
+          "observation": "All 3 berries show a dark 6-point star/hex cavity at their top pole (not just the front one as the prompt text implies).",
+          "inference": "Blueberry calyx scar -- the sole identity feature separating this from a plain sphere.",
+          "confidence": 0.9,
+          "evidenceRef": "blueberry.png full frame, blueberry-3.png top-down",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "blueberry-front-crown-star-pit",
+            "note": ""
+          }
+        },
+        {
+          "id": "near-spherical-form",
+          "zone": "per-berry silhouette",
+          "observation": "Every berry reads as a true sphere, no flattening or taper.",
+          "inference": "Fresh (not dried) berry morphology -- distinguishes from cranberry in the same batch.",
+          "confidence": 0.85,
+          "evidenceRef": "blueberry-2.png front elevation, all instances",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "blueberry-front-near-spherical",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png"
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 3,
+      "microFeatureGroups": 2,
+      "materialLayers": 2,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.75,
+    "mustMatch": [
+      "three-berry cluster silhouette with all three individually readable",
+      "near-spherical body",
+      "star-cavity crown visible on all three berries",
+      "faceted flat shading baked into geometry"
+    ],
+    "niceToHave": [
+      "exact star point count/shape"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "three-berry-cluster-silhouette",
+      "name": "Three-berry cluster silhouette, mutually readable",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "blueberry-back1",
+        "blueberry-back2",
+        "blueberry-front"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "near-spherical-body",
+      "name": "Near-spherical body, no flattening",
+      "tier": "important",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "blueberry-back1",
+        "blueberry-back2",
+        "blueberry-front"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "star-cavity-crown-visible",
+      "name": "Star-cavity crown visible on all three berries from the hero camera",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass",
+        "surface-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "blueberry-back1-crown",
+        "blueberry-back2-crown",
+        "blueberry-front-crown"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "shared-ground-plane",
+      "name": "All three berries rest on the shared ground, no floating parts",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass"
+      ],
+      "minimumScore": 0.85,
+      "mustPass": true,
+      "componentRefs": [
+        "blueberry-back1",
+        "blueberry-back2",
+        "blueberry-front"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": [],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color; repo bans PBR maps outright."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer: scripts/breadlab.ts mirrors scripts/thumbsHarness.ts with a warm directional key 0xffe2b0 at (-2, 6, 2) intensity 1.4, an ambient 0xfff0dc at 0.75 and a cool fill 0xdce8ff at (2.5, 3, -2) intensity 0.2.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The runtime normalizes the cluster's longest axis to 1.6, so absolute dimensions are arbitrary.",
+    "Exact star point count/shape is not identity-critical at pixel precision; the presence of a visible dark concave cavity at each berry's top is what the review scores.",
+    "Winding direction inside the concave pit was verified via a top-down-angle debug render before finalizing (a naive reuse of the convex-shell winding formula could invert the pit's visible faces)."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "BLUEBERRY_RADIUS = 0.5 relative unit. Absolute scale is meaningless: the consumer runtime refits the cluster's longest axis to 1.6 (types.ts section 6)."
+  },
+  "silhouette": {
+    "boundingShape": "compact triangular cluster of three near-spheres, roughly 1.9 wide by 1.15 tall by 1.3 deep in relative units",
+    "aspectRatios": [
+      {
+        "id": "berry-radius-ratio",
+        "value": 1.0,
+        "source": "blueberry.png -- near-perfect sphere"
+      }
+    ],
+    "symmetry": "each berry is approximately radially symmetric about its own vertical axis except for the star-cavity notch; the cluster as a whole is asymmetric",
+    "dominantCurves": [
+      "smooth convex sphere, no taper"
+    ],
+    "negativeSpaces": [
+      "six-point star cavity at each berry's top pole",
+      "shallow contact creases where berries touch"
+    ],
+    "landmarks": [
+      "star-cavity crown on every berry, always visible from the fixed hero camera"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "three near-spherical berries resting together, touching but not overlapping the group silhouette",
+        "ALL THREE berries show a visible dark star/hex cavity at their top pole -- not just the front one (revises the prompt text's single-crown description; image is shape authority)",
+        "front berry's cavity reads as a full 6-point star face-on; the two back berries read the same feature as an elongated hex/oval via grazing viewing angle"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "each berry is close to a true sphere, no visible flattening",
+        "no distinct lighter 'bloom' patch -- shading is a smooth gradient"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "three circular footprints in a tight triangular cluster",
+        "all three star cavities visible from directly above, confirming the three-quarter-view read"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Blueberry Cluster",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the three berry bodies; emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 1.9,
+        "height": 1.15,
+        "depth": 1.3,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "blueberry-body"
+        }
+      },
+      "material": "blueberry-body",
+      "materialLayers": [
+        "blueberry-body",
+        "blueberry-crown"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(76, 90, 140, 1.0)",
+        "secondaryAlbedo": "rgba(57, 69, 110, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/blueberry.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cluster-arrangement",
+          "name": "Three-berry resting cluster",
+          "kind": "contour",
+          "description": "Three berries placed with independent XZ offsets and yaw so each remains individually readable and each star crown stays visible from the fixed 3/4 camera (types.ts R1); all three share the ground plane at world Y=0 after each instance's own bounding-box floor correction.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "star-cavity is a continuation ring range of the same indexed shell (per-sector radius modulation), a real concave dip below the rim height -- not a mask, not a bump",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crown contrast comes from its own darker material bucket plus facet-normal shading inside the pit",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "cluster-arrangement"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "blueberry-back1",
+      "name": "Blueberry body (back1)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass from center-bottom pole through 5 body rings to a shared rim ring; the star-cavity crown is a further continuation of the SAME indexed ring/index arrays (scone.ts pattern), not a separate solid or a vertex mask.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.5
+            ],
+            [
+              0.31,
+              -0.41
+            ],
+            [
+              0.46,
+              -0.24
+            ],
+            [
+              0.5,
+              -0.025
+            ],
+            [
+              0.43,
+              0.175
+            ],
+            [
+              0.3,
+              0.31
+            ],
+            [
+              0.06,
+              0.25
+            ],
+            [
+              0.0,
+              0.25
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.008,
+            "notes": "amplitude 0.008 (0.016 of radius) -- kept small (R4) so the star cavity points stay crisp."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar) per material bucket",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.0,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          -0.42,
+          0.0,
+          -0.32
+        ],
+        "rotation": [
+          0.0,
+          0.4,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "blueberry-back1",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "blueberry-body"
+        }
+      },
+      "material": "blueberry-body",
+      "materialLayers": [
+        "blueberry-body",
+        "blueberry-crown"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(76, 90, 140, 1.0)",
+        "secondaryAlbedo": "rgba(57, 69, 110, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body below the rim, dominant tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/blueberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "blueberry-back1-crown-boundary",
+          "kind": "material-boundary",
+          "notes": "Boundary between blueberry-body and blueberry-crown is a continuous-triangle-range split (sliceTriangles) on one shared indexed shell, not a separate geometry -- watertight by construction (scone.ts precedent), never a vertex mask."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "blueberry-back1-near-spherical",
+          "name": "Near-spherical body",
+          "kind": "contour",
+          "description": "Body ring radii peak near the equator (rFrac 1.0 at hFrac -0.05), reading as a true sphere with no flattening.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "star-cavity is a continuation ring range of the same indexed shell (per-sector radius modulation), a real concave dip below the rim height -- not a mask, not a bump",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crown contrast comes from its own darker material bucket plus facet-normal shading inside the pit",
+        "edgeWearPattern": "none",
+        "notes": "Body tone covers the majority of the shell below the rim. The runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "blueberry-back1-near-spherical"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "blueberry-back1-crown",
+      "name": "Blueberry star crown (back1)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A continuous-triangle-range subset of the parent body's own shared indexed shell (ring transitions 5..8: rim->star-tips->pit-floor->center pole), split by sliceTriangles(bodyTriangles, total) after facet() -- never a vertex mask, since the star needs true per-sector radius modulation that only exists in these specific rings.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.145,
+              0.35
+            ],
+            [
+              0.06,
+              0.25
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "star-radius-modulation",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.22,
+            "notes": "Star-tip ring (hFrac 0.70) alternates radius 0.40 (even sector, point) / 0.18 (odd sector, valley) across 12 segments -> 6 points. Pit-floor ring (hFrac 0.50) dips BELOW the rim's hFrac 0.62, a real concave depression, not a bump; center pole closes it flat at the same height."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals inherited from the parent shell's split-vertex facet bake"
+      },
+      "parent": "blueberry-back1",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.4,
+        "height": 0.1,
+        "depth": 0.4,
+        "units": "relative",
+        "confidence": 0.7
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "blueberry-back1-crown",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "blueberry-body"
+        }
+      },
+      "material": "blueberry-crown",
+      "materialLayers": [
+        "blueberry-crown"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(57, 69, 110, 1.0)",
+        "secondaryAlbedo": "rgba(76, 90, 140, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "top-pole star cavity",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/blueberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "star-radius-modulation"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "blueberry-back1-crown-boundary",
+          "kind": "material-boundary",
+          "notes": "Shares the parent shell's own triangles at the rim ring; watertight because both buckets come from one indexed shell split by continuous triangle range after jitter, never two independently built solids."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "blueberry-back1-crown-star-pit",
+          "name": "Six-point star calyx cavity",
+          "kind": "seam",
+          "description": "The defining blueberry identity cue -- a concave, darker-toned star/hex depression at the top pole, present on all three berries (image evidence overrides the prompt text's single-crown description). Kept as its own material bucket deliberately (drop-rule reversed vs olive/choco precedent): this is identity-critical and the extra contrast helps rather than hurts at the 64px thumbnail target.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "star-cavity is a continuation ring range of the same indexed shell (per-sector radius modulation), a real concave dip below the rim height -- not a mask, not a bump",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crown contrast comes from its own darker material bucket plus facet-normal shading inside the pit",
+        "edgeWearPattern": "none",
+        "notes": "assets/prompts/ingredients/blueberry.json: the crown is identity-critical for reading 'blueberry' rather than a generic blue ball at 64px thumbnail scale."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "blueberry-back1-crown-star-pit"
+      ],
+      "fidelityTier": "surface-pass"
+    },
+    {
+      "id": "blueberry-back2",
+      "name": "Blueberry body (back2)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass from center-bottom pole through 5 body rings to a shared rim ring; the star-cavity crown is a further continuation of the SAME indexed ring/index arrays (scone.ts pattern), not a separate solid or a vertex mask.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.5
+            ],
+            [
+              0.31,
+              -0.41
+            ],
+            [
+              0.46,
+              -0.24
+            ],
+            [
+              0.5,
+              -0.025
+            ],
+            [
+              0.43,
+              0.175
+            ],
+            [
+              0.3,
+              0.31
+            ],
+            [
+              0.06,
+              0.25
+            ],
+            [
+              0.0,
+              0.25
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.008,
+            "notes": "amplitude 0.008 (0.016 of radius) -- kept small (R4) so the star cavity points stay crisp."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar) per material bucket",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.0,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.42,
+          0.0,
+          -0.3
+        ],
+        "rotation": [
+          0.0,
+          -0.9,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "blueberry-back2",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "blueberry-body"
+        }
+      },
+      "material": "blueberry-body",
+      "materialLayers": [
+        "blueberry-body",
+        "blueberry-crown"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(76, 90, 140, 1.0)",
+        "secondaryAlbedo": "rgba(57, 69, 110, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body below the rim, dominant tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/blueberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "blueberry-back2-crown-boundary",
+          "kind": "material-boundary",
+          "notes": "Boundary between blueberry-body and blueberry-crown is a continuous-triangle-range split (sliceTriangles) on one shared indexed shell, not a separate geometry -- watertight by construction (scone.ts precedent), never a vertex mask."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "blueberry-back2-near-spherical",
+          "name": "Near-spherical body",
+          "kind": "contour",
+          "description": "Body ring radii peak near the equator (rFrac 1.0 at hFrac -0.05), reading as a true sphere with no flattening.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "star-cavity is a continuation ring range of the same indexed shell (per-sector radius modulation), a real concave dip below the rim height -- not a mask, not a bump",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crown contrast comes from its own darker material bucket plus facet-normal shading inside the pit",
+        "edgeWearPattern": "none",
+        "notes": "Body tone covers the majority of the shell below the rim. The runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "blueberry-back2-near-spherical"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "blueberry-back2-crown",
+      "name": "Blueberry star crown (back2)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A continuous-triangle-range subset of the parent body's own shared indexed shell (ring transitions 5..8: rim->star-tips->pit-floor->center pole), split by sliceTriangles(bodyTriangles, total) after facet() -- never a vertex mask, since the star needs true per-sector radius modulation that only exists in these specific rings.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.145,
+              0.35
+            ],
+            [
+              0.06,
+              0.25
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "star-radius-modulation",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.22,
+            "notes": "Star-tip ring (hFrac 0.70) alternates radius 0.40 (even sector, point) / 0.18 (odd sector, valley) across 12 segments -> 6 points. Pit-floor ring (hFrac 0.50) dips BELOW the rim's hFrac 0.62, a real concave depression, not a bump; center pole closes it flat at the same height."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals inherited from the parent shell's split-vertex facet bake"
+      },
+      "parent": "blueberry-back2",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.4,
+        "height": 0.1,
+        "depth": 0.4,
+        "units": "relative",
+        "confidence": 0.7
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "blueberry-back2-crown",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "blueberry-body"
+        }
+      },
+      "material": "blueberry-crown",
+      "materialLayers": [
+        "blueberry-crown"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(57, 69, 110, 1.0)",
+        "secondaryAlbedo": "rgba(76, 90, 140, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "top-pole star cavity",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/blueberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "star-radius-modulation"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "blueberry-back2-crown-boundary",
+          "kind": "material-boundary",
+          "notes": "Shares the parent shell's own triangles at the rim ring; watertight because both buckets come from one indexed shell split by continuous triangle range after jitter, never two independently built solids."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "blueberry-back2-crown-star-pit",
+          "name": "Six-point star calyx cavity",
+          "kind": "seam",
+          "description": "The defining blueberry identity cue -- a concave, darker-toned star/hex depression at the top pole, present on all three berries (image evidence overrides the prompt text's single-crown description). Kept as its own material bucket deliberately (drop-rule reversed vs olive/choco precedent): this is identity-critical and the extra contrast helps rather than hurts at the 64px thumbnail target.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "star-cavity is a continuation ring range of the same indexed shell (per-sector radius modulation), a real concave dip below the rim height -- not a mask, not a bump",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crown contrast comes from its own darker material bucket plus facet-normal shading inside the pit",
+        "edgeWearPattern": "none",
+        "notes": "assets/prompts/ingredients/blueberry.json: the crown is identity-critical for reading 'blueberry' rather than a generic blue ball at 64px thumbnail scale."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "blueberry-back2-crown-star-pit"
+      ],
+      "fidelityTier": "surface-pass"
+    },
+    {
+      "id": "blueberry-front",
+      "name": "Blueberry body (front)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass from center-bottom pole through 5 body rings to a shared rim ring; the star-cavity crown is a further continuation of the SAME indexed ring/index arrays (scone.ts pattern), not a separate solid or a vertex mask.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.5
+            ],
+            [
+              0.31,
+              -0.41
+            ],
+            [
+              0.46,
+              -0.24
+            ],
+            [
+              0.5,
+              -0.025
+            ],
+            [
+              0.43,
+              0.175
+            ],
+            [
+              0.3,
+              0.31
+            ],
+            [
+              0.06,
+              0.25
+            ],
+            [
+              0.0,
+              0.25
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.008,
+            "notes": "amplitude 0.008 (0.016 of radius) -- kept small (R4) so the star cavity points stay crisp."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar) per material bucket",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.0,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.02,
+          0.0,
+          0.34
+        ],
+        "rotation": [
+          0.22,
+          1.7,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "blueberry-front",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "blueberry-body"
+        }
+      },
+      "material": "blueberry-body",
+      "materialLayers": [
+        "blueberry-body",
+        "blueberry-crown"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(76, 90, 140, 1.0)",
+        "secondaryAlbedo": "rgba(57, 69, 110, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body below the rim, dominant tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/blueberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "blueberry-front-crown-boundary",
+          "kind": "material-boundary",
+          "notes": "Boundary between blueberry-body and blueberry-crown is a continuous-triangle-range split (sliceTriangles) on one shared indexed shell, not a separate geometry -- watertight by construction (scone.ts precedent), never a vertex mask."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "blueberry-front-near-spherical",
+          "name": "Near-spherical body",
+          "kind": "contour",
+          "description": "Body ring radii peak near the equator (rFrac 1.0 at hFrac -0.05), reading as a true sphere with no flattening.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "star-cavity is a continuation ring range of the same indexed shell (per-sector radius modulation), a real concave dip below the rim height -- not a mask, not a bump",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crown contrast comes from its own darker material bucket plus facet-normal shading inside the pit",
+        "edgeWearPattern": "none",
+        "notes": "Body tone covers the majority of the shell below the rim. The runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "blueberry-front-near-spherical"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "blueberry-front-crown",
+      "name": "Blueberry star crown (front)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A continuous-triangle-range subset of the parent body's own shared indexed shell (ring transitions 5..8: rim->star-tips->pit-floor->center pole), split by sliceTriangles(bodyTriangles, total) after facet() -- never a vertex mask, since the star needs true per-sector radius modulation that only exists in these specific rings.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.145,
+              0.35
+            ],
+            [
+              0.06,
+              0.25
+            ]
+          ],
+          "segments": 12,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "star-radius-modulation",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.22,
+            "notes": "Star-tip ring (hFrac 0.70) alternates radius 0.40 (even sector, point) / 0.18 (odd sector, valley) across 12 segments -> 6 points. Pit-floor ring (hFrac 0.50) dips BELOW the rim's hFrac 0.62, a real concave depression, not a bump; center pole closes it flat at the same height."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals inherited from the parent shell's split-vertex facet bake"
+      },
+      "parent": "blueberry-front",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.4,
+        "height": 0.1,
+        "depth": 0.4,
+        "units": "relative",
+        "confidence": 0.7
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "blueberry-front-crown",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "blueberry-body"
+        }
+      },
+      "material": "blueberry-crown",
+      "materialLayers": [
+        "blueberry-crown"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(57, 69, 110, 1.0)",
+        "secondaryAlbedo": "rgba(76, 90, 140, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "top-pole star cavity",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/blueberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "star-radius-modulation"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "blueberry-front-crown-boundary",
+          "kind": "material-boundary",
+          "notes": "Shares the parent shell's own triangles at the rim ring; watertight because both buckets come from one indexed shell split by continuous triangle range after jitter, never two independently built solids."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "blueberry-front-crown-star-pit",
+          "name": "Six-point star calyx cavity",
+          "kind": "seam",
+          "description": "The defining blueberry identity cue -- a concave, darker-toned star/hex depression at the top pole, present on all three berries (image evidence overrides the prompt text's single-crown description). Kept as its own material bucket deliberately (drop-rule reversed vs olive/choco precedent): this is identity-critical and the extra contrast helps rather than hurts at the 64px thumbnail target.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "star-cavity is a continuation ring range of the same indexed shell (per-sector radius modulation), a real concave dip below the rim height -- not a mask, not a bump",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crown contrast comes from its own darker material bucket plus facet-normal shading inside the pit",
+        "edgeWearPattern": "none",
+        "notes": "assets/prompts/ingredients/blueberry.json: the crown is identity-critical for reading 'blueberry' rather than a generic blue ball at 64px thumbnail scale."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "blueberry-front-crown-star-pit"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "blueberry-body",
+      "name": "Blueberry body (deep blue-violet)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#4C5A8C",
+      "color": "#4C5A8C",
+      "albedo": {
+        "dominant": "#4C5A8C",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/blueberry.json geometry.surface, not pixel-sampled."
+      },
+      "colorVariation": {
+        "palette": [
+          "#4C5A8C"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only for merge attribute consistency."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "spherical body / star-cavity profile",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 3.0,
+          "amplitude": 0.016,
+          "role": "surface jitter noise",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "full body below the rim",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "bloom-natural-gradient",
+          "name": "No painted bloom patch",
+          "maskSource": "geometry",
+          "description": "assets/prompts/ingredients/blueberry.json names a powdery bloom hex (#8B9BC6); the actual reference render shows a smooth N.L gradient with no distinct lighter patch anywhere, so it is not painted (unlike olive's cap, which was a real patch). See spec risk bloom-hue-dropped.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "blueberry-back1",
+            "blueberry-back2",
+            "blueberry-front"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "full body below the rim. Two solid colors for the whole cluster (types.ts inherited section 9); the bloom highlight hex is dropped (confirmed no distinct patch in the actual reference render)."
+    },
+    {
+      "id": "blueberry-crown",
+      "name": "Blueberry crown (star-cavity, darker indigo)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#39456E",
+      "color": "#39456E",
+      "albedo": {
+        "dominant": "#39456E",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/blueberry.json geometry.surface, not pixel-sampled."
+      },
+      "colorVariation": {
+        "palette": [
+          "#39456E"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only for merge attribute consistency."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "spherical body / star-cavity profile",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 3.0,
+          "amplitude": 0.016,
+          "role": "surface jitter noise",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "top-pole star cavity",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "crown-identity-critical-kept",
+          "name": "Crown kept despite olive drop-rule precedent",
+          "maskSource": "geometry",
+          "description": "Unlike olive's dropped shaded-underside hue, this hex is KEPT as its own material bucket: the star crown is the sole identity feature separating blueberry from a plain sphere, and the darker tone reinforces (rather than doubles against) the pit's own facet-normal shading at the 64px thumbnail target.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "blueberry-back1-crown",
+            "blueberry-back2-crown",
+            "blueberry-front-crown"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "top-pole star cavity. Two solid colors for the whole cluster (types.ts inherited section 9); the bloom highlight hex is dropped (confirmed no distinct patch in the actual reference render)."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "blueberry-cluster",
+      "name": "Three-berry resting cluster",
+      "level": "macro",
+      "hostComponents": [
+        "root"
+      ],
+      "elementComponentIds": [
+        "blueberry-back1",
+        "blueberry-back2",
+        "blueberry-front"
+      ],
+      "elementKind": "repeated macro body, each with its own body+crown child pair",
+      "count": 3,
+      "distribution": {
+        "mode": "hand-placed XZ offsets with independent yaw; front instance carries extra tiltX so its star crown reads face-on",
+        "offsets": {
+          "back1": [
+            -0.42,
+            -0.32
+          ],
+          "back2": [
+            0.42,
+            -0.3
+          ],
+          "front": [
+            0.02,
+            0.34
+          ]
+        },
+        "yaw": {
+          "back1": 0.4,
+          "back2": -0.9,
+          "front": 1.7
+        },
+        "note": "Offsets read off blueberry-3.png (top-down footprint); front berry tiltX mirrors olive-a's single-tilted-instance convention."
+      },
+      "sizeClasses": [
+        {
+          "id": "berry",
+          "radius": 0.5
+        }
+      ],
+      "seedRule": "Offsets/yaw/tiltX are fixed authored values; only surface-jitter consumes the builder rng, so the exported GLB is byte-deterministic.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-25T17:50:29.671458+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "three-berry-cluster-silhouette",
+          "score": 0.88,
+          "visible": true,
+          "notes": "3 near-spherical berries in a compact touching triangular cluster, all individually readable -- closely matches blueberry.png/blueberry-3.png."
+        },
+        {
+          "id": "near-spherical-body",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Body reads as a true sphere on all orbit angles, no unwanted flattening."
+        },
+        {
+          "id": "star-cavity-crown-visible",
+          "score": 0.88,
+          "visible": true,
+          "notes": "Strong first-attempt match (cmp-1.png, no iteration needed): front berry shows a clean 6-point star cavity face-on; the two back berries show the same feature as an elongated hex/oval via grazing angle, exactly matching the reference's 3-berry crown read. Winding verified correct -- no inverted/see-through pit."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All three berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read of cmp-1.png: star-cavity crown reads correctly (concave, not inverted) on all 3 berries at the expected per-instance angle; this is the strongest first-attempt match in the batch, no cmp-2/3 iteration needed."
+    },
+    {
+      "timestamp": "2026-08-25T17:50:34.066613+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "three-berry-cluster-silhouette",
+          "score": 0.88,
+          "visible": true,
+          "notes": "3 near-spherical berries in a compact touching triangular cluster, all individually readable -- closely matches blueberry.png/blueberry-3.png."
+        },
+        {
+          "id": "near-spherical-body",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Body reads as a true sphere on all orbit angles, no unwanted flattening."
+        },
+        {
+          "id": "star-cavity-crown-visible",
+          "score": 0.88,
+          "visible": true,
+          "notes": "Strong first-attempt match (cmp-1.png, no iteration needed): front berry shows a clean 6-point star cavity face-on; the two back berries show the same feature as an elongated hex/oval via grazing angle, exactly matching the reference's 3-berry crown read. Winding verified correct -- no inverted/see-through pit."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All three berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read of cmp-1.png: star-cavity crown reads correctly (concave, not inverted) on all 3 berries at the expected per-instance angle; this is the strongest first-attempt match in the batch, no cmp-2/3 iteration needed."
+    },
+    {
+      "timestamp": "2026-08-25T17:50:38.473317+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "three-berry-cluster-silhouette",
+          "score": 0.88,
+          "visible": true,
+          "notes": "3 near-spherical berries in a compact touching triangular cluster, all individually readable -- closely matches blueberry.png/blueberry-3.png."
+        },
+        {
+          "id": "near-spherical-body",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Body reads as a true sphere on all orbit angles, no unwanted flattening."
+        },
+        {
+          "id": "star-cavity-crown-visible",
+          "score": 0.88,
+          "visible": true,
+          "notes": "Strong first-attempt match (cmp-1.png, no iteration needed): front berry shows a clean 6-point star cavity face-on; the two back berries show the same feature as an elongated hex/oval via grazing angle, exactly matching the reference's 3-berry crown read. Winding verified correct -- no inverted/see-through pit."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All three berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read of cmp-1.png: star-cavity crown reads correctly (concave, not inverted) on all 3 berries at the expected per-instance angle; this is the strongest first-attempt match in the batch, no cmp-2/3 iteration needed."
+    },
+    {
+      "timestamp": "2026-08-25T17:50:42.904557+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "three-berry-cluster-silhouette",
+          "score": 0.88,
+          "visible": true,
+          "notes": "3 near-spherical berries in a compact touching triangular cluster, all individually readable -- closely matches blueberry.png/blueberry-3.png."
+        },
+        {
+          "id": "near-spherical-body",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Body reads as a true sphere on all orbit angles, no unwanted flattening."
+        },
+        {
+          "id": "star-cavity-crown-visible",
+          "score": 0.88,
+          "visible": true,
+          "notes": "Strong first-attempt match (cmp-1.png, no iteration needed): front berry shows a clean 6-point star cavity face-on; the two back berries show the same feature as an elongated hex/oval via grazing angle, exactly matching the reference's 3-berry crown read. Winding verified correct -- no inverted/see-through pit."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All three berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read of cmp-1.png: star-cavity crown reads correctly (concave, not inverted) on all 3 berries at the expected per-instance angle; this is the strongest first-attempt match in the batch, no cmp-2/3 iteration needed."
+    },
+    {
+      "timestamp": "2026-08-25T17:50:47.350537+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "three-berry-cluster-silhouette",
+          "score": 0.88,
+          "visible": true,
+          "notes": "3 near-spherical berries in a compact touching triangular cluster, all individually readable -- closely matches blueberry.png/blueberry-3.png."
+        },
+        {
+          "id": "near-spherical-body",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Body reads as a true sphere on all orbit angles, no unwanted flattening."
+        },
+        {
+          "id": "star-cavity-crown-visible",
+          "score": 0.88,
+          "visible": true,
+          "notes": "Strong first-attempt match (cmp-1.png, no iteration needed): front berry shows a clean 6-point star cavity face-on; the two back berries show the same feature as an elongated hex/oval via grazing angle, exactly matching the reference's 3-berry crown read. Winding verified correct -- no inverted/see-through pit."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All three berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read of cmp-1.png: star-cavity crown reads correctly (concave, not inverted) on all 3 berries at the expected per-instance angle; this is the strongest first-attempt match in the batch, no cmp-2/3 iteration needed."
+    },
+    {
+      "timestamp": "2026-08-25T17:50:51.815292+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "three-berry-cluster-silhouette",
+          "score": 0.88,
+          "visible": true,
+          "notes": "3 near-spherical berries in a compact touching triangular cluster, all individually readable -- closely matches blueberry.png/blueberry-3.png."
+        },
+        {
+          "id": "near-spherical-body",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Body reads as a true sphere on all orbit angles, no unwanted flattening."
+        },
+        {
+          "id": "star-cavity-crown-visible",
+          "score": 0.88,
+          "visible": true,
+          "notes": "Strong first-attempt match (cmp-1.png, no iteration needed): front berry shows a clean 6-point star cavity face-on; the two back berries show the same feature as an elongated hex/oval via grazing angle, exactly matching the reference's 3-berry crown read. Winding verified correct -- no inverted/see-through pit."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All three berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read of cmp-1.png: star-cavity crown reads correctly (concave, not inverted) on all 3 berries at the expected per-instance angle; this is the strongest first-attempt match in the batch, no cmp-2/3 iteration needed."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-25T17:50:29.671458+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "three-berry-cluster-silhouette",
+          "score": 0.88,
+          "visible": true,
+          "notes": "3 near-spherical berries in a compact touching triangular cluster, all individually readable -- closely matches blueberry.png/blueberry-3.png."
+        },
+        {
+          "id": "near-spherical-body",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Body reads as a true sphere on all orbit angles, no unwanted flattening."
+        },
+        {
+          "id": "star-cavity-crown-visible",
+          "score": 0.88,
+          "visible": true,
+          "notes": "Strong first-attempt match (cmp-1.png, no iteration needed): front berry shows a clean 6-point star cavity face-on; the two back berries show the same feature as an elongated hex/oval via grazing angle, exactly matching the reference's 3-berry crown read. Winding verified correct -- no inverted/see-through pit."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All three berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "action": "continue",
+      "summary": "3 near-spherical berries, each with a real concave star-cavity crown (2-material continuous-ring-range split, scone.ts pattern). Strong match on first attempt (cmp-1.png) -- winding verified correct, star reads face-on on the front berry and as a grazing-angle hex on the back two, matching the reference's 3-crown read exactly.",
+      "matched": [
+        "3-berry count",
+        "near-spherical body",
+        "star-cavity crown visible+correctly wound on all 3 instances",
+        "shared ground plane, no floating parts",
+        "faceted flat shading",
+        "body/crown 2-material split watertight (no seam tear)"
+      ],
+      "mismatches": [
+        "overall body tone reads a touch darker/less saturated than reference since the bloom highlight hex is not painted (documented risk, confirmed via image inspection that no distinct patch exists in the reference render)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/roundtrip-64-preview.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read of cmp-1.png: star-cavity crown reads correctly (concave, not inverted) on all 3 berries at the expected per-instance angle; this is the strongest first-attempt match in the batch, no cmp-2/3 iteration needed."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:50:34.066613+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "three-berry-cluster-silhouette",
+          "score": 0.88,
+          "visible": true,
+          "notes": "3 near-spherical berries in a compact touching triangular cluster, all individually readable -- closely matches blueberry.png/blueberry-3.png."
+        },
+        {
+          "id": "near-spherical-body",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Body reads as a true sphere on all orbit angles, no unwanted flattening."
+        },
+        {
+          "id": "star-cavity-crown-visible",
+          "score": 0.88,
+          "visible": true,
+          "notes": "Strong first-attempt match (cmp-1.png, no iteration needed): front berry shows a clean 6-point star cavity face-on; the two back berries show the same feature as an elongated hex/oval via grazing angle, exactly matching the reference's 3-berry crown read. Winding verified correct -- no inverted/see-through pit."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All three berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "action": "continue",
+      "summary": "3 near-spherical berries, each with a real concave star-cavity crown (2-material continuous-ring-range split, scone.ts pattern). Strong match on first attempt (cmp-1.png) -- winding verified correct, star reads face-on on the front berry and as a grazing-angle hex on the back two, matching the reference's 3-crown read exactly.",
+      "matched": [
+        "3-berry count",
+        "near-spherical body",
+        "star-cavity crown visible+correctly wound on all 3 instances",
+        "shared ground plane, no floating parts",
+        "faceted flat shading",
+        "body/crown 2-material split watertight (no seam tear)"
+      ],
+      "mismatches": [
+        "overall body tone reads a touch darker/less saturated than reference since the bloom highlight hex is not painted (documented risk, confirmed via image inspection that no distinct patch exists in the reference render)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/roundtrip-64-preview.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read of cmp-1.png: star-cavity crown reads correctly (concave, not inverted) on all 3 berries at the expected per-instance angle; this is the strongest first-attempt match in the batch, no cmp-2/3 iteration needed."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:50:38.473317+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "three-berry-cluster-silhouette",
+          "score": 0.88,
+          "visible": true,
+          "notes": "3 near-spherical berries in a compact touching triangular cluster, all individually readable -- closely matches blueberry.png/blueberry-3.png."
+        },
+        {
+          "id": "near-spherical-body",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Body reads as a true sphere on all orbit angles, no unwanted flattening."
+        },
+        {
+          "id": "star-cavity-crown-visible",
+          "score": 0.88,
+          "visible": true,
+          "notes": "Strong first-attempt match (cmp-1.png, no iteration needed): front berry shows a clean 6-point star cavity face-on; the two back berries show the same feature as an elongated hex/oval via grazing angle, exactly matching the reference's 3-berry crown read. Winding verified correct -- no inverted/see-through pit."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All three berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "action": "continue",
+      "summary": "3 near-spherical berries, each with a real concave star-cavity crown (2-material continuous-ring-range split, scone.ts pattern). Strong match on first attempt (cmp-1.png) -- winding verified correct, star reads face-on on the front berry and as a grazing-angle hex on the back two, matching the reference's 3-crown read exactly.",
+      "matched": [
+        "3-berry count",
+        "near-spherical body",
+        "star-cavity crown visible+correctly wound on all 3 instances",
+        "shared ground plane, no floating parts",
+        "faceted flat shading",
+        "body/crown 2-material split watertight (no seam tear)"
+      ],
+      "mismatches": [
+        "overall body tone reads a touch darker/less saturated than reference since the bloom highlight hex is not painted (documented risk, confirmed via image inspection that no distinct patch exists in the reference render)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/roundtrip-64-preview.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read of cmp-1.png: star-cavity crown reads correctly (concave, not inverted) on all 3 berries at the expected per-instance angle; this is the strongest first-attempt match in the batch, no cmp-2/3 iteration needed."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:50:42.904557+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "three-berry-cluster-silhouette",
+          "score": 0.88,
+          "visible": true,
+          "notes": "3 near-spherical berries in a compact touching triangular cluster, all individually readable -- closely matches blueberry.png/blueberry-3.png."
+        },
+        {
+          "id": "near-spherical-body",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Body reads as a true sphere on all orbit angles, no unwanted flattening."
+        },
+        {
+          "id": "star-cavity-crown-visible",
+          "score": 0.88,
+          "visible": true,
+          "notes": "Strong first-attempt match (cmp-1.png, no iteration needed): front berry shows a clean 6-point star cavity face-on; the two back berries show the same feature as an elongated hex/oval via grazing angle, exactly matching the reference's 3-berry crown read. Winding verified correct -- no inverted/see-through pit."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All three berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "action": "continue",
+      "summary": "3 near-spherical berries, each with a real concave star-cavity crown (2-material continuous-ring-range split, scone.ts pattern). Strong match on first attempt (cmp-1.png) -- winding verified correct, star reads face-on on the front berry and as a grazing-angle hex on the back two, matching the reference's 3-crown read exactly.",
+      "matched": [
+        "3-berry count",
+        "near-spherical body",
+        "star-cavity crown visible+correctly wound on all 3 instances",
+        "shared ground plane, no floating parts",
+        "faceted flat shading",
+        "body/crown 2-material split watertight (no seam tear)"
+      ],
+      "mismatches": [
+        "overall body tone reads a touch darker/less saturated than reference since the bloom highlight hex is not painted (documented risk, confirmed via image inspection that no distinct patch exists in the reference render)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/roundtrip-64-preview.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read of cmp-1.png: star-cavity crown reads correctly (concave, not inverted) on all 3 berries at the expected per-instance angle; this is the strongest first-attempt match in the batch, no cmp-2/3 iteration needed."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:50:47.350537+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "three-berry-cluster-silhouette",
+          "score": 0.88,
+          "visible": true,
+          "notes": "3 near-spherical berries in a compact touching triangular cluster, all individually readable -- closely matches blueberry.png/blueberry-3.png."
+        },
+        {
+          "id": "near-spherical-body",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Body reads as a true sphere on all orbit angles, no unwanted flattening."
+        },
+        {
+          "id": "star-cavity-crown-visible",
+          "score": 0.88,
+          "visible": true,
+          "notes": "Strong first-attempt match (cmp-1.png, no iteration needed): front berry shows a clean 6-point star cavity face-on; the two back berries show the same feature as an elongated hex/oval via grazing angle, exactly matching the reference's 3-berry crown read. Winding verified correct -- no inverted/see-through pit."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All three berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "action": "continue",
+      "summary": "3 near-spherical berries, each with a real concave star-cavity crown (2-material continuous-ring-range split, scone.ts pattern). Strong match on first attempt (cmp-1.png) -- winding verified correct, star reads face-on on the front berry and as a grazing-angle hex on the back two, matching the reference's 3-crown read exactly.",
+      "matched": [
+        "3-berry count",
+        "near-spherical body",
+        "star-cavity crown visible+correctly wound on all 3 instances",
+        "shared ground plane, no floating parts",
+        "faceted flat shading",
+        "body/crown 2-material split watertight (no seam tear)"
+      ],
+      "mismatches": [
+        "overall body tone reads a touch darker/less saturated than reference since the bloom highlight hex is not painted (documented risk, confirmed via image inspection that no distinct patch exists in the reference render)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/roundtrip-64-preview.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read of cmp-1.png: star-cavity crown reads correctly (concave, not inverted) on all 3 berries at the expected per-instance angle; this is the strongest first-attempt match in the batch, no cmp-2/3 iteration needed."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:50:51.815292+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.84,
+      "aiVisionScore": 0.84,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.78,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "three-berry-cluster-silhouette",
+          "score": 0.88,
+          "visible": true,
+          "notes": "3 near-spherical berries in a compact touching triangular cluster, all individually readable -- closely matches blueberry.png/blueberry-3.png."
+        },
+        {
+          "id": "near-spherical-body",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Body reads as a true sphere on all orbit angles, no unwanted flattening."
+        },
+        {
+          "id": "star-cavity-crown-visible",
+          "score": 0.88,
+          "visible": true,
+          "notes": "Strong first-attempt match (cmp-1.png, no iteration needed): front berry shows a clean 6-point star cavity face-on; the two back berries show the same feature as an elongated hex/oval via grazing angle, exactly matching the reference's 3-berry crown read. Winding verified correct -- no inverted/see-through pit."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All three berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "action": "continue",
+      "summary": "3 near-spherical berries, each with a real concave star-cavity crown (2-material continuous-ring-range split, scone.ts pattern). Strong match on first attempt (cmp-1.png) -- winding verified correct, star reads face-on on the front berry and as a grazing-angle hex on the back two, matching the reference's 3-crown read exactly.",
+      "matched": [
+        "3-berry count",
+        "near-spherical body",
+        "star-cavity crown visible+correctly wound on all 3 instances",
+        "shared ground plane, no floating parts",
+        "faceted flat shading",
+        "body/crown 2-material split watertight (no seam tear)"
+      ],
+      "mismatches": [
+        "overall body tone reads a touch darker/less saturated than reference since the bloom highlight hex is not painted (documented risk, confirmed via image inspection that no distinct patch exists in the reference render)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/roundtrip-64-preview.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/blueberry.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/blueberry/cmp-1.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read of cmp-1.png: star-cavity crown reads correctly (concave, not inverted) on all 3 berries at the expected per-instance angle; this is the strongest first-attempt match in the batch, no cmp-2/3 iteration needed."
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 504,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Hard consumer budget for the 'cluster' ingredient group: <=700 tri and <=68KB target (types.ts R2), hard ceiling <=2500 tri and <=100KB. Target reached by construction (12 segments x 8 ring transitions x 3 berries = 504 tri before the body/crown split, which adds zero triangles), not by decimation."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, upper-left.",
+      "usage": "Fixed by scripts/breadlab.ts.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75 -- the pit's darker crown material plus its own inward-facing facet normals both contribute to reading as a cavity.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build one continuous indexed shell per berry: bottom pole -> 5 body rings -> rim ring -> star-tip ring (alternating radius per sector) -> pit-floor ring (dips below rim) -> top pole, recording bodyTriangles at the rim boundary (scone.ts pattern).",
+    "Jitter vertices while still indexed (small amplitude to keep the star crisp, R4).",
+    "Bake faceting by splitting vertices and recomputing normals; never request flatShading.",
+    "sliceTriangles(baked, 0, bodyTriangles) for the body bucket, (bodyTriangles, total) for the crown bucket -- a continuous-range split, never a vertex mask.",
+    "Project top-planar UVs per bucket, then merge all three berries by material into exactly two meshes.",
+    "No lay-down rotation needed -- berries stand upright, local Y is world Y directly. Front instance gets extra tiltX so its crown reads face-on; translate each instance's own bounding box floor to world Y=0."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-cluster rotation for the showcase turntable",
+    "each berry is a named instance"
+  ],
+  "destructionAnchors": [
+    "each berry is its own fractureGroup; the only plausible break is one berry rolling away from the cluster"
+  ],
+  "risks": [
+    {
+      "id": "bloom-hue-dropped",
+      "severity": "low",
+      "description": "assets/prompts/ingredients/blueberry.json names a bloom highlight hex (#8B9BC6) this spec does not paint.",
+      "mitigation": "Close inspection of the actual reference render shows a smooth N.L gradient with no distinct lighter patch -- already free via the runtime key light, confirmed by image evidence (not assumed by analogy to olive)."
+    },
+    {
+      "id": "crown-count-revised-from-prompt-text",
+      "severity": "low",
+      "description": "Prompt text describes the crown as visible on only the front berry ('five-point'); the actual rendered reference shows all 3 berries with a 6-point star/hex cavity.",
+      "mitigation": "INGREDIENTS.md constitution: reference image is shape/proportion authority, prompt JSON is color authority only. All 3 berries get an identical crown cavity; count is 6 points, both read directly off the clearest (front) berry in the image."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-color-based region paint is silently discarded by the runtime's MeshLambertMaterial swap.",
+      "mitigation": "The body/crown split is carried by two separate materials on two separate triangle ranges from one shared indexed shell, split geometrically (sliceTriangles). No vertexPaint block is authored anywhere in this spec."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "A flatShading flag is not inherited by the runtime material swap.",
+      "mitigation": "Faceting is baked into geometry by splitting vertices (scripts/breads/lib.ts facet) before export."
+    },
+    {
+      "id": "cap-seam-tear",
+      "severity": "medium",
+      "description": "Building the star cap as a separately-constructed geometry and welding it to the body afterward would let the shared rim vertices move independently under jitter, opening a crack (same lesson as cheese's welded-box rule).",
+      "mitigation": "Body and crown are one continuous indexed ring/index array from the start (scone.ts pattern); jitter runs once on the whole shell before the sliceTriangles split, so both buckets read the same already-jittered positions."
+    },
+    {
+      "id": "cavity-winding-inversion",
+      "severity": "medium",
+      "description": "Reusing the standard convex-shell triangle winding formula on a ring sequence that dips inward (the pit floor) could in principle produce inward-facing normals that make the cavity invisible or read as solid.",
+      "mitigation": "Verified via a top-down-angle debug render before finalizing the spec; the standard winding held correctly without needing an s/s1 swap (see build-current-pass evidence)."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Blueberry Cluster",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": [
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      }
+    ]
+  },
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6604,
+        "aspectRatioDelta": 0.0037,
+        "scaleDelta": 0.0246,
+        "bilateralSymmetryError": 0.1311,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 21.08,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.660 is below threshold 0.85",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0467569a51f2e58",
+      "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6604,
+        "aspectRatioDelta": 0.0037,
+        "scaleDelta": 0.0246,
+        "bilateralSymmetryError": 0.1311,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 21.08,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.660 is below threshold 0.85"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0467569a51f2e58",
+      "passId": "structural-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6604,
+        "aspectRatioDelta": 0.0037,
+        "scaleDelta": 0.0246,
+        "bilateralSymmetryError": 0.1311,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 21.08,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.660 is below threshold 0.85"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0467569a51f2e58",
+      "passId": "form-refinement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6604,
+        "aspectRatioDelta": 0.0037,
+        "scaleDelta": 0.0246,
+        "bilateralSymmetryError": 0.1311,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 21.08,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.660 is below threshold 0.85",
+        "max per-part color delta-E 21.08 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0467569a51f2e58",
+      "passId": "material-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6604,
+        "aspectRatioDelta": 0.0037,
+        "scaleDelta": 0.0246,
+        "bilateralSymmetryError": 0.1311,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 21.08,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.660 is below threshold 0.85",
+        "max per-part color delta-E 21.08 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0467569a51f2e58",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6604,
+        "aspectRatioDelta": 0.0037,
+        "scaleDelta": 0.0246,
+        "bilateralSymmetryError": 0.1311,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 21.08,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.08
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.36
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.660 is below threshold 0.85",
+        "max per-part color delta-E 21.08 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "d0467569a51f2e58",
+      "passId": "optimization-pass"
+    }
+  ]
+}

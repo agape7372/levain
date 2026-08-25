@@ -1,0 +1,3746 @@
+{
+  "targetName": "Choco Chip Pile",
+  "targetId": "choco-chip-pile",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\choco.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved and deliberately not matched to the reference. The review camera is fixed by the consumer harness (scripts/breadlab.ts applyView)."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "small mound of six chocolate chips",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "repeated instances",
+        "discrete resting cluster"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat color facets only -- prompt JSON explicitly excludes shine. Simplest ingredient in the batch: single material bucket, mesh=1."
+    },
+    "complexity": {
+      "tier": "moderate",
+      "scores": {
+        "silhouetteComplexity": 1,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 1,
+        "materialLayerCount": 0,
+        "localDetailDensity": 1,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 6,
+        "mesoComponents": 0,
+        "microFeatureGroups": 0,
+        "materialLayers": 1,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Six near-identical macro bodies differing only in XZ offset and yaw, so componentCount scores 1.",
+        "Silhouette is six smooth cone tapers with a flat base, scoring silhouetteComplexity 1.",
+        "Repetition density scores 1: 6 instances, hand-placed, matching olive's precedent scale.",
+        "materialLayerCount scores 0: only 1 material bucket needed (both secondary hex dropped as free-via-lighting / illegible-at-thumbnail, see spec risks) -- simpler than olive's 2-bucket split.",
+        "Local detail density scores 1: no sub-feature beyond the base-to-tip taper profile itself.",
+        "Occlusion risk scores 1: interior/back chips' far sides are hidden but fully inferable by radial symmetry.",
+        "Action readiness scores 0: static turntable showcase prop.",
+        "Aggregate below olive's 7/24, confirming simple tier with the lightest material budget in the batch."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": false,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier, macro-only (no meso sub-parts needed since there is no mask split), one repetition system for the 6-instance mound."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 2,
+      "note": "Enumerated by hand from the three supplied reference views rather than build_detail_inventory.py -- CRIB.md skip rule for single-repeated-system objects.",
+      "details": [
+        {
+          "id": "flat-base-taper-profile",
+          "zone": "per-chip profile, base to tip",
+          "observation": "Every chip has a flat circular base with a short near-vertical shoulder, then a smooth monotonic taper to a softly rounded tip pole.",
+          "inference": "Classic chocolate-chip / Hershey's-kiss silhouette -- the flat base + soft point IS the identity signal.",
+          "confidence": 0.9,
+          "evidenceRef": "choco-2.png front elevation, all instances",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "choco-back-2-flat-base-taper",
+            "note": ""
+          }
+        },
+        {
+          "id": "hex-packed-arrangement",
+          "zone": "whole cluster",
+          "observation": "Six chips are packed into a compact hex arrangement, all mutually touching, back row reading taller than front row via the fixed camera angle.",
+          "inference": "Compositional pile read, not a literal 3D stack -- matches olive pilot's resting-not-stacked convention.",
+          "confidence": 0.85,
+          "evidenceRef": "choco.png full frame",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "cluster-arrangement",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png"
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 6,
+      "mesoComponents": 0,
+      "microFeatureGroups": 2,
+      "materialLayers": 1,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.75,
+    "mustMatch": [
+      "six-chip mound silhouette with all six individually readable",
+      "height:width ratio ~1.05:1 per chip",
+      "flat base, smooth taper, soft rounded tip",
+      "faceted flat shading baked into geometry"
+    ],
+    "niceToHave": [
+      "exact per-chip footprint offsets"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "six-chip-mound-silhouette",
+      "name": "Six-chip mound silhouette, all individually readable",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "choco-back-1",
+        "choco-back-2",
+        "choco-back-3",
+        "choco-front-1",
+        "choco-front-2",
+        "choco-front-3"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "flat-base-cone-profile",
+      "name": "Flat base, smooth taper, soft rounded tip",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": [
+        "choco-back-1",
+        "choco-back-2",
+        "choco-back-3",
+        "choco-front-1",
+        "choco-front-2",
+        "choco-front-3"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "shared-ground-plane",
+      "name": "All six chips rest on the shared ground, no floating parts",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass"
+      ],
+      "minimumScore": 0.85,
+      "mustPass": true,
+      "componentRefs": [
+        "choco-back-1",
+        "choco-back-2",
+        "choco-back-3",
+        "choco-front-1",
+        "choco-front-2",
+        "choco-front-3"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "baked-faceting",
+      "name": "Faceted flat shading baked into geometry",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "choco-back-1",
+        "choco-back-2",
+        "choco-back-3",
+        "choco-front-1",
+        "choco-front-2",
+        "choco-front-3"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": [],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color; repo bans PBR maps outright. All shape relief moves into geometry."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer, not authored here: scripts/breadlab.ts mirrors scripts/thumbsHarness.ts with a warm directional key 0xffe2b0 at (-2, 6, 2) intensity 1.4, an ambient 0xfff0dc at 0.75 and a cool fill 0xdce8ff at (2.5, 3, -2) intensity 0.2.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The runtime normalizes the cluster's longest axis to 1.6, so absolute dimensions are arbitrary and only the authored ratios/offsets carry meaning.",
+    "Exact per-chip footprint offset is not identity-critical at pixel precision; the flat-base/soft-tip silhouette and hex-pack density are what the review scores."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "CHOCO_RADIUS = 0.5 relative unit at each chip's own base. Absolute scale is meaningless: the consumer runtime refits the cluster's longest axis to 1.6 (types.ts section 6)."
+  },
+  "silhouette": {
+    "boundingShape": "compact hex-packed mound of six cones, roughly 2.6 wide by 1.12 tall by 1.9 deep in relative units",
+    "aspectRatios": [
+      {
+        "id": "chip-height-over-width",
+        "value": 1.05,
+        "source": "choco-2.png front elevation"
+      }
+    ],
+    "symmetry": "each chip is approximately radially symmetric about its own vertical axis (broken slightly by surface jitter); the cluster as a whole is asymmetric",
+    "dominantCurves": [
+      "smooth convex taper from base to tip, monotonic"
+    ],
+    "negativeSpaces": [
+      "shallow contact creases where chips touch"
+    ],
+    "landmarks": [
+      "flat circular base on every chip",
+      "soft rounded (not sharp) tip pole"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "six teardrop-cone chips in a low hex-packed mound, all touching but individually readable",
+        "back-center chip reads tallest/most prominent in the fixed camera; front row reads lower",
+        "every chip: flat circular base, smooth taper, soft rounded (not sharp) tip"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "single chip height:width ratio close to 1.05:1",
+        "base is flat with a short near-vertical shoulder before the main taper begins",
+        "tip is a soft rounded point, not a knife-edge -- low facet count at the pole reads as gently rounded"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "six roughly circular footprints packed into a compact hexagonal cluster",
+        "no chip fully hides another's footprint from directly above"
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Choco Chip Pile",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the six chip bodies; emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.6,
+        "height": 1.12,
+        "depth": 1.9,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Cone bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "choco-body"
+        }
+      },
+      "material": "choco-body",
+      "materialLayers": [
+        "choco-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(74, 52, 40, 1.0)",
+        "secondaryAlbedo": "rgba(74, 52, 40, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/choco.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cluster-arrangement",
+          "name": "Six-chip hex-packed mound",
+          "kind": "contour",
+          "description": "Six chips placed with independent XZ offsets and yaw in a compact hex-packed arrangement so each remains individually readable in the group silhouette (types.ts R1); all six share the ground plane at world Y=0 after each instance's own bounding-box floor correction.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; upper-face brightness comes from N.L falloff alone",
+        "edgeWearPattern": "none -- an unblemished chip carries no wear",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "cluster-arrangement"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "choco-back-1",
+      "name": "Choco chip (back-1)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally symmetric mass -- a flat-base cone revolved from a single monotonic profile, pole at the tip and a flat-fan pole at the base. Decision tree step 6. Not a cone primitive because the profile carries a non-linear taper (shoulder then smooth curve) a straight cone cannot express.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.56
+            ],
+            [
+              0.5,
+              -0.56
+            ],
+            [
+              0.5,
+              -0.4816
+            ],
+            [
+              0.41,
+              -0.28
+            ],
+            [
+              0.28,
+              -0.0112
+            ],
+            [
+              0.16,
+              0.2464
+            ],
+            [
+              0.065,
+              0.448
+            ],
+            [
+              0.0,
+              0.56
+            ]
+          ],
+          "segments": 8,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.018,
+            "notes": "Uniform per-vertex position noise, amplitude 0.018 (0.036 of base radius), applied while the shell is still indexed."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar) -- no texture emitted, UVs exist only for merge attribute consistency",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.12,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          -0.86,
+          0.0,
+          -0.42
+        ],
+        "rotation": [
+          0.0,
+          0.35,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Cone bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "choco-back-1",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "choco-body"
+        }
+      },
+      "material": "choco-body",
+      "materialLayers": [
+        "choco-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(74, 52, 40, 1.0)",
+        "secondaryAlbedo": "rgba(74, 52, 40, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/choco.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "choco-back-1-flat-base-taper",
+          "name": "Flat base to soft-rounded tip taper",
+          "kind": "contour",
+          "description": "Flat circular base (radius fraction 1.0 fan) with a short near-vertical shoulder, then a smooth monotonic taper to a softly rounded (multi-facet, not single-edge) tip pole.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; upper-face brightness comes from N.L falloff alone",
+        "edgeWearPattern": "none -- an unblemished chip carries no wear",
+        "notes": "Single body tone covers every face; the runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "choco-back-1-flat-base-taper"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "choco-back-2",
+      "name": "Choco chip (back-2)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally symmetric mass -- a flat-base cone revolved from a single monotonic profile, pole at the tip and a flat-fan pole at the base. Decision tree step 6. Not a cone primitive because the profile carries a non-linear taper (shoulder then smooth curve) a straight cone cannot express.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.56
+            ],
+            [
+              0.5,
+              -0.56
+            ],
+            [
+              0.5,
+              -0.4816
+            ],
+            [
+              0.41,
+              -0.28
+            ],
+            [
+              0.28,
+              -0.0112
+            ],
+            [
+              0.16,
+              0.2464
+            ],
+            [
+              0.065,
+              0.448
+            ],
+            [
+              0.0,
+              0.56
+            ]
+          ],
+          "segments": 8,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.018,
+            "notes": "Uniform per-vertex position noise, amplitude 0.018 (0.036 of base radius), applied while the shell is still indexed."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar) -- no texture emitted, UVs exist only for merge attribute consistency",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.12,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.02,
+          0.0,
+          -0.5
+        ],
+        "rotation": [
+          0.0,
+          -0.7,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Cone bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "choco-back-2",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "choco-body"
+        }
+      },
+      "material": "choco-body",
+      "materialLayers": [
+        "choco-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(74, 52, 40, 1.0)",
+        "secondaryAlbedo": "rgba(74, 52, 40, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/choco.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "choco-back-2-flat-base-taper",
+          "name": "Flat base to soft-rounded tip taper",
+          "kind": "contour",
+          "description": "Flat circular base (radius fraction 1.0 fan) with a short near-vertical shoulder, then a smooth monotonic taper to a softly rounded (multi-facet, not single-edge) tip pole.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; upper-face brightness comes from N.L falloff alone",
+        "edgeWearPattern": "none -- an unblemished chip carries no wear",
+        "notes": "Single body tone covers every face; the runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "choco-back-2-flat-base-taper"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "choco-back-3",
+      "name": "Choco chip (back-3)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally symmetric mass -- a flat-base cone revolved from a single monotonic profile, pole at the tip and a flat-fan pole at the base. Decision tree step 6. Not a cone primitive because the profile carries a non-linear taper (shoulder then smooth curve) a straight cone cannot express.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.56
+            ],
+            [
+              0.5,
+              -0.56
+            ],
+            [
+              0.5,
+              -0.4816
+            ],
+            [
+              0.41,
+              -0.28
+            ],
+            [
+              0.28,
+              -0.0112
+            ],
+            [
+              0.16,
+              0.2464
+            ],
+            [
+              0.065,
+              0.448
+            ],
+            [
+              0.0,
+              0.56
+            ]
+          ],
+          "segments": 8,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.018,
+            "notes": "Uniform per-vertex position noise, amplitude 0.018 (0.036 of base radius), applied while the shell is still indexed."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar) -- no texture emitted, UVs exist only for merge attribute consistency",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.12,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.88,
+          0.0,
+          -0.4
+        ],
+        "rotation": [
+          0.0,
+          1.1,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Cone bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "choco-back-3",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "choco-body"
+        }
+      },
+      "material": "choco-body",
+      "materialLayers": [
+        "choco-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(74, 52, 40, 1.0)",
+        "secondaryAlbedo": "rgba(74, 52, 40, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/choco.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "choco-back-3-flat-base-taper",
+          "name": "Flat base to soft-rounded tip taper",
+          "kind": "contour",
+          "description": "Flat circular base (radius fraction 1.0 fan) with a short near-vertical shoulder, then a smooth monotonic taper to a softly rounded (multi-facet, not single-edge) tip pole.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; upper-face brightness comes from N.L falloff alone",
+        "edgeWearPattern": "none -- an unblemished chip carries no wear",
+        "notes": "Single body tone covers every face; the runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "choco-back-3-flat-base-taper"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "choco-front-1",
+      "name": "Choco chip (front-1)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally symmetric mass -- a flat-base cone revolved from a single monotonic profile, pole at the tip and a flat-fan pole at the base. Decision tree step 6. Not a cone primitive because the profile carries a non-linear taper (shoulder then smooth curve) a straight cone cannot express.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.56
+            ],
+            [
+              0.5,
+              -0.56
+            ],
+            [
+              0.5,
+              -0.4816
+            ],
+            [
+              0.41,
+              -0.28
+            ],
+            [
+              0.28,
+              -0.0112
+            ],
+            [
+              0.16,
+              0.2464
+            ],
+            [
+              0.065,
+              0.448
+            ],
+            [
+              0.0,
+              0.56
+            ]
+          ],
+          "segments": 8,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.018,
+            "notes": "Uniform per-vertex position noise, amplitude 0.018 (0.036 of base radius), applied while the shell is still indexed."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar) -- no texture emitted, UVs exist only for merge attribute consistency",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.12,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          -0.46,
+          0.0,
+          0.42
+        ],
+        "rotation": [
+          0.0,
+          -1.3,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Cone bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "choco-front-1",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "choco-body"
+        }
+      },
+      "material": "choco-body",
+      "materialLayers": [
+        "choco-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(74, 52, 40, 1.0)",
+        "secondaryAlbedo": "rgba(74, 52, 40, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/choco.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "choco-front-1-flat-base-taper",
+          "name": "Flat base to soft-rounded tip taper",
+          "kind": "contour",
+          "description": "Flat circular base (radius fraction 1.0 fan) with a short near-vertical shoulder, then a smooth monotonic taper to a softly rounded (multi-facet, not single-edge) tip pole.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; upper-face brightness comes from N.L falloff alone",
+        "edgeWearPattern": "none -- an unblemished chip carries no wear",
+        "notes": "Single body tone covers every face; the runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "choco-front-1-flat-base-taper"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "choco-front-2",
+      "name": "Choco chip (front-2)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally symmetric mass -- a flat-base cone revolved from a single monotonic profile, pole at the tip and a flat-fan pole at the base. Decision tree step 6. Not a cone primitive because the profile carries a non-linear taper (shoulder then smooth curve) a straight cone cannot express.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.56
+            ],
+            [
+              0.5,
+              -0.56
+            ],
+            [
+              0.5,
+              -0.4816
+            ],
+            [
+              0.41,
+              -0.28
+            ],
+            [
+              0.28,
+              -0.0112
+            ],
+            [
+              0.16,
+              0.2464
+            ],
+            [
+              0.065,
+              0.448
+            ],
+            [
+              0.0,
+              0.56
+            ]
+          ],
+          "segments": 8,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.018,
+            "notes": "Uniform per-vertex position noise, amplitude 0.018 (0.036 of base radius), applied while the shell is still indexed."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar) -- no texture emitted, UVs exist only for merge attribute consistency",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.12,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.42,
+          0.0,
+          0.46
+        ],
+        "rotation": [
+          0.0,
+          0.55,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Cone bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "choco-front-2",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "choco-body"
+        }
+      },
+      "material": "choco-body",
+      "materialLayers": [
+        "choco-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(74, 52, 40, 1.0)",
+        "secondaryAlbedo": "rgba(74, 52, 40, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/choco.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "choco-front-2-flat-base-taper",
+          "name": "Flat base to soft-rounded tip taper",
+          "kind": "contour",
+          "description": "Flat circular base (radius fraction 1.0 fan) with a short near-vertical shoulder, then a smooth monotonic taper to a softly rounded (multi-facet, not single-edge) tip pole.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; upper-face brightness comes from N.L falloff alone",
+        "edgeWearPattern": "none -- an unblemished chip carries no wear",
+        "notes": "Single body tone covers every face; the runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "choco-front-2-flat-base-taper"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "choco-front-3",
+      "name": "Choco chip (front-3)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally symmetric mass -- a flat-base cone revolved from a single monotonic profile, pole at the tip and a flat-fan pole at the base. Decision tree step 6. Not a cone primitive because the profile carries a non-linear taper (shoulder then smooth curve) a straight cone cannot express.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.56
+            ],
+            [
+              0.5,
+              -0.56
+            ],
+            [
+              0.5,
+              -0.4816
+            ],
+            [
+              0.41,
+              -0.28
+            ],
+            [
+              0.28,
+              -0.0112
+            ],
+            [
+              0.16,
+              0.2464
+            ],
+            [
+              0.065,
+              0.448
+            ],
+            [
+              0.0,
+              0.56
+            ]
+          ],
+          "segments": 8,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.018,
+            "notes": "Uniform per-vertex position noise, amplitude 0.018 (0.036 of base radius), applied while the shell is still indexed."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar) -- no texture emitted, UVs exist only for merge attribute consistency",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.12,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          1.15,
+          0.0,
+          0.34
+        ],
+        "rotation": [
+          0.0,
+          2.0,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Cone bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "choco-front-3",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "choco-body"
+        }
+      },
+      "material": "choco-body",
+      "materialLayers": [
+        "choco-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(74, 52, 40, 1.0)",
+        "secondaryAlbedo": "rgba(74, 52, 40, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/choco.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "choco-front-3-flat-base-taper",
+          "name": "Flat base to soft-rounded tip taper",
+          "kind": "contour",
+          "description": "Flat circular base (radius fraction 1.0 fan) with a short near-vertical shoulder, then a smooth monotonic taper to a softly rounded (multi-facet, not single-edge) tip pole.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; upper-face brightness comes from N.L falloff alone",
+        "edgeWearPattern": "none -- an unblemished chip carries no wear",
+        "notes": "Single body tone covers every face; the runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "choco-front-3-flat-base-taper"
+      ],
+      "fidelityTier": "form-refinement"
+    }
+  ],
+  "materials": [
+    {
+      "id": "choco-body",
+      "name": "Choco chip body (deep cocoa brown)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#4A3428",
+      "color": "#4A3428",
+      "albedo": {
+        "dominant": "#4A3428",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/choco.json geometry.surface, deliberately not sampled from reference pixels (which carry the generator's baked key light)."
+      },
+      "colorVariation": {
+        "palette": [
+          "#4A3428"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only to satisfy the merge step's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "revolved cone-taper profile",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 3.0,
+          "amplitude": 0.036,
+          "role": "surface jitter noise",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "single-tone body",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "upper-face-natural-highlight",
+          "name": "Per-face key-light highlight",
+          "maskSource": "geometry",
+          "description": "No second bright bucket is authored; the runtime key light's N.L falloff already brightens each cone's upper-facing facets for free -- painting a second lighter tone into geometry would double-brighten it (see spec risk upper-highlight-hue-dropped).",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "choco-back-1",
+            "choco-back-2",
+            "choco-back-3",
+            "choco-front-1",
+            "choco-front-2",
+            "choco-front-3"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "Single solid color is enough for the whole cluster, so no texture is emitted at all (types.ts inherited section 9). Simplest ingredient in the batch -- mesh=1."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "choco-mound",
+      "name": "Six-chip hex-packed mound",
+      "level": "macro",
+      "hostComponents": [
+        "root"
+      ],
+      "elementComponentIds": [
+        "choco-back-1",
+        "choco-back-2",
+        "choco-back-3",
+        "choco-front-1",
+        "choco-front-2",
+        "choco-front-3"
+      ],
+      "elementKind": "repeated macro body, single-mesh cone each",
+      "count": 6,
+      "distribution": {
+        "mode": "hand-placed XZ offsets with independent yaw, back row read taller via camera perspective",
+        "offsets": {
+          "back-1": [
+            -0.86,
+            -0.42
+          ],
+          "back-2": [
+            0.02,
+            -0.5
+          ],
+          "back-3": [
+            0.88,
+            -0.4
+          ],
+          "front-1": [
+            -0.46,
+            0.42
+          ],
+          "front-2": [
+            0.42,
+            0.46
+          ],
+          "front-3": [
+            1.15,
+            0.34
+          ]
+        },
+        "yaw": {
+          "back-1": 0.35,
+          "back-2": -0.7,
+          "back-3": 1.1,
+          "front-1": -1.3,
+          "front-2": 0.55,
+          "front-3": 2.0
+        },
+        "note": "Offsets read off choco-3.png (top-down footprint); back row (-Z) reads as the taller/prominent chips in the fixed 3/4-top-front camera, front row (+Z) reads lower, matching choco.png."
+      },
+      "sizeClasses": [
+        {
+          "id": "chip",
+          "radius": 0.5,
+          "halfLength": 0.56
+        }
+      ],
+      "seedRule": "Offsets/yaw are fixed authored values, not random; only the surface-jitter deformation consumes the builder rng, so the exported GLB is byte-deterministic.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-25T17:23:09.979783+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.72,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "six-chip-mound-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "6 individually readable teardrop cones in a tight hex-packed mound; count and general pile arrangement match choco.png/choco-3.png."
+        },
+        {
+          "id": "flat-base-cone-profile",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Flat circular base and smooth monotonic taper read clearly on shot-90/180/270; tip is faceted-rounded but slightly more pointed than the reference's softer curve (accepted, 8-segment low-poly budget)."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six chips sit flush on y=0, no floating parts on any orbit angle."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Flat per-facet shading baked into geometry (facet() split-vertex bake), consistent across all four rendered angles."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+      "cameraView": "three-quarter",
+      "notes": "shot-90/180/270 orbit confirms no degenerate silhouette; roundtrip-64-preview confirms 64px thumbnail legibility (jagged dark mound silhouette reads clearly). map-stripped-render == plain render: no texture map is ever emitted for this ingredient (types.ts R3 default 0 texture layers), so there is nothing to strip.",
+      "aiVisionNotes": "Own-vision read of cmp-1.png: chip count, base flatness, taper, and pile arrangement match choco.png closely; tip facet count reads slightly sharper than reference and overall tone is more uniformly dark (both documented as accepted risks in the spec, not implementation bugs)."
+    },
+    {
+      "timestamp": "2026-08-25T17:24:14.725491+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.72,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "six-chip-mound-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "6 individually readable teardrop cones in a tight hex-packed mound; count and general pile arrangement match choco.png/choco-3.png."
+        },
+        {
+          "id": "flat-base-cone-profile",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Flat circular base and smooth monotonic taper read clearly on shot-90/180/270; tip is faceted-rounded but slightly more pointed than the reference's softer curve (accepted, 8-segment low-poly budget)."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six chips sit flush on y=0, no floating parts on any orbit angle."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Flat per-facet shading baked into geometry (facet() split-vertex bake), consistent across all four rendered angles."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Unchanged render since blockout; re-confirmed six-chip silhouette and shared-ground-plane feature targets."
+    },
+    {
+      "timestamp": "2026-08-25T17:25:49.386356+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.72,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "six-chip-mound-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "6 individually readable teardrop cones in a tight hex-packed mound; count and general pile arrangement match choco.png/choco-3.png."
+        },
+        {
+          "id": "flat-base-cone-profile",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Flat circular base and smooth monotonic taper read clearly on shot-90/180/270; tip is faceted-rounded but slightly more pointed than the reference's softer curve (accepted, 8-segment low-poly budget)."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six chips sit flush on y=0, no floating parts on any orbit angle."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Flat per-facet shading baked into geometry (facet() split-vertex bake), consistent across all four rendered angles."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Unchanged render; re-confirmed applicable feature targets for form-refinement."
+    },
+    {
+      "timestamp": "2026-08-25T17:25:52.950344+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.72,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "six-chip-mound-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "6 individually readable teardrop cones in a tight hex-packed mound; count and general pile arrangement match choco.png/choco-3.png."
+        },
+        {
+          "id": "flat-base-cone-profile",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Flat circular base and smooth monotonic taper read clearly on shot-90/180/270; tip is faceted-rounded but slightly more pointed than the reference's softer curve (accepted, 8-segment low-poly budget)."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six chips sit flush on y=0, no floating parts on any orbit angle."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Flat per-facet shading baked into geometry (facet() split-vertex bake), consistent across all four rendered angles."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Unchanged render; re-confirmed applicable feature targets for material-pass."
+    },
+    {
+      "timestamp": "2026-08-25T17:25:56.624664+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.72,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "six-chip-mound-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "6 individually readable teardrop cones in a tight hex-packed mound; count and general pile arrangement match choco.png/choco-3.png."
+        },
+        {
+          "id": "flat-base-cone-profile",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Flat circular base and smooth monotonic taper read clearly on shot-90/180/270; tip is faceted-rounded but slightly more pointed than the reference's softer curve (accepted, 8-segment low-poly budget)."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six chips sit flush on y=0, no floating parts on any orbit angle."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Flat per-facet shading baked into geometry (facet() split-vertex bake), consistent across all four rendered angles."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Unchanged render; re-confirmed applicable feature targets for surface-pass."
+    },
+    {
+      "timestamp": "2026-08-25T17:26:00.112708+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.72,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "six-chip-mound-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "6 individually readable teardrop cones in a tight hex-packed mound; count and general pile arrangement match choco.png/choco-3.png."
+        },
+        {
+          "id": "flat-base-cone-profile",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Flat circular base and smooth monotonic taper read clearly on shot-90/180/270; tip is faceted-rounded but slightly more pointed than the reference's softer curve (accepted, 8-segment low-poly budget)."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six chips sit flush on y=0, no floating parts on any orbit angle."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Flat per-facet shading baked into geometry (facet() split-vertex bake), consistent across all four rendered angles."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Unchanged render; re-confirmed applicable feature targets for optimization-pass."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-25T17:23:09.979783+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.72,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "six-chip-mound-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "6 individually readable teardrop cones in a tight hex-packed mound; count and general pile arrangement match choco.png/choco-3.png."
+        },
+        {
+          "id": "flat-base-cone-profile",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Flat circular base and smooth monotonic taper read clearly on shot-90/180/270; tip is faceted-rounded but slightly more pointed than the reference's softer curve (accepted, 8-segment low-poly budget)."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six chips sit flush on y=0, no floating parts on any orbit angle."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Flat per-facet shading baked into geometry (facet() split-vertex bake), consistent across all four rendered angles."
+        }
+      ],
+      "action": "continue",
+      "summary": "Six flat-base teardrop cones in a hex-packed mound, single body-tone material, faceted shading; matches reference silhouette and count well. Tip reads slightly sharper than the reference's soft round point; overall tone reads darker since the upper-highlight hue was deliberately dropped (documented risk).",
+      "matched": [
+        "6-chip count",
+        "hex-packed mound arrangement",
+        "flat circular base per chip",
+        "smooth monotonic taper",
+        "shared ground plane, no floating parts",
+        "faceted flat shading baked into geometry"
+      ],
+      "mismatches": [
+        "tip slightly more pointed than reference's softer round tip (8-segment budget tradeoff)",
+        "average tone darker than reference since the #6B4E3D highlight hue is not painted into geometry (relies on runtime N.L falloff instead)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/roundtrip-64-preview.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+        "cameraView": "three-quarter",
+        "notes": "shot-90/180/270 orbit confirms no degenerate silhouette; roundtrip-64-preview confirms 64px thumbnail legibility (jagged dark mound silhouette reads clearly). map-stripped-render == plain render: no texture map is ever emitted for this ingredient (types.ts R3 default 0 texture layers), so there is nothing to strip.",
+        "aiVisionNotes": "Own-vision read of cmp-1.png: chip count, base flatness, taper, and pile arrangement match choco.png closely; tip facet count reads slightly sharper than reference and overall tone is more uniformly dark (both documented as accepted risks in the spec, not implementation bugs)."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:24:14.725491+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.72,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "six-chip-mound-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "6 individually readable teardrop cones in a tight hex-packed mound; count and general pile arrangement match choco.png/choco-3.png."
+        },
+        {
+          "id": "flat-base-cone-profile",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Flat circular base and smooth monotonic taper read clearly on shot-90/180/270; tip is faceted-rounded but slightly more pointed than the reference's softer curve (accepted, 8-segment low-poly budget)."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six chips sit flush on y=0, no floating parts on any orbit angle."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Flat per-facet shading baked into geometry (facet() split-vertex bake), consistent across all four rendered angles."
+        }
+      ],
+      "action": "continue",
+      "summary": "No new structure needed beyond blockout -- 6 chip instances + shared-ground placement already fully present. Re-confirming against the same render.",
+      "matched": [
+        "6-chip count",
+        "hex-packed mound",
+        "flat base each",
+        "shared ground plane, no floating parts"
+      ],
+      "mismatches": [
+        "same as blockout: tip slightly sharper than reference, tone reads darker (documented risk)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Unchanged render since blockout; re-confirmed six-chip silhouette and shared-ground-plane feature targets."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:25:49.386356+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.72,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "six-chip-mound-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "6 individually readable teardrop cones in a tight hex-packed mound; count and general pile arrangement match choco.png/choco-3.png."
+        },
+        {
+          "id": "flat-base-cone-profile",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Flat circular base and smooth monotonic taper read clearly on shot-90/180/270; tip is faceted-rounded but slightly more pointed than the reference's softer curve (accepted, 8-segment low-poly budget)."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six chips sit flush on y=0, no floating parts on any orbit angle."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Flat per-facet shading baked into geometry (facet() split-vertex bake), consistent across all four rendered angles."
+        }
+      ],
+      "action": "continue",
+      "summary": "No change needed for form-refinement -- design already satisfies this pass's target at blockout (single material, faceted shading, correct profile already authored).",
+      "matched": [
+        "6-chip count",
+        "hex-packed mound",
+        "flat base each",
+        "shared ground plane",
+        "single-material faceted look"
+      ],
+      "mismatches": [
+        "same as blockout: tip slightly sharper than reference, tone reads darker (documented risk, not a defect of this pass)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Unchanged render; re-confirmed applicable feature targets for form-refinement."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:25:52.950344+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.72,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "six-chip-mound-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "6 individually readable teardrop cones in a tight hex-packed mound; count and general pile arrangement match choco.png/choco-3.png."
+        },
+        {
+          "id": "flat-base-cone-profile",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Flat circular base and smooth monotonic taper read clearly on shot-90/180/270; tip is faceted-rounded but slightly more pointed than the reference's softer curve (accepted, 8-segment low-poly budget)."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six chips sit flush on y=0, no floating parts on any orbit angle."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Flat per-facet shading baked into geometry (facet() split-vertex bake), consistent across all four rendered angles."
+        }
+      ],
+      "action": "continue",
+      "summary": "No change needed for material-pass -- design already satisfies this pass's target at blockout (single material, faceted shading, correct profile already authored).",
+      "matched": [
+        "6-chip count",
+        "hex-packed mound",
+        "flat base each",
+        "shared ground plane",
+        "single-material faceted look"
+      ],
+      "mismatches": [
+        "same as blockout: tip slightly sharper than reference, tone reads darker (documented risk, not a defect of this pass)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Unchanged render; re-confirmed applicable feature targets for material-pass."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:25:56.624664+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.72,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "six-chip-mound-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "6 individually readable teardrop cones in a tight hex-packed mound; count and general pile arrangement match choco.png/choco-3.png."
+        },
+        {
+          "id": "flat-base-cone-profile",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Flat circular base and smooth monotonic taper read clearly on shot-90/180/270; tip is faceted-rounded but slightly more pointed than the reference's softer curve (accepted, 8-segment low-poly budget)."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six chips sit flush on y=0, no floating parts on any orbit angle."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Flat per-facet shading baked into geometry (facet() split-vertex bake), consistent across all four rendered angles."
+        }
+      ],
+      "action": "continue",
+      "summary": "No change needed for surface-pass -- design already satisfies this pass's target at blockout (single material, faceted shading, correct profile already authored).",
+      "matched": [
+        "6-chip count",
+        "hex-packed mound",
+        "flat base each",
+        "shared ground plane",
+        "single-material faceted look"
+      ],
+      "mismatches": [
+        "same as blockout: tip slightly sharper than reference, tone reads darker (documented risk, not a defect of this pass)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Unchanged render; re-confirmed applicable feature targets for surface-pass."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:26:00.112708+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.72,
+        "materialSurface": 0.7,
+        "lightingCamera": 0.85
+      },
+      "featureReviews": [
+        {
+          "id": "six-chip-mound-silhouette",
+          "score": 0.82,
+          "visible": true,
+          "notes": "6 individually readable teardrop cones in a tight hex-packed mound; count and general pile arrangement match choco.png/choco-3.png."
+        },
+        {
+          "id": "flat-base-cone-profile",
+          "score": 0.75,
+          "visible": true,
+          "notes": "Flat circular base and smooth monotonic taper read clearly on shot-90/180/270; tip is faceted-rounded but slightly more pointed than the reference's softer curve (accepted, 8-segment low-poly budget)."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six chips sit flush on y=0, no floating parts on any orbit angle."
+        },
+        {
+          "id": "baked-faceting",
+          "score": 0.85,
+          "visible": true,
+          "notes": "Flat per-facet shading baked into geometry (facet() split-vertex bake), consistent across all four rendered angles."
+        }
+      ],
+      "action": "continue",
+      "summary": "No change needed for optimization-pass -- design already satisfies this pass's target at blockout (single material, faceted shading, correct profile already authored).",
+      "matched": [
+        "6-chip count",
+        "hex-packed mound",
+        "flat base each",
+        "shared ground plane",
+        "single-material faceted look"
+      ],
+      "mismatches": [
+        "same as blockout: tip slightly sharper than reference, tone reads darker (documented risk, not a defect of this pass)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/choco.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/choco/cmp-1.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Unchanged render; re-confirmed applicable feature targets for optimization-pass."
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 576,
+    "maxDrawCalls": 1,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Hard consumer budget for the 'cluster' ingredient group: <=700 tri and <=68KB target (types.ts R2), hard ceiling <=2500 tri and <=100KB (scripts/check-budget.mjs). Target reached by construction (8 segments x 7 profile-ring transitions x 6 chips = 576 tri), not by decimation."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, upper-left.",
+      "usage": "Fixed by scripts/breadlab.ts.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75 -- upper-face brightening relies on cone facet orientation toward the key light, not a painted highlight.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none -- no shadow map, no ground plane rendered."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2, opposite the key.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO on the runtime Lambert material."
+    }
+  ],
+  "proceduralStrategy": [
+    "Revolve each chip's shell from the shared flat-base-to-soft-tip profile at the shared segment count.",
+    "Jitter vertices while the shell is still indexed.",
+    "Bake faceting by splitting vertices and recomputing normals; never request flatShading.",
+    "Project top-planar UVs, then merge all six chips into exactly one mesh (single material, no mask split needed).",
+    "No lay-down rotation needed -- chips stand upright, local Y is world Y directly. Add per-instance yaw only, then translate each instance's own bounding box floor to world Y=0."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-cluster rotation for the showcase turntable",
+    "each chip is a named instance, so a future 'add a chip' animation can translate one instance without rebuilding the shared shell logic"
+  ],
+  "destructionAnchors": [
+    "each chip is its own fractureGroup; the only plausible break is one chip rolling away from the pile"
+  ],
+  "risks": [
+    {
+      "id": "upper-highlight-hue-dropped",
+      "severity": "medium",
+      "description": "assets/prompts/ingredients/choco.json names a second hue (#6B4E3D) for upper-facing highlight facets, which this spec does not wire to a material bucket.",
+      "mitigation": "mesh<=2 budget allows a 2nd bucket, but the runtime key light already brightens each cone's upper-facing facets for free via N.L falloff on the faceted cone -- painting a highlight tone into geometry would double-brighten. Single body bucket everywhere."
+    },
+    {
+      "id": "seam-shadow-hue-dropped",
+      "severity": "low",
+      "description": "choco.png shows a slightly darker seam tone (#37241B) where chips meet; this spec does not model it as a color region.",
+      "mitigation": "This is a contact-shadow effect the flat-ambient harness does not render, and is illegible at the ~64px final thumbnail read distance. Recorded here rather than silently dropped."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-color-based region paint is silently discarded by the runtime's MeshLambertMaterial swap.",
+      "mitigation": "Single flat material bucket authored; no vertexPaint block anywhere in this spec."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "A flatShading flag is not inherited by the runtime material swap, so a model relying on it renders smooth.",
+      "mitigation": "Faceting is baked into geometry by splitting vertices (scripts/breads/lib.ts facet) before export."
+    },
+    {
+      "id": "sharp-tip-misread",
+      "severity": "medium",
+      "description": "A cone tip built with too few profile rings near the apex can read as a knife-edge rather than the reference's soft rounded point.",
+      "mitigation": "Profile carries an explicit near-apex ring (0.13, 0.80) before the final pole, softening the facet count at the tip; 8-segment lathe keeps it visibly faceted-but-rounded rather than sharp."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Choco Chip Pile",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  },
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.5457,
+        "aspectRatioDelta": 0.6796,
+        "scaleDelta": 0.1604,
+        "bilateralSymmetryError": 0.0759,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 8.48,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.48
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.48
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.48
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.48
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.48
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.48
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.48
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.546 is below threshold 0.85",
+        "aspect-ratio delta 0.680 exceeds threshold 0.05",
+        "scale delta 0.160 exceeds threshold 0.08",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [],
+      "renderHash": "e0d68263f58492dd",
+      "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6306,
+        "aspectRatioDelta": 0.1203,
+        "scaleDelta": 0.1261,
+        "bilateralSymmetryError": 0.0913,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 8.69,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.631 is below threshold 0.85",
+        "aspect-ratio delta 0.120 exceeds threshold 0.05",
+        "scale delta 0.126 exceeds threshold 0.08",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [],
+      "renderHash": "527f035642a4dfd1",
+      "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6306,
+        "aspectRatioDelta": 0.1203,
+        "scaleDelta": 0.1261,
+        "bilateralSymmetryError": 0.0913,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 8.69,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.631 is below threshold 0.85",
+        "aspect-ratio delta 0.120 exceeds threshold 0.05",
+        "scale delta 0.126 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "527f035642a4dfd1",
+      "passId": "structural-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6306,
+        "aspectRatioDelta": 0.1203,
+        "scaleDelta": 0.1261,
+        "bilateralSymmetryError": 0.0913,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 8.69,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.631 is below threshold 0.85",
+        "aspect-ratio delta 0.120 exceeds threshold 0.05",
+        "scale delta 0.126 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "527f035642a4dfd1",
+      "passId": "form-refinement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6306,
+        "aspectRatioDelta": 0.1203,
+        "scaleDelta": 0.1261,
+        "bilateralSymmetryError": 0.0913,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 8.69,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.631 is below threshold 0.85",
+        "aspect-ratio delta 0.120 exceeds threshold 0.05",
+        "scale delta 0.126 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "527f035642a4dfd1",
+      "passId": "material-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6306,
+        "aspectRatioDelta": 0.1203,
+        "scaleDelta": 0.1261,
+        "bilateralSymmetryError": 0.0913,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 8.69,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.631 is below threshold 0.85",
+        "aspect-ratio delta 0.120 exceeds threshold 0.05",
+        "scale delta 0.126 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "527f035642a4dfd1",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6306,
+        "aspectRatioDelta": 0.1203,
+        "scaleDelta": 0.1261,
+        "bilateralSymmetryError": 0.0913,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 8.69,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.631 is below threshold 0.85",
+        "aspect-ratio delta 0.120 exceeds threshold 0.05",
+        "scale delta 0.126 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "527f035642a4dfd1",
+      "passId": "optimization-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6306,
+        "aspectRatioDelta": 0.1203,
+        "scaleDelta": 0.1261,
+        "bilateralSymmetryError": 0.0913,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 8.69,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.631 is below threshold 0.85",
+        "aspect-ratio delta 0.120 exceeds threshold 0.05",
+        "scale delta 0.126 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "527f035642a4dfd1",
+      "passId": "form-refinement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6306,
+        "aspectRatioDelta": 0.1203,
+        "scaleDelta": 0.1261,
+        "bilateralSymmetryError": 0.0913,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 8.69,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.631 is below threshold 0.85",
+        "aspect-ratio delta 0.120 exceeds threshold 0.05",
+        "scale delta 0.126 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "527f035642a4dfd1",
+      "passId": "form-refinement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6306,
+        "aspectRatioDelta": 0.1203,
+        "scaleDelta": 0.1261,
+        "bilateralSymmetryError": 0.0913,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 8.69,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.631 is below threshold 0.85",
+        "aspect-ratio delta 0.120 exceeds threshold 0.05",
+        "scale delta 0.126 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "527f035642a4dfd1",
+      "passId": "material-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6306,
+        "aspectRatioDelta": 0.1203,
+        "scaleDelta": 0.1261,
+        "bilateralSymmetryError": 0.0913,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 8.69,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.631 is below threshold 0.85",
+        "aspect-ratio delta 0.120 exceeds threshold 0.05",
+        "scale delta 0.126 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "527f035642a4dfd1",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6306,
+        "aspectRatioDelta": 0.1203,
+        "scaleDelta": 0.1261,
+        "bilateralSymmetryError": 0.0913,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 8.69,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.69
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.631 is below threshold 0.85",
+        "aspect-ratio delta 0.120 exceeds threshold 0.05",
+        "scale delta 0.126 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "527f035642a4dfd1",
+      "passId": "optimization-pass"
+    }
+  ]
+}

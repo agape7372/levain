@@ -1,0 +1,2691 @@
+{
+  "targetName": "Strawberry",
+  "targetId": "strawberry",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\strawberry.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved; the review camera is fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 2,
+    "material_procedurality": 2,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "single ripe strawberry",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "revolved body + radial calyx assembly"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat color facets only."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 1,
+        "componentCount": 2,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 1,
+        "materialLayerCount": 1,
+        "localDetailDensity": 2,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 6,
+        "microFeatureGroups": 1,
+        "materialLayers": 2,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "2 macro components (body, calyx assembly), scoring componentCount 2.",
+        "Body silhouette is a simple revolved heart-taper, scoring silhouetteComplexity 1.",
+        "One repetition system (5 leaves), scoring repetitionDensity 1.",
+        "Local detail density scores 2 (not 1): the seed-dimple texture is a genuinely new authoring surface (canvas stipple) beyond a pure geometric displacement, and the 5-hex-under-2-material bucket mapping needed explicit spec-time resolution (R3).",
+        "Material layer count scores 1: 2 buckets (textured body, flat calyx) despite 5 source hues -- most are absorbed by N.L falloff or the texture escape hatch.",
+        "Occlusion risk scores 1: the far side of the body is hidden but inferable by near-radial symmetry.",
+        "Action readiness scores 0: static showcase prop.",
+        "Aggregate 10/24 -- higher than chestnut/walnut but still simple tier (no axis above 2)."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier by part count, but needs a repetition system (5 leaves) and material local overrides (the texture-escape-hatch bucket mapping is itself a local override decision, R3)."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerated by hand from the three supplied reference views -- CRIB.md skip rule.",
+      "details": [
+        {
+          "id": "heart-taper",
+          "zone": "full body",
+          "observation": "Widest point sits well above the vertical midpoint (~58% height), tapering to a rounded point at the bottom.",
+          "inference": "Natural strawberry morphology.",
+          "confidence": 0.9,
+          "evidenceRef": "strawberry-2.png front elevation",
+          "kind": "ridge",
+          "mapsTo": {
+            "ref": "strawberry-heart-taper",
+            "note": ""
+          }
+        },
+        {
+          "id": "seed-dimples",
+          "zone": "full body surface",
+          "observation": "Small pale seed marks scattered evenly across the body, distinct from the dominant scarlet.",
+          "inference": "Achenes -- identity-critical per team brief.",
+          "confidence": 0.9,
+          "evidenceRef": "strawberry.png full frame",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "strawberry-seed-dimples",
+            "note": ""
+          }
+        },
+        {
+          "id": "calyx-star",
+          "zone": "top of the body",
+          "observation": "5 leaves in a radial star pattern around a central stem stub.",
+          "inference": "Strawberry calyx -- identity-critical per team brief.",
+          "confidence": 0.9,
+          "evidenceRef": "strawberry-3.png top-down",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "calyx-star-arrangement",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/strawberry.png"
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 2,
+      "mesoComponents": 6,
+      "microFeatureGroups": 0,
+      "materialLayers": 2,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.75,
+    "mustMatch": [
+      "heart-shaped silhouette, widest near top, tapering to a point at bottom",
+      "seed dimples legible on the body",
+      "5-leaf star calyx + stem, top faces visible",
+      "faceted flat shading baked into geometry"
+    ],
+    "niceToHave": [
+      "exact seed spacing/count"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "heart-taper-silhouette",
+      "name": "Heart-shaped silhouette: widest near top, tapering to a point at bottom",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "strawberry-body"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ]
+    },
+    {
+      "id": "seed-dimple-legibility",
+      "name": "Seed dimples legible on the body texture",
+      "tier": "critical",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": [
+        "strawberry-body"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "calyx-star-legibility",
+      "name": "5-leaf star calyx + stem, top faces visible from review azimuths",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "strawberry-calyx"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "shared-ground-plane",
+      "name": "Rests on the shared ground, no floating parts",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass"
+      ],
+      "minimumScore": 0.85,
+      "mustPass": true,
+      "componentRefs": [
+        "strawberry-body"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "baked-faceting",
+      "name": "Faceted flat shading baked into geometry",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "strawberry-body"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness",
+      "interaction-pass": "static showcase prop, actionReadinessNeed 0"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 96,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "The consumer runtime keeps only map and color; PBR maps are banned outright."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer harness.",
+      "mustAvoid": [
+        "authoring lights into the model"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "Seed dimple exact count/spacing is not measured pixel-precisely; a deterministic rng-scattered grid stands in for it.",
+    "The runtime normalizes the longest axis to 1.6, so absolute dimensions are arbitrary.",
+    "Leaf pitch angle is tuned for camera visibility (top face toward the review azimuths), not measured to the reference's exact droop."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "BODY_RADIUS = 0.5 relative unit. Absolute scale is meaningless (types.ts section 7)."
+  },
+  "silhouette": {
+    "boundingShape": "heart-shaped body (1.0 wide x 0.85 tall) topped by a 0.68-wide leaf star",
+    "aspectRatios": [
+      {
+        "id": "height-over-width",
+        "value": 0.85,
+        "source": "strawberry-2.png front elevation"
+      },
+      {
+        "id": "widest-point-fraction",
+        "value": 0.58,
+        "source": "strawberry-2.png: widest point at ~58% height"
+      }
+    ],
+    "symmetry": "near-radially-symmetric body + 5-fold radial calyx",
+    "dominantCurves": [
+      "convex taper from shoulder to bottom point"
+    ],
+    "negativeSpaces": [
+      "gaps between calyx leaves"
+    ],
+    "landmarks": [
+      "widest point at heightFraction 0.58",
+      "5-leaf star calyx",
+      "seed dimples scattered across the body"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "heart-shaped berry, widest near the top, tapering to a rounded point at the bottom",
+        "small pale seed dimples scattered evenly across the surface",
+        "5-leaf calyx + short stem stub on top"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "widest point sits roughly 55-60% up from the bottom point",
+        "calyx leaves splay outward and slightly downward over the shoulder"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "5 leaves arranged in a radial star pattern around a central stem",
+        "seed dimples visible in a roughly even scatter, denser than a simple grid at the very top"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Strawberry",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the body and calyx; it emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 1.0,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "strawberry-body"
+        }
+      },
+      "material": "strawberry-body",
+      "materialLayers": [
+        "strawberry-body",
+        "strawberry-calyx"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(192, 57, 47, 1.0)",
+        "secondaryAlbedo": "rgba(107, 126, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, no specular lobe.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/strawberry.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried by the revolved profile / flat leaf primitives",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "strawberry-body",
+      "name": "Strawberry body (textured: scarlet + seed dimples)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Continuous revolved mass, widest near the top narrowing to a point at the bottom -- decision tree step 6. Not a cone/sphere because the reference's widest point sits well above the vertical midpoint (heart-shaped asymmetric taper).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.15,
+              0.085
+            ],
+            [
+              0.3,
+              0.204
+            ],
+            [
+              0.425,
+              0.34
+            ],
+            [
+              0.5,
+              0.493
+            ],
+            [
+              0.465,
+              0.646
+            ],
+            [
+              0.35,
+              0.765
+            ],
+            [
+              0.2,
+              0.833
+            ],
+            [
+              0.0,
+              0.85
+            ]
+          ],
+          "segments": 14,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.018,
+            "notes": "Uniform per-vertex noise, amplitude 0.018 (0.036 of equatorial radius)."
+          }
+        ],
+        "uvStrategy": "cylindrical projection around the Y (vertical) axis (scripts/breads/lib.ts uvCylindrical) -- the body is textured (seed dimples baked into a 96px canvas), so unlike the other 2 ingredients this UV is load-bearing, not merge-only. uvDome (XZ-planar) was rejected: it collapses vertical-wall vertices to the same UV, smearing seed dots into vertical streaks.",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never flatShading"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 0.85,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "strawberry-body",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "strawberry-body"
+        }
+      },
+      "material": "strawberry-body",
+      "materialLayers": [
+        "strawberry-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(192, 57, 47, 1.0)",
+        "secondaryAlbedo": "rgba(244, 227, 196, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, no specular lobe.",
+        "zone": "full body surface",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/strawberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "strawberry-heart-taper",
+          "name": "Heart-shaped asymmetric taper",
+          "kind": "ridge",
+          "description": "Widest point (rFrac 1.0) at heightFraction 0.58, well above the vertical midpoint; tapers to a point at the bottom.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "strawberry-seed-dimples",
+          "name": "Scattered pale seed dimples",
+          "kind": "seam",
+          "description": "Small pale (#F4E3C4) achene marks scattered across the body surface, baked into the body material's texture rather than modeled as geometry (identity-critical per team brief, R3 texture escape hatch).",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried by the revolved profile / flat leaf primitives",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "The runtime replaces the material with MeshLambertMaterial keeping only map and color -- the seed dimples survive as the map, everything else (shading) is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "strawberry-heart-taper",
+        "strawberry-seed-dimples"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "strawberry-calyx",
+      "name": "Calyx assembly (5 leaves + stem)",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 0.8,
+      "confidence": 0.85,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the 5 leaves + stem; positioned at the body's top pole. Emits no geometry of its own, mirrors ROOT's placeholder primitive/topologyClass.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.68,
+        "height": 0.17,
+        "depth": 0.68,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0.85,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "strawberry-calyx",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "strawberry-body"
+        }
+      },
+      "material": "strawberry-calyx",
+      "materialLayers": [
+        "strawberry-calyx"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(107, 126, 74, 1.0)",
+        "secondaryAlbedo": "rgba(107, 126, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, no specular lobe.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/strawberry.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "calyx-star-arrangement",
+          "name": "5-leaf radial star arrangement",
+          "kind": "contour",
+          "description": "5 leaves placed at even 72deg intervals around the center stem, each pitched upward off the body's shoulder so its top face remains visible.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried by the revolved profile / flat leaf primitives",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-top"
+      ],
+      "details": [
+        "calyx-star-arrangement"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "strawberry-leaf-0",
+      "name": "Calyx leaf 0",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.8,
+      "primitive": "plane-card",
+      "topologyClass": "open-shell",
+      "topologyRationale": "A thin tent-shaped open shell (2 planes sharing a center ridge, 4 tri) is sufficient for a low-poly calyx leaf -- decision tree step 3 (thin flat part, not a solid).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly flat leaf, faceted",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "none -- flat green bucket carries no texture",
+        "normalStrategy": "flat normals, no jitter (R4: thin parts lose silhouette under bread-scale jitter)"
+      },
+      "parent": "strawberry-calyx",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.16,
+        "height": 0.34,
+        "depth": 0.02,
+        "units": "relative",
+        "confidence": 0.75
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0.0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "strawberry-leaf-0",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "strawberry-body"
+        }
+      },
+      "material": "strawberry-calyx",
+      "materialLayers": [
+        "strawberry-calyx"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(107, 126, 74, 1.0)",
+        "secondaryAlbedo": "rgba(107, 126, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, no specular lobe.",
+        "zone": "single leaf",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/strawberry.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "strawberry-leaf-0-tent-ridge",
+          "name": "Center ridge tent fold",
+          "kind": "ridge",
+          "description": "Two planes sharing a center-line ridge, pitched upward so the leaf's top face remains visible from the harness review azimuths.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.75
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried by the revolved profile / flat leaf primitives",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Single flat green tone, no gradient."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "strawberry-leaf-0-tent-ridge"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "strawberry-leaf-1",
+      "name": "Calyx leaf 1",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.8,
+      "primitive": "plane-card",
+      "topologyClass": "open-shell",
+      "topologyRationale": "A thin tent-shaped open shell (2 planes sharing a center ridge, 4 tri) is sufficient for a low-poly calyx leaf -- decision tree step 3 (thin flat part, not a solid).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly flat leaf, faceted",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "none -- flat green bucket carries no texture",
+        "normalStrategy": "flat normals, no jitter (R4: thin parts lose silhouette under bread-scale jitter)"
+      },
+      "parent": "strawberry-calyx",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.16,
+        "height": 0.34,
+        "depth": 0.02,
+        "units": "relative",
+        "confidence": 0.75
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          1.2566370614359172,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "strawberry-leaf-1",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "strawberry-body"
+        }
+      },
+      "material": "strawberry-calyx",
+      "materialLayers": [
+        "strawberry-calyx"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(107, 126, 74, 1.0)",
+        "secondaryAlbedo": "rgba(107, 126, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, no specular lobe.",
+        "zone": "single leaf",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/strawberry.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "strawberry-leaf-1-tent-ridge",
+          "name": "Center ridge tent fold",
+          "kind": "ridge",
+          "description": "Two planes sharing a center-line ridge, pitched upward so the leaf's top face remains visible from the harness review azimuths.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.75
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried by the revolved profile / flat leaf primitives",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Single flat green tone, no gradient."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "strawberry-leaf-1-tent-ridge"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "strawberry-leaf-2",
+      "name": "Calyx leaf 2",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.8,
+      "primitive": "plane-card",
+      "topologyClass": "open-shell",
+      "topologyRationale": "A thin tent-shaped open shell (2 planes sharing a center ridge, 4 tri) is sufficient for a low-poly calyx leaf -- decision tree step 3 (thin flat part, not a solid).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly flat leaf, faceted",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "none -- flat green bucket carries no texture",
+        "normalStrategy": "flat normals, no jitter (R4: thin parts lose silhouette under bread-scale jitter)"
+      },
+      "parent": "strawberry-calyx",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.16,
+        "height": 0.34,
+        "depth": 0.02,
+        "units": "relative",
+        "confidence": 0.75
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          2.5132741228718345,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "strawberry-leaf-2",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "strawberry-body"
+        }
+      },
+      "material": "strawberry-calyx",
+      "materialLayers": [
+        "strawberry-calyx"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(107, 126, 74, 1.0)",
+        "secondaryAlbedo": "rgba(107, 126, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, no specular lobe.",
+        "zone": "single leaf",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/strawberry.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "strawberry-leaf-2-tent-ridge",
+          "name": "Center ridge tent fold",
+          "kind": "ridge",
+          "description": "Two planes sharing a center-line ridge, pitched upward so the leaf's top face remains visible from the harness review azimuths.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.75
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried by the revolved profile / flat leaf primitives",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Single flat green tone, no gradient."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "strawberry-leaf-2-tent-ridge"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "strawberry-leaf-3",
+      "name": "Calyx leaf 3",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.8,
+      "primitive": "plane-card",
+      "topologyClass": "open-shell",
+      "topologyRationale": "A thin tent-shaped open shell (2 planes sharing a center ridge, 4 tri) is sufficient for a low-poly calyx leaf -- decision tree step 3 (thin flat part, not a solid).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly flat leaf, faceted",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "none -- flat green bucket carries no texture",
+        "normalStrategy": "flat normals, no jitter (R4: thin parts lose silhouette under bread-scale jitter)"
+      },
+      "parent": "strawberry-calyx",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.16,
+        "height": 0.34,
+        "depth": 0.02,
+        "units": "relative",
+        "confidence": 0.75
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          3.7699111843077517,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "strawberry-leaf-3",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "strawberry-body"
+        }
+      },
+      "material": "strawberry-calyx",
+      "materialLayers": [
+        "strawberry-calyx"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(107, 126, 74, 1.0)",
+        "secondaryAlbedo": "rgba(107, 126, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, no specular lobe.",
+        "zone": "single leaf",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/strawberry.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "strawberry-leaf-3-tent-ridge",
+          "name": "Center ridge tent fold",
+          "kind": "ridge",
+          "description": "Two planes sharing a center-line ridge, pitched upward so the leaf's top face remains visible from the harness review azimuths.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.75
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried by the revolved profile / flat leaf primitives",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Single flat green tone, no gradient."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "strawberry-leaf-3-tent-ridge"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "strawberry-leaf-4",
+      "name": "Calyx leaf 4",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.8,
+      "primitive": "plane-card",
+      "topologyClass": "open-shell",
+      "topologyRationale": "A thin tent-shaped open shell (2 planes sharing a center ridge, 4 tri) is sufficient for a low-poly calyx leaf -- decision tree step 3 (thin flat part, not a solid).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly flat leaf, faceted",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "none -- flat green bucket carries no texture",
+        "normalStrategy": "flat normals, no jitter (R4: thin parts lose silhouette under bread-scale jitter)"
+      },
+      "parent": "strawberry-calyx",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.16,
+        "height": 0.34,
+        "depth": 0.02,
+        "units": "relative",
+        "confidence": 0.75
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          5.026548245743669,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "strawberry-leaf-4",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "strawberry-body"
+        }
+      },
+      "material": "strawberry-calyx",
+      "materialLayers": [
+        "strawberry-calyx"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(107, 126, 74, 1.0)",
+        "secondaryAlbedo": "rgba(107, 126, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, no specular lobe.",
+        "zone": "single leaf",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/strawberry.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "strawberry-leaf-4-tent-ridge",
+          "name": "Center ridge tent fold",
+          "kind": "ridge",
+          "description": "Two planes sharing a center-line ridge, pitched upward so the leaf's top face remains visible from the harness review azimuths.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.75
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried by the revolved profile / flat leaf primitives",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Single flat green tone, no gradient."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "strawberry-leaf-4-tent-ridge"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "strawberry-stem",
+      "name": "Calyx center stem stub",
+      "level": "meso",
+      "role": "attachment",
+      "importance": 0.5,
+      "confidence": 0.8,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Simple short cylinder (expressed as a straight-walled lathe profile) for the stem stub -- decision tree step 2 (regular convex primitive fits directly). primitive=lathe, not cylinder, since strict validation pairs topologyClass=continuous-sculpt only with lathe/extrude/curve-sweep.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly cylinder via straight-walled lathe profile",
+        "latheProfile": {
+          "points": [
+            [
+              1.0,
+              0.0
+            ],
+            [
+              1.0,
+              1.0
+            ]
+          ],
+          "segments": 8,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "none -- flat green bucket carries no texture",
+        "normalStrategy": "flat normals, no jitter (R4)"
+      },
+      "parent": "strawberry-calyx",
+      "attachment": {
+        "parentSocket": "strawberry-calyx-center",
+        "localStart": [
+          0,
+          0,
+          0
+        ],
+        "localEnd": [
+          0,
+          0.12,
+          0
+        ],
+        "contactType": "fused",
+        "embedDepth": 0.0,
+        "overlap": 0.0,
+        "gapTolerance": 0.0
+      },
+      "dimensions": {
+        "width": 0.09,
+        "height": 0.12,
+        "depth": 0.09,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding proxy; static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "strawberry-stem",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "strawberry-body"
+        }
+      },
+      "material": "strawberry-calyx",
+      "materialLayers": [
+        "strawberry-calyx"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(107, 126, 74, 1.0)",
+        "secondaryAlbedo": "rgba(107, 126, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, no specular lobe.",
+        "zone": "stem stub",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/strawberry.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "strawberry-stem-stub",
+          "name": "Short stem stub",
+          "kind": "ridge",
+          "description": "A short cylinder centered on the calyx, above the leaves.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "none -- shape carried by the revolved profile / flat leaf primitives",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel",
+        "edgeWearPattern": "none",
+        "notes": "Single flat green tone."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [
+        "strawberry-stem-stub"
+      ],
+      "fidelityTier": "form-refinement"
+    }
+  ],
+  "materials": [
+    {
+      "id": "strawberry-body",
+      "name": "Strawberry body (scarlet + baked seed stipple)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#C0392F",
+      "color": "#C0392F",
+      "albedo": {
+        "dominant": "#C0392F",
+        "secondary": [
+          "#F4E3C4"
+        ],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/strawberry.json geometry.surface."
+      },
+      "colorVariation": {
+        "palette": [
+          "#C0392F",
+          "#F4E3C4"
+        ],
+        "pattern": "stippled-canvas",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 96,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "96px baked canvas (base scarlet + seed dimple stipple), R3 escape hatch for a 5-hex subject under a 2-material budget."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "revolved heart-taper profile",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "revolved body surface",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "doubleSided": false,
+      "localOverrides": [
+        {
+          "id": "body-natural-shading",
+          "name": "Body key-light falloff",
+          "maskSource": "geometry",
+          "description": "No AO/dirt map is authored; the shaded lower-half hue (#96271F) and coral blush (#DC6151) are deliberately NOT painted -- the runtime key light's N.L falloff already darkens/brightens the convex body for free.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "strawberry-body"
+          ]
+        },
+        {
+          "id": "seed-dimple-texture",
+          "name": "Seed dimple stipple",
+          "maskSource": "texture",
+          "description": "Pale (#F4E3C4) seed dots baked into a 96px canvas texture (R3 escape hatch, pumpkin precedent) rather than a third material bucket -- the mesh<=2 budget forces this.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "appliesTo": [
+            "strawberry-body"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors.",
+        "Never set flatShading."
+      ],
+      "notes": "revolved body surface."
+    },
+    {
+      "id": "strawberry-calyx",
+      "name": "Calyx leaves + stem (fresh green)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#6B7E4A",
+      "color": "#6B7E4A",
+      "albedo": {
+        "dominant": "#6B7E4A",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/strawberry.json geometry.surface."
+      },
+      "colorVariation": {
+        "palette": [
+          "#6B7E4A"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "flat leaf/stem primitives",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "5 leaves + stem stub",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "doubleSided": true,
+      "localOverrides": [
+        {
+          "id": "calyx-body-boundary",
+          "name": "Calyx/body material boundary",
+          "maskSource": "geometry",
+          "description": "The calyx is a wholly separate set of primitives (leaves + stem), not a triangle-range split of the body shell -- a hard geometric edge between two mesh groups.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "strawberry-leaf-0",
+            "strawberry-leaf-1",
+            "strawberry-leaf-2",
+            "strawberry-leaf-3",
+            "strawberry-leaf-4",
+            "strawberry-stem"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors.",
+        "Never set flatShading."
+      ],
+      "notes": "5 leaves + stem stub."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "calyx-leaves",
+      "name": "5-leaf radial star",
+      "level": "meso",
+      "hostComponents": [
+        "strawberry-calyx"
+      ],
+      "elementComponentIds": [
+        "strawberry-leaf-0",
+        "strawberry-leaf-1",
+        "strawberry-leaf-2",
+        "strawberry-leaf-3",
+        "strawberry-leaf-4"
+      ],
+      "elementKind": "flat tent-shaped leaf primitive",
+      "count": 5,
+      "distribution": {
+        "mode": "even radial",
+        "angleStepDeg": 72.0,
+        "note": "5 leaves at 72deg intervals, matching the reference's star calyx."
+      },
+      "sizeClasses": [
+        {
+          "id": "leaf",
+          "length": 0.34,
+          "width": 0.16
+        }
+      ],
+      "seedRule": "Angles are fixed authored values (even radial spacing), not random; only the body's surface-jitter deformation consumes the builder rng.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 320,
+    "maxDrawCalls": 2,
+    "textureSize": 96,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Hard consumer budget for the 'single' ingredient group: 200-500 tri and <=48KB target, hard ceiling <=2500 tri/<=100KB. Body revolve (~196 tri) + 5 leaves (4 tri each = 20) + stem (~24 tri) + a 96px canvas texture."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, upper-left.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO."
+    }
+  ],
+  "proceduralStrategy": [
+    "Revolve the body from the heart-taper profile (bottom pole, shoulder ring, top pole under the calyx).",
+    "Bake a small canvas texture: base scarlet fill + deterministic seed-dot stipple grid (rng-jittered), cylindrical UV.",
+    "Jitter the body indexed, facet, project cylindrical UV, apply the textured material.",
+    "Build 5 tent-shaped flat leaves (2 planes each) at even 72deg radial angles, pitched upward, positioned at the body's top pole.",
+    "Build a short stem cylinder centered above the leaves.",
+    "Merge leaves+stem into the flat calyx-green material bucket; merge the body into its own textured bucket -- exactly 2 meshes.",
+    "Translate the whole group's own bounding box floor to world Y=0."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-body rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "calyx and body are separate fractureGroups; no plausible finer sub-fracture"
+  ],
+  "risks": [
+    {
+      "id": "shading-hues-dropped",
+      "severity": "medium",
+      "description": "assets/prompts/ingredients/strawberry.json names #96271F (shaded lower half) and #DC6151 (coral blush), neither wired to a material bucket.",
+      "mitigation": "Both are N.L falloff effects on a convex body that the runtime key light already renders for free (olive/chestnut/walnut precedent)."
+    },
+    {
+      "id": "seed-texture-escape-hatch",
+      "severity": "medium",
+      "description": "5 hex colors under a mesh<=2 budget requires the R3 texture escape hatch: seed dimples are baked into a 96px canvas rather than modeled as geometry or a 3rd material.",
+      "mitigation": "types.ts R3 explicitly names this pattern (pumpkin precedent: one textured bucket + one flat bucket). Texture stays well under the 256px cap."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-color-based region paint is silently discarded by the runtime's MeshLambertMaterial swap.",
+      "mitigation": "No vertexPaint block is authored; the only per-pixel color variation is the baked canvas texture, which the runtime DOES keep (map is preserved, types.ts section 2)."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "A flatShading flag is not inherited by the runtime material swap.",
+      "mitigation": "Faceting is baked into geometry by splitting vertices (lib.facet) before export."
+    },
+    {
+      "id": "uv-projector-mismatch",
+      "severity": "medium",
+      "description": "uvDome (XZ-planar) would collapse vertical-wall vertices to near-identical UVs, smearing the seed-dot texture into vertical streaks.",
+      "mitigation": "uvCylindrical('y') used instead for the body -- caught before any render (advisor pre-review)."
+    },
+    {
+      "id": "leaf-backface-culling",
+      "severity": "medium",
+      "description": "The consumer runtime's MeshLambertMaterial swap (scripts/breadlab.ts / scripts/thumbsHarness.ts / src/render/breadShowcase.ts) keeps only map and color -- material.side is NOT preserved, so a spec-level doubleSided:true flag has no runtime effect. A single-sided flat leaf plane would render invisible from any azimuth where its front face points away from the camera.",
+      "mitigation": "Each leaf's geometry itself is built as a thin two-sided volume (front-facing tent triangles + a mirrored back-facing copy with reversed winding), not a true zero-thickness plane relying on material.side -- this is a geometric workaround, not a material one, so it survives the swap."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Strawberry",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  }
+}

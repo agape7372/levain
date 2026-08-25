@@ -1,0 +1,1723 @@
+{
+  "targetName": "Chestnut",
+  "targetId": "chestnut",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\chestnut.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved and deliberately not matched to the reference. The review camera is fixed by the consumer harness (scripts/breadlab.ts applyView)."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "single roasted chestnut",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "single revolved body"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat color facets only -- prompt JSON explicitly excludes any shine. Consumer runtime is a stylized low-poly showcase, so target look is faceted matte clay rather than food photorealism."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 1,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 0,
+        "materialLayerCount": 1,
+        "localDetailDensity": 1,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 1,
+        "mesoComponents": 1,
+        "microFeatureGroups": 0,
+        "materialLayers": 2,
+        "repetitionSystems": 0
+      },
+      "reasoning": [
+        "Single macro body (chestnut-shell) with one meso sub-region (chestnut-base-patch), scoring componentCount 1.",
+        "Silhouette is one revolved onion-dome with a mild belly-base taper and one crease, scoring silhouetteComplexity 1.",
+        "No repetition system: a single instance, not a cluster, scoring repetitionDensity 0.",
+        "One material family in two albedo zones (shell vs base patch), so materialLayerCount scores 1.",
+        "Local detail density scores 1: the split-line crease is the one authored micro-feature, carried geometrically rather than as a color bucket.",
+        "Occlusion risk scores 1: the far side (opposite the crease) is hidden but fully inferable by radial symmetry.",
+        "Action readiness scores 0: static turntable showcase prop, no pivots/sockets/colliders beyond a bounding proxy.",
+        "Aggregate 5/24 with no axis above 1 confirms the simple tier."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": false,
+      "needsMaterialLocalOverrides": false,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier by part count, but still needs meso depth (the base patch is a separately shaded sub-region split from the shell) even though there is no repetition system (single instance, not a cluster)."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerated by hand from the three supplied reference views rather than by build_detail_inventory.py -- CRIB.md skip rule for a single simple body.",
+      "details": [
+        {
+          "id": "belly-base-taper",
+          "zone": "lower half of the body",
+          "observation": "The base edge is visibly narrower than the belly bulge above it -- the shell pinches inward toward the ground rather than flaring flush.",
+          "inference": "Natural chestnut morphology -- the shell narrows toward its attachment scar.",
+          "confidence": 0.85,
+          "evidenceRef": "chestnut-2.png front elevation",
+          "kind": "ridge",
+          "mapsTo": {
+            "ref": "chestnut-belly-taper",
+            "note": ""
+          }
+        },
+        {
+          "id": "sharp-apex-tuft",
+          "zone": "top pole",
+          "observation": "The top tapers to a genuinely sharp point, not a rounded crown.",
+          "inference": "Stylized rendering of the chestnut's stigma-scar tuft.",
+          "confidence": 0.9,
+          "evidenceRef": "chestnut.png full frame",
+          "kind": "ridge",
+          "mapsTo": {
+            "ref": "chestnut-apex-tuft",
+            "note": ""
+          }
+        },
+        {
+          "id": "split-line-seam",
+          "zone": "right side of the dome, apex to near-base",
+          "observation": "A single lighter seam (#C68B5B) runs from the apex down one side of the dome, distinct from the dominant shell tone as a hard facet edge with no gradient.",
+          "inference": "Natural chestnut shell suture line.",
+          "confidence": 0.85,
+          "evidenceRef": "chestnut.png full frame",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "chestnut-split-line",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/chestnut.png"
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 1,
+      "mesoComponents": 1,
+      "microFeatureGroups": 0,
+      "materialLayers": 2,
+      "repetitionSystems": 0,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.75,
+    "mustMatch": [
+      "onion-dome silhouette: belly wider than base, sharp apex tuft",
+      "height:width ratio ~0.62:1",
+      "base narrower than belly (inward taper toward ground)",
+      "shell/base-patch two-tone facet split, surviving the runtime Lambert swap",
+      "split-line crease visible from the review camera",
+      "faceted flat shading baked into geometry"
+    ],
+    "niceToHave": [
+      "exact split-line crease width/depth"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "onion-dome-silhouette",
+      "name": "Onion-dome silhouette: belly wider than base, sharp apex",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "chestnut-shell"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ]
+    },
+    {
+      "id": "belly-base-taper",
+      "name": "Belly wider than base (inward taper toward ground)",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "chestnut-shell"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "base-patch-facet-split",
+      "name": "Shell/base-patch two-tone facet split",
+      "tier": "critical",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "chestnut-base-patch"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "split-line-crease-visible",
+      "name": "Split-line crease visible from the review camera",
+      "tier": "important",
+      "passIds": [
+        "form-refinement",
+        "surface-pass"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "chestnut-shell"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "shared-ground-plane",
+      "name": "Rests on the shared ground, no floating parts",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass"
+      ],
+      "minimumScore": 0.85,
+      "mustPass": true,
+      "componentRefs": [
+        "chestnut-shell"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "baked-faceting",
+      "name": "Faceted flat shading baked into geometry",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "chestnut-shell"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "blockout",
+    "completedPasses": [],
+    "lastCompletedPass": "",
+    "blockedReason": "blockout requires a browser screenshot and self-correction review before structural-pass unlocks",
+    "nextRequiredEvidence": [
+      "blockout browser render screenshot from your agent's browser/screenshot tool",
+      "side-by-side reference/render comparison sheet",
+      "AI vision score >= 0.7 with layer scores and mismatch critique",
+      "critical semantic feature scores from the same image pair meeting their individual thresholds",
+      "reviewHistory entry for blockout with action=continue"
+    ],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model (spec.lookDevTargets.lightingPass.authority)",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy; preSpecAssessment scores actionReadinessNeed 0"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "See qualityContract.featureGroups.reference-lookdev.documentedLimitation: the consumer runtime keeps only map and color, and the repo bans PBR maps outright."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer, not authored here: scripts/breadlab.ts mirrors scripts/thumbsHarness.ts with a warm directional key 0xffe2b0 at (-2, 6, 2) intensity 1.4, an ambient 0xfff0dc at 0.75 and a cool fill 0xdce8ff at (2.5, 3, -2) intensity 0.2.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The far side of the dome (opposite the split-line crease) is never directly visible at any reviewed azimuth; resolved by construction (full radial symmetry before the crease indent).",
+    "The runtime normalizes the longest axis to 1.6, so absolute dimensions are arbitrary and only the authored ratios carry meaning.",
+    "The split-line crease position is not identity-critical at pixel precision; its presence and camera-facing orientation are what the review scores."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "CHESTNUT_RADIUS = 0.5 relative unit at the belly. Absolute scale is meaningless: the consumer runtime refits the longest axis to 1.6 (types.ts section 7)."
+  },
+  "silhouette": {
+    "boundingShape": "onion-dome, roughly 1.0 wide by 0.62 tall in relative units",
+    "aspectRatios": [
+      {
+        "id": "height-over-width",
+        "value": 0.62,
+        "source": "chestnut-2.png front elevation"
+      },
+      {
+        "id": "base-over-belly-radius",
+        "value": 0.8,
+        "source": "chestnut-2.png: base edge visibly narrower than the belly bulge"
+      }
+    ],
+    "symmetry": "radially symmetric about the vertical axis, broken only by the single split-line crease and surface jitter",
+    "dominantCurves": [
+      "smooth convex taper from belly to apex, sharper taper from belly down to base"
+    ],
+    "negativeSpaces": [
+      "none -- a single solid body"
+    ],
+    "landmarks": [
+      "widest point (belly) at heightFraction 0.32",
+      "sharp apex tuft at heightFraction 1.0",
+      "pale base patch confined to the flat bottom disk",
+      "split-line crease facing the review camera"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "onion-dome silhouette: broad rounded belly narrowing to a sharp pointed apex tuft",
+        "a single lighter split-line seam runs from the apex down the right side of the dome",
+        "a pale flat oval patch occupies the lower-front base where the shell meets the ground"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "widest point (belly) sits roughly 30-35% of the way up from the base, not at the exact midpoint",
+        "base is visibly narrower than the belly bulge above it -- the shell tapers inward toward the ground",
+        "apex tapers to a genuinely sharp point, not a rounded crown"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "cross-section reads as near-circular (radially symmetric), confirming a single revolved-shell primitive",
+        "the split-line seam is visible as a short bright arc near the silhouette edge, not crossing the center"
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Chestnut",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the shell body; it emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 0.62,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "chestnut-shell"
+        }
+      },
+      "material": "chestnut-shell",
+      "materialLayers": [
+        "chestnut-shell",
+        "chestnut-base-patch"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(122, 86, 56, 1.0)",
+        "secondaryAlbedo": "rgba(217, 196, 160, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe. The reference explicitly excludes any shine.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/chestnut.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single sector-local radius indent for the split-line crease -- shape otherwise carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; underside/crease darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished chestnut carries no wear",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "chestnut-shell",
+      "name": "Chestnut shell (dome + crease)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous, smoothly varying rotationally symmetric mass -- an onion-dome shell revolved from a single monotonic-then-tapering profile, poles at apex and base center. Decision tree step 6. Not a sphere/cone primitive because the reference shows a distinct belly-wider-than-base taper and a sharp (not rounded) apex, which only a custom profile carries.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.4,
+              0.0
+            ],
+            [
+              0.46,
+              0.0868
+            ],
+            [
+              0.5,
+              0.1984
+            ],
+            [
+              0.45,
+              0.3224
+            ],
+            [
+              0.34,
+              0.4464
+            ],
+            [
+              0.2,
+              0.5456
+            ],
+            [
+              0.07,
+              0.5952
+            ],
+            [
+              0.0,
+              0.62
+            ]
+          ],
+          "segments": 16,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "split-line-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.08,
+            "notes": "Single-sector (sector 5 of 16, azimuth ~112.5-135deg, facing the harness three-quarter camera) radius indent across rings [2, 3, 4, 5, 6, 7], multiplying local radius by (1 - 0.08). Carries the reference's #C68B5B split-line hue as a geometric facet-shading seam instead of a third material bucket (mesh<=2 budget, types.ts section 1)."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.018,
+            "notes": "Uniform per-vertex position noise, amplitude 0.018 (0.036 of equatorial radius), applied while the shell is still indexed so the base-patch/shell shared triangle boundary moves together and never tears (R1)."
+          }
+        ],
+        "uvStrategy": "dome (polar top-down) projection per material bucket (scripts/breads/lib.ts uvDome) -- no texture is emitted, UVs exist only for merge attribute consistency",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.0,
+        "height": 0.62,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "chestnut-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "chestnut-shell"
+        }
+      },
+      "material": "chestnut-shell",
+      "materialLayers": [
+        "chestnut-shell",
+        "chestnut-base-patch"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(122, 86, 56, 1.0)",
+        "secondaryAlbedo": "rgba(217, 196, 160, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe. The reference explicitly excludes any shine.",
+        "zone": "full dome, dominant tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/chestnut.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "split-line-crease",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "chestnut-base-boundary",
+          "kind": "material-boundary",
+          "notes": "Boundary between chestnut-shell and chestnut-base-patch is a triangle-range slice on one shared indexed shell (lib.sliceTriangles at the base-edge ring transition), not a separate geometry -- watertight by construction, no seam-overlap risk."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "chestnut-belly-taper",
+          "name": "Belly-wider-than-base taper",
+          "kind": "ridge",
+          "description": "Widest point (belly, rFrac 1.0) sits at heightFraction 0.32, clearly wider than the base edge (rFrac 0.80 at heightFraction 0); the base pinches inward relative to the belly rather than flaring flush.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "chestnut-apex-tuft",
+          "name": "Sharp apex tuft",
+          "kind": "ridge",
+          "description": "The top pole tapers to a genuinely sharp point (radius reaches 0 by heightFraction 0.96-1.0), not a rounded crown.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "chestnut-split-line",
+          "name": "Split-line crease",
+          "kind": "seam",
+          "description": "A single sector-local radius indent (sector 5) running rings [2, 3, 4, 5, 6, 7], from just above the base edge to just below the apex, facing the harness camera.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single sector-local radius indent for the split-line crease -- shape otherwise carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; underside/crease darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished chestnut carries no wear",
+        "notes": "Shell tone covers everything above the base-patch boundary. The runtime replaces the material with MeshLambertMaterial keeping only map and color, so all shape relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "chestnut-belly-taper",
+        "chestnut-apex-tuft",
+        "chestnut-split-line"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "chestnut-base-patch",
+      "name": "Chestnut flat base patch",
+      "level": "meso",
+      "role": "surface",
+      "importance": 0.7,
+      "confidence": 0.85,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Not a separate solid -- the flat bottom-cap fan of the parent shell's own indexed geometry (pole-to-base-edge triangle fan), selected by a fixed triangle-index range after facet(), mirroring how scone.ts splits body/top by a triangle-range slice at a shared ring.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.4,
+              0.0
+            ]
+          ],
+          "segments": 16,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "dome (polar top-down) projection (scripts/breads/lib.ts uvDome)",
+        "normalStrategy": "flat normals inherited from the parent shell's split-vertex facet bake"
+      },
+      "parent": "chestnut-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.8,
+        "height": 0.0,
+        "depth": 0.8,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Spherical bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "chestnut-base-patch",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "chestnut-shell"
+        }
+      },
+      "material": "chestnut-base-patch",
+      "materialLayers": [
+        "chestnut-base-patch"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(217, 196, 160, 1.0)",
+        "secondaryAlbedo": "rgba(122, 86, 56, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte faceted ingredient prop: opaque dielectric, roughness 1.0, no specular lobe. The reference explicitly excludes any shine.",
+        "zone": "flat bottom disk",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/chestnut.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [
+        {
+          "id": "chestnut-base-patch-boundary",
+          "kind": "material-boundary",
+          "notes": "Shares the parent shell's own triangles at the base-edge ring; watertight because both buckets come from one indexed shell split by triangle index, never two independently built solids."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "chestnut-base-patch-region",
+          "name": "Pale flat base patch",
+          "kind": "contour",
+          "description": "Pale oatmeal color (#D9C4A0) confined to the flat bottom disk fan, a hard facet edge with no gradient, per assets/prompts/ingredients/chestnut.json.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices",
+        "displacementPattern": "single sector-local radius indent for the split-line crease -- shape otherwise carried entirely by the revolved profile",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; underside/crease darkening comes from N.L falloff alone",
+        "edgeWearPattern": "none -- a whole, unblemished chestnut carries no wear",
+        "notes": "assets/prompts/ingredients/chestnut.json geometry.surface: the base patch is identity-critical for reading 'chestnut' rather than a generic brown dome at 64px thumbnail scale."
+      },
+      "evidenceRefs": [
+        "view-three-quarter"
+      ],
+      "details": [
+        "chestnut-base-patch-region"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "chestnut-shell",
+      "name": "Chestnut shell (warm russet-brown)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#7A5638",
+      "color": "#7A5638",
+      "albedo": {
+        "dominant": "#7A5638",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/chestnut.json geometry.surface, the curated prompt that generated these reference images. Deliberately NOT sampled from reference pixels, which carry the generator's baked key light."
+      },
+      "colorVariation": {
+        "palette": [
+          "#7A5638"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only to satisfy the merge step's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "revolved belly-taper profile",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 3.0,
+          "amplitude": 0.036,
+          "role": "surface jitter noise",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "dome above the base-patch boundary",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "underside-natural-darkening",
+          "name": "Lower-dome key-light falloff",
+          "maskSource": "geometry",
+          "description": "No AO/dirt map is authored; the shaded lower-half hue (#5E4029, prompts/ingredients/chestnut.json) is deliberately NOT painted as a second material -- the runtime key light already darkens the convex dome's lower faces via N.L falloff.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "chestnut-shell"
+          ]
+        },
+        {
+          "id": "split-line-facet-seam",
+          "name": "Split-line crease facet seam",
+          "maskSource": "geometry",
+          "description": "The reference's #C68B5B split-line hue is not painted; a sector-local radius indent (CREASE_SECTOR) creates two new facet edges whose normals catch the key light differently, reading as a lighter/darker seam through shading alone.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "chestnut-shell"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "dome above the base-patch boundary. Two solid colors are enough for the whole body, so no texture is emitted at all."
+    },
+    {
+      "id": "chestnut-base-patch",
+      "name": "Chestnut base patch (pale oatmeal)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#D9C4A0",
+      "color": "#D9C4A0",
+      "albedo": {
+        "dominant": "#D9C4A0",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/chestnut.json geometry.surface, the curated prompt that generated these reference images. Deliberately NOT sampled from reference pixels, which carry the generator's baked key light."
+      },
+      "colorVariation": {
+        "palette": [
+          "#D9C4A0"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only to satisfy the merge step's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "revolved belly-taper profile",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 3.0,
+          "amplitude": 0.036,
+          "role": "surface jitter noise",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "flat bottom disk",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "base-patch-facet-boundary",
+          "name": "Shell/base-patch facet boundary",
+          "maskSource": "geometry",
+          "description": "The boundary is a fixed triangle-index range (the pole-to-base-edge fan) sliced from the shared indexed shell -- a hard geometric edge between two meshes, not a texture boundary and not a vertex-color ramp.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "chestnut-base-patch"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "flat bottom disk. Two solid colors are enough for the whole body, so no texture is emitted at all."
+    }
+  ],
+  "repetitionSystems": [],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [],
+  "reviewHistory": [],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 224,
+    "maxDrawCalls": 2,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Hard consumer budget for the 'single' ingredient group: 200-500 tri and <=48KB target (types.ts R2), hard ceiling <=2500 tri and <=100KB (scripts/check-budget.mjs). Target reached by construction (16 segments x 8 profile transitions = 224 tri before crease displacement, which adds zero triangles), not by decimation."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, upper-left -- the same relationship as the reference's 'single soft key light upper-left'.",
+      "usage": "Fixed by scripts/breadlab.ts, mirrored from scripts/thumbsHarness.ts. Not authored by the model.",
+      "exposure": "no exposure control and no tone mapping -- authored albedo lands on screen almost unchanged."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75 -- a high ambient ratio, which is why the lower-dome darkening and the crease seam rely on the shell's own curvature turning away from the key light rather than a painted shadow tone.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none -- no shadow map, no ground plane rendered."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2, opposite the key.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping (three.js default); no AO available on the runtime Lambert material."
+    }
+  ],
+  "proceduralStrategy": [
+    "Revolve the shell from the shared belly-taper profile (pole at base center, base edge, belly, apex pole).",
+    "Indent one fixed sector's radius across the mid-profile rings before jitter to carry the split-line crease as facet shading.",
+    "Jitter vertices while the shell is still indexed, so the base-patch/shell split never tears.",
+    "Bake faceting by splitting vertices and recomputing normals; never request flatShading.",
+    "Slice the base-cap fan (pole-to-base-edge) into its own triangle range after facet() for the base-patch material.",
+    "Project dome UVs per bucket, then merge by material into exactly two meshes.",
+    "Translate the whole shell's own bounding box floor to world Y=0."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-body rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single fractureGroup; no plausible sub-fracture for a whole chestnut"
+  ],
+  "risks": [
+    {
+      "id": "shaded-lower-hue-dropped",
+      "severity": "medium",
+      "description": "assets/prompts/ingredients/chestnut.json names a third hue (#5E4029) for the shaded lower half, which this spec does not wire to a material bucket.",
+      "mitigation": "mesh<=2 budget forces a 2-bucket split (types.ts section 1); the runtime key light already darkens the lower dome of a convex shell for free via N.L falloff. Shell bucket carries #7A5638 everywhere except the base-patch fan."
+    },
+    {
+      "id": "split-line-color-dropped",
+      "severity": "medium",
+      "description": "assets/prompts/ingredients/chestnut.json names a fourth hue (#C68B5B) for the split-line seam, which this spec does not wire to a material bucket.",
+      "mitigation": "Carried as a geometric sector-local radius indent (CREASE_SECTOR) instead -- the two new facet edges catch the key light differently, reading as a lighter/darker seam through shading rather than paint. Sector chosen to face the harness review camera (azimuth ~121.8deg)."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-color-based region paint is silently discarded by the runtime's MeshLambertMaterial swap, collapsing the two-tone split to one flat tone.",
+      "mitigation": "The shell/base-patch split is carried by two separate materials on two separate triangle ranges from one shared indexed shell, split by triangle index. No vertexPaint block is authored anywhere in this spec."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "A flatShading flag is not inherited by the runtime material swap, so a model relying on it renders smooth.",
+      "mitigation": "Faceting is baked into geometry by splitting vertices (scripts/breads/lib.ts facet) before export."
+    },
+    {
+      "id": "seam-tear",
+      "severity": "medium",
+      "description": "Base-patch and shell triangles come from the same shell; jittering after the triangle-range slice (rather than before) would let the shared boundary vertices move independently and open a crack.",
+      "mitigation": "Jitter runs once, on the whole indexed shell, before facet()/slice -- both buckets read the same already-jittered positions."
+    },
+    {
+      "id": "merge-attribute-mismatch",
+      "severity": "medium",
+      "description": "mergeByMaterial throws when geometries in one bucket carry different attribute sets.",
+      "mitigation": "Every geometry gets exactly position, normal and uv; no color attribute is ever created; both part geometries route through the same uvDome call."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Chestnut",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  }
+}

@@ -1,0 +1,3753 @@
+{
+  "targetName": "Cranberry Heap",
+  "targetId": "cranberry-heap",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\ingredients\\src\\cranberry.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved; review camera is fixed by the consumer harness."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 2,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "small heap of six dried cranberries",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic",
+        "low-poly faceted"
+      ],
+      "structureKind": [
+        "repeated instances",
+        "discrete resting cluster"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte faceted clay shading, flat color facets only. Identity carried by silhouette (flattened oblate) + carved crease geometry, not color -- mesh=1, simplest material budget in the batch alongside choco."
+    },
+    "complexity": {
+      "tier": "moderate",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 1,
+        "hierarchyDepth": 1,
+        "repetitionDensity": 1,
+        "materialLayerCount": 0,
+        "localDetailDensity": 1,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 6,
+        "mesoComponents": 0,
+        "microFeatureGroups": 0,
+        "materialLayers": 1,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Six near-identical macro bodies differing only in XZ offset/yaw and crease-sector rng draw, so componentCount scores 1.",
+        "Silhouette scores 2 (not 1): the carved crease groove is a real, load-bearing silhouette/normal feature, more than olive/choco's smooth taper alone.",
+        "Repetition density scores 1: 6 instances, hand-placed, matching the batch's established scale.",
+        "materialLayerCount scores 0: only 1 material bucket needed -- both secondary hex dropped (crease now geometric, blush free-via-lighting).",
+        "Local detail density scores 1: crease + flatten deformation are the only two authored details.",
+        "Occlusion risk scores 1: interior/back berries' far sides are hidden but inferable by near-symmetry.",
+        "Action readiness scores 0: static turntable showcase prop."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": false,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Simple tier, macro-only (no mask split needed since crease is a deformation, not a second material), one repetition system for the 6-instance mound."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 2,
+      "note": "Enumerated by hand from the three supplied reference views -- CRIB.md skip rule for single-repeated-system objects.",
+      "details": [
+        {
+          "id": "longitudinal-fold-crease-profile",
+          "zone": "per-berry top surface",
+          "observation": "Every berry shows 1-2 fold-crease grooves running along its flattened top surface, parallel to the long axis, not radiating from a pole.",
+          "inference": "Dried-fruit wrinkle -- the defining identity signal distinguishing cranberry from a smooth berry.",
+          "confidence": 0.9,
+          "evidenceRef": "cranberry-2.png front elevation, cranberry-3.png top-down",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "cranberry-a-fold-crease",
+            "note": ""
+          }
+        },
+        {
+          "id": "flattened-oblate-form",
+          "zone": "per-berry silhouette",
+          "observation": "Berries read as flattened discs/lentils, not spheres -- height distinctly less than width.",
+          "inference": "Drying flattens the berry; distinguishes from the perfectly round blueberry in the same batch.",
+          "confidence": 0.85,
+          "evidenceRef": "cranberry-2.png front elevation, all instances",
+          "kind": "contour",
+          "mapsTo": {
+            "ref": "cranberry-a-flattened-oblate",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png"
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 6,
+      "mesoComponents": 0,
+      "microFeatureGroups": 2,
+      "materialLayers": 1,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.75,
+    "mustMatch": [
+      "six-berry mound silhouette with all six individually readable",
+      "flattened oblate silhouette, not spherical",
+      "visible longitudinal fold crease per berry",
+      "faceted flat shading baked into geometry"
+    ],
+    "niceToHave": [
+      "exact per-berry crease count/position"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "six-berry-mound-silhouette",
+      "name": "Six-berry mound silhouette, all individually readable",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "cranberry-a",
+        "cranberry-b",
+        "cranberry-c",
+        "cranberry-d",
+        "cranberry-e",
+        "cranberry-f"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "flattened-oblate-silhouette",
+      "name": "Flattened oblate silhouette (not spherical)",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": [
+        "cranberry-a",
+        "cranberry-b",
+        "cranberry-c",
+        "cranberry-d",
+        "cranberry-e",
+        "cranberry-f"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    },
+    {
+      "id": "longitudinal-fold-crease",
+      "name": "Visible longitudinal fold crease on top surface",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement",
+        "surface-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": true,
+      "componentRefs": [
+        "cranberry-a",
+        "cranberry-b",
+        "cranberry-c",
+        "cranberry-d",
+        "cranberry-e",
+        "cranberry-f"
+      ],
+      "evidenceRefs": [
+        "view-front",
+        "view-top"
+      ]
+    },
+    {
+      "id": "shared-ground-plane",
+      "name": "All six berries rest on the shared ground, no floating parts",
+      "tier": "critical",
+      "passIds": [
+        "structural-pass"
+      ],
+      "minimumScore": 0.85,
+      "mustPass": true,
+      "componentRefs": [
+        "cranberry-a",
+        "cranberry-b",
+        "cranberry-c",
+        "cranberry-d",
+        "cranberry-e",
+        "cranberry-f"
+      ],
+      "evidenceRefs": [
+        "view-front"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": [],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color; repo bans PBR maps outright."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer: scripts/breadlab.ts mirrors scripts/thumbsHarness.ts with a warm directional key 0xffe2b0 at (-2, 6, 2) intensity 1.4, an ambient 0xfff0dc at 0.75 and a cool fill 0xdce8ff at (2.5, 3, -2) intensity 0.2.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "The runtime normalizes the cluster's longest axis to 1.6, so absolute dimensions are arbitrary.",
+    "Exact crease count/position per berry is not identity-critical at pixel precision; the flattened silhouette + at-least-one-visible-crease read is what the review scores."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "CRANBERRY_RADIUS = 0.5 relative unit. Absolute scale is meaningless: the consumer runtime refits the cluster's longest axis to 1.6 (types.ts section 6)."
+  },
+  "silhouette": {
+    "boundingShape": "compact hex-packed mound of six flattened oblate berries, roughly 2.7 wide by 0.75 tall by 1.9 deep in relative units",
+    "aspectRatios": [
+      {
+        "id": "berry-length-over-height",
+        "value": 1.49,
+        "source": "2*0.56 / (2*0.5*0.75)"
+      }
+    ],
+    "symmetry": "each berry is approximately radially symmetric before the crease pull and flatten deformations break it slightly; the cluster as a whole is asymmetric",
+    "dominantCurves": [
+      "smooth oblate curve, flattened on the vertical axis"
+    ],
+    "negativeSpaces": [
+      "longitudinal fold-crease grooves on each berry's top surface",
+      "shallow contact creases where berries touch"
+    ],
+    "landmarks": [
+      "1-2 fold creases per berry, always facing world-up regardless of yaw"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "six oblate near-round berries in a compact touching mound, individually readable",
+        "each berry shows 1-2 longitudinal fold creases on its visible top surface, not radiating from a pole",
+        "silhouette is flattened/plump, not spherical -- distinguishes from blueberry in the same batch"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "berries read as flattened discs/lentils, height distinctly less than width",
+        "fold creases run roughly horizontally across the visible face, parallel to the long axis"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "six roughly oval footprints packed into a compact cluster",
+        "creases visible on the top faces run along the long axis of each berry, confirming the front-elevation read"
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Cranberry Heap",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the six berry bodies; emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.7,
+        "height": 0.75,
+        "depth": 1.9,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Oblate bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cranberry-body"
+        }
+      },
+      "material": "cranberry-body",
+      "materialLayers": [
+        "cranberry-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(179, 50, 74, 1.0)",
+        "secondaryAlbedo": "rgba(179, 50, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cranberry.json geometry.surface"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cluster-arrangement",
+          "name": "Six-berry hex-packed mound",
+          "kind": "contour",
+          "description": "Six berries placed with independent XZ offsets and yaw in a compact hex-packed arrangement (types.ts R1); all six share the ground plane at world Y=0 after each instance's own bounding-box floor correction.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the carved crease grooves",
+        "displacementPattern": "crease grooves carried as vertex-position pull-toward-axis on fixed (ring,sector) grid indices, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crease darkness comes from facet-normal N.L falloff alone",
+        "edgeWearPattern": "none",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "cluster-arrangement"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "cranberry-a",
+      "name": "Cranberry (a)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass, laid on its side (rotateZ bake, olive precedent) so the flattened radialScale axis becomes world-up and the profile's pole-to-pole axis becomes the long horizontal axis. Fold creases are a (ring,sector) grid vertex pull-toward-axis on the same shell, not a separate part.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.56
+            ],
+            [
+              0.325,
+              -0.476
+            ],
+            [
+              0.475,
+              -0.252
+            ],
+            [
+              0.5,
+              0.0
+            ],
+            [
+              0.475,
+              0.252
+            ],
+            [
+              0.325,
+              0.476
+            ],
+            [
+              0.0,
+              0.56
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "flatten-radial",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "amplitude": 0.125,
+            "notes": "radialScale sx=0.75 (old local X, becomes world-up after lay-down) vs sz=1.0 -- flattens the berry vertically without touching the long axis."
+          },
+          {
+            "id": "primary-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.28,
+            "notes": "Sectors [4, 5, 6] (sectorCenter+-1, faces world-up after lay-down per olive's cap convention) pulled toward the local axis by 28% of local radius on every non-pole ring, before jitter."
+          },
+          {
+            "id": "secondary-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.18,
+            "notes": "One rng-chosen sector per berry (excluding the primary cluster), pulled toward the axis by a shallower amount -- organic per-instance variation, deterministic under the builder rng."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.016,
+            "notes": "amplitude 0.016 (0.032 of radius), applied indexed after the crease pulls."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.12,
+        "height": 0.75,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          -0.86,
+          0.0,
+          -0.42
+        ],
+        "rotation": [
+          0.0,
+          0.35,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Oblate bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cranberry-a",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cranberry-body"
+        }
+      },
+      "material": "cranberry-body",
+      "materialLayers": [
+        "cranberry-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(179, 50, 74, 1.0)",
+        "secondaryAlbedo": "rgba(179, 50, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cranberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "flatten-radial",
+        "primary-crease",
+        "secondary-crease",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cranberry-a-fold-crease",
+          "name": "Longitudinal fold crease",
+          "kind": "seam",
+          "description": "1-2 grooves carved along the flattened top surface (not radiating from a pole), the defining wrinkled-dried-fruit identity cue distinguishing this from a smooth berry.",
+          "evidenceRefs": [
+            "view-front",
+            "view-top"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "cranberry-a-flattened-oblate",
+          "name": "Flattened oblate silhouette",
+          "kind": "contour",
+          "description": "Height distinctly less than width/depth (radialScale sx=0.75), reading as plump-and-flattened rather than spherical.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the carved crease grooves",
+        "displacementPattern": "crease grooves carried as vertex-position pull-toward-axis on fixed (ring,sector) grid indices, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crease darkness comes from facet-normal N.L falloff alone",
+        "edgeWearPattern": "none",
+        "notes": "Single body tone covers every face; crease depth is the only surface relief, carried entirely by geometry."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "cranberry-a-fold-crease",
+        "cranberry-a-flattened-oblate"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "cranberry-b",
+      "name": "Cranberry (b)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass, laid on its side (rotateZ bake, olive precedent) so the flattened radialScale axis becomes world-up and the profile's pole-to-pole axis becomes the long horizontal axis. Fold creases are a (ring,sector) grid vertex pull-toward-axis on the same shell, not a separate part.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.56
+            ],
+            [
+              0.325,
+              -0.476
+            ],
+            [
+              0.475,
+              -0.252
+            ],
+            [
+              0.5,
+              0.0
+            ],
+            [
+              0.475,
+              0.252
+            ],
+            [
+              0.325,
+              0.476
+            ],
+            [
+              0.0,
+              0.56
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "flatten-radial",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "amplitude": 0.125,
+            "notes": "radialScale sx=0.75 (old local X, becomes world-up after lay-down) vs sz=1.0 -- flattens the berry vertically without touching the long axis."
+          },
+          {
+            "id": "primary-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.28,
+            "notes": "Sectors [4, 5, 6] (sectorCenter+-1, faces world-up after lay-down per olive's cap convention) pulled toward the local axis by 28% of local radius on every non-pole ring, before jitter."
+          },
+          {
+            "id": "secondary-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.18,
+            "notes": "One rng-chosen sector per berry (excluding the primary cluster), pulled toward the axis by a shallower amount -- organic per-instance variation, deterministic under the builder rng."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.016,
+            "notes": "amplitude 0.016 (0.032 of radius), applied indexed after the crease pulls."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.12,
+        "height": 0.75,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.02,
+          0.0,
+          -0.5
+        ],
+        "rotation": [
+          0.0,
+          -0.7,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Oblate bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cranberry-b",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cranberry-body"
+        }
+      },
+      "material": "cranberry-body",
+      "materialLayers": [
+        "cranberry-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(179, 50, 74, 1.0)",
+        "secondaryAlbedo": "rgba(179, 50, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cranberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "flatten-radial",
+        "primary-crease",
+        "secondary-crease",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cranberry-b-fold-crease",
+          "name": "Longitudinal fold crease",
+          "kind": "seam",
+          "description": "1-2 grooves carved along the flattened top surface (not radiating from a pole), the defining wrinkled-dried-fruit identity cue distinguishing this from a smooth berry.",
+          "evidenceRefs": [
+            "view-front",
+            "view-top"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "cranberry-b-flattened-oblate",
+          "name": "Flattened oblate silhouette",
+          "kind": "contour",
+          "description": "Height distinctly less than width/depth (radialScale sx=0.75), reading as plump-and-flattened rather than spherical.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the carved crease grooves",
+        "displacementPattern": "crease grooves carried as vertex-position pull-toward-axis on fixed (ring,sector) grid indices, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crease darkness comes from facet-normal N.L falloff alone",
+        "edgeWearPattern": "none",
+        "notes": "Single body tone covers every face; crease depth is the only surface relief, carried entirely by geometry."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "cranberry-b-fold-crease",
+        "cranberry-b-flattened-oblate"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "cranberry-c",
+      "name": "Cranberry (c)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass, laid on its side (rotateZ bake, olive precedent) so the flattened radialScale axis becomes world-up and the profile's pole-to-pole axis becomes the long horizontal axis. Fold creases are a (ring,sector) grid vertex pull-toward-axis on the same shell, not a separate part.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.56
+            ],
+            [
+              0.325,
+              -0.476
+            ],
+            [
+              0.475,
+              -0.252
+            ],
+            [
+              0.5,
+              0.0
+            ],
+            [
+              0.475,
+              0.252
+            ],
+            [
+              0.325,
+              0.476
+            ],
+            [
+              0.0,
+              0.56
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "flatten-radial",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "amplitude": 0.125,
+            "notes": "radialScale sx=0.75 (old local X, becomes world-up after lay-down) vs sz=1.0 -- flattens the berry vertically without touching the long axis."
+          },
+          {
+            "id": "primary-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.28,
+            "notes": "Sectors [4, 5, 6] (sectorCenter+-1, faces world-up after lay-down per olive's cap convention) pulled toward the local axis by 28% of local radius on every non-pole ring, before jitter."
+          },
+          {
+            "id": "secondary-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.18,
+            "notes": "One rng-chosen sector per berry (excluding the primary cluster), pulled toward the axis by a shallower amount -- organic per-instance variation, deterministic under the builder rng."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.016,
+            "notes": "amplitude 0.016 (0.032 of radius), applied indexed after the crease pulls."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.12,
+        "height": 0.75,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.88,
+          0.0,
+          -0.4
+        ],
+        "rotation": [
+          0.0,
+          1.1,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Oblate bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cranberry-c",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cranberry-body"
+        }
+      },
+      "material": "cranberry-body",
+      "materialLayers": [
+        "cranberry-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(179, 50, 74, 1.0)",
+        "secondaryAlbedo": "rgba(179, 50, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cranberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "flatten-radial",
+        "primary-crease",
+        "secondary-crease",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cranberry-c-fold-crease",
+          "name": "Longitudinal fold crease",
+          "kind": "seam",
+          "description": "1-2 grooves carved along the flattened top surface (not radiating from a pole), the defining wrinkled-dried-fruit identity cue distinguishing this from a smooth berry.",
+          "evidenceRefs": [
+            "view-front",
+            "view-top"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "cranberry-c-flattened-oblate",
+          "name": "Flattened oblate silhouette",
+          "kind": "contour",
+          "description": "Height distinctly less than width/depth (radialScale sx=0.75), reading as plump-and-flattened rather than spherical.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the carved crease grooves",
+        "displacementPattern": "crease grooves carried as vertex-position pull-toward-axis on fixed (ring,sector) grid indices, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crease darkness comes from facet-normal N.L falloff alone",
+        "edgeWearPattern": "none",
+        "notes": "Single body tone covers every face; crease depth is the only surface relief, carried entirely by geometry."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "cranberry-c-fold-crease",
+        "cranberry-c-flattened-oblate"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "cranberry-d",
+      "name": "Cranberry (d)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass, laid on its side (rotateZ bake, olive precedent) so the flattened radialScale axis becomes world-up and the profile's pole-to-pole axis becomes the long horizontal axis. Fold creases are a (ring,sector) grid vertex pull-toward-axis on the same shell, not a separate part.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.56
+            ],
+            [
+              0.325,
+              -0.476
+            ],
+            [
+              0.475,
+              -0.252
+            ],
+            [
+              0.5,
+              0.0
+            ],
+            [
+              0.475,
+              0.252
+            ],
+            [
+              0.325,
+              0.476
+            ],
+            [
+              0.0,
+              0.56
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "flatten-radial",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "amplitude": 0.125,
+            "notes": "radialScale sx=0.75 (old local X, becomes world-up after lay-down) vs sz=1.0 -- flattens the berry vertically without touching the long axis."
+          },
+          {
+            "id": "primary-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.28,
+            "notes": "Sectors [4, 5, 6] (sectorCenter+-1, faces world-up after lay-down per olive's cap convention) pulled toward the local axis by 28% of local radius on every non-pole ring, before jitter."
+          },
+          {
+            "id": "secondary-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.18,
+            "notes": "One rng-chosen sector per berry (excluding the primary cluster), pulled toward the axis by a shallower amount -- organic per-instance variation, deterministic under the builder rng."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.016,
+            "notes": "amplitude 0.016 (0.032 of radius), applied indexed after the crease pulls."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.12,
+        "height": 0.75,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          -0.46,
+          0.0,
+          0.42
+        ],
+        "rotation": [
+          0.0,
+          -1.3,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Oblate bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cranberry-d",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cranberry-body"
+        }
+      },
+      "material": "cranberry-body",
+      "materialLayers": [
+        "cranberry-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(179, 50, 74, 1.0)",
+        "secondaryAlbedo": "rgba(179, 50, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cranberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "flatten-radial",
+        "primary-crease",
+        "secondary-crease",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cranberry-d-fold-crease",
+          "name": "Longitudinal fold crease",
+          "kind": "seam",
+          "description": "1-2 grooves carved along the flattened top surface (not radiating from a pole), the defining wrinkled-dried-fruit identity cue distinguishing this from a smooth berry.",
+          "evidenceRefs": [
+            "view-front",
+            "view-top"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "cranberry-d-flattened-oblate",
+          "name": "Flattened oblate silhouette",
+          "kind": "contour",
+          "description": "Height distinctly less than width/depth (radialScale sx=0.75), reading as plump-and-flattened rather than spherical.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the carved crease grooves",
+        "displacementPattern": "crease grooves carried as vertex-position pull-toward-axis on fixed (ring,sector) grid indices, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crease darkness comes from facet-normal N.L falloff alone",
+        "edgeWearPattern": "none",
+        "notes": "Single body tone covers every face; crease depth is the only surface relief, carried entirely by geometry."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "cranberry-d-fold-crease",
+        "cranberry-d-flattened-oblate"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "cranberry-e",
+      "name": "Cranberry (e)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass, laid on its side (rotateZ bake, olive precedent) so the flattened radialScale axis becomes world-up and the profile's pole-to-pole axis becomes the long horizontal axis. Fold creases are a (ring,sector) grid vertex pull-toward-axis on the same shell, not a separate part.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.56
+            ],
+            [
+              0.325,
+              -0.476
+            ],
+            [
+              0.475,
+              -0.252
+            ],
+            [
+              0.5,
+              0.0
+            ],
+            [
+              0.475,
+              0.252
+            ],
+            [
+              0.325,
+              0.476
+            ],
+            [
+              0.0,
+              0.56
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "flatten-radial",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "amplitude": 0.125,
+            "notes": "radialScale sx=0.75 (old local X, becomes world-up after lay-down) vs sz=1.0 -- flattens the berry vertically without touching the long axis."
+          },
+          {
+            "id": "primary-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.28,
+            "notes": "Sectors [4, 5, 6] (sectorCenter+-1, faces world-up after lay-down per olive's cap convention) pulled toward the local axis by 28% of local radius on every non-pole ring, before jitter."
+          },
+          {
+            "id": "secondary-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.18,
+            "notes": "One rng-chosen sector per berry (excluding the primary cluster), pulled toward the axis by a shallower amount -- organic per-instance variation, deterministic under the builder rng."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.016,
+            "notes": "amplitude 0.016 (0.032 of radius), applied indexed after the crease pulls."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.12,
+        "height": 0.75,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0.42,
+          0.0,
+          0.46
+        ],
+        "rotation": [
+          0.0,
+          0.55,
+          0.0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Oblate bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cranberry-e",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cranberry-body"
+        }
+      },
+      "material": "cranberry-body",
+      "materialLayers": [
+        "cranberry-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(179, 50, 74, 1.0)",
+        "secondaryAlbedo": "rgba(179, 50, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cranberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "flatten-radial",
+        "primary-crease",
+        "secondary-crease",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cranberry-e-fold-crease",
+          "name": "Longitudinal fold crease",
+          "kind": "seam",
+          "description": "1-2 grooves carved along the flattened top surface (not radiating from a pole), the defining wrinkled-dried-fruit identity cue distinguishing this from a smooth berry.",
+          "evidenceRefs": [
+            "view-front",
+            "view-top"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "cranberry-e-flattened-oblate",
+          "name": "Flattened oblate silhouette",
+          "kind": "contour",
+          "description": "Height distinctly less than width/depth (radialScale sx=0.75), reading as plump-and-flattened rather than spherical.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the carved crease grooves",
+        "displacementPattern": "crease grooves carried as vertex-position pull-toward-axis on fixed (ring,sector) grid indices, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crease darkness comes from facet-normal N.L falloff alone",
+        "edgeWearPattern": "none",
+        "notes": "Single body tone covers every face; crease depth is the only surface relief, carried entirely by geometry."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "cranberry-e-fold-crease",
+        "cranberry-e-flattened-oblate"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "cranberry-f",
+      "name": "Cranberry (f)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous rotationally-built mass, laid on its side (rotateZ bake, olive precedent) so the flattened radialScale axis becomes world-up and the profile's pole-to-pole axis becomes the long horizontal axis. Fold creases are a (ring,sector) grid vertex pull-toward-axis on the same shell, not a separate part.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, faceted after generation",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              -0.56
+            ],
+            [
+              0.325,
+              -0.476
+            ],
+            [
+              0.475,
+              -0.252
+            ],
+            [
+              0.5,
+              0.0
+            ],
+            [
+              0.475,
+              0.252
+            ],
+            [
+              0.325,
+              0.476
+            ],
+            [
+              0.0,
+              0.56
+            ]
+          ],
+          "segments": 10,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "flatten-radial",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "amplitude": 0.125,
+            "notes": "radialScale sx=0.75 (old local X, becomes world-up after lay-down) vs sz=1.0 -- flattens the berry vertically without touching the long axis."
+          },
+          {
+            "id": "primary-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.28,
+            "notes": "Sectors [4, 5, 6] (sectorCenter+-1, faces world-up after lay-down per olive's cap convention) pulled toward the local axis by 28% of local radius on every non-pole ring, before jitter."
+          },
+          {
+            "id": "secondary-crease",
+            "type": "vertex-displacement",
+            "axis": [
+              1,
+              0,
+              1
+            ],
+            "amplitude": 0.18,
+            "notes": "One rng-chosen sector per berry (excluding the primary cluster), pulled toward the axis by a shallower amount -- organic per-instance variation, deterministic under the builder rng."
+          },
+          {
+            "id": "surface-jitter",
+            "type": "vertex-noise",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.016,
+            "notes": "amplitude 0.016 (0.032 of radius), applied indexed after the crease pulls."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "flat normals baked by splitting vertices after jitter, never a flatShading flag"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.12,
+        "height": 0.75,
+        "depth": 1.0,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          1.15,
+          0.0,
+          0.34
+        ],
+        "rotation": [
+          0.0,
+          2.0,
+          0.18
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "showcase-instance",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.85
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": true,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "sphere",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Oblate bounding proxy; sufficient for a static showcase prop."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cranberry-f",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "cranberry-body"
+        }
+      },
+      "material": "cranberry-body",
+      "materialLayers": [
+        "cranberry-body"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(179, 50, 74, 1.0)",
+        "secondaryAlbedo": "rgba(179, 50, 74, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte faceted ingredient prop, roughness 1.0, no specular lobe -- prompt JSON explicitly excludes shine.",
+        "zone": "full body, single tone",
+        "evidenceRefs": [
+          "assets/prompts/ingredients/cranberry.json geometry.surface"
+        ]
+      },
+      "deformations": [
+        "flatten-radial",
+        "primary-crease",
+        "secondary-crease",
+        "surface-jitter"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cranberry-f-fold-crease",
+          "name": "Longitudinal fold crease",
+          "kind": "seam",
+          "description": "1-2 grooves carved along the flattened top surface (not radiating from a pole), the defining wrinkled-dried-fruit identity cue distinguishing this from a smooth berry.",
+          "evidenceRefs": [
+            "view-front",
+            "view-top"
+          ],
+          "confidence": 0.85
+        },
+        {
+          "id": "cranberry-f-flattened-oblate",
+          "name": "Flattened oblate silhouette",
+          "kind": "contour",
+          "description": "Height distinctly less than width/depth (radialScale sx=0.75), reading as plump-and-flattened rather than spherical.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "faceted planar shading from split vertices, including the carved crease grooves",
+        "displacementPattern": "crease grooves carried as vertex-position pull-toward-axis on fixed (ring,sector) grid indices, zero extra triangles",
+        "occlusionPattern": "none -- runtime Lambert has no AO channel; crease darkness comes from facet-normal N.L falloff alone",
+        "edgeWearPattern": "none",
+        "notes": "Single body tone covers every face; crease depth is the only surface relief, carried entirely by geometry."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "cranberry-f-fold-crease",
+        "cranberry-f-flattened-oblate"
+      ],
+      "fidelityTier": "form-refinement"
+    }
+  ],
+  "materials": [
+    {
+      "id": "cranberry-body",
+      "name": "Cranberry body (deep saturated crimson)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#B3324A",
+      "color": "#B3324A",
+      "albedo": {
+        "dominant": "#B3324A",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/ingredients/cranberry.json geometry.surface."
+      },
+      "colorVariation": {
+        "palette": [
+          "#B3324A"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "No texture is emitted. UVs exist only for merge attribute consistency."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "flattened oblate profile",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 2.0,
+          "amplitude": 0.25,
+          "role": "longitudinal fold crease grooves",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 4.0,
+          "amplitude": 0.032,
+          "role": "surface jitter noise",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert -- the runtime Lambert swap discards roughness entirely"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "single-tone body with crease grooves",
+        "amplitude": 0.0,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel: the runtime Lambert material has none."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "crease-natural-darkening",
+          "name": "Crease facet-normal shading",
+          "maskSource": "geometry",
+          "description": "No second dark bucket is authored for the crease shadow hex (#8E2438); the carved groove's own facet normals already darken under the runtime key light, the same mechanism cracker's docking holes use.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "cranberry-a",
+            "cranberry-b",
+            "cranberry-c",
+            "cranberry-d",
+            "cranberry-e",
+            "cranberry-f"
+          ]
+        },
+        {
+          "id": "upper-blush-natural-highlight",
+          "name": "Per-face key-light highlight",
+          "maskSource": "geometry",
+          "description": "No bright bucket is authored for the upper-face blush hex (#D9707F); the runtime key light's N.L falloff already brightens upper-facing facets for free (olive/choco precedent).",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "cranberry-a",
+            "cranberry-b",
+            "cranberry-c",
+            "cranberry-d",
+            "cranberry-e",
+            "cranberry-f"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: that flag is not inherited by the runtime swap either. Faceting must be baked as split vertices."
+      ],
+      "notes": "Single solid color for the whole cluster; identity carried entirely by silhouette + carved crease geometry (types.ts inherited section 9). mesh=1."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "cranberry-mound",
+      "name": "Six-berry hex-packed mound",
+      "level": "macro",
+      "hostComponents": [
+        "root"
+      ],
+      "elementComponentIds": [
+        "cranberry-a",
+        "cranberry-b",
+        "cranberry-c",
+        "cranberry-d",
+        "cranberry-e",
+        "cranberry-f"
+      ],
+      "elementKind": "repeated macro body, single-mesh lay-down shell with carved creases each",
+      "count": 6,
+      "distribution": {
+        "mode": "hand-placed XZ offsets with independent yaw; crease always faces world-up post-layout regardless of yaw (yaw only rotates about the vertical axis)",
+        "offsets": {
+          "a": [
+            -0.86,
+            -0.42
+          ],
+          "b": [
+            0.02,
+            -0.5
+          ],
+          "c": [
+            0.88,
+            -0.4
+          ],
+          "d": [
+            -0.46,
+            0.42
+          ],
+          "e": [
+            0.42,
+            0.46
+          ],
+          "f": [
+            1.15,
+            0.34
+          ]
+        },
+        "yaw": {
+          "a": 0.35,
+          "b": -0.7,
+          "c": 1.1,
+          "d": -1.3,
+          "e": 0.55,
+          "f": 2.0
+        },
+        "note": "Offsets read off cranberry-3.png (top-down footprint); berry-f carries an extra tiltZ for visual variety (olive-a precedent)."
+      },
+      "sizeClasses": [
+        {
+          "id": "berry",
+          "radius": 0.5,
+          "halfLength": 0.56
+        }
+      ],
+      "seedRule": "Offsets/yaw are fixed authored values; surface-jitter and the secondary-crease sector selection consume the builder rng, so the exported GLB is byte-deterministic.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-25T17:42:04.770460+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.8,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "six-berry-mound-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "6 individually readable oblate berries in a tight hex-packed mound; count and general pile arrangement match cranberry.png/cranberry-3.png."
+        },
+        {
+          "id": "flattened-oblate-silhouette",
+          "score": 0.72,
+          "visible": true,
+          "notes": "FLATTEN_X=0.68 gives a distinctly flattened lumpy silhouette (not spherical) on shot-90/180/270, matching cranberry-2.png's flattened-disc read."
+        },
+        {
+          "id": "longitudinal-fold-crease",
+          "score": 0.72,
+          "visible": true,
+          "notes": "v3 (cmp-3.png, after 2 depth/taper iterations): tapered single-sector V-notch (center depth 0.6, neighbors 0.08) reads as a clear dark fold line on most berries, a large improvement over the v1/v2 broad shallow dip that read as generic low-poly bumpiness."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read of cmp-3.png (final iteration after v1 broad-shallow-dip -> v2 tapered-3-sector -> v3 sharp single-sector V-notch): flattened lumpy silhouette and visible fold creases read clearly, matching the wrinkled-dried-fruit identity distinct from the smooth-sphere blueberry in the same batch."
+    },
+    {
+      "timestamp": "2026-08-25T17:42:07.954456+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.8,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "six-berry-mound-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "6 individually readable oblate berries in a tight hex-packed mound; count and general pile arrangement match cranberry.png/cranberry-3.png."
+        },
+        {
+          "id": "flattened-oblate-silhouette",
+          "score": 0.72,
+          "visible": true,
+          "notes": "FLATTEN_X=0.68 gives a distinctly flattened lumpy silhouette (not spherical) on shot-90/180/270, matching cranberry-2.png's flattened-disc read."
+        },
+        {
+          "id": "longitudinal-fold-crease",
+          "score": 0.72,
+          "visible": true,
+          "notes": "v3 (cmp-3.png, after 2 depth/taper iterations): tapered single-sector V-notch (center depth 0.6, neighbors 0.08) reads as a clear dark fold line on most berries, a large improvement over the v1/v2 broad shallow dip that read as generic low-poly bumpiness."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read of cmp-3.png (final iteration after v1 broad-shallow-dip -> v2 tapered-3-sector -> v3 sharp single-sector V-notch): flattened lumpy silhouette and visible fold creases read clearly, matching the wrinkled-dried-fruit identity distinct from the smooth-sphere blueberry in the same batch."
+    },
+    {
+      "timestamp": "2026-08-25T17:42:11.280950+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.8,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "six-berry-mound-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "6 individually readable oblate berries in a tight hex-packed mound; count and general pile arrangement match cranberry.png/cranberry-3.png."
+        },
+        {
+          "id": "flattened-oblate-silhouette",
+          "score": 0.72,
+          "visible": true,
+          "notes": "FLATTEN_X=0.68 gives a distinctly flattened lumpy silhouette (not spherical) on shot-90/180/270, matching cranberry-2.png's flattened-disc read."
+        },
+        {
+          "id": "longitudinal-fold-crease",
+          "score": 0.72,
+          "visible": true,
+          "notes": "v3 (cmp-3.png, after 2 depth/taper iterations): tapered single-sector V-notch (center depth 0.6, neighbors 0.08) reads as a clear dark fold line on most berries, a large improvement over the v1/v2 broad shallow dip that read as generic low-poly bumpiness."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read of cmp-3.png (final iteration after v1 broad-shallow-dip -> v2 tapered-3-sector -> v3 sharp single-sector V-notch): flattened lumpy silhouette and visible fold creases read clearly, matching the wrinkled-dried-fruit identity distinct from the smooth-sphere blueberry in the same batch."
+    },
+    {
+      "timestamp": "2026-08-25T17:42:14.609749+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.8,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "six-berry-mound-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "6 individually readable oblate berries in a tight hex-packed mound; count and general pile arrangement match cranberry.png/cranberry-3.png."
+        },
+        {
+          "id": "flattened-oblate-silhouette",
+          "score": 0.72,
+          "visible": true,
+          "notes": "FLATTEN_X=0.68 gives a distinctly flattened lumpy silhouette (not spherical) on shot-90/180/270, matching cranberry-2.png's flattened-disc read."
+        },
+        {
+          "id": "longitudinal-fold-crease",
+          "score": 0.72,
+          "visible": true,
+          "notes": "v3 (cmp-3.png, after 2 depth/taper iterations): tapered single-sector V-notch (center depth 0.6, neighbors 0.08) reads as a clear dark fold line on most berries, a large improvement over the v1/v2 broad shallow dip that read as generic low-poly bumpiness."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read of cmp-3.png (final iteration after v1 broad-shallow-dip -> v2 tapered-3-sector -> v3 sharp single-sector V-notch): flattened lumpy silhouette and visible fold creases read clearly, matching the wrinkled-dried-fruit identity distinct from the smooth-sphere blueberry in the same batch."
+    },
+    {
+      "timestamp": "2026-08-25T17:42:18.089970+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.8,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "six-berry-mound-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "6 individually readable oblate berries in a tight hex-packed mound; count and general pile arrangement match cranberry.png/cranberry-3.png."
+        },
+        {
+          "id": "flattened-oblate-silhouette",
+          "score": 0.72,
+          "visible": true,
+          "notes": "FLATTEN_X=0.68 gives a distinctly flattened lumpy silhouette (not spherical) on shot-90/180/270, matching cranberry-2.png's flattened-disc read."
+        },
+        {
+          "id": "longitudinal-fold-crease",
+          "score": 0.72,
+          "visible": true,
+          "notes": "v3 (cmp-3.png, after 2 depth/taper iterations): tapered single-sector V-notch (center depth 0.6, neighbors 0.08) reads as a clear dark fold line on most berries, a large improvement over the v1/v2 broad shallow dip that read as generic low-poly bumpiness."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read of cmp-3.png (final iteration after v1 broad-shallow-dip -> v2 tapered-3-sector -> v3 sharp single-sector V-notch): flattened lumpy silhouette and visible fold creases read clearly, matching the wrinkled-dried-fruit identity distinct from the smooth-sphere blueberry in the same batch."
+    },
+    {
+      "timestamp": "2026-08-25T17:42:21.638563+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.8,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "six-berry-mound-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "6 individually readable oblate berries in a tight hex-packed mound; count and general pile arrangement match cranberry.png/cranberry-3.png."
+        },
+        {
+          "id": "flattened-oblate-silhouette",
+          "score": 0.72,
+          "visible": true,
+          "notes": "FLATTEN_X=0.68 gives a distinctly flattened lumpy silhouette (not spherical) on shot-90/180/270, matching cranberry-2.png's flattened-disc read."
+        },
+        {
+          "id": "longitudinal-fold-crease",
+          "score": 0.72,
+          "visible": true,
+          "notes": "v3 (cmp-3.png, after 2 depth/taper iterations): tapered single-sector V-notch (center depth 0.6, neighbors 0.08) reads as a clear dark fold line on most berries, a large improvement over the v1/v2 broad shallow dip that read as generic low-poly bumpiness."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "Own-vision read of cmp-3.png (final iteration after v1 broad-shallow-dip -> v2 tapered-3-sector -> v3 sharp single-sector V-notch): flattened lumpy silhouette and visible fold creases read clearly, matching the wrinkled-dried-fruit identity distinct from the smooth-sphere blueberry in the same batch."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-25T17:42:04.770460+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.8,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "six-berry-mound-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "6 individually readable oblate berries in a tight hex-packed mound; count and general pile arrangement match cranberry.png/cranberry-3.png."
+        },
+        {
+          "id": "flattened-oblate-silhouette",
+          "score": 0.72,
+          "visible": true,
+          "notes": "FLATTEN_X=0.68 gives a distinctly flattened lumpy silhouette (not spherical) on shot-90/180/270, matching cranberry-2.png's flattened-disc read."
+        },
+        {
+          "id": "longitudinal-fold-crease",
+          "score": 0.72,
+          "visible": true,
+          "notes": "v3 (cmp-3.png, after 2 depth/taper iterations): tapered single-sector V-notch (center depth 0.6, neighbors 0.08) reads as a clear dark fold line on most berries, a large improvement over the v1/v2 broad shallow dip that read as generic low-poly bumpiness."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "action": "continue",
+      "summary": "6 flattened-oblate berries with a carved V-notch fold crease (tuned over 3 cmp iterations, v3 final), single body-tone material, faceted shading; matches reference silhouette, flatness, and count well.",
+      "matched": [
+        "6-berry count",
+        "hex-packed mound",
+        "flattened oblate silhouette (not spherical)",
+        "visible fold crease on most berries",
+        "shared ground plane, no floating parts",
+        "faceted flat shading"
+      ],
+      "mismatches": [
+        "crease reads clearly on most but not all 6 instances at this camera angle (some faces slightly away from the up-facing crease sector)",
+        "overall tone reads more uniformly saturated than reference since both secondary hex are dropped (documented risk)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/roundtrip-64-preview.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read of cmp-3.png (final iteration after v1 broad-shallow-dip -> v2 tapered-3-sector -> v3 sharp single-sector V-notch): flattened lumpy silhouette and visible fold creases read clearly, matching the wrinkled-dried-fruit identity distinct from the smooth-sphere blueberry in the same batch."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:42:07.954456+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.8,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "six-berry-mound-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "6 individually readable oblate berries in a tight hex-packed mound; count and general pile arrangement match cranberry.png/cranberry-3.png."
+        },
+        {
+          "id": "flattened-oblate-silhouette",
+          "score": 0.72,
+          "visible": true,
+          "notes": "FLATTEN_X=0.68 gives a distinctly flattened lumpy silhouette (not spherical) on shot-90/180/270, matching cranberry-2.png's flattened-disc read."
+        },
+        {
+          "id": "longitudinal-fold-crease",
+          "score": 0.72,
+          "visible": true,
+          "notes": "v3 (cmp-3.png, after 2 depth/taper iterations): tapered single-sector V-notch (center depth 0.6, neighbors 0.08) reads as a clear dark fold line on most berries, a large improvement over the v1/v2 broad shallow dip that read as generic low-poly bumpiness."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "action": "continue",
+      "summary": "6 flattened-oblate berries with a carved V-notch fold crease (tuned over 3 cmp iterations, v3 final), single body-tone material, faceted shading; matches reference silhouette, flatness, and count well.",
+      "matched": [
+        "6-berry count",
+        "hex-packed mound",
+        "flattened oblate silhouette (not spherical)",
+        "visible fold crease on most berries",
+        "shared ground plane, no floating parts",
+        "faceted flat shading"
+      ],
+      "mismatches": [
+        "crease reads clearly on most but not all 6 instances at this camera angle (some faces slightly away from the up-facing crease sector)",
+        "overall tone reads more uniformly saturated than reference since both secondary hex are dropped (documented risk)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/roundtrip-64-preview.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read of cmp-3.png (final iteration after v1 broad-shallow-dip -> v2 tapered-3-sector -> v3 sharp single-sector V-notch): flattened lumpy silhouette and visible fold creases read clearly, matching the wrinkled-dried-fruit identity distinct from the smooth-sphere blueberry in the same batch."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:42:11.280950+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.8,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "six-berry-mound-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "6 individually readable oblate berries in a tight hex-packed mound; count and general pile arrangement match cranberry.png/cranberry-3.png."
+        },
+        {
+          "id": "flattened-oblate-silhouette",
+          "score": 0.72,
+          "visible": true,
+          "notes": "FLATTEN_X=0.68 gives a distinctly flattened lumpy silhouette (not spherical) on shot-90/180/270, matching cranberry-2.png's flattened-disc read."
+        },
+        {
+          "id": "longitudinal-fold-crease",
+          "score": 0.72,
+          "visible": true,
+          "notes": "v3 (cmp-3.png, after 2 depth/taper iterations): tapered single-sector V-notch (center depth 0.6, neighbors 0.08) reads as a clear dark fold line on most berries, a large improvement over the v1/v2 broad shallow dip that read as generic low-poly bumpiness."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "action": "continue",
+      "summary": "6 flattened-oblate berries with a carved V-notch fold crease (tuned over 3 cmp iterations, v3 final), single body-tone material, faceted shading; matches reference silhouette, flatness, and count well.",
+      "matched": [
+        "6-berry count",
+        "hex-packed mound",
+        "flattened oblate silhouette (not spherical)",
+        "visible fold crease on most berries",
+        "shared ground plane, no floating parts",
+        "faceted flat shading"
+      ],
+      "mismatches": [
+        "crease reads clearly on most but not all 6 instances at this camera angle (some faces slightly away from the up-facing crease sector)",
+        "overall tone reads more uniformly saturated than reference since both secondary hex are dropped (documented risk)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/roundtrip-64-preview.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read of cmp-3.png (final iteration after v1 broad-shallow-dip -> v2 tapered-3-sector -> v3 sharp single-sector V-notch): flattened lumpy silhouette and visible fold creases read clearly, matching the wrinkled-dried-fruit identity distinct from the smooth-sphere blueberry in the same batch."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:42:14.609749+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.8,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "six-berry-mound-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "6 individually readable oblate berries in a tight hex-packed mound; count and general pile arrangement match cranberry.png/cranberry-3.png."
+        },
+        {
+          "id": "flattened-oblate-silhouette",
+          "score": 0.72,
+          "visible": true,
+          "notes": "FLATTEN_X=0.68 gives a distinctly flattened lumpy silhouette (not spherical) on shot-90/180/270, matching cranberry-2.png's flattened-disc read."
+        },
+        {
+          "id": "longitudinal-fold-crease",
+          "score": 0.72,
+          "visible": true,
+          "notes": "v3 (cmp-3.png, after 2 depth/taper iterations): tapered single-sector V-notch (center depth 0.6, neighbors 0.08) reads as a clear dark fold line on most berries, a large improvement over the v1/v2 broad shallow dip that read as generic low-poly bumpiness."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "action": "continue",
+      "summary": "6 flattened-oblate berries with a carved V-notch fold crease (tuned over 3 cmp iterations, v3 final), single body-tone material, faceted shading; matches reference silhouette, flatness, and count well.",
+      "matched": [
+        "6-berry count",
+        "hex-packed mound",
+        "flattened oblate silhouette (not spherical)",
+        "visible fold crease on most berries",
+        "shared ground plane, no floating parts",
+        "faceted flat shading"
+      ],
+      "mismatches": [
+        "crease reads clearly on most but not all 6 instances at this camera angle (some faces slightly away from the up-facing crease sector)",
+        "overall tone reads more uniformly saturated than reference since both secondary hex are dropped (documented risk)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/roundtrip-64-preview.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read of cmp-3.png (final iteration after v1 broad-shallow-dip -> v2 tapered-3-sector -> v3 sharp single-sector V-notch): flattened lumpy silhouette and visible fold creases read clearly, matching the wrinkled-dried-fruit identity distinct from the smooth-sphere blueberry in the same batch."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:42:18.089970+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.8,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "six-berry-mound-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "6 individually readable oblate berries in a tight hex-packed mound; count and general pile arrangement match cranberry.png/cranberry-3.png."
+        },
+        {
+          "id": "flattened-oblate-silhouette",
+          "score": 0.72,
+          "visible": true,
+          "notes": "FLATTEN_X=0.68 gives a distinctly flattened lumpy silhouette (not spherical) on shot-90/180/270, matching cranberry-2.png's flattened-disc read."
+        },
+        {
+          "id": "longitudinal-fold-crease",
+          "score": 0.72,
+          "visible": true,
+          "notes": "v3 (cmp-3.png, after 2 depth/taper iterations): tapered single-sector V-notch (center depth 0.6, neighbors 0.08) reads as a clear dark fold line on most berries, a large improvement over the v1/v2 broad shallow dip that read as generic low-poly bumpiness."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "action": "continue",
+      "summary": "6 flattened-oblate berries with a carved V-notch fold crease (tuned over 3 cmp iterations, v3 final), single body-tone material, faceted shading; matches reference silhouette, flatness, and count well.",
+      "matched": [
+        "6-berry count",
+        "hex-packed mound",
+        "flattened oblate silhouette (not spherical)",
+        "visible fold crease on most berries",
+        "shared ground plane, no floating parts",
+        "faceted flat shading"
+      ],
+      "mismatches": [
+        "crease reads clearly on most but not all 6 instances at this camera angle (some faces slightly away from the up-facing crease sector)",
+        "overall tone reads more uniformly saturated than reference since both secondary hex are dropped (documented risk)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/roundtrip-64-preview.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read of cmp-3.png (final iteration after v1 broad-shallow-dip -> v2 tapered-3-sector -> v3 sharp single-sector V-notch): flattened lumpy silhouette and visible fold creases read clearly, matching the wrinkled-dried-fruit identity distinct from the smooth-sphere blueberry in the same batch."
+      }
+    },
+    {
+      "timestamp": "2026-08-25T17:42:21.638563+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.76,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.78,
+        "componentStructure": 0.8,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.82
+      },
+      "featureReviews": [
+        {
+          "id": "six-berry-mound-silhouette",
+          "score": 0.8,
+          "visible": true,
+          "notes": "6 individually readable oblate berries in a tight hex-packed mound; count and general pile arrangement match cranberry.png/cranberry-3.png."
+        },
+        {
+          "id": "flattened-oblate-silhouette",
+          "score": 0.72,
+          "visible": true,
+          "notes": "FLATTEN_X=0.68 gives a distinctly flattened lumpy silhouette (not spherical) on shot-90/180/270, matching cranberry-2.png's flattened-disc read."
+        },
+        {
+          "id": "longitudinal-fold-crease",
+          "score": 0.72,
+          "visible": true,
+          "notes": "v3 (cmp-3.png, after 2 depth/taper iterations): tapered single-sector V-notch (center depth 0.6, neighbors 0.08) reads as a clear dark fold line on most berries, a large improvement over the v1/v2 broad shallow dip that read as generic low-poly bumpiness."
+        },
+        {
+          "id": "shared-ground-plane",
+          "score": 0.9,
+          "visible": true,
+          "notes": "All six berries sit flush on y=0, no floating parts on any orbit angle."
+        }
+      ],
+      "action": "continue",
+      "summary": "6 flattened-oblate berries with a carved V-notch fold crease (tuned over 3 cmp iterations, v3 final), single body-tone material, faceted shading; matches reference silhouette, flatness, and count well.",
+      "matched": [
+        "6-berry count",
+        "hex-packed mound",
+        "flattened oblate silhouette (not spherical)",
+        "visible fold crease on most berries",
+        "shared ground plane, no floating parts",
+        "faceted flat shading"
+      ],
+      "mismatches": [
+        "crease reads clearly on most but not all 6 instances at this camera angle (some faces slightly away from the up-facing crease sector)",
+        "overall tone reads more uniformly saturated than reference since both secondary hex are dropped (documented risk)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-90.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-180.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-270.png",
+        "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/roundtrip-64-preview.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/src/cranberry.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/shot-hero.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/ingredients/work/cranberry/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "Own-vision read of cmp-3.png (final iteration after v1 broad-shallow-dip -> v2 tapered-3-sector -> v3 sharp single-sector V-notch): flattened lumpy silhouette and visible fold creases read clearly, matching the wrinkled-dried-fruit identity distinct from the smooth-sphere blueberry in the same batch."
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 540,
+    "maxDrawCalls": 1,
+    "textureSize": 0,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Hard consumer budget for the 'cluster' ingredient group: <=700 tri and <=68KB target (types.ts R2), hard ceiling <=2500 tri and <=100KB. Target reached by construction (10 segments x 6 profile-ring transitions x 6 berries = 540 tri; crease pulls add zero triangles), not by decimation."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2, 6, 2), intensity 1.4, upper-left.",
+      "usage": "Fixed by scripts/breadlab.ts.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75 -- crease darkening relies on facet-normal orientation away from the key light, not a painted shadow.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5, 3, -2), intensity 0.2.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping; no AO."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build each berry vertically (olive convention) via buildRevolvedShell with radialScale sx=0.75 (flatten) sz=1.0.",
+    "Pull (ring,sector) grid vertices toward the local axis for the primary (sectorCenter+-1) and one rng-chosen secondary crease sector, on the indexed pre-layout shell.",
+    "Bake lay-down via rotateZ(-90deg) so the pole-to-pole axis becomes world-X (long axis) and the flattened radial axis becomes world-Y (up) -- the crease then faces world-up regardless of per-instance yaw.",
+    "Jitter vertices while still indexed, after the crease pulls.",
+    "Bake faceting by splitting vertices and recomputing normals; never request flatShading.",
+    "Project top-planar UVs, then merge all six berries into exactly one mesh (single material, no mask split needed).",
+    "Translate each instance's own bounding box floor to world Y=0 after its per-instance yaw/tiltZ rotation."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-cluster rotation for the showcase turntable",
+    "each berry is a named instance"
+  ],
+  "destructionAnchors": [
+    "each berry is its own fractureGroup; the only plausible break is one berry rolling away from the heap"
+  ],
+  "risks": [
+    {
+      "id": "crease-shadow-hue-dropped",
+      "severity": "low",
+      "description": "assets/prompts/ingredients/cranberry.json names a crease-shadow hue (#8E2438) this spec does not paint as a color region.",
+      "mitigation": "Crease is now real carved geometry; its own facet normals darken under the runtime key light for free (cracker docking-hole precedent), so a painted tone would double-darken."
+    },
+    {
+      "id": "blush-hue-dropped",
+      "severity": "low",
+      "description": "The upper-face blush hex (#D9707F) is not painted into geometry.",
+      "mitigation": "Runtime key light N.L falloff already brightens upper-facing facets (olive/choco precedent)."
+    },
+    {
+      "id": "radial-crease-pumpkin-confusion",
+      "severity": "medium",
+      "description": "A crease pattern radiating from a pole would misread as pumpkin, a separate ingredient in this same 12-item batch.",
+      "mitigation": "Crease is carved BEFORE the lay-down rotation on a fixed (ring,sector) column, producing a groove parallel to the long/flattened axis after layout, not a pole-radiating pattern -- verified against cranberry-2/-3.png front/top views before implementation."
+    },
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-color-based region paint is silently discarded by the runtime's MeshLambertMaterial swap.",
+      "mitigation": "Single flat material bucket authored; no vertexPaint block anywhere in this spec."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "high",
+      "description": "A flatShading flag is not inherited by the runtime material swap.",
+      "mitigation": "Faceting is baked into geometry by splitting vertices before export."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Cranberry Heap",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  },
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6591,
+        "aspectRatioDelta": 0.281,
+        "scaleDelta": 0.2358,
+        "bilateralSymmetryError": 0.092,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 12.23,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.659 is below threshold 0.85",
+        "aspect-ratio delta 0.281 exceeds threshold 0.05",
+        "scale delta 0.236 exceeds threshold 0.08",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [],
+      "renderHash": "28b657f72c2f38e7",
+      "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6591,
+        "aspectRatioDelta": 0.281,
+        "scaleDelta": 0.2358,
+        "bilateralSymmetryError": 0.092,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 12.23,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.659 is below threshold 0.85",
+        "aspect-ratio delta 0.281 exceeds threshold 0.05",
+        "scale delta 0.236 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "28b657f72c2f38e7",
+      "passId": "structural-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6591,
+        "aspectRatioDelta": 0.281,
+        "scaleDelta": 0.2358,
+        "bilateralSymmetryError": 0.092,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 12.23,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.659 is below threshold 0.85",
+        "aspect-ratio delta 0.281 exceeds threshold 0.05",
+        "scale delta 0.236 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "28b657f72c2f38e7",
+      "passId": "form-refinement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6591,
+        "aspectRatioDelta": 0.281,
+        "scaleDelta": 0.2358,
+        "bilateralSymmetryError": 0.092,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 12.23,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.659 is below threshold 0.85",
+        "aspect-ratio delta 0.281 exceeds threshold 0.05",
+        "scale delta 0.236 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "28b657f72c2f38e7",
+      "passId": "material-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6591,
+        "aspectRatioDelta": 0.281,
+        "scaleDelta": 0.2358,
+        "bilateralSymmetryError": 0.092,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 12.23,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.659 is below threshold 0.85",
+        "aspect-ratio delta 0.281 exceeds threshold 0.05",
+        "scale delta 0.236 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "28b657f72c2f38e7",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.6591,
+        "aspectRatioDelta": 0.281,
+        "scaleDelta": 0.2358,
+        "bilateralSymmetryError": 0.092,
+        "colorDelta": {
+          "checked": 7,
+          "maxDeltaE": 12.23,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.23
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.659 is below threshold 0.85",
+        "aspect-ratio delta 0.281 exceeds threshold 0.05",
+        "scale delta 0.236 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "28b657f72c2f38e7",
+      "passId": "optimization-pass"
+    }
+  ]
+}
