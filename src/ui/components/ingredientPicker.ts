@@ -3,7 +3,7 @@
 import { copy } from '../copy';
 import { openModal } from './modal';
 import { toast } from './toast';
-import { ingredientArt } from '../screens/ingredientArt';
+import { ingredientArtNode } from '../screens/ingredientArt';
 import { INGREDIENTS } from '../../sim';
 import type { IngredientId } from '../../sim';
 import type { GameApi } from '../gameApi';
@@ -32,9 +32,9 @@ export function openIngredientPicker(opts: IngredientPickerOpts): void {
     const card = document.createElement('button');
     card.type = 'button';
     card.className = 'recipe-card';
-    const art = document.createElement('div');
-    art.className = 'art';
-    art.appendChild(ingredientArt(ing.id));
+    // 도감 그리드와 **같은** 아트 경로(PNG 우선). 여기서 SVG를 직접 부르면 12종분만 그려지고
+    // 나머지는 전부 같은 베이지 타원이 된다 — 30종 확장에서 실제로 18장이 겹쳤던 자리다.
+    const art = ingredientArtNode(ing.id);
     const name = document.createElement('div');
     name.className = 'name';
     name.textContent = copy.recipes.ingredientNames[ing.id];

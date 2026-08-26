@@ -7,7 +7,7 @@ import { openModal, confirmModal } from '../components/modal';
 import { openStarterGift } from '../components/ingredientPicker';
 import { untilText } from '../format';
 import { breadArt } from './breadArt';
-import { ingredientArt } from './ingredientArt';
+import { ingredientArtNode } from './ingredientArt';
 import type { GameApi } from '../gameApi';
 import type { CollectionEntry, CompatibilityRule, RecipeDef, SimEvent, Snapshot } from '../../sim';
 import {
@@ -329,24 +329,9 @@ export function createRecipesScreen(
     return art;
   }
 
-  /**
-   * 재료 카드 아트 — artOf와 같은 구조(PNG 우선 · 실패 시 SVG 폴백).
-   * 그록 원본(assets/ingredients/src/)을 쓰지 않는 이유: 배경이 페일 세이지 단색이라
-   * 카드 표면(--bg-soft)과 충돌한다. GLB에서 구운 **투명 배경** 썸네일만 올린다.
-   */
-  function ingredientArtOf(id: string): HTMLElement {
-    const art = document.createElement('div');
-    art.className = 'art';
-    const img = document.createElement('img');
-    img.src = `/ingredients/thumbs/${id}.png`;
-    img.alt = '';
-    img.addEventListener('error', () => {
-      img.remove();
-      art.appendChild(ingredientArt(id));
-    });
-    art.appendChild(img);
-    return art;
-  }
+  // 재료 카드 아트는 ingredientArt.ts의 `ingredientArtNode`가 정본이다 —
+  // 선물 피커와 같은 구현을 공유해야 한 쪽만 PNG를 타는 어긋남이 안 생긴다(그 절 주석 참조).
+  const ingredientArtOf = ingredientArtNode;
 
   /** ?-실루엣 카드 — 미발견·미해금 공용 (도감의 신비 항목) */
   function mysteryCard(baseRecipeId: string, onTap: () => void): HTMLButtonElement {

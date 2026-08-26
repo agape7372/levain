@@ -4,7 +4,7 @@
 // 배포(vercel)는 이 스크립트가 하지 않는다 — 마지막에 안내만 출력, 실행은 사람 몫.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, unlinkSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { collectFiles, makeZip } from './lib/zip.mjs';
@@ -39,6 +39,46 @@ if (!version) {
 }
 if (!/^\d+\.\d+\.\d+$/.test(version)) {
   console.error(`버전 형식이 잘못됐습니다: "${version}" (semver 예: 1.1.0)`);
+  process.exit(1);
+}
+
+// ★dist/를 먼저 비운다 — 빌드가 스스로 비우지 않는다.
+//
+// 산출물 파일명이 내용 해시라 빌드마다 새 이름이 생기고 옛 파일은 **그대로 남는다.**
+// index.html은 최신 진입점 하나만 가리키므로 앱은 정상 동작하지만, zip은 디렉터리를 통째로
+// 담으므로 죽은 코드가 전부 실려 나간다. 실측(1.3.3 발행 전): dist/assets 449개 중 진짜
+// 산출물은 **9개**(깨끗한 디렉터리로 빌드해 대조), 나머지 440개 42.6MB가 누적분이었다.
+// 1.2.4~1.3.2 네 번의 릴리스가 이 상태로 나갔다 — 사용자가 매번 안 쓰는 JS를 같이 내려받았다.
+//
+// ★**디렉터리째 지우지 않는다.** 이 환경에서 `rmSync(dist, {recursive:true, force:true})`는
+// **에러 없이 실패한다**(호출 직후 `existsSync`가 여전히 true). vite의 `emptyOutDir`도 같은
+// 이유로 안 먹는다. 파일 단위 `unlinkSync`는 전부 성공하므로, 디렉터리는 남기고 **내용만** 비운다.
+// 조용히 실패하는 경로라 마지막에 잔존 수를 세서 확인한다 — 안 세면 다음 사람이 또 속는다.
+function emptyDir(dir) {
+  if (!existsSync(dir)) return 0;
+  let n = 0;
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) {
+      n += emptyDir(p);
+      try {
+        rmSync(p, { recursive: true, force: true });
+      } catch {
+        /* 디렉터리 제거는 막힐 수 있다 — 내용만 비면 충분하다 */
+      }
+    } else {
+      unlinkSync(p);
+      n++;
+    }
+  }
+  return n;
+}
+const distPath = path.join(root, 'dist');
+console.log(`dist/ 정리: 파일 ${emptyDir(distPath)}개 삭제`);
+const leftover = existsSync(distPath) ? collectFiles(distPath).length : 0;
+if (leftover > 0) {
+  console.error(`dist/ 에 ${leftover}개가 남았습니다 — 지난 빌드 산출물이 번들에 섞입니다.`);
+  console.error('열려 있는 dev 서버(npm run dev)나 파일 잠금을 확인하고 다시 실행하세요.');
   process.exit(1);
 }
 

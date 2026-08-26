@@ -238,3 +238,28 @@ export function ingredientArt(id: string): HTMLElement {
   const draw = DRAWERS[id] ?? plain;
   return root(draw()) as unknown as HTMLElement;
 }
+
+/**
+ * 재료 카드 아트 **정본** — PNG 썸네일 우선, 404일 때만 위 SVG로 내려온다.
+ * `recipes.ts`의 `artOf`(빵)와 같은 구조.
+ *
+ * ★**재료 카드를 그리는 곳은 전부 이걸 써라 — `ingredientArt`를 직접 부르지 마라.**
+ * `DRAWERS`는 12종분뿐이고 나머지는 `plain()`(베이지 타원)으로 떨어진다. 카드를 그리는 표면이
+ * 둘(도감 그리드 · 첫 재료 선물 피커)인데 한쪽만 PNG를 타면, 재료가 늘어난 만큼 그쪽에서
+ * **같은 그림이 여러 장** 나온다 — 12종일 땐 우연히 안 보이다가 30종에서 18장이 겹쳐 드러났다.
+ * 그록 원본(`assets/ingredients/src/`)을 쓰지 않는 이유: 배경이 페일 세이지 단색이라
+ * 카드 표면(`--bg-soft`)과 충돌한다. GLB에서 구운 **투명 배경** 썸네일만 올린다.
+ */
+export function ingredientArtNode(id: string): HTMLElement {
+  const art = document.createElement('div');
+  art.className = 'art';
+  const img = document.createElement('img');
+  img.src = `/ingredients/thumbs/${id}.png`;
+  img.alt = '';
+  img.addEventListener('error', () => {
+    img.remove();
+    art.appendChild(ingredientArt(id));
+  });
+  art.appendChild(img);
+  return art;
+}
