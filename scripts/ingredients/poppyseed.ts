@@ -1,15 +1,40 @@
-// 포피시드 — 낮고 넓은 더미 + 앞쪽에 분리된 둥근 낱알 3개(크기 점증). 계약은 types.ts 주석이 정본.
+// 포피시드 — 알갱이가 오돌토돌 드러난 낮고 넓은 더미 + 앞쪽에 분리된 둥근 낱알 3개(크기 점증).
+// 계약은 types.ts 주석이 정본.
 //
 // 유래: img2threejs 스펙 assets/ingredients/specs/poppyseed.json(워크스페이스 원본은
 // assets/ingredients/work/poppyseed/). 프로필·색은 그 스펙(author_spec.py)의 전사이며,
 // 수치를 고칠 때는 스펙을 먼저 고치고 여기로 옮긴다.
+// ⚠ v3의 수치는 스펙 JSON에 아직 역전사되지 않았다 — 이 배치의 파일 권한이 `scripts/ingredients/*.ts`
+//   뿐이었다. 다음에 스펙을 만질 사람은 v3 상수를 스펙으로 올려라.
 //
 // ★세트에서 가장 작은 알갱이 — CRIB 최종 게이트("뭉쳐 보이면 개수를 줄이고 하나를 키운다")를
-// 정면으로 받는 재료다. "수백 개 흩뿌림" 대신 더미는 단일 페이셋 힙(matcha/oat/flaxseed와 동일
-// 패턴)으로, "낱알이 개별 형태로 읽혀야" 하는 요구는 앞쪽 3개의 작은 구체 인스턴스가 전담한다.
-// poppyseed.png 실측: 앞쪽 3알은 크기가 점증한다(소/중/대) — 단순 반복이 아니라 시각적 리듬을
-// 준다. 낱알은 올리브의 (링,섹터) 하이라이트 캡 기법을 재사용하되 섹터 제한 없이 링 1개 전체를
-// 밝게(둥근 알이라 방향성 스트라이프가 필요 없다 — 사각지대 없이 "위쪽이 밝다"만 필요).
+// 정면으로 받는 재료다. 낱알은 올리브의 (링,섹터) 하이라이트 캡 기법을 재사용하되 섹터 제한 없이
+// 링 1개 전체를 밝게(둥근 알이라 방향성 스트라이프가 필요 없다).
+//
+// ═══ v3 (2026-08-26, 전체 화면 쇼케이스 파손 수정) ═══
+//
+// v2는 **64px 썸네일만 보고 판정해서** 두 가지를 동시에 망가뜨렸다. 전체 화면(빵과 같은
+// `FIT_SIZE=1.6` 쇼케이스)에서 재료도 똑같이 확대돼 보인다는 걸 계산에 안 넣은 결과다.
+//
+//  (a) `SEED_SEGMENTS=6` — 64px에선 원형 실루엣이 남지만 전체 화면에선 **육각 프리즘**이다.
+//      윗면이 평평하고 옆면이 수직 6면이라 양귀비씨가 아니라 연탄·검은 주사위로 읽혔다.
+//      → 20세그먼트 + 프로필 9점(위아래 극점 포함)으로 진짜 구체를 만든다.
+//  (b) 64px 판독을 살리려 낱알을 0.09~0.17 → 0.20~0.30으로 키웠는데, 전체 화면에서는
+//      **거대한 돌덩이 3개**가 됐다. 레퍼런스(assets/ingredients/src/poppyseed.png)의 앞알은
+//      더미의 1/10 크기다.
+//
+// ★근본 원인은 낱알 크기가 아니라 **더미가 매끈했다는 것**이다. 매끈한 렌즈는 크기와 무관하게
+// "검은 돌 하나"로 읽힌다. 레퍼런스의 더미는 **수백 개의 작은 구체가 쌓인 오돌토돌한 표면**이고,
+// 그 알갱이 결이 64px에서도 실루엣의 물결로 살아남는다. 그래서 v3은 낱알을 v1 크기로 되돌리고
+// (0.10/0.13/0.16) 대신 **더미 표면에 알갱이 범프를 새겼다** — 판독을 낱알이 아니라 더미가 맡는다.
+//
+// ★알갱이 결은 **인스턴스로** 낸다. 1차 시도는 공짜(0tri)인 코사인 로브 변위였는데 렌더에서
+// 실패했다: 로브가 링을 가로질러 세로로 정렬되면서 꼭대기에 바큇살이 생기고 테두리가 톱니바퀴가
+// 됐다(로브 하나당 세그먼트가 4개뿐이라 마루가 정점 하나로 뾰족해진다). 진짜 알갱이 15개를
+// 더미 표면에 반쯤 파묻는 편이 예산은 들어도(1200tri) 결과가 확실하다 — 구체는 어느 각도에서도
+// 구체다. 상향된 예산(250KB/8000tri)이 이걸 감당한다.
+// ⚠ 되돌리지 말 것: 세그먼트를 다시 낮추면 (a)가, 알갱이를 지우면 (b)가 그대로 돌아온다.
+// ⚠ 알갱이를 코사인 변위로 되돌리지 마라 — 위 실패가 그대로 재현된다.
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
 import { buildRevolvedShell, facet, jitterVertices, mergeByMaterial, pickTriangles, splitTrianglesByVertexMask, stdMaterial, uvDome, uvTopPlanar } from '../breads/lib';
@@ -20,17 +45,27 @@ const HIGHLIGHT_COLOR = 0x45424f; // "a soft slate-gray highlight catching the r
 // 드롭: 크레바스에 고이는 근흑색 그늘 #1B1A24(N·L 감쇠가 공짜로 어둡게 함)와
 // 뽀얀 보라 잔반점 #5A5568(하이라이트 버킷과 명도가 가까워 중복 — 4색을 2버킷으로 압축).
 
-const SEED_SEGMENTS = 6; // 극소 알갱이 — 세그먼트를 낮춰도 64px에서 원형 실루엣은 그대로 읽힌다
 type ProfilePoint = readonly [number, number];
+
+// ── 낱알 ─────────────────────────────────────────────────────────────────────
+// v3: 6 → 20 세그먼트. 프로필도 5점 → 9점으로 늘려 위아래를 둥글린다(v2는 위아래가 평평한
+// 프리즘이었다). 280tri/개 × 3 = 840tri — 상향된 예산(250KB/8000tri)에서 싼 값이다.
+const SEED_SEGMENTS = 18;
 const SEED_PROFILE: readonly ProfilePoint[] = [
   [0.0, -1.0],
-  [0.85, -0.6],
+  [0.34, -0.94],
+  [0.64, -0.77],
+  [0.87, -0.47],
   [1.0, 0.0],
-  [0.85, 0.6],
+  [0.87, 0.47],
+  [0.64, 0.77],
+  [0.34, 0.94],
   [0.0, 1.0],
 ];
-const SEED_JITTER_AMP_FRAC = 0.02; // 반지름 대비 비율(R4 취지 — 작은 알갱이일수록 절대 진폭도 작게)
-const HIGHLIGHT_RING_INDEX = 3; // 위쪽 극점 바로 아래 링 — 섹터 제한 없이 전체(둥근 알은 방향성 불필요)
+const SEED_JITTER_AMP_FRAC = 0.018; // 반지름 대비 비율(R4 취지 — 작은 알갱이일수록 절대 진폭도 작게)
+// 하이라이트 — 위쪽 극점 바로 아래 링 하나. OR-of-3-vertices라 위아래 밴드까지 걸쳐 "둥근 윗면
+// 캡"이 된다(280tri 중 60tri ≈ 21%). v2처럼 링을 2개 이상 잡으면 알이 반반으로 갈려 보인다.
+const HIGHLIGHT_RING_INDEX = 7;
 
 function buildSeed(rng: () => number, radius: number): { bodyGeo: THREE.BufferGeometry; highlightGeo: THREE.BufferGeometry } {
   const { geometry, ringStart } = buildRevolvedShell(SEED_PROFILE, SEED_SEGMENTS, radius, () => [radius, radius]);
@@ -53,37 +88,101 @@ function buildSeed(rng: () => number, radius: number): { bodyGeo: THREE.BufferGe
   return { bodyGeo, highlightGeo };
 }
 
-// 더미 — 낮고 넓은 힙(단일 버킷, BODY_COLOR). poppyseed.png 실측: 폭 대비 높이가 낮은 렌즈꼴.
+// ── 더미 ─────────────────────────────────────────────────────────────────────
+// 낮고 넓은 렌즈꼴 힙. poppyseed.png 실측: 폭 대비 높이가 낮다.
 //
-// ★v2 (2026-08-26, 64px 판독 실패 수정): 더미를 줄이고 낱알을 키워 **비율을 뒤집었다.**
-//
-// v1은 더미 반지름 0.78 vs 낱알 0.09~0.17 — 더미가 낱알의 **5~9배**였다. 그 결과 64px에서
-// 더미가 화면을 지배하고 낱알은 꼬리처럼 붙어, "양귀비씨 무더기"가 아니라 **"검은 돌 하나"**로 읽혔다
-// (판독 검사: "딱정벌레 등껍질"). 다운샘플 전 512px 원본에서 이미 그랬다 — 해상도 문제가 아니라
-// 구도 문제였다.
-//
-// ★CRIB의 "부품 길이 : 더미 반지름 비율" 함정(coconut)과 **같은 축의 반대 방향**이다:
-// coconut은 부품이 더미보다 커서 성게 가시가 됐고, 여기는 부품이 너무 작아 더미에 먹혔다.
-// 어느 쪽이든 **둘의 비율**이 판독을 정한다.
-const MOUND_SEGMENTS = 14;
-const MOUND_RADIUS = 0.52; // 0.78 → 낱알 대비 지배력을 낮춘다
-const MOUND_HALF_HEIGHT = 0.19; // 렌즈꼴 비율(높이/반지름 ≈ 0.33)은 유지
-const MOUND_JITTER_AMP = 0.024; // 반지름을 줄인 만큼 같이 (명도 침식 방지 — CRIB 실측)
+// ★v3 핵심: 매끈한 렌즈 위에 **진짜 알갱이 15개를 반쯤 파묻는다.** 매끈한 표면은 크기와 무관하게
+// "검은 돌"로 읽히고, 알갱이가 테두리를 물결치게 만들면 64px에서도 "쌓인 씨앗"으로 읽힌다.
+const MOUND_SEGMENTS = 26; // 알갱이 사이로 드러나는 면이라 각져 보이지 않을 만큼은 필요
+// v3.2: 0.6/0.22 → 0.55/0.20. 알갱이 대비 더미가 크면 알갱이 사이의 매끈한 면이 넓게 남아
+// "리벳 박힌 원반"으로 읽힌다. 더미를 줄여 알갱이가 서로 겹치게 만든다.
+const MOUND_RADIUS = 0.55;
+const MOUND_HALF_HEIGHT = 0.2;
+const MOUND_JITTER_AMP = 0.018;
 const MOUND_PROFILE: readonly ProfilePoint[] = [
-  [0.85, -1.0],
-  [1.0, -0.5],
-  [0.9, 0.0],
-  [0.55, 0.45],
-  [0.15, 0.8],
+  [0.86, -1.0],
+  [0.97, -0.72],
+  [1.0, -0.38],
+  [0.97, -0.02],
+  [0.88, 0.32],
+  [0.72, 0.6],
+  [0.48, 0.82],
   [0.0, 1.0],
 ];
 
+/**
+ * 극점을 건드리지 않는 지터. lib.jitterVertices는 극점 정점도 밀어버리는데, 극점은 팬의
+ * 중심이라 조금만 밀려도 **별 모양 핀치 주름**이 생긴다(v2 더미 꼭대기의 실제 결함).
+ * rng는 극점에서도 그대로 소비해 시드 소비 순서를 단순하게 유지한다.
+ */
+function jitterExceptPoles(
+  geometry: THREE.BufferGeometry,
+  rng: () => number,
+  amp: number,
+  profile: readonly ProfilePoint[],
+  ringStart: readonly number[],
+): void {
+  const poles = new Set<number>();
+  profile.forEach((p, ri) => {
+    if (p[0] <= 1e-6) poles.add(ringStart[ri]);
+  });
+  const pos = geometry.attributes.position as THREE.BufferAttribute;
+  for (let i = 0; i < pos.count; i++) {
+    const dx = (rng() - 0.5) * 2 * amp;
+    const dy = (rng() - 0.5) * 2 * amp;
+    const dz = (rng() - 0.5) * 2 * amp;
+    if (poles.has(i)) continue;
+    pos.setXYZ(i, pos.getX(i) + dx, pos.getY(i) + dy, pos.getZ(i) + dz);
+  }
+  pos.needsUpdate = true;
+}
+
 function buildMound(rng: () => number): THREE.BufferGeometry {
-  const { geometry } = buildRevolvedShell(MOUND_PROFILE, MOUND_SEGMENTS, MOUND_HALF_HEIGHT, () => [MOUND_RADIUS, MOUND_RADIUS]);
-  jitterVertices(geometry, rng, MOUND_JITTER_AMP);
+  const { geometry, ringStart } = buildRevolvedShell(MOUND_PROFILE, MOUND_SEGMENTS, MOUND_HALF_HEIGHT, () => [
+    MOUND_RADIUS,
+    MOUND_RADIUS,
+  ]);
+  jitterExceptPoles(geometry, rng, MOUND_JITTER_AMP, MOUND_PROFILE, ringStart);
   const baked = facet(geometry);
   uvTopPlanar(baked);
   return baked;
+}
+
+// ── 표면 알갱이 ───────────────────────────────────────────────────────────────
+// 더미 표면에 반쯤 파묻히는 작은 구체들. 이게 테두리를 물결치게 만들어 "돌"과 "쌓인 씨앗"을 가른다.
+// v3.2: 15 → 20개. 대신 프로필을 6점 → 5점으로 깎아 개당 80 → 60tri로 맞췄다(예산 동일).
+// 아래 절반은 더미에 파묻혀 안 보이므로 세로 해상도보다 **개수**가 이득이다. 세그먼트(=평면도
+// 윤곽의 매끄러움)는 10을 유지 — 부감 카메라라 그쪽이 눈에 띈다.
+const GRAIN_COUNT = 20;
+const GRAIN_SEGMENTS = 10;
+const GRAIN_PROFILE: readonly ProfilePoint[] = [
+  [0.0, -1.0],
+  [0.62, -0.6],
+  [1.0, 0.0],
+  [0.62, 0.6],
+  [0.0, 1.0],
+];
+const GRAIN_R_MIN = 0.09;
+const GRAIN_R_MAX = 0.155; // 편차를 넓혀 균일한 리벳 배열처럼 보이지 않게
+const GRAIN_T_LO = 0.75; // 프로필 인덱스 하한 — 이보다 아래는 더미 밑동이라 알갱이가 바닥을 뚫는다
+const GRAIN_T_SPAN = 5.65;
+const GOLDEN_ANGLE = 2.39996; // 방위를 균등 배치하면 줄무늬가 보인다 — 황금각으로 흩는다
+
+function buildGrain(rng: () => number, radius: number): THREE.BufferGeometry {
+  const { geometry } = buildRevolvedShell(GRAIN_PROFILE, GRAIN_SEGMENTS, radius, () => [radius, radius]);
+  jitterVertices(geometry, rng, radius * SEED_JITTER_AMP_FRAC);
+  const baked = facet(geometry);
+  uvDome(baked);
+  return baked;
+}
+
+/** 프로필을 선형 보간해 더미 표면의 (반지름, 높이)를 준다 — 중심을 표면에 두면 정확히 절반 파묻힌다. */
+function moundSurfacePoint(t: number): { r: number; y: number } {
+  const i = Math.min(MOUND_PROFILE.length - 2, Math.max(0, Math.floor(t)));
+  const f = t - i;
+  const [r0, h0] = MOUND_PROFILE[i];
+  const [r1, h1] = MOUND_PROFILE[i + 1];
+  return { r: (r0 + (r1 - r0) * f) * MOUND_RADIUS, y: (h0 + (h1 - h0) * f) * MOUND_HALF_HEIGHT };
 }
 
 function placeAndGround(child: THREE.Object3D, offset: readonly [number, number], yaw: number): THREE.Group {
@@ -103,13 +202,13 @@ interface SeedDef {
 }
 // poppyseed.png 실측: 앞쪽 3알이 좌->우로 크기가 점증(소/중/대) — 단순 반복이 아닌 시각적 리듬.
 //
-// ★v2: 낱알을 키우고(0.09~0.17 → 0.20~0.30) 좌우로 더 벌렸다. 더미를 줄인 것과 짝이다 —
-// 이제 낱알이 더미의 **0.38~0.58배**라 "무더기 옆의 낱알들"로 읽힌다(v1은 0.12~0.22배로 부속물이었다).
-// 크기 점증 리듬은 유지하되 폭을 키워 셋이 서로 안 겹치게 했다(네거티브 스페이스 = 경계).
+// ★v3: 크기를 v1대로 되돌렸다(0.20~0.30 → 0.10~0.16). 더미 반지름 0.6 대비 1/6~1/4로,
+// 레퍼런스의 "무더기 앞의 낱알 견본" 구도다. 64px 판독은 이제 더미의 오돌토돌한 실루엣이 맡는다 —
+// **낱알을 다시 키우지 말 것.** 키우면 전체 화면에서 다시 돌덩이 3개가 된다.
 const SEEDS: Record<'a' | 'b' | 'c', SeedDef> = {
-  a: { offset: [-0.78, 0.62], radius: 0.20 },
-  b: { offset: [-0.05, 0.74], radius: 0.25 },
-  c: { offset: [0.72, 0.6], radius: 0.30 },
+  a: { offset: [-0.4, 0.78], radius: 0.1 },
+  b: { offset: [0.0, 0.86], radius: 0.13 },
+  c: { offset: [0.44, 0.78], radius: 0.16 },
 };
 
 export const createPoppyseed: IngredientBuilder = (rng) => {
@@ -118,8 +217,21 @@ export const createPoppyseed: IngredientBuilder = (rng) => {
 
   const cluster = new THREE.Group();
 
-  const moundMesh = new THREE.Mesh(buildMound(rng), bodyMat);
-  cluster.add(placeAndGround(moundMesh, [0, -0.1], 0.1));
+  // 더미 = 매끈한 렌즈 + 표면 알갱이. 한 그룹으로 묶어 **마지막에 한 번만** 접지한다
+  // (알갱이를 개별 접지하면 전부 바닥으로 내려앉아 더미를 떠난다).
+  const heap = new THREE.Group();
+  heap.add(new THREE.Mesh(buildMound(rng), bodyMat));
+  for (let i = 0; i < GRAIN_COUNT; i++) {
+    const u = (i + 0.5) / GRAIN_COUNT;
+    const t = GRAIN_T_LO + GRAIN_T_SPAN * Math.pow(u, 0.72); // 아래(넓은 쪽)에 더 촘촘히 = 테두리 물결
+    const psi = i * GOLDEN_ANGLE;
+    const radius = GRAIN_R_MIN + (GRAIN_R_MAX - GRAIN_R_MIN) * (((i * 3) % 7) / 6);
+    const p = moundSurfacePoint(t);
+    const grain = new THREE.Mesh(buildGrain(rng, radius), bodyMat);
+    grain.position.set(Math.cos(psi) * p.r, p.y, Math.sin(psi) * p.r);
+    heap.add(grain);
+  }
+  cluster.add(placeAndGround(heap, [0, -0.1], 0.1));
 
   (Object.keys(SEEDS) as (keyof typeof SEEDS)[]).forEach((key) => {
     const def = SEEDS[key];

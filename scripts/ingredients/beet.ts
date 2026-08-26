@@ -25,7 +25,8 @@ const RING_PALE = 0xc4548a; // "paler dusty pink" — 링 교대색
 // 위아래 거의 대칭인 둥근 뿌리라 프로필을 대칭에 가깝게 잡았다).
 const BEET_RADIUS = 0.6; // 적도(절단면) 반지름
 const BEET_HALF_LENGTH = 0.6; // 극-극 절반 길이 — 거의 구형(비율 1:1)
-const BEET_SEGMENTS = 12; // half-revolution 컬럼 수 (fig와 동일 밀도)
+const BEET_SEGMENTS = 20; // ★12→20 (2026-08-26, fig와 동일 밀도 유지). 예산 상향
+// (2500→8000tri) 후 전체 화면 기준 재판정 — 12컬럼(15°)은 @180/@270에서 실루엣이 각졌다.
 
 type ProfilePoint = readonly [number, number];
 // (반지름비, 높이비) — heightFrac -1(아랫극) .. +1(윗극, 스텁과 만남). 거의 대칭이되 살짝 아래쪽이
@@ -44,13 +45,18 @@ const PROFILE: readonly ProfilePoint[] = [
   [0.0, 1.0],
 ];
 
-const JITTER_AMP = 0.018; // ~3% of BEET_RADIUS — R4, olive/fig와 같은 자릿수
+const JITTER_AMP = 0.012; // ★0.018→0.012 (2026-08-26) — 되돌리지 말 것.
+// 컬럼을 20으로 올리자 극 근처 링(rFrac 0.1 => 반지름 0.06)의 컬럼 간격이 0.01 아래로 좁아져
+// **지터 진폭이 삼각형보다 커졌다** — 윗극 슬라이버가 뒤집혔다(실측: 몸통 안쪽향 15개, 전부
+// y 0.57~0.61 윗극). 진폭을 간격 아래로 내린다. 세그먼트를 더 올리면 이 값도 같이 내릴 것.
 
 const STUB_RADIUS_BOTTOM = 0.11;
 const STUB_RADIUS_TOP = 0.08;
 const STUB_HEIGHT = 0.14; // "a short trimmed stub" — pumpkin/fig 꼭지보다 짧게
-const STUB_SEGMENTS = 7;
-const STUB_EMBED = 0.05;
+const STUB_SEGMENTS = 12; // ★7→12 (2026-08-26). 예산 상향(2500→8000tri) 후 전체 화면 기준 재판정 —
+// 7각 스텁은 각졌다. 12각의 추가 비용은 ~20tri라 아낄 이유가 없다.
+const STUB_EMBED = 0.07; // ★0.05→0.07 (2026-08-26). 밑동 반지름(0.11)이 그 높이의 몸통 반지름보다
+// 커서 테두리가 턱을 만들었다 — 조금 더 묻는다.
 const STUB_JITTER_AMP = 0.006;
 
 // 단면 텍스처 — 거리 기반 동심원(나이테). 무화과의 각도 기반 방사 씨앗줄과 달리 atan2가 필요 없다.
@@ -96,12 +102,19 @@ function buildHalfShell(
     for (let s = 0; s < segments; s++) {
       const s1 = s + 1;
       if (aPole) {
-        skinIndex.push(a0, b0 + s, b0 + s1);
+      // ★와인딩 반전 수정(2026-08-26). 이 셀브는 좌표계가 lib의 buildRevolvedShell과
+      // **거울상**이다(lib은 z=+sin, 여기는 z=-sin 또는 x=sin/z=cos). 그런데 감기를 lib 것을
+      // 그대로 복사해 **손잡이가 뒤집혀 법선이 전부 안을 향했다**.
+      // 증상: FrontSide 컴링이라 가까운 벙이 사라지고 먼 벽 안쪽이 보인다 —
+      // 일부 각도에서 몸통이 통째로 사라지고 꼭지만 남아 "떠 있는 꼭지"로 보였다.
+      // 실측(수정 전): 바깥향 삼각형 5~8% · 부호부피 음수(정상인 olive는 97%/양수).
+      // ⚠ 캡(단면)은 **이 좌표계에서 손으로 유도**한 것이라 그대로 둔다. 스킨만 뒤집는다.
+        skinIndex.push(a0, b0 + s1, b0 + s);
       } else if (bPole) {
-        skinIndex.push(a0 + s1, a0 + s, b0);
+        skinIndex.push(a0 + s, a0 + s1, b0);
       } else {
-        skinIndex.push(a0 + s, b0 + s1, a0 + s1);
-        skinIndex.push(a0 + s, b0 + s, b0 + s1);
+        skinIndex.push(a0 + s, a0 + s1, b0 + s1);
+        skinIndex.push(a0 + s, b0 + s1, b0 + s);
       }
     }
   }
@@ -187,14 +200,23 @@ function paintBeetCutfaceTexture(): THREE.CanvasTexture {
 }
 
 function buildStub(rng: () => number): THREE.BufferGeometry {
+  // ★뚜껑 링 추가(2026-08-26) — 되돌리지 말 것.
+  // 이전 프로필은 [[1,-1],[1,1]] 두 링뿐이라 **옆벽만 있고 양 끝이 뚫린 통**이었다.
+  // stdMaterial은 FrontSide라 뚫린 윗면으로 통 안쪽이 보이고, 실측상 @180/@270에서 스텁이
+  // 두 개의 뿔("고양이 귀")로, @0/@90에서는 속이 보이는 컵으로 읽혔다.
+  // rFrac=0 극점 링을 양 끝에 붙이면 buildRevolvedShell의 aPole/bPole 분기가 원판 뚜껑을 만든다
+  // (극점 hFrac을 림과 같게 둬 높이 불변 — 잘라낸 자리라 평평한 게 맞다).
+  // 링이 4개가 됐으므로 radialScale은 ringIndex<=1(아랫극·아랫림) 기준으로 갈라야 한다.
   const { geometry } = buildRevolvedShell(
     [
+      [0, -1],
       [1, -1],
       [1, 1],
+      [0, 1],
     ],
     STUB_SEGMENTS,
     STUB_HEIGHT / 2,
-    (_hFrac, ringIndex) => (ringIndex === 0 ? [STUB_RADIUS_BOTTOM, STUB_RADIUS_BOTTOM] : [STUB_RADIUS_TOP, STUB_RADIUS_TOP]),
+    (_hFrac, ringIndex) => (ringIndex <= 1 ? [STUB_RADIUS_BOTTOM, STUB_RADIUS_BOTTOM] : [STUB_RADIUS_TOP, STUB_RADIUS_TOP]),
   );
   jitterVertices(geometry, rng, STUB_JITTER_AMP);
   const baked = facet(geometry);

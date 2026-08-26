@@ -40,11 +40,17 @@ export const FAMILIES = {
     outDir: 'ingredients',
     refDir: 'ingredients',
     promptDir: 'ingredients',
-    perKB: 100,
-    maxTri: 2500,
+    // ★2026-08-26 상향 (100→250KB · 2500→8000tri). 원래 "재료는 빵보다 단순하니 조인다"였는데
+    // **그 전제가 틀렸다.** 조인 진짜 이유는 도감 썸네일이 작아서였고, 나는 재료가 **빵과 똑같은
+    // 쇼케이스에서 똑같은 크기로 확대돼 감상된다**는 걸 계산에 안 넣었다
+    // (`breadShowcase.ts`의 `FIT_SIZE = 1.6`이 패밀리를 안 가린다).
+    // 결과: 64px 썸네일에서는 멀쩡하고 전체 화면에서는 각지고 조잡했다 — 실기기에서 드러났다.
+    // 상한을 빵과 같게 둔다. 같은 화면에서 같은 크기로 보는 것에 다른 예산을 줄 근거가 없다.
+    perKB: 250,
+    maxTri: 8000,
     totalKB: null,
     /** 12 → 30종으로 자란다 — 합계는 개수 비례 */
-    perItemKB: 64,
+    perItemKB: 160,
   },
 };
 

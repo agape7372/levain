@@ -36,7 +36,9 @@ const STRAND_COLOR = 0xe8c9a8; // "fine radiating seed strands in warm sand"
 // 거의 같은 정면 단면 샷이라 이 비율은 fig-2.png 기준으로 통일했다).
 const FIG_RADIUS = 0.46; // 적도(가장 넓은 지점) 반지름
 const FIG_HALF_LENGTH = 0.8; // 극-극 절반 길이
-const FIG_SEGMENTS = 12; // half-revolution 컬럼 수 (0..12 => 컬럼 13개, phi 0..pi)
+const FIG_SEGMENTS = 20; // ★12→20 (2026-08-26). half-revolution 컬럼 수. 예산 상향
+// (2500→8000tri) 후 전체 화면 기준 재판정 — 12컬럼(15°)은 옆·뒤 각도에서 실루엣이 각졌다.
+// 20컬럼(9°)에 드는 비용은 +100tri 남짓이고 전체는 여전히 400tri/8000이다.
 
 type ProfilePoint = readonly [number, number];
 // (반지름비, 높이비) — heightFrac -1(둥근 아랫극) .. +1(줄기와 만나는 윗극). 가장 넓은 지점은
@@ -56,20 +58,27 @@ const PROFILE: readonly ProfilePoint[] = [
   [0.0, 1.0],
 ];
 
-const JITTER_AMP = 0.017; // ~3.7% of FIG_RADIUS — R4, olive(0.016/0.44)와 같은 자릿수
+const JITTER_AMP = 0.011; // ★0.017→0.011 (2026-08-26) — 되돌리지 말 것.
+// 컬럼을 20으로 올리자 극 근처 링(rFrac 0.14 => 반지름 0.064)의 컬럼 간격이 0.01까지 좁아져
+// **지터 진폭이 삼각형보다 커졌다** — 목 부근 얇은 슬라이버가 뒤집혔다(실측: 몸통에서 안쪽 향한
+// 삼각형 17개, 전부 y 0.5~0.8 목 구간). 진폭을 간격 아래로 내려 뒤집힘을 없앤다.
+// 세그먼트를 더 올리려면 이 값도 같이 내려야 한다(간격 = π·r/segments).
 
 const STEM_RADIUS_TOP = 0.085;
 const STEM_RADIUS_BOTTOM = 0.115;
 const STEM_HEIGHT = 0.34;
-const STEM_SEGMENTS = 8;
-const STEM_EMBED = 0.06; // 줄기 밑동이 몸통 윗극보다 STEM_EMBED만큼 내려가 파묻혀 뜨는 부분이 없다.
+const STEM_SEGMENTS = 12; // ★8→12 (2026-08-26). 예산 상향(2500→8000tri) 후 전체 화면 기준으로
+// 다시 보니 8각 줄기는 각져 보였다. 줄기 12각의 추가 비용은 ~16tri다 — 아낄 이유가 없다.
+const STEM_EMBED = 0.1; // ★0.06→0.1 (2026-08-26). 줄기 밑동 반지름(0.115)이 그 높이의 몸통
+// 반지름보다 커서 밑동 테두리가 목 밖으로 턱을 만들었다. 더 깊이 묻어 턱을 줄인다.
 const STEM_JITTER_AMP = 0.008;
 
 // 단면 텍스처 — profileRadiusAt과 같은 PROFILE을 공유해 텍스처 경계가 실제 지오메트리 경계와
 // 정확히 일치한다(campagne의 ringPhase 공유 패턴과 동일 원리).
 const TEX_SIZE = 192; // <=256 (R3)
 const RIM_BAND_FRAC = 0.84; // rBoundary 대비 이 비율을 넘으면 크림색 림
-const STRAND_COUNT = 26;
+const STRAND_COUNT = 34; // ★26→34 (2026-08-26). 부채가 단면을 꽉 채우게 되자 26줄은 굵은
+// 쐐기로 보여 "떠오르는 해" 도안처럼 읽혔다 — 개수를 늘리고 아래 widths를 좁혀 가는 씨앗줄로.
 const CORE_H_FRAC = -0.02; // 방사 무늬가 수렴하는 중심 — PROFILE 최대 반지름 지점과 동일
 
 function profileRadiusAt(hFrac: number): number {
@@ -122,12 +131,19 @@ function buildHalfShell(
     for (let s = 0; s < segments; s++) {
       const s1 = s + 1;
       if (aPole) {
-        skinIndex.push(a0, b0 + s, b0 + s1);
+      // ★와인딩 반전 수정(2026-08-26). 이 셀브는 좌표계가 lib의 buildRevolvedShell과
+      // **거울상**이다(lib은 z=+sin, 여기는 z=-sin 또는 x=sin/z=cos). 그런데 감기를 lib 것을
+      // 그대로 복사해 **손잡이가 뒤집혀 법선이 전부 안을 향했다**.
+      // 증상: FrontSide 컴링이라 가까운 벙이 사라지고 먼 벽 안쪽이 보인다 —
+      // 일부 각도에서 몸통이 통째로 사라지고 꼭지만 남아 "떠 있는 꼭지"로 보였다.
+      // 실측(수정 전): 바깥향 삼각형 5~8% · 부호부피 음수(정상인 olive는 97%/양수).
+      // ⚠ 캡(단면)은 **이 좌표계에서 손으로 유도**한 것이라 그대로 둔다. 스킨만 뒤집는다.
+        skinIndex.push(a0, b0 + s1, b0 + s);
       } else if (bPole) {
-        skinIndex.push(a0 + s1, a0 + s, b0);
+        skinIndex.push(a0 + s, a0 + s1, b0);
       } else {
-        skinIndex.push(a0 + s, b0 + s1, a0 + s1);
-        skinIndex.push(a0 + s, b0 + s, b0 + s1);
+        skinIndex.push(a0 + s, a0 + s1, b0 + s1);
+        skinIndex.push(a0 + s, b0 + s1, b0 + s);
       }
     }
   }
@@ -186,16 +202,22 @@ function paintFigInteriorTexture(rng: () => number): THREE.CanvasTexture {
   const strand: [number, number, number] = [(STRAND_COLOR >> 16) & 0xff, (STRAND_COLOR >> 8) & 0xff, STRAND_COLOR & 0xff];
 
   // 방사 스파이크 — 각도/길이/폭을 주입 rng로 결정론 생성(Math.random 금지).
-  // 길이는 월드 단위(FIG_RADIUS와 같은 자)로 잡는다 — UV(u,v)는 X폭(0.92)과 Y높이(1.6)의 스케일이
-  // 서로 달라(비등방) atan2/hypot을 UV 공간에서 바로 쓰면 별 무늬가 찌그러진다(디버그 렌더로 확인:
-  // no-strand 버전은 림/속살 경계가 정상이었는데 strand를 켜면 무너졌다 — 원인이 여기 있었다).
+  // ★길이 단위 변경(2026-08-26) — 되돌리지 말 것.
+  // 예전엔 월드 단위(반경 0.23~0.41)로 잡았다. 그런데 단면은 0.92 x 1.6짜리 **세로로 긴 타원**이라
+  // 월드 등방 원은 세로를 29~51%밖에 못 채운다 — 부채가 단면 한가운데 작은 원반으로 뭉쳐
+  // "무늬가 윤곽과 안 맞는다"로 읽혔다. 그래서 길이·거리·각도를 전부 **정규화 타원 좌표**
+  // (nx = x/FIG_RADIUS, ny = (y-coreY)/FIG_HALF_LENGTH = hFrac-CORE_H_FRAC)에서 잰다.
+  // 이 좌표에서 dist=1이 곧 윤곽선이라
+  // 부채가 단면을 꽉 채우고, 넘치는 부분은 아래 rim 밴드 검사(cr <= RIM_BAND_FRAC)가 잘라준다.
+  // ⚠ 옛 주석이 경계하던 "UV 공간 비등방"과는 다른 이야기다 — UV는 캔버스 정사각 기준이라
+  //   가로세로 배율이 어긋나지만, 여기 정규화는 **실제 반경/반높이로 나눈** 것이라 윤곽과 일치한다.
   const angles: number[] = [];
   const lens: number[] = [];
   const widths: number[] = [];
   for (let i = 0; i < STRAND_COUNT; i++) {
     angles.push((i / STRAND_COUNT) * Math.PI * 2 + (rng() - 0.5) * 0.12);
-    lens.push((0.5 + rng() * 0.4) * FIG_RADIUS * 0.85);
-    widths.push(0.03 + rng() * 0.018);
+    lens.push(0.86 + rng() * 0.34); // 정규화 반경 — 1.0이 윤곽선
+    widths.push(0.018 + rng() * 0.012); // 반각(rad) — 줄 간격 0.185rad의 20~32%
   }
 
   return bakeTexture(TEX_SIZE, (ctx, size) => {
@@ -203,9 +225,15 @@ function paintFigInteriorTexture(rng: () => number): THREE.CanvasTexture {
     for (let py = 0; py < size; py++) {
       for (let px = 0; px < size; px++) {
         const u = (px + 0.5) / size;
-        // cmp-1/cmp-2 실측: py를 그대로 v로 쓰는 쪽(flipY 보정 없음)이 core 위치를 중앙 부근에 둔다 —
-        // flipY 보정을 넣었더니(cmp-2) core가 맨 위로 밀려났다(반대 방향). 원래 매핑을 유지한다.
-        const v = (py + 0.5) / size;
+        // ★flipY 정합(2026-08-26) — 되돌리지 말 것.
+        // CanvasTexture 기본 flipY=true라 **캔버스 맨 윗줄(py=0)이 메시 V=1**에 붙는다
+        // (pumpkin.ts의 꼭지 예비 패치가 같은 규칙 위에서 이미 정상 동작 중이다).
+        // 예전 코드는 v = py/size를 그대로 써서 프로필에서 뽑은 rBoundary가 **세로로 뒤집힌 채**
+        // 칠해졌다: 몸통은 아래가 넓고 위가 좁은데 텍스처는 그 반대라 크림 림 띠 폭이 제각각이고
+        // 속살 창이 렌즈 모양으로 잘려 부채가 한쪽 절반에만 남았다.
+        // core가 중앙 근처(CORE_H_FRAC=-0.02)라 옛 실측(cmp-1/cmp-2)에서는 이 뒤집힘이
+        // "core 위치"로는 드러나지 않았다 — 그 관찰로 매핑을 확정한 것이 오진이었다.
+        const v = 1 - (py + 0.5) / size;
         const localX = (u - 0.5) * 2 * FIG_RADIUS;
         const hFrac = v * 2 - 1;
         const rBoundary = profileRadiusAt(hFrac) * FIG_RADIUS;
@@ -213,19 +241,22 @@ function paintFigInteriorTexture(rng: () => number): THREE.CanvasTexture {
         if (rBoundary > 1e-4) {
           const cr = Math.abs(localX) / rBoundary;
           if (cr <= RIM_BAND_FRAC) {
-            // 등방(월드 단위) 좌표에서 각도/거리 계산 — localX는 이미 월드 단위, localY도 같은 자로
-            // 맞춘다(uv가 아니라 hFrac*FIG_HALF_LENGTH). CORE도 같은 월드 좌표계로 변환.
-            const localY = hFrac * FIG_HALF_LENGTH;
-            const coreY = CORE_H_FRAC * FIG_HALF_LENGTH;
-            const dx = localX;
-            const dy = localY - coreY;
-            const dist = Math.hypot(dx, dy);
-            const angle = Math.atan2(dy, dx);
+            // 정규화 타원 좌표 — nx=1이 적도 윤곽, ny=1이 극. 위 lens 주석 참조.
+            const nx = localX / FIG_RADIUS; // ±1 = 적도 윤곽
+            const ny = hFrac - CORE_H_FRAC; // hFrac이 이미 ±1 정규화(극 = ±1)
+            const dist = Math.hypot(nx, ny);
+            const angle = Math.atan2(ny, nx);
             let onStrand = false;
             for (let i = 0; i < STRAND_COUNT; i++) {
-              let d = Math.abs(angle - angles[i]);
+              // ★각도차 접기에 `% 2π`가 빠져 있었다(2026-08-26 수정) — 되돌리지 말 것.
+              // atan2는 (-π, π]를 주는데 angles[i]는 [0, 2π)로 만든다. 그래서 단면 아래쪽
+              // (angle<0)에서 |angle - angles[i]|가 **2π를 넘고**, 그때 `d = 2π - d`는 음수가 된다.
+              // 음수는 어떤 width보다도 작으니 onStrand가 무조건 참 → **코어 아래 절반이 통째로
+              // 씨앗색으로 칠해졌다**(부채가 위쪽 절반에만 있는 것처럼 보이던 정체가 이것이다).
+              // lib.angleDeltaDeg가 `% 360`을 먼저 하는 것과 같은 접기다 — 그 관례를 따른다.
+              let d = Math.abs(angle - angles[i]) % (Math.PI * 2);
               if (d > Math.PI) d = Math.PI * 2 - d;
-              if (d < widths[i] && dist > 0.015 && dist < lens[i]) {
+              if (d < widths[i] && dist > 0.04 && dist < lens[i]) {
                 onStrand = true;
                 break;
               }
@@ -245,14 +276,23 @@ function paintFigInteriorTexture(rng: () => number): THREE.CanvasTexture {
 }
 
 function buildStem(rng: () => number): THREE.BufferGeometry {
+  // ★뚜껑 링 추가(2026-08-26) — 되돌리지 말 것.
+  // 이전 프로필은 [[1,-1],[1,1]] 두 링뿐이라 **옆벽만 있고 양 끝이 뚫린 통**이었다.
+  // stdMaterial은 FrontSide라 뚫린 윗면으로 통 안쪽(뒷면 컬링)이 보이고, 그 구멍이
+  // 전 각도에서 "속이 보이는 컵" 또는 실루엣 상단의 V홈("고양이 귀")으로 읽혔다.
+  // rFrac=0인 극점 링을 양 끝에 붙이면 buildRevolvedShell이 aPole/bPole 분기로 원판 뚜껑을
+  // 만들어 닫는다(극점 hFrac을 림과 같게 둬 높이는 그대로, 뚜껑은 평평한 절단면).
+  // 그래서 radialScale은 ringIndex 0/1(아랫극·아랫림) vs 2/3(윗림·윗극)으로 갈라야 한다.
   const { geometry } = buildRevolvedShell(
     [
+      [0, -1],
       [1, -1],
       [1, 1],
+      [0, 1],
     ],
     STEM_SEGMENTS,
     STEM_HEIGHT / 2,
-    (_hFrac, ringIndex) => (ringIndex === 0 ? [STEM_RADIUS_BOTTOM, STEM_RADIUS_BOTTOM] : [STEM_RADIUS_TOP, STEM_RADIUS_TOP]),
+    (_hFrac, ringIndex) => (ringIndex <= 1 ? [STEM_RADIUS_BOTTOM, STEM_RADIUS_BOTTOM] : [STEM_RADIUS_TOP, STEM_RADIUS_TOP]),
   );
   jitterVertices(geometry, rng, STEM_JITTER_AMP);
   const baked = facet(geometry);

@@ -1,14 +1,37 @@
-// 피스타치오 — 알맹이 4개 + 쪼개진 알 1개(2조각). 계약은 types.ts 주석이 정본. 재료 배치4 3번째.
+// 피스타치오 — 통 알맹이 3개 + 반으로 쪼개진 알 1개(반쪽 2개). 계약은 types.ts 주석이 정본.
 //
 // 유래: img2threejs 스펙 assets/ingredients/specs/pistachio.json(워크스페이스 원본은
-// assets/ingredients/work/pistachio/). 프로필·색은 전부 그 스펙(author_spec.py)의 전사이며,
+// assets/ingredients/work/pistachio/). 프로필·색은 그 스펙(author_spec.py)의 전사이며,
 // 수치를 고칠 때는 스펙을 먼저 고치고 여기로 옮긴다.
 //
 // 기술 계보: 알맹이 셸은 olive.ts와 동일한 회전체(buildRevolvedShell) + rotateZ(-90deg) 눕히기
-// 패턴(단, 올리브의 비대칭 테이퍼 대신 양끝이 비슷하게 둥근 대칭 프로필). 쪼개진 알의 "홈"(자른 면)은
-// olive.ts의 (ring,sector) 캡 마스크 기법을 **단일 링이 아니라 극점 제외 전체 링**으로 넓히고,
-// chestnut.ts의 CREASE(반지름 축소)를 같은 섹터 범위에 적용해 실제 평평한 단면을 깎는다 — 마스크와
-// 함몰이 같은 (ring,sector) 범위를 공유하므로 지오메트리(평평함)와 색(아이보리) 경계가 항상 일치한다.
+// 패턴(단, 올리브의 비대칭 테이퍼 대신 양끝이 비슷하게 둥근 대칭 프로필).
+//
+// ═══ v2 (2026-08-26 쇼케이스 수리) — 되돌리지 말 것 ═══════════════════════════════════════
+// ★스펙(assets/ingredients/work/pistachio/object-sculpt-spec.json)의 배치와 "홈(자른 면)" 기법은
+//   **둘 다 깨져 있다.** 이 파일이 그 스펙보다 앞선다 — 스펙에서 복원하지 마라. 근거 셋:
+//
+//   (1) 배치 관통. 알 하나는 1.24×0.8인데 옛 오프셋들의 상호 거리가 0.45~0.61이었다. 알을
+//       캡슐(축 반길이 0.22 · 반지름 0.4)로 근사해 선분-선분 거리를 재보면 6알 중 **8쌍이
+//       기준 0.80을 밑돌고 최악이 0.212**다. 렌더는 주석이 말하는 "느슨한 원형"이 아니라
+//       초록 덩어리 하나였다. → 알을 **방사 로제트**(중심에서 바깥으로 뻗는 꽃잎 배치)로 다시
+//       깔고, 모든 쌍의 캡슐 거리를 0.80 이상으로 맞췄다(최악 0.822). 개수도 6 → 5로 줄였다
+//       (겹침을 없애면 자리를 더 먹으므로, 남는 알을 키우는 게 전체 화면에서 이득 — 64px 게이트의
+//       "인스턴스를 줄이고 하나를 키운다"와 같은 방향이다).
+//       ⚠ 오프셋을 다시 좁히면 관통이 그대로 돌아온다. 좁히려면 캡슐 거리를 먼저 계산해라.
+//
+//   (2) 자른 면. 옛 기법은 (링,섹터) 한 줄의 반지름을 42% 당겨 "홈"을 판 것이었는데, 그건
+//       평면이 아니라 세로 골이라 아이보리 영역이 **알보다 큰 베이지 돌덩이/찢긴 종이**로 읽혔다.
+//       게다가 두 조각이 각각 통 알맹이 크기여서 "쪼개진 알 하나"가 아니라 "홈 파인 알 둘"이었다.
+//       → 진짜 평면 절단으로 바꿨다: 눕힌 뒤 y > Y_CUT 인 정점을 전부 Y_CUT으로 눌러 **적도에서
+//         자른 실제 반쪽**을 만든다. 눌린 정점 = 마스크 = 아이보리 버킷이라 지오메트리(평평함)와
+//         색 경계가 정의상 일치한다. 클램프는 **지터 이전**에 적용한다 — 그래야 마스크가 지터
+//         스트림과 무관하게 결정론적이다(CRIB의 "좌표 임계값 금지"는 지터 후 임계값 얘기고,
+//         여기서는 평면 절단 자체가 의도라 평면이 곧 정의다).
+//
+//   (3) 각짐. SEGMENTS 8 · 프로필 6점은 전체 화면에서 대놓고 각졌다. 예산이 100KB/2500tri →
+//       250KB/8000tri로 상향됐고(families.mjs) 재료도 빵과 같은 크기로 확대돼 보인다.
+//       SEGMENTS 8 → 20, 프로필 6 → 9점.
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
 import {
@@ -24,10 +47,8 @@ import {
 
 // 팔레트 — assets/prompts/ingredients/pistachio.json geometry.surface[0] 손 전사 (JSON import 금지,
 // types.ts §7). "#6E8A38"(그늘진 아랫면)은 올리브/밤과 같은 이유로 버킷을 안 만든다(볼록 셸의 N·L
-// 감쇠가 공짜). "#8B5D6E"(자주빛 속껍질 잔흔)도 드롭한다 — mesh<=2 예산이 이미 몸통+홈 2버킷을 다
-// 썼고, 정확한 UV 타겟 텍스처를 만드는 비용이 이 단계에서 정당화되지 않는다고 판단했다(정직한
-// 한계, spec risk mauve-skin-remnant-dropped). 노트에 "결정적"이라 적혀 있지만 아이보리/초록
-// 대비만으로도 "쪼개진 속이 보이는 콩"은 충분히 읽힌다고 본다.
+// 감쇠가 공짜). "#8B5D6E"(자주빛 속껍질 잔흔)도 드롭한다 — mesh<=2 예산이 이미 몸통+자른면 2버킷을
+// 다 썼다(정직한 한계, spec risk mauve-skin-remnant-dropped).
 const BODY_COLOR = 0x8fa84a; // "a soft yellow-green body"
 const CUT_COLOR = 0xede4c0; // "a pale ivory groove ... inside the split kernel's cleft"
 
@@ -35,57 +56,52 @@ const CUT_COLOR = 0xede4c0; // "a pale ivory groove ... inside the split kernel'
 // 양끝이 비슷하게 둥글다(올리브의 비대칭 뭉툭/뾰족 대신).
 const KERNEL_RADIUS = 0.4;
 const KERNEL_HALF_LENGTH = 0.62;
-const SEGMENTS = 8;
+const SEGMENTS = 20; // v2: 8 → 20 (전체 화면에서 8각 단면이 그대로 보였다)
 
 type ProfilePoint = readonly [number, number];
+// v2: 6 → 9점. 실루엣 계열은 그대로 두고(최대 반지름은 hFrac≈-0.08, 양끝은 둥근 극점) 사이만 채웠다.
 const PROFILE: readonly ProfilePoint[] = [
   [0.0, -1.0],
-  [0.7, -0.7],
-  [1.0, -0.15],
-  [0.9, 0.35],
-  [0.5, 0.75],
+  [0.42, -0.86],
+  [0.72, -0.64],
+  [0.92, -0.36],
+  [1.0, -0.08],
+  [0.97, 0.22],
+  [0.82, 0.52],
+  [0.52, 0.8],
   [0.0, 1.0],
 ];
 
-const JITTER_AMP = 0.014; // ~3.5% of KERNEL_RADIUS — R4, olive/chestnut과 동일 비율
+// v2: 0.014 → 0.012. SEGMENTS를 20으로 올려 한 변이 짧아졌고(R4), 자른 면의 평평함도 지켜야 한다.
+const JITTER_AMP = 0.012;
 
-// 자른 면 마스크/함몰 — 극점(rFrac<=0, 인덱스 0·5) 제외한 전 링(1..4)에 고정 섹터 범위를 적용한다.
-// olive.ts는 캡을 링 1개에만 찍었지만, 여기서는 알의 "길이 전체"를 가로지르는 평평한 단면이
-// 필요해서 극점 사이 전 링으로 넓혔다 — chestnut.ts CREASE가 여러 링에 걸쳐 적용되는 것과 같은 확장.
-const CUT_RING_INDICES: readonly number[] = [1, 2, 3, 4];
-// cmp-2 판정: half-width 1(3/8 폭)은 두 조각의 단면이 서로 뭉개져 하나의 크림색 덩어리로 보였다 —
-// 0(1/8 폭)으로 좁혀 조각별 경계가 또렷해지게 한다.
-const CUT_SECTOR_HALF_WIDTH = 0;
-// cmp-1 판정: rotateZ(-90deg) 눕히기는 new_y = -old_x다 — old 로컬 +X(섹터 0)는 눕힌 뒤 -Y(바닥
-// 쪽)로 가 완전히 숨었다. new_y>0("위")를 내려면 old_x<0, 즉 섹터는 각도 180deg 근처여야 한다
-// (SEGMENTS=8이면 섹터 4).
-const CUT_SECTOR_CENTER = 4;
-const CUT_RADIAL_PULL = 0.42; // 해당 섹터 반지름을 이 비율만큼 축소 — 평평한 단면을 깎는다
+// 자른 면 = 평면 절단. 눕힌 뒤(장축이 로컬 X) y > Y_CUT 인 정점을 Y_CUT으로 누른다.
+// 적도(y=0)보다 살짝 위 → "반쪽보다 아주 조금 큰" 조각. 끝으로 갈수록 링 반지름이 줄어 y가
+// Y_CUT을 못 넘으므로 자른 면이 저절로 뾰족하게 좁아진다(별도 테이퍼 코드 불필요).
+const Y_CUT = 0.02;
 
 /**
- * 알맹이 1개. isSplit=true면 자른 면 마스크/함몰을 추가로 적용해 { bodyGeo, cutGeo } 둘 다 반환하고,
- * false면 cutGeo는 비운다(whole 알맹이는 단일 재질).
+ * 알맹이 1개. isSplit=true면 평면 절단을 적용해 { bodyGeo, cutGeo } 둘 다 반환하고,
+ * false면 cutGeo는 비운다(통 알맹이는 단일 재질).
  */
 function buildKernel(rng: () => number, isSplit: boolean): { bodyGeo: THREE.BufferGeometry; cutGeo: THREE.BufferGeometry | null } {
-  const { geometry, ringStart } = buildRevolvedShell(PROFILE, SEGMENTS, KERNEL_HALF_LENGTH, () => [KERNEL_RADIUS, KERNEL_RADIUS]);
-  const pos = geometry.attributes.position as THREE.BufferAttribute;
-
-  const mask = new Uint8Array(pos.count);
-  if (isSplit) {
-    // 함몰/마스크 — 지터/회전 전, (링,섹터) 격자 인덱스로 직접 지정(좌표 임계값 금지, CRIB).
-    for (const ri of CUT_RING_INDICES) {
-      const base = ringStart[ri];
-      for (let d = -CUT_SECTOR_HALF_WIDTH; d <= CUT_SECTOR_HALF_WIDTH; d++) {
-        const s = ((CUT_SECTOR_CENTER + d) % SEGMENTS + SEGMENTS) % SEGMENTS;
-        const idx = base + s;
-        mask[idx] = 1;
-        pos.setXYZ(idx, pos.getX(idx) * (1 - CUT_RADIAL_PULL), pos.getY(idx), pos.getZ(idx) * (1 - CUT_RADIAL_PULL));
-      }
-    }
-  }
+  const { geometry } = buildRevolvedShell(PROFILE, SEGMENTS, KERNEL_HALF_LENGTH, () => [KERNEL_RADIUS, KERNEL_RADIUS]);
 
   // 눕히기: rotateZ(-90deg) — olive.ts와 동일 관례. 장축이 로컬 X로, 로컬 Y가 "위"가 된다.
   geometry.rotateZ(-Math.PI / 2);
+
+  const pos = geometry.attributes.position as THREE.BufferAttribute;
+  const mask = new Uint8Array(pos.count);
+  if (isSplit) {
+    // ⚠ 지터 **이전**에 자른다 — 마스크가 rng와 무관해야 색 경계가 결정론적이다.
+    for (let i = 0; i < pos.count; i++) {
+      if (pos.getY(i) > Y_CUT) {
+        pos.setY(i, Y_CUT);
+        mask[i] = 1;
+      }
+    }
+    pos.needsUpdate = true;
+  }
 
   // 지터 — indexed 상태에서(공유 정점이 함께 움직여야 경계가 안 찢어진다, types.ts §5).
   jitterVertices(geometry, rng, JITTER_AMP);
@@ -108,23 +124,27 @@ function buildKernel(rng: () => number, isSplit: boolean): { bodyGeo: THREE.Buff
 }
 
 interface KernelDef {
-  offset: readonly [number, number]; // world XZ
-  yaw: number;
-  tiltZ: number; // 자른 알만: 벌어지는 느낌
+  /** 로제트 각도(deg) — 중심에서 이 방향으로 밀어낸다. 0deg = +X, 90deg = +Z. */
+  deg: number;
+  /** 중심에서의 거리. 이웃 알과의 캡슐 거리를 결정하는 주 손잡이. */
+  radius: number;
+  /** 장축을 순수 방사에서 살짝 비튼다(정확한 꽃잎 대칭은 인공적으로 보인다). */
+  skew: number;
+  /** 반쪽만: 길이 방향으로 살짝 흔들리게. ⚠ 크게 주면 자른 면이 "위"로 안 읽힌다 — 0.2 이하. */
+  tiltZ: number;
   split: boolean;
 }
 
-// assets/ingredients/work/pistachio/object-sculpt-spec.json 배치 전사. pistachio.png 탑다운 실측 —
-// 5알이 느슨한 원형으로 놓이고, 자른 알(splitA/splitB)이 앞쪽에서 살짝 벌어져 단면을 보여준다.
-const KERNELS: Record<'w1' | 'w2' | 'w3' | 'w4' | 'splitA' | 'splitB', KernelDef> = {
-  w1: { offset: [-0.55, 0.5], yaw: 0.3, tiltZ: 0, split: false },
-  w2: { offset: [0.05, 0.62], yaw: -0.5, tiltZ: 0, split: false },
-  w3: { offset: [0.62, 0.35], yaw: 1.1, tiltZ: 0, split: false },
-  w4: { offset: [-0.6, -0.15], yaw: 2.0, tiltZ: 0, split: false },
-  // 자른 알 — CUT_SECTOR_CENTER는 로컬 +Y(눕힌 뒤 "위")라 yaw(월드 Y 회전)에 안 흔들리고 항상
-  // 카메라를 향한다. cmp-2 판정: 간격이 너무 좁아 두 단면이 뭉쳐 보였다 — offset을 벌린다.
-  splitA: { offset: [0.08, -0.32], yaw: 2.8, tiltZ: -0.16, split: true },
-  splitB: { offset: [0.52, -0.42], yaw: 2.55, tiltZ: 0.16, split: true },
+// v2 배치 — 방사 로제트. 각 알의 장축이 중심에서 바깥으로 뻗고(yaw = -deg), 이웃끼리는 안쪽 끝에서
+// 가장 가까워진다. 전 쌍의 캡슐 거리 실측: 최악 0.822 / 기준 0.80 (전부 접촉 이상, 관통 0).
+// 로제트를 통째로 돌려 **쪼개진 반쪽 둘(hA·hB)이 기본 3/4 카메라 쪽(deg 121.6)에 오게** 맞췄다 —
+// 자른 면이 이 재료의 읽을거리라 앞에 둬야 한다.
+const KERNELS: Record<'w1' | 'w2' | 'w3' | 'hA' | 'hB', KernelDef> = {
+  w1: { deg: 238, radius: 0.95, skew: -0.1, tiltZ: 0, split: false },
+  w2: { deg: 310, radius: 0.97, skew: 0.09, tiltZ: 0, split: false },
+  w3: { deg: 18, radius: 0.93, skew: 0.14, tiltZ: 0, split: false },
+  hA: { deg: 90, radius: 0.97, skew: -0.08, tiltZ: -0.1, split: true },
+  hB: { deg: 160, radius: 0.93, skew: 0.1, tiltZ: 0.1, split: true },
 };
 
 export const createPistachio: IngredientBuilder = (rng) => {
@@ -141,8 +161,10 @@ export const createPistachio: IngredientBuilder = (rng) => {
     sub.add(new THREE.Mesh(bodyGeo, bodyMat));
     if (cutGeo) sub.add(new THREE.Mesh(cutGeo, cutMat));
 
-    sub.rotation.set(0, def.yaw, def.tiltZ);
-    sub.position.set(def.offset[0], 0, def.offset[1]);
+    // yaw = -angle 이면 장축(로컬 +X)이 (cos angle, 0, sin angle) — 즉 로제트 반지름 방향이 된다.
+    const angle = (def.deg * Math.PI) / 180;
+    sub.rotation.set(0, -angle + def.skew, def.tiltZ);
+    sub.position.set(Math.cos(angle) * def.radius, 0, Math.sin(angle) * def.radius);
 
     // 공유 지면 y=0 — 이 알만의 회전 후 bbox를 구해 바닥을 원점에 맞춘다(types.ts R1, olive.ts 관례).
     sub.updateMatrixWorld(true);

@@ -12,8 +12,9 @@
     "breads:export": "node scripts/export-breads.mjs --family=bread",
     "ingredients:export": "node scripts/export-breads.mjs --family=ingredient",
     "ingredients:thumbs": "node scripts/bake-thumbs.mjs --family=ingredient",
-    "check-budget": "node scripts/check-budget.mjs",
-    "ota:release": "node scripts/ota-release.mjs"
+    "check-budget": "node scripts/check-budget.mjs && node scripts/check-winding.mjs",
+    "ota:release": "node scripts/ota-release.mjs",
+    "check-winding": "node scripts/check-winding.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",

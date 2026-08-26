@@ -12,12 +12,20 @@
 // (지오메트리 로브 방식은 세그먼트를 30+로 올려야 매끈해 tri 예산을 초과한다).
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
-import { bakeTexture, buildRevolvedShell, facet, jitterVertices, mergeByMaterial, sliceTriangles, stdMaterial, uvDome, uvTopPlanar } from '../breads/lib';
+import { bakeTexture, buildRevolvedShell, facet, jitterVertices, mergeByMaterial, scaleHex, sliceTriangles, stdMaterial, uvDome, uvTopPlanar } from '../breads/lib';
 
 // 팔레트 — assets/prompts/ingredients/pumpkin.json geometry.surface[0] 손 전사 (JSON import 금지, types.ts §7).
 const SKIN_LIGHT = 0xd98b3a; // "a warm orange skin"
 const SKIN_DARK = 0xb96f27; // "deeper amber sunk into the rib grooves"
-const CUTFACE_COLOR = 0xefa84e; // "a bright golden cut face"
+const CUTFACE_SPEC = 0xefa84e; // "a bright golden cut face"
+// ★자른면 밝기 상향(2026-08-26) — 되돌리지 말 것.
+// 스펙 원색(#EFA84E)은 껍질(#D98B3A)과 명도·색상이 너무 가까워, 전체 화면에서 자른 단면이
+// "잘린 속살"이 아니라 **그림자 진 껍질 안쪽 벽**으로 읽혔다(절단면은 측면을 향해 키라이트를
+// 거의 못 받아 렌더에서 한 단계 더 어두워진다 — 팔레트 차이보다 화면 차이가 더 좁았다).
+// 순색 버킷이라 텍스처로 대비를 줄 자리가 없으므로 색 자체를 벌린다. 새 hex를 지어내지 않고
+// types.ts §7대로 lib.scaleHex로 결정론 유도(R 채널은 255에서 클램프돼 노란 쪽으로 기운다 —
+// 프롬프트 JSON이 말하는 씨방(#F5D08A)의 "paler" 방향과 같은 쪽이라 팔레트에서 벗어나지 않는다).
+const CUTFACE_COLOR = scaleHex(CUTFACE_SPEC, 1.28); // = #FFD764
 const STEM_COLOR = 0x6e7f4a; // "a short muted-green stem"
 // 씨방(#F5D08A "a paler seed hollow at its center")은 드롭 — 자른면 버킷은 순색(텍스처 없음)이라
 // 실을 자리가 없고, 64px 썸네일에서 서브 판독 디테일이다(스펙 risk seed-hollow-dropped).
@@ -26,7 +34,10 @@ const STEM_COLOR = 0x6e7f4a; // "a short muted-green stem"
 // 탑다운(pumpkin-3.png)이 특히 유용 — 골 개수·웨지 각도를 직접 셀 수 있다.
 const PUMPKIN_RADIUS = 0.62; // 적도 반지름
 const PUMPKIN_HALF_HEIGHT = 0.3; // 정점-정점 절반 높이 (높이:너비 ~= 0.48:1, pumpkin-2.png 실측)
-const SEGMENTS = 18; // 큰 호(웨지 제외) 컬럼 수 — 골은 지오메트리가 아니라 텍스처라 낮게 유지 가능
+const SEGMENTS = 30; // ★18→30 (2026-08-26). 큰 호(웨지 제외) 컬럼 수.
+// 골이 텍스처라 예전엔 18로 낮게 뒀지만, 골 무늬는 uvDome **정점 UV의 선형 보간**으로 면 위에
+// 펴지므로 컬럼이 골(13개)보다 촘촘하지 않으면 골 선이 큰 면 안에서 꺾인다 — 실측에서 골이
+// 물결치듯 휘어 보이던 원인이다. 예산 상향(2500→8000tri) 후엔 조일 이유도 없다.
 const WEDGE_HALF_ANGLE = 0.39; // ~22.4deg 편측, 웨지 총각 ~45deg (pumpkin-3.png 탑다운 실측)
 
 type ProfilePoint = readonly [number, number];
@@ -45,7 +56,10 @@ const PROFILE: readonly ProfilePoint[] = [
   [0.0, 1.0],
 ];
 
-const JITTER_AMP = 0.02; // ~3.2% of PUMPKIN_RADIUS — R4, olive/fig와 같은 자릿수
+const JITTER_AMP = 0.013; // ★0.02→0.013 (2026-08-26) — 되돌리지 말 것.
+// 컬럼을 30으로 올리자 윗극 근처 링(rFrac 0.18 => 반지름 0.11)의 컬럼 간격이 0.023까지 좁아지고,
+// 극 팬 삼각형은 그보다 더 얇다 — **지터 진폭이 삼각형보다 커져** 윗극 슬라이버가 뒤집혔다.
+// 진폭을 간격 아래로 내린다. 세그먼트를 더 올리면 이 값도 같이 내릴 것.
 
 const STEM_RADIUS_BOTTOM = 0.14;
 const STEM_RADIUS_TOP = 0.11;
@@ -89,16 +103,24 @@ function buildWedgeShell(
 ): { geometry: THREE.BufferGeometry; skinTriCount: number; cutfaceTriCount: number } {
   const positions: number[] = [];
   const ringStart: number[] = [];
-  const axisIndex: number[] = [];
+  // ★axisIndex는 **링 번호로 직접 주소를 매긴다**(2026-08-26 수정) — 되돌리지 말 것.
+  // 예전엔 두 루프에서 각각 push했다: 1) 극 링을 만나면 그 자리에서 push, 2) 그 뒤 논-극 링을
+  // 몰아서 push. 그래서 배열 순서가 링 순서와 어긋났다(프로필 10링 중 0·9가 극이면
+  // axisIndex = [극0, 극9, 링1축, 링2축, ...] → axisIndex[1]이 **맨 위 극점**이었다).
+  // 그런데 아래 buildCutface는 axisIndex[ri]로 읽는다. 결과: 절단면 삼각형이 아래쪽 림을
+  // 반대편 끝 높이의 축점에 이어 붙여 **실루엣 밖으로 길게 삐져나온 얇은 날개**가 생겼다
+  // (@90에서 몸통 왼쪽 위로 뻗은 판, @270에서 오른쪽 판 — 파손으로 읽히던 정체가 이것이다).
+  const axisIndex: number[] = new Array<number>(profile.length).fill(-1);
   const isPole: boolean[] = [];
 
-  for (const [rFrac, hFrac] of profile) {
+  for (let ri = 0; ri < profile.length; ri++) {
+    const [rFrac, hFrac] = profile[ri];
     const pole = rFrac <= 1e-6;
     isPole.push(pole);
     ringStart.push(positions.length / 3);
     if (pole) {
       positions.push(0, hFrac * heightScale, 0);
-      axisIndex.push(positions.length / 3 - 1); // 극점 = 이미 축 위, 재사용
+      axisIndex[ri] = positions.length / 3 - 1; // 극점 = 이미 축 위, 재사용
       continue;
     }
     for (let s = 0; s <= segments; s++) {
@@ -106,12 +128,12 @@ function buildWedgeShell(
       positions.push(Math.sin(phi) * rFrac * radius, hFrac * heightScale, Math.cos(phi) * rFrac * radius);
     }
   }
-  // 논-극 링만 별도 중심축 정점 추가 (극 링은 위에서 이미 axisIndex를 채웠다).
+  // 논-극 링만 별도 중심축 정점 추가 (극 링은 위에서 이미 axisIndex[ri]를 채웠다).
   for (let ri = 0; ri < profile.length; ri++) {
     if (isPole[ri]) continue;
     const [, hFrac] = profile[ri];
     positions.push(0, hFrac * heightScale, 0);
-    axisIndex.push(positions.length / 3 - 1);
+    axisIndex[ri] = positions.length / 3 - 1;
   }
 
   const skinIndex: number[] = [];
@@ -123,20 +145,35 @@ function buildWedgeShell(
     for (let s = 0; s < segments; s++) {
       const s1 = s + 1;
       if (aPole) {
-        skinIndex.push(a0, b0 + s, b0 + s1);
+      // ★와인딩 반전 수정(2026-08-26). 이 셀브는 좌표계가 lib의 buildRevolvedShell과
+      // **거울상**이다(lib은 z=+sin, 여기는 z=-sin 또는 x=sin/z=cos). 그런데 감기를 lib 것을
+      // 그대로 복사해 **손잡이가 뒤집혀 법선이 전부 안을 향했다**.
+      // 증상: FrontSide 컴링이라 가까운 벙이 사라지고 먼 벽 안쪽이 보인다 —
+      // 일부 각도에서 몸통이 통째로 사라지고 꼭지만 남아 "떠 있는 꼭지"로 보였다.
+      // 실측(수정 전): 바깥향 삼각형 5~8% · 부호부피 음수(정상인 olive는 97%/양수).
+      // ⚠ 캡(단면)은 **이 좌표계에서 손으로 유도**한 것이라 그대로 둔다. 스킨만 뒤집는다.
+        skinIndex.push(a0, b0 + s1, b0 + s);
       } else if (bPole) {
-        skinIndex.push(a0 + s1, a0 + s, b0);
+        skinIndex.push(a0 + s, a0 + s1, b0);
       } else {
-        skinIndex.push(a0 + s, b0 + s1, a0 + s1);
-        skinIndex.push(a0 + s, b0 + s, b0 + s1);
+        skinIndex.push(a0 + s, a0 + s1, b0 + s1);
+        skinIndex.push(a0 + s, b0 + s1, b0 + s);
       }
     }
   }
 
-  // 절단면 — rimAt(ring, "start"|"end")과 axisIndex[ring]을 링 순서대로 잇는다. 와인딩은 첫 렌더로
-  // 검증(figCap 유도와 같은 원리지만 극좌표 부호가 달라 재유도 대신 실측으로 확정).
-  function buildCutface(rimAt: (ri: number) => number): number[] {
+  // 절단면 — rimAt(ring)과 axisIndex[ring]을 링 순서대로 잇는다.
+  // ★와인딩(2026-08-26 재유도) — 되돌리지 말 것.
+  // 아래 감기가 만드는 법선은 항상 (d × ŷ)·Δh·r 방향이다(d = 그 림 컬럼의 수평 단위벡터).
+  //   · 시작 림(phi=+w): 고체는 phi가 커지는 쪽 → 바깥 = (-cos w, 0, sin w) = d × ŷ  → 그대로 OK
+  //   · 끝 림(phi=2π-w): 고체는 phi가 작아지는 쪽 → 바깥 = (cos w, 0, sin w) = **-(d × ŷ)** → 뒤집어야 함
+  // 즉 두 절단면은 감기가 서로 반대여야 하는데 예전엔 같은 함수를 그대로 두 번 써서
+  // **끝 림 절단면 법선이 몸통 안쪽을 향했다**(FrontSide 컬링이라 그 면이 사라지고 반대편
+  // 안쪽 벽이 비친다). 예전 주석은 "첫 렌더로 실측 확정"이라 적었지만, 그 렌더는 위 axisIndex
+  // 버그로 절단면 자체가 엉뚱한 모양이라 와인딩을 판정할 수 있는 그림이 아니었다.
+  function buildCutface(rimAt: (ri: number) => number, flip: boolean): number[] {
     const idx: number[] = [];
+    const push3 = (a: number, b: number, c: number) => (flip ? idx.push(a, c, b) : idx.push(a, b, c));
     for (let ri = 0; ri < profile.length - 1; ri++) {
       const aPole = isPole[ri];
       const bPole = isPole[ri + 1];
@@ -145,18 +182,18 @@ function buildWedgeShell(
       const bRim = rimAt(ri + 1);
       const bAxis = axisIndex[ri + 1];
       if (aPole) {
-        idx.push(aRim, bRim, bAxis);
+        push3(aRim, bRim, bAxis);
       } else if (bPole) {
-        idx.push(aRim, bAxis, aAxis);
+        push3(aRim, bAxis, aAxis);
       } else {
-        idx.push(aRim, bRim, bAxis);
-        idx.push(aRim, bAxis, aAxis);
+        push3(aRim, bRim, bAxis);
+        push3(aRim, bAxis, aAxis);
       }
     }
     return idx;
   }
-  const cutface1 = buildCutface((ri) => (isPole[ri] ? ringStart[ri] : ringStart[ri]));
-  const cutface2 = buildCutface((ri) => (isPole[ri] ? ringStart[ri] : ringStart[ri] + segments));
+  const cutface1 = buildCutface((ri) => ringStart[ri], false);
+  const cutface2 = buildCutface((ri) => (isPole[ri] ? ringStart[ri] : ringStart[ri] + segments), true);
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -201,14 +238,23 @@ function paintPumpkinSkinTexture(): THREE.CanvasTexture {
 }
 
 function buildStem(rng: () => number): THREE.BufferGeometry {
+  // ★뚜껑 링 추가(2026-08-26) — 되돌리지 말 것.
+  // 이전 프로필은 [[1,-1],[1,1]] 두 링뿐이라 **옆벽만 있고 양 끝이 뚫린 통**이었다.
+  // stdMaterial은 FrontSide라 뚫린 윗면 너머로 통 안쪽(뒷면 컬링)이 보이고, 실측상 전 각도에서
+  // 꼭지가 홈 파인 두 뿔("고양이 귀")로 읽혔다 — 호박에서 가장 눈에 띄던 파손이다.
+  // rFrac=0 극점 링을 양 끝에 붙이면 buildRevolvedShell의 aPole/bPole 분기가 원판 뚜껑을 만든다
+  // (극점 hFrac을 림과 같게 둬 높이 불변 — 잘린 꼭지라 평평한 윗면이 맞다).
+  // 링이 4개가 됐으므로 radialScale은 ringIndex<=1(아랫극·아랫림) 기준으로 갈라야 한다.
   const { geometry } = buildRevolvedShell(
     [
+      [0, -1],
       [1, -1],
       [1, 1],
+      [0, 1],
     ],
     STEM_SEGMENTS,
     STEM_HEIGHT / 2,
-    (_hFrac, ringIndex) => (ringIndex === 0 ? [STEM_RADIUS_BOTTOM, STEM_RADIUS_BOTTOM] : [STEM_RADIUS_TOP, STEM_RADIUS_TOP]),
+    (_hFrac, ringIndex) => (ringIndex <= 1 ? [STEM_RADIUS_BOTTOM, STEM_RADIUS_BOTTOM] : [STEM_RADIUS_TOP, STEM_RADIUS_TOP]),
   );
   jitterVertices(geometry, rng, STEM_JITTER_AMP);
   const baked = facet(geometry);
