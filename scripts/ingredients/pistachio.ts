@@ -32,6 +32,9 @@
 //   (3) 각짐. SEGMENTS 8 · 프로필 6점은 전체 화면에서 대놓고 각졌다. 예산이 100KB/2500tri →
 //       250KB/8000tri로 상향됐고(families.mjs) 재료도 빵과 같은 크기로 확대돼 보인다.
 //       SEGMENTS 8 → 20, 프로필 6 → 9점.
+//
+// ⚠ v2의 (2)는 v3에서 다시 뒤집혔다 — **적도 수평 절단은 "쪼개진 알"이 아니었다.**
+//   근거와 대체 기법은 아래 Z_CUT 위 v3 주석에.
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
 import {
@@ -75,10 +78,25 @@ const PROFILE: readonly ProfilePoint[] = [
 // v2: 0.014 → 0.012. SEGMENTS를 20으로 올려 한 변이 짧아졌고(R4), 자른 면의 평평함도 지켜야 한다.
 const JITTER_AMP = 0.012;
 
-// 자른 면 = 평면 절단. 눕힌 뒤(장축이 로컬 X) y > Y_CUT 인 정점을 Y_CUT으로 누른다.
-// 적도(y=0)보다 살짝 위 → "반쪽보다 아주 조금 큰" 조각. 끝으로 갈수록 링 반지름이 줄어 y가
-// Y_CUT을 못 넘으므로 자른 면이 저절로 뾰족하게 좁아진다(별도 테이퍼 코드 불필요).
-const Y_CUT = 0.02;
+// ═══ v3 (2026-08-26 재감사 — "적도 절단이라 분홍 테두리 단서 없음") ═══════════════════════
+// v2는 **적도(수평) 절단**이었다: 눕힌 알의 y > Y_CUT 을 눌러 위쪽 절반을 날렸다. 그래서
+// 아이보리 면이 알 **윗면 전체**를 덮었고, 두 반쪽이 로제트의 서로 다른 자리에 흩어져 있었다.
+//   ⇒ 읽히는 것: "윗면이 베이지인 콩 두 개"(잘린 아몬드/누에콩). 프롬프트가 요구하는
+//     "one kernel split lengthwise into two lobes to reveal the groove between them"의
+//     **벌어진 틈**이 아예 존재하지 않았다 — 틈을 만들 두 조각이 한 알이 아니었기 때문이다.
+// v3의 두 가지 변경:
+//   ① 절단면을 **세로(장축을 품는 평면)**로 돌렸다: z > Z_CUT 클램프. 반쪽은 길이·높이는 그대로고
+//      두께만 절반인 진짜 "lengthwise half"가 된다(1.24 × 0.8 × 0.42).
+//   ② 두 반쪽을 **한 쌍으로 묶어** 펼친 책처럼 벌린다(등이 아래, 자른 면이 위+바깥).
+//      자른 면 법선 = (0, cos τ, ±sin τ) — CRIB "절단면류 법선에 +Y 성분을 실어라"를 만족하면서
+//      두 면이 서로 반대쪽으로 기울어 **어느 azimuth에서도 최소 한 면이 정면으로** 잡힌다.
+//      몸통은 아래안쪽으로 기울어 바닥 중앙에서 서로 맞물리므로 사이로 배경이 비치지 않는다.
+// ⚠ 되돌리지 마라: 절단을 y축으로 돌리면 ①이, 두 반쪽을 로제트에 흩으면 ②가 그대로 돌아온다.
+//
+// 자른 면 = 평면 절단. 눕힌 뒤(장축이 로컬 X) z > Z_CUT 인 정점을 Z_CUT으로 누른다.
+// 중앙(z=0)보다 살짝 바깥 → "반쪽보다 아주 조금 큰" 조각. 끝으로 갈수록 링 반지름이 줄어 z가
+// Z_CUT을 못 넘으므로 자른 면이 저절로 뾰족하게 좁아진다(별도 테이퍼 코드 불필요).
+const Z_CUT = 0.03;
 
 /**
  * 알맹이 1개. isSplit=true면 평면 절단을 적용해 { bodyGeo, cutGeo } 둘 다 반환하고,
@@ -95,8 +113,8 @@ function buildKernel(rng: () => number, isSplit: boolean): { bodyGeo: THREE.Buff
   if (isSplit) {
     // ⚠ 지터 **이전**에 자른다 — 마스크가 rng와 무관해야 색 경계가 결정론적이다.
     for (let i = 0; i < pos.count; i++) {
-      if (pos.getY(i) > Y_CUT) {
-        pos.setY(i, Y_CUT);
+      if (pos.getZ(i) > Z_CUT) {
+        pos.setZ(i, Z_CUT);
         mask[i] = 1;
       }
     }
@@ -130,22 +148,86 @@ interface KernelDef {
   radius: number;
   /** 장축을 순수 방사에서 살짝 비튼다(정확한 꽃잎 대칭은 인공적으로 보인다). */
   skew: number;
-  /** 반쪽만: 길이 방향으로 살짝 흔들리게. ⚠ 크게 주면 자른 면이 "위"로 안 읽힌다 — 0.2 이하. */
+  /** 길이 방향으로 살짝 흔들리게(로컬 Z 롤). */
   tiltZ: number;
-  split: boolean;
 }
 
-// v2 배치 — 방사 로제트. 각 알의 장축이 중심에서 바깥으로 뻗고(yaw = -deg), 이웃끼리는 안쪽 끝에서
-// 가장 가까워진다. 전 쌍의 캡슐 거리 실측: 최악 0.822 / 기준 0.80 (전부 접촉 이상, 관통 0).
-// 로제트를 통째로 돌려 **쪼개진 반쪽 둘(hA·hB)이 기본 3/4 카메라 쪽(deg 121.6)에 오게** 맞췄다 —
-// 자른 면이 이 재료의 읽을거리라 앞에 둬야 한다.
-const KERNELS: Record<'w1' | 'w2' | 'w3' | 'hA' | 'hB', KernelDef> = {
-  w1: { deg: 238, radius: 0.95, skew: -0.1, tiltZ: 0, split: false },
-  w2: { deg: 310, radius: 0.97, skew: 0.09, tiltZ: 0, split: false },
-  w3: { deg: 18, radius: 0.93, skew: 0.14, tiltZ: 0, split: false },
-  hA: { deg: 90, radius: 0.97, skew: -0.08, tiltZ: -0.1, split: true },
-  hB: { deg: 160, radius: 0.93, skew: 0.1, tiltZ: 0.1, split: true },
+// v2 배치 = 방사 로제트(각 알의 장축이 중심에서 바깥으로, yaw = -deg). 관통 0을 만든 구조라
+// v3도 그대로 쓴다. 다만 **자리 하나를 쪼개진 한 쌍이 통째로 차지**하므로 항목이 5 → 4가 됐고,
+// 쌍은 폭이 통 알(0.8)의 1.7배(≈1.34)라 그만큼 이웃과의 각 간격·반지름을 벌렸다.
+// v3 캡슐 실측(축 반길이 0.22 · 반지름 0.4, 쌍은 반지름 0.67로 취급):
+//   쌍↔w3 1.08 / 쌍↔w1 1.11 (요구 1.07) · 통↔통 최악 1.03 (요구 0.80) — 전부 여유.
+// ⚠ 좁히려면 캡슐 거리를 먼저 계산해라(v1의 초록 덩어리가 그렇게 돌아온다).
+const WHOLE_KERNELS: Record<'w1' | 'w2' | 'w3', KernelDef> = {
+  w1: { deg: 220, radius: 1.0, skew: -0.1, tiltZ: 0.06 },
+  w2: { deg: 300, radius: 1.02, skew: 0.09, tiltZ: -0.05 },
+  w3: { deg: 20, radius: 1.0, skew: 0.14, tiltZ: 0.04 },
 };
+
+// 쪼개진 알 — 기본 3/4 카메라 쪽(deg 121.6 = 카메라 (-1.6, 2.2, 2.6)의 방위)에 둔다.
+// 자른 면이 이 재료의 유일한 읽을거리라 앞자리를 준다.
+const SPLIT_DEG = 121.6;
+const SPLIT_RADIUS = 0.86;
+const SPLIT_SKEW = 0.05;
+/** 자른 면 법선이 +Y에서 기운 각(τ). 법선 = (0, cos τ, ±sin τ) — 자른 면 자체는 수평에서 τ만큼 눕는다.
+ * ★v3.1에서 25° → 34°. 하네스 카메라는 수직에서 **54°**(고도 35.8°)라, τ가 작으면 두 면이
+ * 거의 수평으로 누워 az 225~315에서 **아이보리 원반 두 장**으로만 읽혔다(초록 몸통이 안 보였다 —
+ * CRIB "넓은 마스크가 의도를 뒤집는다"의 정확한 재현). τ=34°면 카메라 쪽 면은 내적 cos20°=0.94로
+ * 정면에 가깝게 잡히고, 반대쪽 면은 내적 0.03으로 시선에 스쳐 **초록 등짝**이 대신 보인다 —
+ * 어느 방위에서도 아이보리와 초록이 함께 잡힌다. 두 면의 이면각 112°(펼친 책). */
+const SPLIT_OPEN = (34 * Math.PI) / 180;
+/** 두 반쪽의 중심 간 거리 절반. 자른 면 안쪽(높은) 모서리가 중앙에서 만나는 값이 τ=34°에서
+ * 0.332라 0.27이면 위쪽에서 0.124 겹쳐 능선이 붙고 아래는 몸통끼리 맞물린다 — 배경이 안 비친다. */
+const SPLIT_HALF_GAP = 0.27;
+/** 두 반쪽을 길이축으로 어긋나게 놓는다. 정확히 나란하면 az 90/270에서 두 면이 투영상 포개져
+ * 큰 베이지 덩어리 하나가 된다 — 어긋내면 옆에서도 조각 둘로 갈린다.
+ * v3.2: 0.09 → 0.16(총 어긋남 0.32 = 길이 1.24의 26%). 0.18(15%)로는 az 270에서 두 면이
+ * 여전히 하나의 베이지 원반으로 뭉쳤다. 더 키우면 "쪼개진 한 알"이 아니라 미끄러진 두 조각이 된다. */
+const SPLIT_STAGGER = 0.16;
+
+/** 로제트 한 자리를 차지하는 서브그룹 — 회전 후 자기 bbox로 접지한다(types.ts R1, olive.ts 관례). */
+function placeInRosette(child: THREE.Object3D, deg: number, radius: number, skew: number, tiltZ: number): THREE.Group {
+  const sub = new THREE.Group();
+  sub.add(child);
+  // yaw = -angle 이면 장축(로컬 +X)이 (cos angle, 0, sin angle) — 즉 로제트 반지름 방향이 된다.
+  const angle = (deg * Math.PI) / 180;
+  sub.rotation.set(0, -angle + skew, tiltZ);
+  sub.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+  sub.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(sub);
+  sub.position.y -= box.min.y;
+  return sub;
+}
+
+/**
+ * 쪼개진 알 한 쌍 — 펼친 책(등이 아래, 자른 면이 위+바깥).
+ * side=+1 반쪽은 자른 면 법선이 +Z 그대로라 rotation.x = -(90°-τ) 로 눕히면 법선이
+ * (0, cos τ, +sin τ)가 된다. side=-1은 yaw π 로 법선을 -Z로 돌린 뒤 반대 부호로 눕힌다.
+ * ⚠ 거울 스케일(scale.z = -1)로 만들지 마라 — 와인딩이 뒤집혀 면이 안쪽을 향한다.
+ * 회전과 이동을 한 Object3D에 몰지 않고 그룹을 겹치는 것도 의도다(적용 순서 함정, flaxseed 선례).
+ */
+function buildSplitPair(rng: () => number, bodyMat: THREE.Material, cutMat: THREE.Material): THREE.Group {
+  const pair = new THREE.Group();
+  for (const side of [1, -1] as const) {
+    const { bodyGeo, cutGeo } = buildKernel(rng, true);
+    const lobe = new THREE.Group();
+    lobe.add(new THREE.Mesh(bodyGeo, bodyMat));
+    if (cutGeo) lobe.add(new THREE.Mesh(cutGeo, cutMat));
+
+    const yawed = new THREE.Group();
+    yawed.rotation.y = side === 1 ? 0 : Math.PI;
+    yawed.add(lobe);
+
+    const roller = new THREE.Group();
+    roller.rotation.x = -side * (Math.PI / 2 - SPLIT_OPEN);
+    // 완전 대칭은 인공적이다 — 한쪽만 길이축으로 조금 더 돌린다(결정론, rng 무관).
+    roller.rotation.y = side === 1 ? 0.07 : -0.04;
+    roller.position.set(side * SPLIT_STAGGER, 0, side * SPLIT_HALF_GAP);
+    roller.add(yawed);
+    pair.add(roller);
+  }
+  return pair;
+}
 
 export const createPistachio: IngredientBuilder = (rng) => {
   const bodyMat = stdMaterial({ color: BODY_COLOR });
@@ -153,26 +235,17 @@ export const createPistachio: IngredientBuilder = (rng) => {
 
   const cluster = new THREE.Group();
 
-  (Object.keys(KERNELS) as (keyof typeof KERNELS)[]).forEach((key) => {
-    const def = KERNELS[key];
-    const { bodyGeo, cutGeo } = buildKernel(rng, def.split);
-
-    const sub = new THREE.Group();
-    sub.add(new THREE.Mesh(bodyGeo, bodyMat));
-    if (cutGeo) sub.add(new THREE.Mesh(cutGeo, cutMat));
-
-    // yaw = -angle 이면 장축(로컬 +X)이 (cos angle, 0, sin angle) — 즉 로제트 반지름 방향이 된다.
-    const angle = (def.deg * Math.PI) / 180;
-    sub.rotation.set(0, -angle + def.skew, def.tiltZ);
-    sub.position.set(Math.cos(angle) * def.radius, 0, Math.sin(angle) * def.radius);
-
-    // 공유 지면 y=0 — 이 알만의 회전 후 bbox를 구해 바닥을 원점에 맞춘다(types.ts R1, olive.ts 관례).
-    sub.updateMatrixWorld(true);
-    const box = new THREE.Box3().setFromObject(sub);
-    sub.position.y -= box.min.y;
-
-    cluster.add(sub);
+  (Object.keys(WHOLE_KERNELS) as (keyof typeof WHOLE_KERNELS)[]).forEach((key) => {
+    const def = WHOLE_KERNELS[key];
+    const { bodyGeo } = buildKernel(rng, false);
+    const kernel = new THREE.Group();
+    kernel.add(new THREE.Mesh(bodyGeo, bodyMat));
+    cluster.add(placeInRosette(kernel, def.deg, def.radius, def.skew, def.tiltZ));
   });
+
+  // 쌍은 **한 덩어리로 한 번만** 접지한다 — 반쪽을 따로 접지하면 벌어진 각도가 눌려
+  // 두 조각이 나란히 눕고 "펼친 책"이 사라진다(CRIB 더미 그라운딩 규칙과 같은 이유).
+  cluster.add(placeInRosette(buildSplitPair(rng, bodyMat, cutMat), SPLIT_DEG, SPLIT_RADIUS, SPLIT_SKEW, 0));
 
   return mergeByMaterial(cluster);
 };

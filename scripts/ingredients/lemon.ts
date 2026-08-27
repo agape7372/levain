@@ -40,6 +40,36 @@
 //   세그먼트는 16 → 40. 예산이 100KB/2500tri → 250KB/8000tri로 상향됐고(families.mjs),
 //   재료도 빵과 **같은 쇼케이스에서 같은 크기로** 확대돼 보인다. 16각형 원반은 전체 화면에서
 //   눈에 띄게 각졌다 — 폴리곤을 아낄 이유가 없다.
+//
+// ═══ v3 (2026-08-27 턴테이블 재감사 수리) ════════════════════════════════════════════════
+// 재감사 판정: "뒷면 과육이 탁한 올리브 + 270°에 6px 핀홀". 둘 다 **TILT가 근본 원인**이었다.
+//
+//   (1) 탁한 과육 — v2는 "N·L을 0.31→0.81로 올렸다"에서 멈췄는데, 진짜 문제는 **어느 각도에서
+//       뒷면이 보이느냐**였다. 하네스/앱 조명은 씬 고정이고 카메라(앱은 모델)가 도니, 원반의
+//       뒷면이 카메라에 걸리는 az 구간에서는 그 면이 **원리적으로 앰비언트 전용**이다
+//       (dot(-n,L)<0 → 어떤 hex를 써도 R채널 상한이 ~135). 즉 색으로는 못 고친다.
+//       ★고칠 수 있는 건 "뒷면이 보이는 구간의 폭과 그 면의 화면 점유율"이다.
+//       앞면 가시조건은 n·u > 0이고, 이 씬에서 u의 고도는 고정(2.2/3.75 = 0.587)이라
+//         n·u = 0.814·sin(TILT)·cos(az) + 0.587·cos(TILT)
+//       가 된다(YAW를 대입해 정리한 결과 — az 항이 cos만 남는다). TILT=1.05는 최소값이 −0.29라
+//       az 114~246° **132도 구간에서 뒷면이 정면으로** 보였다(az=180에서 화면 점유율 최대).
+//       TILT=0.78로 눕히면 최소값이 −0.155 → 뒷면 구간이 az 136~224°로 좁아지고 그 안에서도
+//       **스침각(|n·u| ≤ 0.155)**이라 뒷면 과육의 화면 면적이 1/3 이하로 줄고 대신 껍질 벽이
+//       실루엣을 채운다. 겸사겸사 앞면 N·L도 0.81 → 0.935로 올라간다.
+//       ⚠ TILT < 0.625rad(= atan(0.587/0.814))이면 뒷면이 **영구히** 안 보이지만, 그건
+//       원반을 거의 눕히는 것이라 **banana(rotation.x 0.08~0.2)와의 분리축이 무너진다.**
+//       0.78rad(44.7°)은 banana의 ~10°와 확실히 갈리는 하한이다 — 더 내리지 말 것.
+//   (2) 6px 핀홀 — 구멍이 아니라 **두 슬라이스 사이 틈**이 스침각에서 서브픽셀로 눌린 것이다
+//       (확대 확인: 배경색 띠가 앞 슬라이스 껍질 엣지와 뒤 슬라이스 과육 사이를 지난다).
+//       평행 평면 두 장은 간격 D > 두께합이어야 교차하지 않으니, **거의 edge-on인 az에서는
+//       배경이 반드시 보인다** — 없앨 수 없다. 없앨 수 있는 건 "실루엣이 겨우 닿아 실금이
+//       되는 상태"다. NORMAL_GAP을 올려 그 구간에서 두 장이 **깨끗히 떨어져 보이게** 했다
+//       (재료 군집이 원래 그렇다 — 올리브 3알처럼 떨어져 보이는 건 결함이 아니다).
+//   (3) 과육 텍스처의 어두운 교대 웨지가 화면의 27%(az=0)·20%(az=180)를 차지해 지배색이
+//       **#987810 / #605008**이었다 — CRIB "넓은 마스크가 의도를 뒤집는다"의 텍스처판이다.
+//       프롬프트 원문은 "**the lower shaded segments**"(소수의 아래쪽 칸)인데 구현은 절반이었다.
+//       칸 수는 그대로 두고 **어두운 칸을 5칸 → 2칸**으로 줄이고 톤도 ×1.15 → ×1.30으로 올렸다.
+//       웨지 구분은 아이보리 막선(#F5F0D6)이 이미 하고 있어 판독은 안 잃는다.
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
 import { bakeTexture, buildRevolvedShell, facet, jitterVertices, mergeByMaterial, scaleHex, sliceTriangles, stdMaterial, uvDome, uvTopPlanar } from '../breads/lib';
@@ -58,7 +88,11 @@ const PITH_COLOR = 0xf5f0d6; // "thin ivory-white pith membranes" + 중심 심
 // 라임-화이트로 색상이 틀어진다. 더 올리고 싶으면 배율이 아니라 hex 자체를 다시 잡아야 한다.
 const RIND_COLOR = scaleHex(RIND_SRC, 1.12);
 const PULP_COLOR = scaleHex(PULP_SRC, 1.15);
-const PULP_SHADE = scaleHex(SHADE_SRC, 1.15);
+// v3: 1.15 → 1.30. 어두운 칸이 뒷면(앰비언트 전용)에서 #605008로 앉아 "탁한 올리브"의 주범이었다.
+// 채널 여유는 충분하다(#A89426의 R=168 → 218). "deeper golden-yellow"는 과육보다 한 단 아래면
+// 충족되고, 0.76배(원본 hex 비율)까지 떨어뜨릴 이유가 없었다 — 그 비율은 레퍼런스가 아니라
+// 프롬프트 hex 두 개의 산술 비였다.
+const PULP_SHADE = scaleHex(SHADE_SRC, 1.3);
 
 // 실측 비율 (assets/ingredients/src/lemon.png 3/4 · lemon-2.png 정면 · lemon-3.png 탑다운).
 const LEMON_RADIUS = 0.62;
@@ -104,6 +138,11 @@ const TEX_SIZE = 160; // <=256 (R3)
 const WEDGE_COUNT = 10; // 레몬-3.png 탑다운 실측: 방사 칸 8~11개 범위
 const PITH_RADIUS = 0.1; // 정규화 반지름(0~0.5가 원판 전체) 대비 중심 심 크기
 const MEMBRANE_HALF_WIDTH = 0.05; // cos(angle*WEDGE_COUNT) 값 기준 막선 폭
+// v3: 어두운 칸을 "짝수 칸 전부"(5/10)에서 5의 배수 칸(2/10)으로. 프롬프트 원문이
+// "the **lower** shaded segments"라 소수 칸이 정본이고, 절반은 CRIB "넓은 마스크가 의도를
+// 뒤집는다"에 그대로 걸렸다(지배색이 과육색이 아니라 음영색이었다). 두 칸은 서로 안 붙는다
+// (인덱스 0과 5 → 원판 반대편) — 인접 구조를 안 만들어 "이색 반원"으로 안 읽힌다.
+const SHADE_WEDGE_STRIDE = 5;
 
 function paintLemonPulpTexture(): THREE.CanvasTexture {
   const pulp: [number, number, number] = [(PULP_COLOR >> 16) & 0xff, (PULP_COLOR >> 8) & 0xff, PULP_COLOR & 0xff];
@@ -127,7 +166,7 @@ function paintLemonPulpTexture(): THREE.CanvasTexture {
             c = pith; // 웨지 경계 막선
           } else {
             const wedgeIndex = Math.floor(((angle / (Math.PI * 2)) * WEDGE_COUNT + WEDGE_COUNT) % WEDGE_COUNT);
-            c = wedgeIndex % 2 === 0 ? pulp : shade; // 교대 명암 — "wedge-shaped ... segments" 가독성
+            c = wedgeIndex % SHADE_WEDGE_STRIDE === 0 ? shade : pulp; // 소수 칸만 음영 (v3)
           }
         }
         const o = (py * size + px) * 4;
@@ -141,40 +180,47 @@ function paintLemonPulpTexture(): THREE.CanvasTexture {
   });
 }
 
-// ── 배치 (v2) ──────────────────────────────────────────────────────────────────────────
-// 두 슬라이스는 **평면 방향이 완전히 같다**. 방향은 Euler가 아니라 쿼터니언 합성으로 준다:
-//   q = Ryaw(YAW) · Rtilt(TILT) · Rroll(roll)
-// roll은 원반 자기 축(local Y) 회전이라 **평면을 바꾸지 않는다** — 웨지 무늬 위상만 돌린다.
-// 그래서 roll을 아무리 달리 줘도 평행 보장이 안 깨진다. (Euler 'XYZ'로 같은 걸 하려면 축 순서를
-// 매번 따져야 해서 실수하기 쉽다 — 옛 코드가 그러다 두 평면을 24도 벌려놓고 관통했다.)
-const TILT = 1.05; // 원반 평면의 수평 대비 기울기(rad, 60.2도). PI/2=세움 → 과육면이 위를 더 본다.
-const YAW = -0.5522; // = atan2(-1.6, 2.6). 과육면 법선의 수평 성분을 기본 3/4 카메라 쪽으로 정렬.
+// ── 배치 (v4 — 2026-08-27 리드 마감: "눕힌 장 + 기댄 장") ────────────────────────────────
+// ★v2~v3의 "두 장 완전 평행" 계약을 **폐기**하고 "공간 분리 보장" 계약으로 바꿨다. 이유:
+// 평행판 두 장은 n·u = 0이 되는 방위(az≈137/223)에서 **둘이 동시에** 모서리로 선다 —
+// 턴테이블에서 "가는 막대 2개"로 읽혔다(리드 실측). 기울기를 어디에 두든 평행인 한 이 방위는
+// 반드시 존재한다. 해법은 두 장의 평면을 갈라놓되 교차는 **배치 기하로** 차단하는 것:
+//
+//   a = 거의 눕힌 장 (TILT_A=0.12). 법선이 거의 +Y라 n·u ≈ 0.58로 **방위 무관 상수** —
+//       어느 각도에서도 과육 웨지가 보이는 정체 담보다(그룹A beet의 수학과 동일).
+//   b = 기대 선 장 (TILT_B=0.78 유지) — banana 분리축("레몬은 서 있다")은 b가 지킨다.
+//       b가 모서리로 서는 방위에서도 a의 면이 보이므로 "막대기만 2개"가 불가능해진다.
+//
+// ★교차 불가 증명(이 파일의 새 계약 — 배치 상수를 바꾸면 다시 세워라):
+//   b의 낮은 부분(y<0.22 = a 상면 0.2+지터)은 바닥 접점 림 주변 스트립뿐이고, 접점은
+//   b 중심에서 **−OUT 쪽으로 R·cos(TILT_B) ≈ 0.44** 지점이다(법선 수평성분이 +OUT이므로
+//   내리막은 −OUT). b_OUT=−0.30이면 스트립은 OUT ∈ [−0.96, −0.52]. a(OUT=+0.30, 반지름
+//   0.62+지터)의 최소 OUT은 −0.34 → **0.18 간격**으로 겹치지 않는다. b가 a 위 공간(OUT>−0.34)
+//   으로 넘어오는 부분은 접점에서 면내 0.56+ 떨어진 지점이라 y ≥ 0.56·sin(0.78) ≈ 0.39 —
+//   a 상면(0.22)을 0.17 여유로 넘는다. 즉 b는 a의 **뒤에서 위로 기대 넘어오는** 고전 구도다.
+const TILT_A = 0.12; // 눕힌 장 — banana(0.08~0.2)와 같은 대역이지만 분리축은 b와 무늬·색이 진다
+const TILT_B = 0.78; // v3 값 유지 (44.7°). 하한 0.625rad 금지 근거는 머리 주석 v3 (1).
+const YAW = -0.5522; // = atan2(-1.6, 2.6). 기댄 장 법선의 수평 성분을 기본 3/4 카메라 쪽으로 정렬.
 
-// YAW로 돌린 수평 기저 2개 (XZ 평면). LAT = 면내(원반 표면을 따라 미끄러짐), OUT = 법선의 수평 성분.
+// YAW로 돌린 수평 기저 2개 (XZ 평면). LAT = 면내 가로, OUT = 카메라 쪽 (b 법선의 수평 성분).
 const LAT: readonly [number, number] = [Math.cos(YAW), -Math.sin(YAW)]; // ≈ (0.852, 0.524)
 const OUT: readonly [number, number] = [Math.sin(YAW), Math.cos(YAW)]; // ≈ (-0.524, 0.852)
-
-// LATERAL = 화면상 겹침을 만드는 면내 이동(지름 1.24 대비 0.60 → 절반 조금 넘게 겹친다).
-// NORMAL_GAP = 법선 방향 이격. 실제 평면 간격 = NORMAL_GAP × sin(TILT) = 0.295.
-// 두께합 0.2 + 지터 최악 0.037 = 0.237 < 0.295 → **교차 불가**. 이 부등식이 이 파일의 계약이다.
-// (지터는 축마다 독립으로 ±amp라 법선 방향 최악 변위는 amp×L1(n) = 0.011×(0.455+0.498+0.739)
-//  ≈ 0.019, 마주 보는 두 면이니 0.037. amp나 TILT를 바꾸면 이 부등식을 다시 세워라.)
-const LATERAL = 0.6;
-const NORMAL_GAP = 0.34;
 
 interface SliceDef {
   /** 위 두 기저의 계수 — [LAT 계수, OUT 계수]. 실제 XZ는 build 시 합성. */
   uv: readonly [number, number];
   /** 원반 자기 축 회전 — 웨지 무늬 위상만 바뀐다(평면 불변). */
   roll: number;
+  /** 눕힘 각 (rad, 0=수평). a·b가 다르다 — 위 v4 주석. */
+  tilt: number;
 }
 
-// a·b는 기저 좌표에서 정확히 대칭 — 클러스터가 스스로 중앙에 온다(런타임이 bbox로 다시 잡지만
-// 대칭이면 두 슬라이스의 화면 비중이 az에 따라 덜 흔들린다).
-// roll 차이 0.314rad ≈ 웨지 반 칸(WEDGE_COUNT=10 → 한 칸 0.628) — 무늬 위상이 최대로 어긋난다.
+// a는 앞(+OUT)에 눕고 b는 뒤(−OUT)에서 카메라 쪽으로 기대 넘어온다. 히어로(az 0)에서
+// 화면 겹침은 시선축(OUT) 분리가 만든다 — 물리적으론 떨어져 있어도 투영은 절반쯤 겹친다.
+// roll 차이 0.314rad ≈ 웨지 반 칸 — 무늬 위상이 최대로 어긋나 쌍둥이로 안 읽힌다.
 const SLICES: Record<'a' | 'b', SliceDef> = {
-  a: { uv: [-LATERAL / 2, -NORMAL_GAP / 2], roll: 0 },
-  b: { uv: [LATERAL / 2, NORMAL_GAP / 2], roll: 0.314 },
+  a: { uv: [-0.28, 0.3], roll: 0, tilt: TILT_A },
+  b: { uv: [0.28, -0.3], roll: 0.314, tilt: TILT_B },
 };
 
 function buildSlice(rng: () => number): { rindGeo: THREE.BufferGeometry; pulpBottomGeo: THREE.BufferGeometry; pulpTopGeo: THREE.BufferGeometry } {
@@ -221,7 +267,7 @@ export const createLemon: IngredientBuilder = (rng) => {
     // ⚠ quaternion만 쓴다 — rotation.set을 같이 부르면 나중 쓴 쪽이 이긴다(둘은 같은 상태다).
     sub.quaternion
       .setFromAxisAngle(AXIS_Y, YAW)
-      .multiply(new THREE.Quaternion().setFromAxisAngle(AXIS_X, TILT))
+      .multiply(new THREE.Quaternion().setFromAxisAngle(AXIS_X, def.tilt))
       .multiply(new THREE.Quaternion().setFromAxisAngle(AXIS_Y, def.roll));
     sub.position.set(def.uv[0] * LAT[0] + def.uv[1] * OUT[0], 0, def.uv[0] * LAT[1] + def.uv[1] * OUT[1]);
 

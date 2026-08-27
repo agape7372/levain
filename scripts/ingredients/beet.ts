@@ -8,6 +8,10 @@
 // 레퍼런스 3장이 전부 절단면을 카메라로 정면으로 향한 거의 완전한 구체(비트는 무화과와 달리
 // 위아래가 거의 대칭인 둥근 뿌리)라 PROFILE만 대칭에 가깝게 다시 잡았다. 절단면 무늬는 무화과의
 // 각도 기반 방사 씨앗줄 대신 **거리 기반 동심원**(나이테)이라 훨씬 단순하다 — atan2 불필요.
+//
+// ★2026-08-27 턴테이블 정체 수리. 절단면을 정면(+Z)에서 **거의 위**로 눕혔다(LAY_ROTATE_Z /
+// CUT_TILT_X 주석에 유도 전문). 지오메트리·프로필·텍스처는 한 줄도 안 바꿨다 — 배치 회전만으로
+// 8각도 전수에서 나이테가 읽힌다. 되돌리면 az 135~290이 다시 검자주 돔이 된다.
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
 import { bakeTexture, buildRevolvedShell, facet, jitterVertices, mergeByMaterial, sliceTriangles, stdMaterial, uvTopPlanar } from '../breads/lib';
@@ -58,6 +62,26 @@ const STUB_SEGMENTS = 12; // ★7→12 (2026-08-26). 예산 상향(2500→8000tr
 const STUB_EMBED = 0.07; // ★0.05→0.07 (2026-08-26). 밑동 반지름(0.11)이 그 높이의 몸통 반지름보다
 // 커서 테두리가 턱을 만들었다 — 조금 더 묻는다.
 const STUB_JITTER_AMP = 0.006;
+
+// ★배치 회전 — 절단면을 "정면"에서 "거의 위"로 눕힌다(2026-08-27) — 되돌리지 말 것.
+// 문제: 절단면 법선이 순수 +Z(정면)라 나이테가 앞 반 바퀴에서만 보였다. 뒤 반 바퀴(az 135~290)는
+// 스텁 하나 달린 검자주 돔이라 비트로 읽히지 않았다(재감사 "약함" 판정 근거).
+// 유도: 하네스 카메라 (-1.6,2.2,2.6)의 단위벡터는 (-0.425, 0.585, 0.691) — **수직 성분 0.585가
+// 방위와 무관하게 고정**이고 수평 성분 크기는 0.81이다. 법선 (0, n_y, n_h)의 노출도는
+//   dot(az) = 0.585·n_y + 0.81·n_h·cos(az + 31.6°)
+// 로, 뒤 반 바퀴 최솟값이 0.585·n_y − 0.81·n_h다. n_y=0.951/n_h=0.309에서 최솟값 0.30 —
+// 최악 방위에서도 나이테 원판이 면적의 30%(≒70° 입사)로 보인다. 반대로 히어로 방위(az 0)는
+// 0.77로 **종전 0.69보다 오히려 정면**이다. 키라이트 (-2,6,2)와의 내적도 0.30→0.95로 뛰어
+// CRIB "절단면류 법선에 +Y 성분" 절이 말하는 어두워 죽는 문제까지 같이 해결된다.
+// n_y를 0.93까지만 내려도 최솟값이 0.25로 떨어져 눌린 띠로 읽힌다 — 이 값이 하한 근처다.
+const LAY_ROTATE_Z = Math.PI / 2; // 스텁을 화면 왼쪽(-X, 카메라 쪽)으로 — CRIB "히어로 카메라" 절.
+const CUT_TILT_X = -1.2566; // -72°: 절단면 법선 +Z → (0, 0.951, 0.309)
+
+/** 절단면을 위로 눕히는 배치 회전. UV·텍스처를 다 낸 뒤에 굽는다(sweetpotato.ts와 동일 순서). */
+function orientLaid(g: THREE.BufferGeometry): void {
+  g.rotateZ(LAY_ROTATE_Z);
+  g.rotateX(CUT_TILT_X);
+}
 
 // 단면 텍스처 — 거리 기반 동심원(나이테). 무화과의 각도 기반 방사 씨앗줄과 달리 atan2가 필요 없다.
 const TEX_SIZE = 192; // <=256 (R3)
@@ -235,13 +259,17 @@ export const createBeet: IngredientBuilder = (rng) => {
   uvTopPlanar(skinGeo);
   uvFrontPlanar(capGeo);
 
+  const stubGeo = buildStub(rng);
+  // 회전은 UV를 낸 뒤에 — position만 바뀌고 UV는 그대로라 나이테가 안 틀어진다.
+  for (const g of [skinGeo, capGeo, stubGeo]) orientLaid(g);
+
   const skinMat = stdMaterial({ color: SKIN_COLOR });
   const cutfaceMat = stdMaterial({ map: paintBeetCutfaceTexture(), color: 0xffffff });
 
   const group = new THREE.Group();
   group.add(new THREE.Mesh(skinGeo, skinMat));
   group.add(new THREE.Mesh(capGeo, cutfaceMat));
-  group.add(new THREE.Mesh(buildStub(rng), skinMat)); // 스텁은 skin 버킷과 합류(잎을 자르고 남은 뿌리색)
+  group.add(new THREE.Mesh(stubGeo, skinMat)); // 스텁은 skin 버킷과 합류(잎을 자르고 남은 뿌리색)
 
   return mergeByMaterial(group);
 };

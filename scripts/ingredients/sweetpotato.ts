@@ -22,6 +22,12 @@
 //       상향됐고(families.mjs 2026-08-26 주석), 재료도 빵과 **같은 쇼케이스에서 같은 크기로**
 //       확대돼 보인다. 옛 격자는 64px 썸네일에서만 멀쩡했고 전체 화면에서는 각진 덩어리 +
 //       뭉툭한 원뿔 끝으로 읽혔다. 폴리곤을 아껴서 각지게 만들지 마라.
+//
+// ★2026-08-27 턴테이블 정체 수리. **자른 원판 조각 1개를 옆에 추가**했다(buildSlice) — 되돌리지
+// 말 것. 몸통 절단면만으로는 앞 반 바퀴에서만 정체가 서고 뒤 반 바퀴는 검자주 방울이라 fig와
+// 구분조차 안 됐다. 원판을 평평하게(윗면 법선 = 정확히 +Y) 눕히면 노출도가 방위와 무관하게
+// 상수라 뒤 반 바퀴를 그 하나로 덮는다. 근거·수치는 SLICE_* 상수 주석에 있다.
+// 몸통의 프로필·SEGMENTS·KNOB·ROTATE_X는 한 줄도 안 바꿨다.
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
 import { angleDeltaDeg, bakeTexture, buildRevolvedShell, facet, jitterVertices, mergeByMaterial, sliceTriangles, stdMaterial, uvTopPlanar } from '../breads/lib';
@@ -87,6 +93,36 @@ const ROTATE_X = -1.92; // -110deg — cmp-2 실측: 순수 -90deg(법선이 정
 // 오므로 법선에 +Y 성분을 더 실어야(카메라 방향과의 내적이 (0,0,1)의 0.72 -> (0,0.34,0.94)의
 // 0.89로 상승) 절단면이 더 밝게/더 카메라 정면으로 잡힌다.
 const ROTATE_Y = 0; // 요는 생략 유지 — cmp-1에서 -25deg 요가 절단면을 오히려 거의 안 보이게 만들었다.
+
+// ★자른 조각 1개 추가(2026-08-27) — 되돌리지 말 것. types.ts R1 군집 규칙 적용(2개, 상한 3).
+// 문제: 절단면 법선이 (0, 0.342, 0.940)이라 앞 반 바퀴에서만 보였다. 하네스 카메라
+// (-1.6,2.2,2.6)의 단위벡터 (-0.425, 0.585, 0.691)에서 수직 성분 0.585는 방위 불변이고 수평
+// 성분 크기는 0.81이므로 법선 (0,n_y,n_h)의 노출도는 0.585·n_y + 0.81·n_h·cos(az+31.6°) —
+// n_y=0.342/n_h=0.940이면 뒤 반 바퀴 최솟값이 −0.56, 즉 **절반이 완전 은폐**다. 뒤에서는
+// 검자주 방울로만 읽혀 같은 세트의 fig와 구분조차 안 됐다(재감사 "약함" 판정 근거).
+//
+// beet·fig처럼 절단면을 위로 눕히는 처방은 여기서 못 쓴다 — 길이:너비 2:1 덩이뿌리는 단면이
+// 장축에 수직이라, 법선을 위로 세우면 장축이 같이 서서 "세워둔 통나무"가 된다(정체 손실이
+// 더 크다). 대신 **통짜 1 + 자른 조각 1** 구성을 쓴다: 두께 있는 원판 조각을 몸통 옆에
+// 평평하게(위 절단면 법선 = 정확히 +Y) 눕히면 노출도가 **모든 방위에서 0.585로 상수**다.
+// 방위 의존성이 아예 없어지므로 뒤 반 바퀴에도 방사 전분 무늬가 그대로 남는다.
+// 프롬프트 산문("sliced ... near one end")과도 맞는다 — 끝에서 잘라낸 조각이 바로 이것이다.
+const SLICE_RADIUS = RADIUS * CUT_RIM_FRAC; // 몸통 절단면과 같은 지름 — 같은 자리에서 잘려 나왔다
+const SLICE_HALF_THICKNESS = 0.085; // 두께 0.17 ≒ 지름 0.69의 1/4. 더 얇으면 옆 방위에서
+// 종잇장(핸드오프 flaxseed 칼날 함정)이 되고, 더 두꺼우면 두 번째 덩이뿌리로 읽힌다.
+const SLICE_SEGMENTS = 24; // 원판 테두리 — 몸통 32보다 낮아도 반지름이 작아 각져 보이지 않는다
+const SLICE_KNOB_AMP = 0.05; // 원판 테두리도 정원이 아니다(몸통 KNOB과 같은 이유, 진폭만 조금 크게)
+// ★오프셋 방향은 "가려지는 방위를 고르는" 문제다(2026-08-27 실측) — 되돌리지 말 것.
+// 조각이 2개면 어떤 오프셋을 줘도 **한 방위에서는 반드시 시선과 일직선**이 되어 뒤 조각이
+// 몸통에 가린다. 없앨 수 없으니 **어느 방위에서 가릴지를 고른다**: 몸통 자신의 절단면이 가장
+// 잘 보이는 방위(az≈60)에 겹침을 몰아넣으면, 겹치는 그 순간에도 정체 단서가 하나 남는다.
+// 유도: 카메라 수평 방향은 az=0에서 (-0.525, 0.853)이고 R_y(az)로 돈다. az=60에서 (0.476, 0.881)
+// 이므로 오프셋을 그 반대 (-0.476, -0.881) 쪽으로 두면 az 60에서 원판이 몸통 정후방에 선다.
+// 첫 시도는 (-0.78, +0.16)(거의 순수 -X)였고, 그 방향은 겹침 방위가 az 90~135로 가서
+// **몸통이 광폭으로 보이는 구간**과 겹쳐 원판이 완전히 사라졌다(r1 실측: az 90에서 소실).
+const SLICE_OFFSET_X = -0.5;
+const SLICE_OFFSET_Z = -0.86; // 몸통 뒤끝(z≈-0.8)을 살짝 지난 자리 — 몸통 꼬리 반지름이 이미
+// 0.2 아래라 원판 반지름 0.36과 부딪히지 않는다(R1 "서로 실루엣 가림 금지").
 
 const TEX_SIZE = 256; // <=256 (R3) — 176에서 상한까지. 전체화면에서 절단면이 화면의 30% 가까이
 // 차지하므로 176은 방사줄 가장자리가 눈에 띄게 계단졌다. R3의 256² 상한 자체는 그대로다.
@@ -160,6 +196,62 @@ function paintFleshTexture(rng: () => number): THREE.CanvasTexture {
   });
 }
 
+/**
+ * 자른 원판 조각 — 윗면(살, 법선 정확히 +Y) + 테두리·아랫면(껍질).
+ * 프로필 4점 = 아랫극·아랫림·윗림·윗극. 극과 림의 높이를 같게 둬 buildRevolvedShell의 극 팬
+ * 분기가 그대로 평평한 원판 뚜껑이 된다(몸통 절단면과 같은 트릭 — CRIB "같은 높이의 극+림 두 점").
+ * 생성 순서가 아랫면 팬 SEG · 옆 테두리 2·SEG · 윗면 팬 SEG라 윗면만 sliceTriangles로 가른다.
+ */
+function buildSlice(rng: () => number): { fleshGeo: THREE.BufferGeometry; skinGeo: THREE.BufferGeometry } {
+  const { geometry, ringStart } = buildRevolvedShell(
+    [
+      [0, -1],
+      [1, -1],
+      [1, 1],
+      [0, 1],
+    ],
+    SLICE_SEGMENTS,
+    SLICE_HALF_THICKNESS,
+    () => [SLICE_RADIUS, SLICE_RADIUS],
+  );
+
+  // 테두리 두 링(1·2)에만 저주파 혹 — 두 링에 같은 각도 함수를 먹여 윤곽이 정원을 벗어나되
+  // 옆벽은 수직으로 남는다(링마다 다르게 주면 테두리가 비틀린다). 극점은 반지름 0이라 제외.
+  const pos = geometry.attributes.position as THREE.BufferAttribute;
+  const phase = rng() * Math.PI * 2;
+  for (const ri of [1, 2]) {
+    for (let i = ringStart[ri]; i < ringStart[ri + 1]; i++) {
+      const x = pos.getX(i);
+      const z = pos.getZ(i);
+      const theta = Math.atan2(z, x);
+      const wave = Math.sin(3 * theta + phase) + 0.5 * Math.sin(5 * theta - phase);
+      const m = 1 + (SLICE_KNOB_AMP * wave) / 1.5; // /1.5 = 최대 진폭 정규화
+      pos.setXYZ(i, x * m, pos.getY(i), z * m);
+    }
+  }
+  pos.needsUpdate = true;
+
+  jitterVertices(geometry, rng, JITTER_AMP); // 두께 0.17에 진폭 0.008 — R4 여유 충분
+  const baked = facet(geometry);
+  const triCount = baked.attributes.position.count / 3;
+  const skinGeo = sliceTriangles(baked, 0, triCount - SLICE_SEGMENTS);
+  const fleshGeo = sliceTriangles(baked, triCount - SLICE_SEGMENTS, triCount);
+  uvTopPlanar(fleshGeo); // 절단면이 로컬 XZ 평면 — 몸통 절단면과 같은 정투영이라 텍스처를 공유한다
+  uvTopPlanar(skinGeo);
+  for (const g of [skinGeo, fleshGeo]) g.translate(SLICE_OFFSET_X, 0, SLICE_OFFSET_Z);
+  return { fleshGeo, skinGeo };
+}
+
+/** 조각들을 공유 지면 y=0에 앉힌다(R1 "뜨는 파트 금지") — 회전을 다 구운 뒤 bbox를 재서 내린다. */
+function groundPiece(geos: readonly THREE.BufferGeometry[]): void {
+  const box = new THREE.Box3();
+  for (const g of geos) {
+    g.computeBoundingBox();
+    box.union(g.boundingBox as THREE.Box3);
+  }
+  for (const g of geos) g.translate(0, -box.min.y, 0);
+}
+
 export const createSweetpotato: IngredientBuilder = (rng) => {
   // 마스크가 아니라 생성 순서(sliceTriangles)로 가르므로 ringStart는 필요 없다.
   const { geometry, ringStart } = buildRevolvedShell(PROFILE, SEGMENTS, HALF_LENGTH, () => [RADIUS, RADIUS]);
@@ -201,13 +293,20 @@ export const createSweetpotato: IngredientBuilder = (rng) => {
   capGeo.rotateY(ROTATE_Y);
   skinGeo.rotateX(ROTATE_X);
   skinGeo.rotateY(ROTATE_Y);
+  groundPiece([skinGeo, capGeo]);
+
+  const slice = buildSlice(rng);
+  groundPiece([slice.skinGeo, slice.fleshGeo]);
 
   const skinMat = stdMaterial({ color: SKIN_COLOR });
+  // 텍스처 1장을 두 절단면이 공유한다 — 머티리얼 인스턴스가 같아야 mergeByMaterial이 mesh 2개로 접는다.
   const fleshMat = stdMaterial({ map: paintFleshTexture(rng), color: 0xffffff });
 
   const group = new THREE.Group();
   group.add(new THREE.Mesh(skinGeo, skinMat));
   group.add(new THREE.Mesh(capGeo, fleshMat));
+  group.add(new THREE.Mesh(slice.skinGeo, skinMat));
+  group.add(new THREE.Mesh(slice.fleshGeo, fleshMat));
 
   return mergeByMaterial(group);
 };

@@ -28,7 +28,13 @@ const jobs = all
 async function main() {
   const puppeteer = (await import('puppeteer')).default;
 
-  const vite = spawn('npx', ['vite', '--port', '5197'], { cwd: root, shell: true, stdio: 'pipe' });
+  // POSIX에선 detached로 그룹 리더를 만들어야 killTree가 그룹째 죽일 수 있다
+  const vite = spawn('npx', ['vite', '--port', '5197'], {
+    cwd: root,
+    shell: true,
+    stdio: 'pipe',
+    detached: process.platform !== 'win32',
+  });
   let viteLog = '';
   vite.stdout.on('data', (d) => (viteLog += String(d)));
   vite.stderr.on('data', (d) => (viteLog += String(d)));
@@ -92,6 +98,7 @@ async function main() {
 
 // Windows에서 shell:true 자식의 kill()은 cmd 래퍼만 죽인다 — 프로세스 트리째 종료
 // (export-breads.mjs와 같은 함정. 안 하면 vite가 호출마다 살아남아 쌓인다)
+// POSIX도 child.kill()은 sh 래퍼만 죽인다 — detached 그룹째(-pid) 죽인다.
 function killTree(child) {
   if (process.platform === 'win32') {
     try {
@@ -99,7 +106,13 @@ function killTree(child) {
     } catch {
       /* 이미 종료 */
     }
-  } else child.kill();
+  } else {
+    try {
+      process.kill(-child.pid, 'SIGKILL');
+    } catch {
+      child.kill();
+    }
+  }
 }
 
 main().catch((e) => {
