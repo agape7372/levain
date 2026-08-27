@@ -7,6 +7,10 @@
 // olive와 다른 점: 레퍼런스 3장(3/4·정면·탑다운)이 전부 같은 정면 단면 샷이다 — 무화과의
 // 정체성은 통째로 잘린 단면에 있다. 그래서 몸통을 "반회전체(phi 0..pi)"로만 짓고, 나머지 절반의
 // phi 공간은 그 셸의 phi=0/phi=pi 림 컬럼을 그대로 잇는 "룰드 서피스" 단면 캡으로 채운다 — 캡은
+// ★2026-08-27 턴테이블 정체 수리 — 두 가지를 바꿨다(되돌리지 말 것):
+//   (1) 절단면을 정면(+Z)에서 거의 위로 눕혔다(LAY_ROTATE_Z / CUT_TILT_X 주석에 유도 전문).
+//   (2) 줄기 길이 0.34 → 0.18. (1) 때문에 줄기가 수평이 되어 프라이팬 손잡이로 읽혔다.
+// 지오메트리 생성부·프로필·텍스처는 그대로다 — 배치와 줄기 비율만 손봤다.
 // 새 정점을 하나도 만들지 않으므로 지터가 셸/단면 이음매를 찢을 수 없다(R1, olive 캡 마스크
 // 방식보다 더 강한 보장). lib.buildRevolvedShell은 항상 2π로 감아서 이 half-revolution을 표현할
 // 수 없어 로컬 buildHalfShell을 이 파일 안에 둔다(lib.ts 수정 금지).
@@ -64,14 +68,45 @@ const JITTER_AMP = 0.011; // ★0.017→0.011 (2026-08-26) — 되돌리지 말 
 // 삼각형 17개, 전부 y 0.5~0.8 목 구간). 진폭을 간격 아래로 내려 뒤집힘을 없앤다.
 // 세그먼트를 더 올리려면 이 값도 같이 내려야 한다(간격 = π·r/segments).
 
-const STEM_RADIUS_TOP = 0.085;
+const STEM_RADIUS_TOP = 0.1; // ★0.085→0.1 (2026-08-27) — 아래 STEM_HEIGHT 주석과 한 묶음.
 const STEM_RADIUS_BOTTOM = 0.115;
-const STEM_HEIGHT = 0.34;
+const STEM_HEIGHT = 0.18; // ★0.34→0.18 (2026-08-27) — 되돌리지 말 것.
+// 0.34는 몸통이 **세로로 서 있던** 시절의 값이다(위로 뻗은 줄기는 길어도 줄기로 읽힌다).
+// 절단면을 위로 눕히자(아래 CUT_TILT_X) 줄기가 절단면 평면 안에서 **수평으로** 뻗게 됐고 —
+// 줄기는 장축의 연장이라 눕히면 반드시 수평이 된다 — 길이 0.34 · 반지름 0.1의 원통이
+// 물방울 단면에 붙은 **손잡이**가 되어 az 0/45/180/225에서 프라이팬·국자로 읽혔다(r1 실측).
+// 길이를 반으로 줄이고 위쪽 반지름을 키워 "높이보다 넓은 뭉툭한 꼭지"로 만든다.
+// 프롬프트 산문도 "a **short** stem"이라 이쪽이 더 충실하다.
 const STEM_SEGMENTS = 12; // ★8→12 (2026-08-26). 예산 상향(2500→8000tri) 후 전체 화면 기준으로
 // 다시 보니 8각 줄기는 각져 보였다. 줄기 12각의 추가 비용은 ~16tri다 — 아낄 이유가 없다.
 const STEM_EMBED = 0.1; // ★0.06→0.1 (2026-08-26). 줄기 밑동 반지름(0.115)이 그 높이의 몸통
 // 반지름보다 커서 밑동 테두리가 목 밖으로 턱을 만들었다. 더 깊이 묻어 턱을 줄인다.
 const STEM_JITTER_AMP = 0.008;
+
+// ★배치 회전 — 절단면을 "정면"에서 "거의 위"로 눕힌다(2026-08-27) — 되돌리지 말 것.
+// 문제: 절단면 법선이 순수 +Z라 부채무늬가 앞 반 바퀴에서만 보였다. 뒤 반 바퀴(az 135~290)는
+// 줄기 달린 검자주 물방울이라 무화과·가지·자두를 구분할 단서가 없었다 — 게다가 같은 세트의
+// sweetpotato가 뒤에서 거의 같은 실루엣이라 서로 구분도 안 됐다(재감사 "약함" 판정 근거).
+// 유도: 하네스 카메라 (-1.6,2.2,2.6) 단위벡터 (-0.425, 0.585, 0.691)에서 **수직 성분 0.585는
+// 방위와 무관하게 고정**이고 수평 성분 크기는 0.81이다. 법선 (0, n_y, n_h)의 노출도는
+//   dot(az) = 0.585·n_y + 0.81·n_h·cos(az + 31.6°)
+// 이라 뒤 반 바퀴 최솟값이 0.585·n_y − 0.81·n_h. n_y=0.951/n_h=0.309에서 최솟값 0.30이고
+// 히어로 방위(az 0)는 0.77 — 종전 순수 +Z의 0.69보다 오히려 정면이다. 키라이트 (-2,6,2)와의
+// 내적도 0.30→0.95로 올라 절단면이 밝아진다(CRIB "절단면류 법선에 +Y 성분" 절).
+// 물방울 장축은 rotateZ로 화면 좌우로 눕혀 옆·뒤 방위에서도 물방울 윤곽이 유지되게 한다.
+const LAY_ROTATE_Z = Math.PI / 2; // 줄기를 화면 왼쪽(-X, 카메라 쪽)으로 — CRIB "히어로 카메라" 절.
+const CUT_TILT_X = -1.3614; // ★-72°→-78° (2026-08-27). 법선 (0, 0.978, 0.208).
+// beet(-72°)보다 더 눕히는 이유: 비트 단면은 **원**이라 최악 방위에서 30%로 눌려도 나이테가
+// 동심원으로 읽히지만, 무화과 단면은 **가로세로 2:1 물방울**이라 짧은 축이 같은 비율로 눌리면
+// 부채가 실오라기 띠가 된다(r2 실측: az 135/180에서 카누·나뭇잎으로 읽혔다).
+// n_h를 0.309→0.208로 줄이면 노출도 진폭이 ±0.25에서 ±0.17로 좁아져 최솟값이 0.31→0.40으로
+// 오르고(최악 방위 개선 30%), 히어로는 0.77→0.72로 거의 그대로다 — 종전 순수 +Z(0.69)보다 여전히 낫다.
+
+/** 절단면을 위로 눕히는 배치 회전. UV·텍스처를 다 낸 뒤에 굽는다(sweetpotato.ts와 동일 순서). */
+function orientLaid(g: THREE.BufferGeometry): void {
+  g.rotateZ(LAY_ROTATE_Z);
+  g.rotateX(CUT_TILT_X);
+}
 
 // 단면 텍스처 — profileRadiusAt과 같은 PROFILE을 공유해 텍스처 경계가 실제 지오메트리 경계와
 // 정확히 일치한다(campagne의 ringPhase 공유 패턴과 동일 원리).
@@ -311,13 +346,17 @@ export const createFig: IngredientBuilder = (rng) => {
   uvTopPlanar(skinGeo);
   uvFrontPlanar(capGeo);
 
+  const stemGeo = buildStem(rng);
+  // 회전은 UV를 낸 뒤에 — position만 바뀌고 UV는 그대로라 부채무늬가 안 틀어진다.
+  for (const g of [skinGeo, capGeo, stemGeo]) orientLaid(g);
+
   const skinMat = stdMaterial({ color: SKIN_COLOR });
   const interiorMat = stdMaterial({ map: paintFigInteriorTexture(rng), color: 0xffffff });
 
   const group = new THREE.Group();
   group.add(new THREE.Mesh(skinGeo, skinMat));
   group.add(new THREE.Mesh(capGeo, interiorMat));
-  group.add(new THREE.Mesh(buildStem(rng), skinMat)); // 줄기색 드롭 — skin 버킷에 합류(risk stem-hue-dropped)
+  group.add(new THREE.Mesh(stemGeo, skinMat)); // 줄기색 드롭 — skin 버킷에 합류(risk stem-hue-dropped)
 
   return mergeByMaterial(group);
 };

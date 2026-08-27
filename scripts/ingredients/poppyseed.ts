@@ -35,6 +35,9 @@
 // 구체다. 상향된 예산(250KB/8000tri)이 이걸 감당한다.
 // ⚠ 되돌리지 말 것: 세그먼트를 다시 낮추면 (a)가, 알갱이를 지우면 (b)가 그대로 돌아온다.
 // ⚠ 알갱이를 코사인 변위로 되돌리지 마라 — 위 실패가 그대로 재현된다.
+//
+// ═══ v4 (2026-08-26 재감사, "뒤 각도에서 뜬 구슬 3개") — 지오메트리는 손 안 댔다 ═══
+// 바뀐 건 앞알 3개의 **배치 거리·방위뿐**이다. 근거는 SEEDS 상수 주석에.
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
 import { buildRevolvedShell, facet, jitterVertices, mergeByMaterial, pickTriangles, splitTrianglesByVertexMask, stdMaterial, uvDome, uvTopPlanar } from '../breads/lib';
@@ -205,10 +208,31 @@ interface SeedDef {
 // ★v3: 크기를 v1대로 되돌렸다(0.20~0.30 → 0.10~0.16). 더미 반지름 0.6 대비 1/6~1/4로,
 // 레퍼런스의 "무더기 앞의 낱알 견본" 구도다. 64px 판독은 이제 더미의 오돌토돌한 실루엣이 맡는다 —
 // **낱알을 다시 키우지 말 것.** 키우면 전체 화면에서 다시 돌덩이 3개가 된다.
+//
+// ═══ v4 (2026-08-26 재감사 — "뒤 각도에서 뜬 구슬 3개") ═══
+// 낱알 크기는 그대로다(위 경고대로). 문제는 **더미와의 거리**였다: 중심에서 0.96~0.98이면
+// 더미 실루엣(밑동 반경 ≈0.55 + 알갱이)과 0.3 이상 떨어진다. 바닥면이 없는 씬이라
+// 실루엣이 분리되는 순간 지면 오브젝트가 뜬 것으로 읽히고, 뒤 각도(az 135~225)에서는
+// 낱알이 카메라 시점상 더미 **위쪽**으로 투영돼(0.96·sin36° > 더미 높이) 그대로 "뜬 구슬"이 된다.
+// flaxseed v4.1이 확정한 처방 — **끝을 더미에 물려 실루엣을 연결한다** — 을 그대로 적용한다:
+// 낱알이 더미 밑동에 닿게 당겼다(같은 BODY_COLOR라 교차선은 안 보이고 "무더기에서 흘러나온
+// 낱알"로 읽힌다). 대신 방위를 ±24°에서 ±40°로 벌렸다 — 반지름만 줄이면 셋이 서로 접해
+// 한 줄 덩어리가 된다(CRIB 크랜베리 함정). 실측 중심간 거리 a-b 0.49 · b-c 0.51 > 반지름 합 0.23 · 0.29.
+// ★거리는 **더미 반지름이 아니라 알갱이 껍질 반지름**에 맞춰야 한다 — r1에서 0.60~0.64로 잡았더니
+// 낱알이 표면 알갱이 층(밑동에서 0.518 + 알갱이 0.155 = 0.673까지 뻗는다) 안으로 완전히 들어가
+// 셋이 사라지고 "오돌토돌한 덩어리 하나"가 됐다. 뜬 구슬은 없앴지만 견본 낱알이라는 구도도 같이
+// 없앤 셈이라 과교정이었다. 0.70~0.76이면 안쪽 모서리(0.60~0.62)가 알갱이 층에 물려 실루엣은
+// 이어지고, 바깥쪽 절반은 층 밖으로 나와 개별 알로 읽힌다.
+// ⚠ 다시 밖으로 밀지 마라 — 0.85를 넘으면 뒤 각도에서 실루엣이 다시 끊긴다(baseline은 0.96이었다).
+const MOUND_CENTER: readonly [number, number] = [0, -0.1];
+function seedOffset(deg: number, dist: number): readonly [number, number] {
+  const t = (deg * Math.PI) / 180;
+  return [MOUND_CENTER[0] + Math.sin(t) * dist, MOUND_CENTER[1] + Math.cos(t) * dist];
+}
 const SEEDS: Record<'a' | 'b' | 'c', SeedDef> = {
-  a: { offset: [-0.4, 0.78], radius: 0.1 },
-  b: { offset: [0.0, 0.86], radius: 0.13 },
-  c: { offset: [0.44, 0.78], radius: 0.16 },
+  a: { offset: seedOffset(-40, 0.7), radius: 0.1 },
+  b: { offset: seedOffset(0, 0.72), radius: 0.13 },
+  c: { offset: seedOffset(40, 0.76), radius: 0.16 },
 };
 
 export const createPoppyseed: IngredientBuilder = (rng) => {
@@ -231,7 +255,7 @@ export const createPoppyseed: IngredientBuilder = (rng) => {
     grain.position.set(Math.cos(psi) * p.r, p.y, Math.sin(psi) * p.r);
     heap.add(grain);
   }
-  cluster.add(placeAndGround(heap, [0, -0.1], 0.1));
+  cluster.add(placeAndGround(heap, MOUND_CENTER, 0.1));
 
   (Object.keys(SEEDS) as (keyof typeof SEEDS)[]).forEach((key) => {
     const def = SEEDS[key];

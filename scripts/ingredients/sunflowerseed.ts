@@ -7,9 +7,11 @@
 // ★세트에서 가장 큰 씨앗 — 포피시드(반지름 0.09~0.17)와의 크기 대비가 정체성이다(팀리드 지시).
 // 절대 스케일은 런타임 리핏으로 무의미하지만(types.ts §6), 상대 크기는 각 재료 내부 구성에서
 // "커널 하나가 화면 대부분을 채운다"로 인코딩한다(advisor 지시) — 3알이 서로 바짝 붙어 전체
-// 실루엣을 꽉 채우게 배치했다. 하이라이트는 flaxseed.ts와 같은 (링,섹터) 기법이지만 폭을 좁혀
-// "긴 축을 따라 도는 옅은 줄무늬"(prompt: ghost-pale stripe tracing the long axis)로 만든다 —
-// olive.ts의 캡 좌표계(rotateZ(-90) 이후 sectorCenter가 "위") 그대로 재사용.
+// 실루엣을 꽉 채우게 배치했다. 눕히기·마스크 좌표계는 olive.ts 그대로 재사용한다
+// (rotateZ(-90) 이후 sectorCenter가 "위").
+//
+// ★줄무늬는 v4에서 **한 방위 고정 밴드 -> 원주 주기 4줄**로 바뀌었다. 이유는 STRIPE_PERIOD
+// 선언 위 주석에 전부 있다 — 고치기 전에 그것부터 읽을 것.
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
 import { buildRevolvedShell, facet, jitterVertices, mergeByMaterial, pickTriangles, splitTrianglesByVertexMask, stdMaterial, uvTopPlanar } from '../breads/lib';
@@ -20,7 +22,9 @@ const STRIPE_COLOR = 0x8c8478; // "a pale taupe highlight catching the plump upp
 // 드롭: 아랫면 그늘 #332F2A(N·L 감쇠가 공짜로 어둡게 함)와
 // 옅은 유령 줄무늬 #6B6558(STRIPE_COLOR와 명도가 가까워 64px에서 살아남지 못함 — advisor 지시로 드롭).
 
-const KERNEL_SEGMENTS = 10;
+// v4: 10 -> 20. 줄무늬를 전 방위 주기 패턴으로 바꾸려면 섹터가 충분히 많아야 한다(아래 참조).
+// 덩달아 물방울 실루엣도 매끈해진다 — 360tri는 예산(8000tri)의 4.5%였다.
+const KERNEL_SEGMENTS = 20;
 const KERNEL_RADIUS = 0.5;
 const KERNEL_HALF_LENGTH = 0.92; // 길이:너비 ~= 1.84:1 (sunflowerseed-2.png 실측, 통통한 물방울)
 
@@ -36,12 +40,33 @@ const PROFILE: readonly ProfilePoint[] = [
   [0.5, 0.85],
   [0.0, 1.0],
 ];
-// 줄무늬 — sectorCenter(=segments/2)가 눕힌 뒤 "위"를 향한다(올리브 공식). 포피시드의 넓은 캡,
-// 아마씨의 넓은 상면 하이라이트와 달리 여기는 폭을 좁혀(half=1) "줄무늬"로 좁힌다.
-const STRIPE_RING_INDICES: readonly number[] = [2, 3, 4, 5];
-const STRIPE_SECTOR_HALF_WIDTH = 1; // segments=10일 때 3칸 폭
+// ★v4 (2026-08-26 쇼케이스 재감사 — "줄무늬 소실") ─────────────────────────────────────────
+// v3까지 줄무늬는 **한 방위에 고정된 섹터 밴드**였다(sectorCenter ± 1칸, 링 2~5). 눕힌 좌표계의
+// "위"에 한 줄만 있으니 턴테이블을 돌리면 그 한 줄이 알의 등 뒤로 넘어가고, 남는 건 N·L 음영뿐이라
+// 8각도 중 대부분에서 "무늬 없는 갈색 아몬드"로 읽혔다. **마스크가 방위 고정이면 보이는 방위도
+// 고정된다** — 이게 근본 원인이고, 폭·링을 어떻게 조절해도 안 풀린다.
+//
+// 해법: 줄무늬를 **원주 방향 주기 패턴**으로 깐다. 극점을 제외한 모든 링에서 컬럼 인덱스가
+// STRIPE_PERIOD의 배수인 것만 마킹하면, 길이축을 따라 흐르는 줄이 원주에 4줄 생긴다.
+// 어느 방위에서 봐도 보이는 반원(180도)에 줄 2개가 걸린다 — 방위 의존이 사라진다.
+//
+// 폭 계산: buildRevolvedShell의 측면 삼각형 2장은 둘 다 컬럼 s와 s+1을 함께 물므로
+// (index.push가 a0+s, b0+s1, a0+s1 / a0+s, b0+s, b0+s1), **컬럼 1개를 마킹하면 섹터 2칸이
+// 초록이 된다**. period 5 · segments 20 → 줄 4개 × 2칸(36도) = 원주의 40%가 줄무늬,
+// 나머지 60%가 몸통. 마킹 컬럼을 늘리지 않고도 줄이 충분히 굵다(64px에서 알 폭의 ~1/5).
+//
+// 극점 정점은 마킹하지 않는다 — 마킹하면 팬 삼각형 전체가 걸려 끝이 통째로 물든다. 대신 링 1의
+// 마킹 컬럼이 팬 삼각형 2장씩을 끌고 들어가 **줄이 끝에서 수렴**한다(실제 씨앗의 무늬와 같다).
+//
+// 프롬프트 정합: JSON은 "faint ghost-pale stripe (#6B6558) tracing the kernel's long axis"라고
+// 한 줄로 서술하지만, negative의 "striped hull"은 껍질째 씨앗을 그리지 말라는 이미지 생성 지시다.
+// 색은 프롬프트 hex 그대로(#8C8478 하이라이트 / #4A4640 몸통)를 쓰고, **한 줄 -> 주기 4줄**은
+// 방위 독립을 얻기 위한 조형 결정이다(팀리드 지시).
+const STRIPE_PERIOD = 5; // 컬럼 5칸마다 1칸 마킹 => 줄 4개
+const STRIPE_PHASE = 0; // 컬럼 10(= sectorCenter, 눕힌 뒤 "위")이 10 % 5 === 0이라 줄 하나가 정수리에 온다
 
-const JITTER_AMP = 0.018; // ~3.6% of KERNEL_RADIUS — olive 비율과 일치(R4 기준선)
+const JITTER_AMP = 0.011; // R2: segments 10->20이면 컬럼 간격이 절반 — 0.018에서 내렸다.
+// 실측 여유: 최소 링 반지름 0.35*0.5=0.175, 컬럼 간격 2π·0.175/20=0.055 > 지터 진폭 0.011.
 
 function buildKernel(rng: () => number): { bodyGeo: THREE.BufferGeometry; stripeGeo: THREE.BufferGeometry } {
   const { geometry, ringStart } = buildRevolvedShell(PROFILE, KERNEL_SEGMENTS, KERNEL_HALF_LENGTH, () => [
@@ -50,14 +75,14 @@ function buildKernel(rng: () => number): { bodyGeo: THREE.BufferGeometry; stripe
   ]);
   const pos = geometry.attributes.position as THREE.BufferAttribute;
 
+  // 주기 줄무늬 마스크 — 극 링(정점 1개)은 건너뛰고, 나머지 모든 링에서 같은 컬럼 집합을 찍는다.
+  // 같은 컬럼이 링을 관통해 이어지므로 길이축을 따라 흐르는 줄이 된다. ringStart는
+  // buildRevolvedShell이 계산해 준 값 그대로 쓴다(좌표 임계값 재발명 금지, CRIB).
   const mask = new Uint8Array(pos.count);
-  const sectorCenter = Math.floor(KERNEL_SEGMENTS / 2);
-  for (const ri of STRIPE_RING_INDICES) {
+  for (let ri = 0; ri < PROFILE.length; ri++) {
+    if (PROFILE[ri][0] <= 1e-6) continue; // 극점
     const base = ringStart[ri];
-    for (let d = -STRIPE_SECTOR_HALF_WIDTH; d <= STRIPE_SECTOR_HALF_WIDTH; d++) {
-      const s = (sectorCenter + d + KERNEL_SEGMENTS) % KERNEL_SEGMENTS;
-      mask[base + s] = 1;
-    }
+    for (let s = STRIPE_PHASE; s < KERNEL_SEGMENTS; s += STRIPE_PERIOD) mask[base + s] = 1;
   }
 
   // 눕히기: rotateZ(-90deg) => new_x = old_y(길이), new_y = -old_x("위").
