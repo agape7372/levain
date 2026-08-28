@@ -4,6 +4,11 @@
 // assets/ingredients/work/olive/). 프로파일·오프셋·색은 전부 그 스펙(author_spec.py)의 전사이며,
 // 수치를 고칠 때는 스펙을 먼저 고치고 여기로 옮긴다.
 //
+// ★쇼케이스 수리: 곡면 그린은 데칼, 평면 스텀프는 스티커 캡. 뭉툭한 끝은 같은 높이 극+림
+// (CRIB 평면 캡) 뒤 극점만 안쪽으로 밀어 과육 구덩이를 만들고, 마스크는 ringStart[0]뿐.
+// 꼭지는 작은 평면 캡으로 바늘 첨점을 없앤다. 절단면 yaw를 갈라 턴테이블에서 한 알은 보이게.
+// #4A3A36 그늘 버킷은 드롭 유지.
+//
 // R1(types.ts) 군집 정본 순서: 알 1개 = 한 덩어리 indexed 셸(lib.buildRevolvedShell) →
 // jitterVertices → facet → 삼각형을 버킷 2개(몸통/그린캡)로 분리. 알끼리는 정점을 공유하지
 // 않으므로(pancake 디스크 3장과 동일 패턴) 알마다 독립적으로 셸을 짓고 mesh 변환으로 배치한다 —
@@ -17,6 +22,7 @@ import {
   jitterVertices,
   mergeByMaterial,
   pickTriangles,
+  scaleHex,
   splitTrianglesByVertexMask,
   stdMaterial,
   uvTopPlanar,
@@ -26,104 +32,87 @@ import {
 // "#4A3A36"(그늘진 아랫면)은 의도적으로 버킷을 안 만든다 — mesh<=2 예산이 2버킷을 강제하는데,
 // 런타임 키라이트가 볼록한 셸의 아랫면을 N·L 감쇠로 이미 공짜로 어둡게 만든다. 지오메트리에 두 번째
 // 어두운 톤을 칠하면 이중으로 어두워진다(스펙 risk shaded-underside-hue-dropped 참조).
-const BODY_COLOR = 0x3b2f2f; // "a deep aubergine-black body"
+// Lambert가 어두운 보석색을 한 단 내려 검은 바위로 읽히므로 알베도만 살짝 올린다(apricot 선례).
+const BODY_BASE = 0x3b2f2f; // "a deep aubergine-black body"
+const BODY_COLOR = scaleHex(BODY_BASE, 1.14);
 const CAP_COLOR = 0x5c6b3e; // "a muted olive-green cast ... catching the upper faces"
 
 // 실측 비율 (assets/ingredients/src/olive.png 3/4 · olive-2.png 정면 · olive-3.png 탑다운).
 // 절대 스케일은 무의미 — 런타임이 군집 전체 최장축을 1.6으로 리핏한다 (types.ts §6).
 const OLIVE_RADIUS = 0.44; // 적도 반지름
 const OLIVE_HALF_LENGTH = 0.775; // 극-극 절반 길이 (길이:너비 ~= 1.55:1, olive-2.png 실측)
-const OLIVE_SEGMENTS = 12;
+const OLIVE_SEGMENTS = 32; // 12·16은 각진 결정체. 32면 페이셋은 남고 실루엣이 타원으로 읽힌다.
+const CUT_RIM = 0.58; // 뭉툭한 끝 구덩이 입구 반지름비
+const CUT_INSET = 0.16; // 극점을 +Y(내부)로 — 마스크가 아니라 구덩이 깊이. Y임계 마스크 아님.
 
-// (반지름비, 높이비) — heightFrac -1(뭉툭한 끝 극점) .. +1(꼭지 끝 극점). 비대칭 테이퍼:
-// 뭉툭한 끝은 완만하게 넓어지고(반지름이 -0.80까지 0.55 이상 유지) 꼭지 끝은 급하게 좁아진다
-// (0.80을 지나면 반지름 0.22 밑) — olive-2.png에서 관찰된 전형적 올리브 비대칭.
+// (반지름비, 높이비) — heightFrac -1(뭉툭한 끝 = 과육 구덩이) .. +1(꼭지 끝).
+// 앞 두 점·뒤 두 점은 같은 hFrac → pole-fan이 평면(CRIB). 꼭지 평면은 몸통색(마스크 안 함).
 type ProfilePoint = readonly [number, number];
 const PROFILE: readonly ProfilePoint[] = [
   [0.0, -1.0],
-  [0.55, -0.8],
-  [0.9, -0.46],
-  [1.0, -0.08],
-  [0.88, 0.22],
-  [0.58, 0.54],
-  [0.22, 0.8],
+  [CUT_RIM, -1.0],
+  [0.8, -0.8],
+  [0.95, -0.52],
+  [1.0, -0.22],
+  [1.0, 0.06],
+  [0.94, 0.32],
+  [0.8, 0.54],
+  [0.6, 0.72],
+  [0.36, 0.88],
+  [0.16, 1.0],
   [0.0, 1.0],
 ];
 
-// 그린 캡 마스크 — cmp-1/cmp-2 실측: Y좌표 임계값(로컬 Y > k*OLIVE_RADIUS) 방식은 실패했다.
-// 카메라가 위쪽에서 내려다보는 3/4 뷰라 "위를 향한 면"이 애초에 시야의 절반 가까이를 차지해서,
-// k를 0.1에서 0.55로 올려도(원주 점유율 47%->31%) 카메라에 늘 보이는 중심부(t=180 정점)는 두
-// 경우 다 포함되어 렌더가 거의 안 바뀌었다. 좌표 기반 임계값 대신 (링, 섹터) 격자 좌표로 직접
-// 지정한다 — buildRevolvedShell이 돌려주는 ringStart를 그대로 쓴다.
-// splitTrianglesByVertexMask는 "정점 3개 중 하나라도 true면 삼각형 true"라 마스크를 링 2개(2,3)에
-// 찍으면 그 사이/양옆 세 밴드(1-2, 2-3, 3-4)가 전부 걸려 length의 절반이 물든다(shot-90/180/270
-// 실측 — azimuth를 돌려도 항상 절반 가까이 초록으로 읽혔다). 링을 1개(3, 가장 넓은 링)로,
-// 섹터도 중심 1칸만(half=0)으로 좁혀 걸리는 밴드를 2-3/3-4 두 개로, 폭도 최소로 줄였다.
-const CAP_RING_INDICES: readonly number[] = [3];
-const CAP_SECTOR_HALF_WIDTH = 0; // 중심 섹터 1칸만 (segments=12일 때 1/12 = 30도 폭)
-
-const JITTER_AMP = 0.016; // ~3.6% of OLIVE_RADIUS — R4: 빵 크러스트 스케일(0.008/반지름1.0)보다 낮춤
+const JITTER_AMP = 0.0035; // 세그↑이면 지터↓ (types.ts R2). 구덩이 입구가 찢어지지 않게 낮춘다.
 
 interface OliveDef {
   offset: readonly [number, number]; // world XZ
-  yaw: number; // world Y 회전 (배치 방향 다양화)
-  tiltZ: number; // 추가 world Z 회전 (뭉툭한 끝을 카메라 쪽으로 들어올림)
+  yaw: number; // world Y 회전 — 절단면 방향을 알마다 갈라 턴테이블에서 숨지 않게
+  tiltZ: number; // 추가 world Z 회전 (뭉툭한 끝 구덩이를 카메라 쪽으로 들어올림)
   tilted: boolean;
+  scale: number; // 알별 미세 크기 — 동일 회전체 3개가 암석 표본처럼 안 보이게
+  flatten: number; // radialScale sx. 알마다 납작함을 달리 해 복사-붙여넣기처럼 안 보이게
 }
 
-// assets/ingredients/work/olive/object-sculpt-spec.json OLIVES 전사.
+// assets/ingredients/work/olive/object-sculpt-spec.json OLIVES 전사 + 절단면 방위만 분산.
 // olive-a = "one tilted to show its blunt end" (geometry.silhouette, olive.json).
-// 1회 수정(advisor 리뷰 반영, 오실레이션 아님): 최초 오프셋은 레퍼런스의 밀착된 무더기보다
-// 넓게 퍼져 있었다(cmp-sheet.png 자기 리뷰에서 지적) — 절반으로 좁혀 서로 닿게 했다.
-// tiltZ도 0.32->0.5로 올렸다 — tilted-blunt-end-cue 피처 리뷰가 0.55점(important 기준 0.65 미달).
 const OLIVES: Record<'a' | 'b' | 'c', OliveDef> = {
-  a: { offset: [-0.33, 0.18], yaw: -0.55, tiltZ: 0.5, tilted: true },
-  b: { offset: [0.33, 0.15], yaw: 0.3, tiltZ: 0.0, tilted: false },
-  // c의 Z만 -0.30 -> -0.45로 되돌림: -0.30은 a/b 사이 정중앙 뒤라 고정 카메라에서 거의 완전히
-  // 가려졌다(R1 "서로 가리지 않게" 위반, roundtrip.png 실측). 원래 -0.55보다는 여전히 좁혔다.
-  c: { offset: [0.0, -0.45], yaw: 1.55, tiltZ: 0.0, tilted: false },
+  a: { offset: [-0.38, 0.16], yaw: -0.45, tiltZ: 0.78, tilted: true, scale: 1.05, flatten: 0.9 },
+  b: { offset: [0.38, 0.14], yaw: 2.05, tiltZ: 0.4, tilted: false, scale: 0.94, flatten: 0.84 },
+  c: { offset: [0.02, -0.52], yaw: -2.15, tiltZ: 0.32, tilted: false, scale: 0.86, flatten: 0.78 },
 };
 
 /**
- * 알 1개 = 회전체 셸(극점 2개) + 캡 마스크(링/섹터 격자 인덱스) + 지터 + 캡/몸통 삼각형 분리
- * + 눕히기. buildRevolvedShell은 항상 Y축으로 돌리므로, 세워 지은 상태에서 ringStart로 캡
- * 마스크를 먼저 찍고(격자 인덱스라 지터·회전에 안 흔들림), 그 다음 geometry.rotateZ(-90deg)로
- * "눕히기"를 지오메트리에 굽는다(장축 old Y -> new X, old X -> new Y="위").
+ * 알 1개 = 회전체 셸(뭉툭한 끝 구덩이 + 꼭지 평면) + 캡 마스크(링 0 극점) + 지터
+ * + 캡/몸통 삼각형 분리 + 눕히기.
  */
-function buildOlive(rng: () => number): {
+function buildOlive(
+  rng: () => number,
+  flatten: number,
+): {
   bodyGeo: THREE.BufferGeometry;
   capGeo: THREE.BufferGeometry;
 } {
-  // PROFILE의 rFrac(0..1)에 상수 OLIVE_RADIUS를 곱해 실제 반지름을, heightScale=OLIVE_HALF_LENGTH로
-  // hFrac(-1..1)에 곱해 실제 길이를 낸다 — radialScale은 링마다 다를 필요가 없어 상수를 반환한다.
   const { geometry, ringStart } = buildRevolvedShell(PROFILE, OLIVE_SEGMENTS, OLIVE_HALF_LENGTH, () => [
-    OLIVE_RADIUS,
+    OLIVE_RADIUS * flatten,
     OLIVE_RADIUS,
   ]);
   const pos = geometry.attributes.position as THREE.BufferAttribute;
 
-  // 캡 마스크 — 지터/회전 전, (링, 섹터) 격자 인덱스로 직접 지정(좌표 임계값 재발명 금지).
-  // 섹터 중심(=segments/2)이 old_x=-rFrac*R 방향(cos t=-1)이고, rotateZ(-90deg) 후 new_y=-old_x가
-  // 최대가 되는 지점이라 "눕힌 뒤 위"로 온다 — 링별 시작 인덱스는 buildRevolvedShell이 이미 계산해
-  // 반환한 ringStart를 그대로 쓴다(재추론 없음).
+  // 캡 마스크 — 좌표 임계값 금지. 극점(ring 0)만 찍으면 OR-of-3가 폴 팬(구덩이 과육)만 넘긴다.
+  // 림을 찍으면 옆면 첫 밴드까지 번진다. 극점을 +Y로 밀어 입구보다 깊게 — 플러시 스텀프가 아니다.
+  const pole = ringStart[0];
+  pos.setY(pole, pos.getY(pole) + CUT_INSET);
   const mask = new Uint8Array(pos.count);
-  const sectorCenter = Math.floor(OLIVE_SEGMENTS / 2);
-  for (const ri of CAP_RING_INDICES) {
-    const base = ringStart[ri];
-    for (let d = -CAP_SECTOR_HALF_WIDTH; d <= CAP_SECTOR_HALF_WIDTH; d++) {
-      const s = (sectorCenter + d + OLIVE_SEGMENTS) % OLIVE_SEGMENTS;
-      mask[base + s] = 1;
-    }
-  }
+  mask[pole] = 1;
+  pos.needsUpdate = true;
 
-  // 눕히기: rotateZ(-90deg) => new_x = old_y, new_y = -old_x. 장축이 로컬 X로, 로컬 Y가 "위"가 된다.
+  // 눕히기: rotateZ(-90deg) => new_x = old_y, new_y = -old_x. 장축이 로컬 X, 구덩이는 -X 끝.
   geometry.rotateZ(-Math.PI / 2);
 
   // 지터 — indexed 상태에서(공유 정점이 함께 움직여야 캡/몸통 경계가 안 찢어진다, types.ts §5).
-  // 마스크는 인덱스 기반이라 지터 전/후 순서에 영향받지 않는다.
   jitterVertices(geometry, rng, JITTER_AMP);
 
-  // facet 전에 원본 index를 보존 — splitTrianglesByVertexMask는 facet() 이전 indexed 배열을 요구한다.
   const originalIndex = (geometry.index as THREE.BufferAttribute).array as ArrayLike<number>;
   const baked = facet(geometry);
   const { trueTris, falseTris } = splitTrianglesByVertexMask(originalIndex, mask);
@@ -143,14 +132,15 @@ export const createOlive: IngredientBuilder = (rng) => {
 
   (Object.keys(OLIVES) as (keyof typeof OLIVES)[]).forEach((key) => {
     const def = OLIVES[key];
-    const { bodyGeo, capGeo } = buildOlive(rng);
+    const { bodyGeo, capGeo } = buildOlive(rng, def.flatten);
 
     const sub = new THREE.Group();
     const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
     const capMesh = new THREE.Mesh(capGeo, capMat);
     sub.add(bodyMesh, capMesh);
 
-    // 배치: yaw(world Y) + tiltZ(뭉툭한 끝을 카메라로 들어올리는 추가 회전, olive-a만).
+    // 배치: yaw(world Y) + tiltZ(구덩이를 카메라로 들어올리는 추가 회전).
+    sub.scale.setScalar(def.scale);
     sub.rotation.set(0, def.yaw, def.tiltZ);
     sub.position.set(def.offset[0], 0, def.offset[1]);
 

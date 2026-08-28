@@ -35,6 +35,19 @@
 // 구체다. 상향된 예산(250KB/8000tri)이 이걸 감당한다.
 // ⚠ 되돌리지 말 것: 세그먼트를 다시 낮추면 (a)가, 알갱이를 지우면 (b)가 그대로 돌아온다.
 // ⚠ 알갱이를 코사인 변위로 되돌리지 마라 — 위 실패가 그대로 재현된다.
+//
+// ═══ v4 (접지·배치 — 낱알 반지름은 그대로) ═══
+//
+// v3은 더미 결은 살렸지만 앞알을 더미 앞 허공에 두었다. 레퍼런스는 바닥에 그림자가 있어
+// 간격이 허용되지만, 쇼케이스는 투명 배경이라 같은 간격이 **공중 부유**로 읽힌다.
+// 뒤 각도(135~225)에서는 더미 너머로 구슬 3개가 따로 떠 보인다.
+//
+// 원인은 크기 아님(★반지름 0.10/0.13/0.16 유지). 두 가지 배치 단서:
+//  (1) 앞알 z가 더미 앞발과 안 겹침 → 앞알을 더미 밑동에 포갠다.
+//  (2) 알갱이가 더미 바닥보다 아래로 뚫려 힙 bbox가 알갱이 바닥에 맞춰 들어올려짐
+//      → 더미가 앞알보다 위에 떠서 접지면이 갈라진다. 알갱이는 표면에 더 묻고,
+//      바닥을 뚫으면 더미 밑동까지 올려 힙과 앞알이 같은 y=0을 공유하게.
+// v4.1: 밑동을 넓히고 접지 치마 알갱이 10개를 둘러, 낮은 각도에서 렌즈 컷·허공 틈이 안 보이게.
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
 import { buildRevolvedShell, facet, jitterVertices, mergeByMaterial, pickTriangles, splitTrianglesByVertexMask, stdMaterial, uvDome, uvTopPlanar } from '../breads/lib';
@@ -96,17 +109,19 @@ function buildSeed(rng: () => number, radius: number): { bodyGeo: THREE.BufferGe
 const MOUND_SEGMENTS = 26; // 알갱이 사이로 드러나는 면이라 각져 보이지 않을 만큼은 필요
 // v3.2: 0.6/0.22 → 0.55/0.20. 알갱이 대비 더미가 크면 알갱이 사이의 매끈한 면이 넓게 남아
 // "리벳 박힌 원반"으로 읽힌다. 더미를 줄여 알갱이가 서로 겹치게 만든다.
+// v4.1: 밑동 rFrac 0.86→0.94. 렌즈처럼 안으로 들어간 밑면은 낮은 각도에서 동굴이 되고
+// 앞알이 그 앞에 떠 보인다. 밑동을 넓혀 더미가 바닥에 앉은 무더기로 읽히게.
 const MOUND_RADIUS = 0.55;
 const MOUND_HALF_HEIGHT = 0.2;
 const MOUND_JITTER_AMP = 0.018;
 const MOUND_PROFILE: readonly ProfilePoint[] = [
-  [0.86, -1.0],
-  [0.97, -0.72],
-  [1.0, -0.38],
-  [0.97, -0.02],
-  [0.88, 0.32],
-  [0.72, 0.6],
-  [0.48, 0.82],
+  [0.94, -1.0],
+  [1.0, -0.68],
+  [0.99, -0.32],
+  [0.92, 0.02],
+  [0.8, 0.34],
+  [0.62, 0.62],
+  [0.38, 0.84],
   [0.0, 1.0],
 ];
 
@@ -154,7 +169,7 @@ function buildMound(rng: () => number): THREE.BufferGeometry {
 // 아래 절반은 더미에 파묻혀 안 보이므로 세로 해상도보다 **개수**가 이득이다. 세그먼트(=평면도
 // 윤곽의 매끄러움)는 10을 유지 — 부감 카메라라 그쪽이 눈에 띈다.
 const GRAIN_COUNT = 20;
-const GRAIN_SEGMENTS = 10;
+const GRAIN_SEGMENTS = 8;
 const GRAIN_PROFILE: readonly ProfilePoint[] = [
   [0.0, -1.0],
   [0.62, -0.6],
@@ -162,8 +177,8 @@ const GRAIN_PROFILE: readonly ProfilePoint[] = [
   [0.62, 0.6],
   [0.0, 1.0],
 ];
-const GRAIN_R_MIN = 0.09;
-const GRAIN_R_MAX = 0.155; // 편차를 넓혀 균일한 리벳 배열처럼 보이지 않게
+const GRAIN_R_MIN = 0.085;
+const GRAIN_R_MAX = 0.13; // 앞알보다 크지 않게. 너무 작으면 더미가 다시 매끈한 렌즈.
 const GRAIN_T_LO = 0.75; // 프로필 인덱스 하한 — 이보다 아래는 더미 밑동이라 알갱이가 바닥을 뚫는다
 const GRAIN_T_SPAN = 5.65;
 const GOLDEN_ANGLE = 2.39996; // 방위를 균등 배치하면 줄무늬가 보인다 — 황금각으로 흩는다
@@ -176,13 +191,36 @@ function buildGrain(rng: () => number, radius: number): THREE.BufferGeometry {
   return baked;
 }
 
-/** 프로필을 선형 보간해 더미 표면의 (반지름, 높이)를 준다 — 중심을 표면에 두면 정확히 절반 파묻힌다. */
+/** 프로필을 선형 보간해 더미 표면의 (반지름, 높이)를 준다. */
 function moundSurfacePoint(t: number): { r: number; y: number } {
   const i = Math.min(MOUND_PROFILE.length - 2, Math.max(0, Math.floor(t)));
   const f = t - i;
   const [r0, h0] = MOUND_PROFILE[i];
   const [r1, h1] = MOUND_PROFILE[i + 1];
   return { r: (r0 + (r1 - r0) * f) * MOUND_RADIUS, y: (h0 + (h1 - h0) * f) * MOUND_HALF_HEIGHT };
+}
+
+const GRAIN_BURY = 0.28; // 너무 묻으면 실루엣이 다시 매끈한 렌즈가 된다. 돌출은 남기되 붙여넣은 구슬은 피한다.
+const MOUND_BOTTOM = -MOUND_HALF_HEIGHT;
+// 밑동 한 바퀴 — 열린 렌즈 밑면이 낮은 각도에서 검은 돌 컷으로 보이는 걸 알갱이 치마로 가린다.
+// 앞알(0.10)보다 작아서 견본 알과 안 헷갈린다.
+const SKIRT_COUNT = 10;
+const SKIRT_R_MIN = 0.062;
+const SKIRT_R_MAX = 0.084;
+const SKIRT_R_FRAC = 0.84; // 밑동 안쪽에 심어 둘레 구슬이 따로 안 떠 보이게. 실루엣만 물결.
+
+/** 표면 법선 쪽으로 파묻고, 더미 밑동 아래로 안 뚫리게 올린다(힙 접지가 알갱이 바닥에 안 끌려가게). */
+function placeGrainOnMound(grain: THREE.Object3D, psi: number, t: number, radius: number): void {
+  const p = moundSurfacePoint(t);
+  const len = Math.hypot(p.r, p.y) || 1;
+  const bury = radius * GRAIN_BURY;
+  grain.position.set(
+    Math.cos(psi) * (p.r - (p.r / len) * bury),
+    p.y - (p.y / len) * bury,
+    Math.sin(psi) * (p.r - (p.r / len) * bury),
+  );
+  const below = MOUND_BOTTOM - (grain.position.y - radius);
+  if (below > 0) grain.position.y += below;
 }
 
 function placeAndGround(child: THREE.Object3D, offset: readonly [number, number], yaw: number): THREE.Group {
@@ -202,13 +240,13 @@ interface SeedDef {
 }
 // poppyseed.png 실측: 앞쪽 3알이 좌->우로 크기가 점증(소/중/대) — 단순 반복이 아닌 시각적 리듬.
 //
-// ★v3: 크기를 v1대로 되돌렸다(0.20~0.30 → 0.10~0.16). 더미 반지름 0.6 대비 1/6~1/4로,
-// 레퍼런스의 "무더기 앞의 낱알 견본" 구도다. 64px 판독은 이제 더미의 오돌토돌한 실루엣이 맡는다 —
-// **낱알을 다시 키우지 말 것.** 키우면 전체 화면에서 다시 돌덩이 3개가 된다.
+// ★v3: 크기를 v1대로 되돌렸다(0.20~0.30 → 0.10~0.16). **낱알을 다시 키우지 말 것.**
+// ★v4.2: 반지름 그대로. 너무 밀어 넣으면 히어로에서 견본 3알이 더미에 먹힌다.
+// 밑동·치마와 겹치되 앞쪽으로 살짝 내밀어 "더미 + 앞알"로 읽히게.
 const SEEDS: Record<'a' | 'b' | 'c', SeedDef> = {
-  a: { offset: [-0.4, 0.78], radius: 0.1 },
-  b: { offset: [0.0, 0.86], radius: 0.13 },
-  c: { offset: [0.44, 0.78], radius: 0.16 },
+  a: { offset: [-0.3, 0.48], radius: 0.1 },
+  b: { offset: [0.02, 0.54], radius: 0.13 },
+  c: { offset: [0.3, 0.5], radius: 0.16 },
 };
 
 export const createPoppyseed: IngredientBuilder = (rng) => {
@@ -226,12 +264,19 @@ export const createPoppyseed: IngredientBuilder = (rng) => {
     const t = GRAIN_T_LO + GRAIN_T_SPAN * Math.pow(u, 0.72); // 아래(넓은 쪽)에 더 촘촘히 = 테두리 물결
     const psi = i * GOLDEN_ANGLE;
     const radius = GRAIN_R_MIN + (GRAIN_R_MAX - GRAIN_R_MIN) * (((i * 3) % 7) / 6);
-    const p = moundSurfacePoint(t);
     const grain = new THREE.Mesh(buildGrain(rng, radius), bodyMat);
-    grain.position.set(Math.cos(psi) * p.r, p.y, Math.sin(psi) * p.r);
+    placeGrainOnMound(grain, psi, t, radius);
     heap.add(grain);
   }
-  cluster.add(placeAndGround(heap, [0, -0.1], 0.1));
+  for (let i = 0; i < SKIRT_COUNT; i++) {
+    const radius = SKIRT_R_MIN + (SKIRT_R_MAX - SKIRT_R_MIN) * (((i * 5) % 6) / 5);
+    const psi = i * GOLDEN_ANGLE + 0.31; // 표면 알갱이 황금각과 어긋나 줄무늬 방지
+    const r = MOUND_RADIUS * SKIRT_R_FRAC;
+    const grain = new THREE.Mesh(buildGrain(rng, radius), bodyMat);
+    grain.position.set(Math.cos(psi) * r, MOUND_BOTTOM + radius, Math.sin(psi) * r);
+    heap.add(grain);
+  }
+  cluster.add(placeAndGround(heap, [0, -0.04], 0.08));
 
   (Object.keys(SEEDS) as (keyof typeof SEEDS)[]).forEach((key) => {
     const def = SEEDS[key];

@@ -8,6 +8,12 @@
 // 레퍼런스 3장이 전부 절단면을 카메라로 정면으로 향한 거의 완전한 구체(비트는 무화과와 달리
 // 위아래가 거의 대칭인 둥근 뿌리)라 PROFILE만 대칭에 가깝게 다시 잡았다. 절단면 무늬는 무화과의
 // 각도 기반 방사 씨앗줄 대신 **거리 기반 동심원**(나이테)이라 훨씬 단순하다 — atan2 불필요.
+//
+// ★2026-08-28 턴테이블 수리 — 되돌리지 말 것.
+// 연직 절단면(+Z)은 FrontSide라 azimuth 180에서 껍질만 남아 자주색 돌이 됐다. yaw로는
+// 앞·뒤가 180° 떨어져 동시에 속을 못 보여 준다. rotateX로 법선에 +Y를 싣고(sweetpotato
+// ROTATE_X · CRIB "절단면류 법선에 +Y 성분") 반구 Z를 납작하게 해 고각 카메라에서 전 방위
+// 나이테가 남게 했다. 아랫극만 짧게 모아 스침각 실루엣이 뿌리지, 긴 주근은 당근이 된다.
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
 import { bakeTexture, buildRevolvedShell, facet, jitterVertices, mergeByMaterial, sliceTriangles, stdMaterial, uvTopPlanar } from '../breads/lib';
@@ -24,20 +30,20 @@ const RING_PALE = 0xc4548a; // "paler dusty pink" — 링 교대색
 // 전부 절단면이 카메라를 거의 정면으로 향해 찍혀 몸통 옆모습 정보가 없다. 무화과와 달리 비트는
 // 위아래 거의 대칭인 둥근 뿌리라 프로필을 대칭에 가깝게 잡았다).
 const BEET_RADIUS = 0.6; // 적도(절단면) 반지름
-const BEET_HALF_LENGTH = 0.6; // 극-극 절반 길이 — 거의 구형(비율 1:1)
+const BEET_HALF_LENGTH = 0.6; // 극-극 절반 길이 — 거의 구형(비율 1:1). 아랫극만 살짝 아래로.
 const BEET_SEGMENTS = 20; // ★12→20 (2026-08-26, fig와 동일 밀도 유지). 예산 상향
 // (2500→8000tri) 후 전체 화면 기준 재판정 — 12컬럼(15°)은 @180/@270에서 실루엣이 각졌다.
 
 type ProfilePoint = readonly [number, number];
-// (반지름비, 높이비) — heightFrac -1(아랫극) .. +1(윗극, 스텁과 만남). 거의 대칭이되 살짝 아래쪽이
-// 더 넓다(beet.png 3/4뷰 실측 — 절단면 원이 정중앙보다 살짝 위에서 시작해 아래로 넓어진다).
+// (반지름비, 높이비) — 아랫극 .. +1(윗극, 스텁). 몸통은 둥근 비트, 아래만 짧게 모아 스침각에서
+// 뿌리로 읽히게 한다. hFrac -1.48 주근은 히어로가 눈물방울/당근이 되어 버렸다 — 되돌리지 말 것.
 const PROFILE: readonly ProfilePoint[] = [
-  [0.0, -1.0],
-  [0.55, -0.88],
-  [0.85, -0.65],
-  [0.97, -0.35],
-  [1.0, -0.05],
-  [0.97, 0.28],
+  [0.0, -1.1],
+  [0.42, -0.96],
+  [0.72, -0.74],
+  [0.92, -0.48],
+  [1.0, -0.08],
+  [0.96, 0.28],
   [0.82, 0.55],
   [0.58, 0.78],
   [0.3, 0.93],
@@ -45,27 +51,44 @@ const PROFILE: readonly ProfilePoint[] = [
   [0.0, 1.0],
 ];
 
-const JITTER_AMP = 0.012; // ★0.018→0.012 (2026-08-26) — 되돌리지 말 것.
-// 컬럼을 20으로 올리자 극 근처 링(rFrac 0.1 => 반지름 0.06)의 컬럼 간격이 0.01 아래로 좁아져
-// **지터 진폭이 삼각형보다 커졌다** — 윗극 슬라이버가 뒤집혔다(실측: 몸통 안쪽향 15개, 전부
-// y 0.57~0.61 윗극). 진폭을 간격 아래로 내린다. 세그먼트를 더 올리면 이 값도 같이 내릴 것.
+const JITTER_AMP = 0.01; // ★0.018→0.012 (2026-08-26) →0.01. 윗극 링(rFrac 0.1) 간격 ≈0.0094
+// 아래로 둔다. 세그먼트를 더 올리면 같이 내릴 것.
 
 const STUB_RADIUS_BOTTOM = 0.11;
 const STUB_RADIUS_TOP = 0.08;
 const STUB_HEIGHT = 0.14; // "a short trimmed stub" — pumpkin/fig 꼭지보다 짧게
-const STUB_SEGMENTS = 12; // ★7→12 (2026-08-26). 예산 상향(2500→8000tri) 후 전체 화면 기준 재판정 —
-// 7각 스텁은 각졌다. 12각의 추가 비용은 ~20tri라 아낄 이유가 없다.
-const STUB_EMBED = 0.07; // ★0.05→0.07 (2026-08-26). 밑동 반지름(0.11)이 그 높이의 몸통 반지름보다
-// 커서 테두리가 턱을 만들었다 — 조금 더 묻는다.
+const STUB_SEGMENTS = 12; // ★7→12 (2026-08-26). 12각의 추가 비용은 ~20tri라 아낄 이유가 없다.
+const STUB_EMBED = 0.07; // ★0.05→0.07 (2026-08-26). 밑동 반지름이 몸통보다 커서 턱이 생겼다 — 묻는다.
 const STUB_JITTER_AMP = 0.006;
+
+// rotateX(-α) 후 법선 (0, sin α, cos α). α>50°여야 n·cam_180>0 (2.2 sinα − 2.6 cosα).
+// 72°는 접시처럼 눕고, 58°는 180에서 나이테가 스친다. 64°가 세운 반쪽과 뒷면 속살의 타협.
+const TILT_X = -1.12; // ~-64deg
+const DEPTH_SCALE = 0.76; // 반구 Z. 1이면 틸트 후에도 돔이 단면을 가리기 쉽다.
 
 // 단면 텍스처 — 거리 기반 동심원(나이테). 무화과의 각도 기반 방사 씨앗줄과 달리 atan2가 필요 없다.
 const TEX_SIZE = 192; // <=256 (R3)
 const RING_COUNT = 6; // beet-2.png 정면 실측: 절단면 가장자리에서 중심 점까지 교대 밴드 ~6개
 const BAND_LOW = -0.15;
-const BAND_HIGH = 0.15; // 사이는 smoothstep — 레퍼런스의 밴드는 폭이 고르게 나뉘어 있어(pumpkin 홈보다
-// 대칭적으로) 좁힐 필요가 없었다.
-const CORE_H_FRAC = -0.05; // 나이테가 수렴하는 중심 — PROFILE 최대 반지름 지점과 동일
+const BAND_HIGH = 0.15;
+const CORE_H_FRAC = -0.05; // 나이테가 수렴하는 중심 — PROFILE 최대 반지름 지점 근처
+const RIM_INNER = 0.84; // 스펙 "thin deep maroon-brown skin rim" — 스침각에서 속살·껍질 경계
+const RIM_OUTER = 0.98;
+
+const H_MIN = PROFILE[0][1];
+const H_MAX = PROFILE[PROFILE.length - 1][1];
+
+function profileRadiusAt(hFrac: number): number {
+  for (let i = 0; i < PROFILE.length - 1; i++) {
+    const [r0, h0] = PROFILE[i];
+    const [r1, h1] = PROFILE[i + 1];
+    if (hFrac >= h0 && hFrac <= h1) {
+      const t = h1 === h0 ? 0 : (hFrac - h0) / (h1 - h0);
+      return r0 + (r1 - r0) * t;
+    }
+  }
+  return 0;
+}
 
 /**
  * 로컬 half-revolution 셸 — fig.ts의 buildHalfShell을 그대로 복제(lib.ts에 없음, 재료마다 로컬
@@ -78,6 +101,7 @@ function buildHalfShell(
   segments: number,
   radius: number,
   heightScale: number,
+  depthScale: number,
 ): { geometry: THREE.BufferGeometry; skinTriCount: number; capTriCount: number } {
   const positions: number[] = [];
   const ringStart: number[] = [];
@@ -89,7 +113,7 @@ function buildHalfShell(
     }
     for (let s = 0; s <= segments; s++) {
       const t = (s / segments) * Math.PI; // phi in [0, pi]
-      positions.push(Math.cos(t) * rFrac * radius, hFrac * heightScale, -Math.sin(t) * rFrac * radius);
+      positions.push(Math.cos(t) * rFrac * radius, hFrac * heightScale, -Math.sin(t) * rFrac * radius * depthScale);
     }
   }
 
@@ -102,13 +126,10 @@ function buildHalfShell(
     for (let s = 0; s < segments; s++) {
       const s1 = s + 1;
       if (aPole) {
-      // ★와인딩 반전 수정(2026-08-26). 이 셀브는 좌표계가 lib의 buildRevolvedShell과
-      // **거울상**이다(lib은 z=+sin, 여기는 z=-sin 또는 x=sin/z=cos). 그런데 감기를 lib 것을
-      // 그대로 복사해 **손잡이가 뒤집혀 법선이 전부 안을 향했다**.
-      // 증상: FrontSide 컴링이라 가까운 벙이 사라지고 먼 벽 안쪽이 보인다 —
-      // 일부 각도에서 몸통이 통째로 사라지고 꼭지만 남아 "떠 있는 꼭지"로 보였다.
-      // 실측(수정 전): 바깥향 삼각형 5~8% · 부호부피 음수(정상인 olive는 97%/양수).
-      // ⚠ 캡(단면)은 **이 좌표계에서 손으로 유도**한 것이라 그대로 둔다. 스킨만 뒤집는다.
+      // ★와인딩 반전 수정(2026-08-26). 이 셸의 좌표계가 lib의 buildRevolvedShell과
+      // **거울상**이다(lib은 z=+sin, 여기는 z=-sin). 감기를 lib 것을 그대로 복사해
+      // 손잡이가 뒤집혀 법선이 전부 안을 향했다. FrontSide 컬링이라 가까운 벽이 사라지고
+      // 먼 벽 안쪽이 보인다 — "떠 있는 꼭지". ⚠ 캡은 이 좌표계에서 손으로 유도한 것이라 스킨만 뒤집는다.
         skinIndex.push(a0, b0 + s1, b0 + s);
       } else if (bPole) {
         skinIndex.push(a0 + s, a0 + s1, b0);
@@ -172,26 +193,32 @@ function lerpChannel(a: number, b: number, t: number): number {
 function paintBeetCutfaceTexture(): THREE.CanvasTexture {
   const dark: [number, number, number] = [(RING_DARK >> 16) & 0xff, (RING_DARK >> 8) & 0xff, RING_DARK & 0xff];
   const pale: [number, number, number] = [(RING_PALE >> 16) & 0xff, (RING_PALE >> 8) & 0xff, RING_PALE & 0xff];
+  const rim: [number, number, number] = [(SKIN_COLOR >> 16) & 0xff, (SKIN_COLOR >> 8) & 0xff, SKIN_COLOR & 0xff];
+  const yMin = H_MIN * BEET_HALF_LENGTH;
+  const yMax = H_MAX * BEET_HALF_LENGTH;
+  const ySpan = Math.max(yMax - yMin, 1e-6);
+  const coreY = CORE_H_FRAC * BEET_HALF_LENGTH;
 
   return bakeTexture(TEX_SIZE, (ctx, size) => {
     const img = ctx.createImageData(size, size);
     for (let py = 0; py < size; py++) {
       for (let px = 0; px < size; px++) {
         const u = (px + 0.5) / size;
-        // fig.ts 실측과 동일 관례: py를 그대로 v로 쓴다(flipY 보정 없음) — core가 캔버스 중앙 부근에 온다.
-        const v = (py + 0.5) / size;
+        // CanvasTexture flipY=true: 캔버스 맨 윗줄(py=0) = 메시 V=1 (uvFrontPlanar 윗극).
+        const v = 1 - (py + 0.5) / size;
         const localX = (u - 0.5) * 2 * BEET_RADIUS;
-        const hFrac = v * 2 - 1;
-        const localY = hFrac * BEET_HALF_LENGTH;
-        const coreY = CORE_H_FRAC * BEET_HALF_LENGTH;
-        // 거리만 필요(각도 무관) — 동심원은 나이테라 방향성이 없다.
-        const dist = Math.hypot(localX, localY - coreY) / BEET_RADIUS;
+        const localY = yMin + v * ySpan;
+        const hFrac = localY / BEET_HALF_LENGTH;
+        const dist = Math.min(Math.hypot(localX, localY - coreY) / BEET_RADIUS, 1.02);
         const stripe = Math.cos(RING_COUNT * Math.PI * dist);
         const t = smoothstep(BAND_LOW, BAND_HIGH, stripe); // t=1 at stripe peak(dist=0) => 중심은 어두운 점
+        const rBound = Math.max(profileRadiusAt(hFrac) * BEET_RADIUS, 1e-6);
+        const edge = Math.abs(localX) / rBound;
+        const rimT = smoothstep(RIM_INNER, RIM_OUTER, edge);
         const o = (py * size + px) * 4;
-        img.data[o] = lerpChannel(pale[0], dark[0], t);
-        img.data[o + 1] = lerpChannel(pale[1], dark[1], t);
-        img.data[o + 2] = lerpChannel(pale[2], dark[2], t);
+        img.data[o] = lerpChannel(lerpChannel(pale[0], dark[0], t), rim[0], rimT);
+        img.data[o + 1] = lerpChannel(lerpChannel(pale[1], dark[1], t), rim[1], rimT);
+        img.data[o + 2] = lerpChannel(lerpChannel(pale[2], dark[2], t), rim[2], rimT);
         img.data[o + 3] = 255;
       }
     }
@@ -226,14 +253,25 @@ function buildStub(rng: () => number): THREE.BufferGeometry {
 }
 
 export const createBeet: IngredientBuilder = (rng) => {
-  const { geometry, skinTriCount, capTriCount } = buildHalfShell(PROFILE, BEET_SEGMENTS, BEET_RADIUS, BEET_HALF_LENGTH);
+  const { geometry, skinTriCount, capTriCount } = buildHalfShell(
+    PROFILE,
+    BEET_SEGMENTS,
+    BEET_RADIUS,
+    BEET_HALF_LENGTH,
+    DEPTH_SCALE,
+  );
   // 지터는 셸 전체(스킨+캡 공유 정점)에 한 번만 — R1: 이음매가 절대 찢어지지 않는다.
   jitterVertices(geometry, rng, JITTER_AMP);
   const baked = facet(geometry);
   const skinGeo = sliceTriangles(baked, 0, skinTriCount);
   const capGeo = sliceTriangles(baked, skinTriCount, skinTriCount + capTriCount);
   uvTopPlanar(skinGeo);
-  uvFrontPlanar(capGeo);
+  uvFrontPlanar(capGeo); // UV는 회전 전 절단면(XY)에서 — 회전 후 bbox는 절단면을 안 담는다.
+
+  const stubGeo = buildStub(rng);
+  skinGeo.rotateX(TILT_X);
+  capGeo.rotateX(TILT_X);
+  stubGeo.rotateX(TILT_X);
 
   const skinMat = stdMaterial({ color: SKIN_COLOR });
   const cutfaceMat = stdMaterial({ map: paintBeetCutfaceTexture(), color: 0xffffff });
@@ -241,7 +279,7 @@ export const createBeet: IngredientBuilder = (rng) => {
   const group = new THREE.Group();
   group.add(new THREE.Mesh(skinGeo, skinMat));
   group.add(new THREE.Mesh(capGeo, cutfaceMat));
-  group.add(new THREE.Mesh(buildStub(rng), skinMat)); // 스텁은 skin 버킷과 합류(잎을 자르고 남은 뿌리색)
+  group.add(new THREE.Mesh(stubGeo, skinMat)); // 스텁은 skin 버킷과 합류(잎을 자르고 남은 뿌리색)
 
   return mergeByMaterial(group);
 };
