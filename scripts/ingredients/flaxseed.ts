@@ -10,6 +10,23 @@
 // 낱알 형태 = cranberry.ts의 FLATTEN_X 눕히기 공식(반지름축 하나를 짓눌러 두께를 낸다) +
 // 한쪽 끝만 뾰족한 비대칭 테이퍼 프로필.
 //
+// ═══ v4 (2026-08-27, 쇼케이스 재감사 파손 수정) ═══
+//
+// v3는 64px·히어로 각도만 고치고 **턴테이블 중간각**을 안 봤다. 재감사 az≈195~225에서
+// 파손 판정: 더미가 정구형이라 트러플·솔방울로 읽히고, 뒤쪽 납작 낱알이 스침각에서
+// **단검·날개·곰 귀**가 된다(같은 메커니즘의 poppyseed는 구체라 "뜬 구슬"=약함으로 끝난다).
+// az=0·150·270 실루엣의 지느러미 슬리버도 같은 원인 — 적도 너머 비늘이 수직으로 선다.
+//
+// 처방(핸드오프 확정, 되돌리지 마라):
+//   (1) 채움 돔 높이:폭 ≈1:1 (R=0.50 / 반높이 0.30) → **반높이를 내려 낮고 넓은 둔덕**.
+//       레퍼런스는 넓고 납작한 비늘 더미지 공이 아니다.
+//   (2) 비늘이 **뒤로 안 돌게** — phi를 적도 아래로 보내지 않고, 표면 기울기를 낮게 캡한다.
+//       납작 씨앗이 법선을 따라 수직이 되면 그 순간 종잇장이다.
+//   (3) **앞알 3개를 지우지 마라.** 정체 단서다. 고치는 축은 더미 실루엣이다.
+//
+// ★v4.1 실패: 채움만 낮추고 구면 phi 배치를 유지하면 비늘이 극점에 몰려 **쿠키 위 아몬드**가
+// 된다. 채움이 실루엣을 그리면 안 된다. v4.2는 비늘을 XZ 원반에 깔고 채움은 구멍 막개로 축소.
+//
 // ═══ v3 (2026-08-26, 전체 화면 쇼케이스 파손 수정) ═══
 //
 // v2는 64px 썸네일 판독만 보고 통과시켰고 전체 화면에서 셋 다 무너져 있었다:
@@ -63,7 +80,7 @@ const FRONT_HALF_LENGTH = 0.42;
 const FRONT_RADIUS = 0.22;
 // 더미 구성 낱알(비늘) — 서로 겹쳐서 가려지므로 격자를 낮춘다. 납작한 씨앗이라 세그먼트가 적어도
 // 각져 보이지 않는다: 위에서 본 윤곽은 섹터가 아니라 **프로필**이 그린다(넓은 축 최대점이 한 열).
-const SHINGLE_SEGMENTS = 8;
+const SHINGLE_SEGMENTS = 6;
 const SHINGLE_PROFILE: readonly ProfilePoint[] = [
   [0.0, -1.0],
   [0.36, -0.58],
@@ -128,18 +145,18 @@ function buildSeed(
   return { bodyGeo, rimGeo };
 }
 
-// ── 채움 돔 ───────────────────────────────────────────────────────────────────
-// 비늘 낱알 **안쪽**에 숨는 낮은 돔. 낱알 사이 틈으로 배경이 비치는 것만 막는 보험이라
-// 낱알보다 안쪽에 둔다. 이게 넓게 드러나면 v2의 매끈한 돔(=곰 머리)이 돌아온 것이다.
-const FILL_SEGMENTS = 16;
-const FILL_RADIUS = 0.5;
-const FILL_HALF_HEIGHT = 0.3;
-const FILL_JITTER_AMP = 0.014;
+// ── 채움 ─────────────────────────────────────────────────────────────────────
+// 비늘 **안쪽** 구멍 막개. 실루엣을 이 메시가 그리면 쿠키·공·도넛이 된다(v4.1 실측).
+// 더미 외곽은 비늘 낱알의 합집합이고, 채움은 그보다 한 단 작다.
+const FILL_SEGMENTS = 12;
+const FILL_RADIUS = 0.34;
+const FILL_HALF_HEIGHT = 0.11;
+const FILL_JITTER_AMP = 0.008;
 const FILL_PROFILE: readonly ProfilePoint[] = [
-  [0.88, -1.0],
-  [1.0, -0.42],
-  [0.86, 0.22],
-  [0.5, 0.7],
+  [0.7, -1.0],
+  [1.0, -0.2],
+  [0.9, 0.4],
+  [0.5, 0.82],
   [0.0, 1.0],
 ];
 
@@ -163,58 +180,48 @@ function placeAndGround(child: THREE.Object3D, offset: readonly [number, number]
   return sub;
 }
 
-/** 채움 돔(회전타원) 표면까지의 거리 — 비늘 낱알이 뜨지도 파묻히지도 않게 하는 기준. */
-function domeRadius(phi: number): number {
-  const s = Math.sin(phi) / FILL_RADIUS;
-  const c = Math.cos(phi) / FILL_HALF_HEIGHT;
-  return 1 / Math.sqrt(s * s + c * c);
+// ★v4.2: 구면 phi 배치는 둔덕을 낮추는 순간 비늘이 극점에 몰려 "쿠키 위 토핑"이 됐다.
+// 해법 = XZ 원반에 황금각으로 깔고, 높이는 포물선 둔덕. 씨앗은 거의 수평(비늘) —
+// 법선을 따라 세우지 않는다. 뒤쪽 적도로 안 넘어가므로 칼날·귀가 원리적으로 안 생긴다.
+const HEAP_RADIUS = 0.56;
+const HEAP_HEIGHT = 0.2;
+const MAX_SHINGLE_TILT = 0.28; // ≈16°. 그 이상이면 가장자리가 종잇장 // ≈16°. 그 이상이면 가장자리가 종잇장
+const GOLDEN_ANGLE = 2.39996;
+
+function heapY(r: number): number {
+  const t = Math.min(1, r / HEAP_RADIUS);
+  return HEAP_HEIGHT * (1 - t * t);
 }
-/** 그 점에서의 표면 법선이 Y축과 이루는 각 — 비늘의 기울기(구면각 phi를 그냥 쓰면 납작한 돔에서 어긋난다). */
-function domeNormalTilt(phi: number): number {
-  return Math.atan2(Math.sin(phi) / FILL_RADIUS, Math.cos(phi) / FILL_HALF_HEIGHT);
+function heapTilt(r: number): number {
+  return Math.min(MAX_SHINGLE_TILT, 0.55 * (r / HEAP_RADIUS));
 }
-// v3.1: 0.9는 **너무 깊었다.** 중심을 표면 거리 d의 90%에 두면 파묻힌 깊이가 d·0.1 + 반두께라
-// 낱알의 3/4이 잠겨 테두리 림만 남고, 그게 "긁힌 자국"으로 읽혔다. 중심을 정확히 표면에 두면
-// (=1.0) 딱 절반이 드러난다 — 그게 비늘로 읽히는 최소치다.
-const SHINGLE_SINK = 1.0;
 
 /**
- * 비늘 배치 — 방위(Y) → 기울기(Z) → 반경 이동 → 자전(Y) 순으로 **그룹을 겹쳐** 만든다.
+ * 원반 둔덕 배치 — 방위(Y) → 반경·높이 이동 → 약한 기울기(X, 바깥이 낮아짐) → 자전·lean.
  * 한 Object3D에 오일러 3축을 한꺼번에 주면 적용 순서(THREE 기본 'XYZ')에 걸려 의도와 달라진다.
  */
-function shingleTransform(child: THREE.Object3D, psi: number, phi: number, spin: number, lean: number): THREE.Group {
+function shingleOnHeap(child: THREE.Object3D, psi: number, r: number, y: number, spin: number, lean: number): THREE.Group {
   const azimuth = new THREE.Group();
   azimuth.rotation.y = psi;
-  const tilt = new THREE.Group();
-  tilt.rotation.z = -domeNormalTilt(phi);
-  const lift = new THREE.Group();
-  lift.position.set(0, domeRadius(phi) * SHINGLE_SINK, 0);
+  const placer = new THREE.Group();
+  placer.position.set(0, y, r);
+  placer.rotation.x = heapTilt(r);
   const spinner = new THREE.Group();
   spinner.rotation.y = spin;
   const leaner = new THREE.Group();
-  leaner.rotation.x = lean; // 제 길이축(local X) 기준 기울임 — 긴 모서리 한쪽이 들린다
+  leaner.rotation.x = lean;
   leaner.add(child);
   spinner.add(leaner);
-  lift.add(spinner);
-  tilt.add(lift);
-  azimuth.add(tilt);
+  placer.add(spinner);
+  azimuth.add(placer);
   return azimuth;
 }
 
-// v3.1: 10장 → 16장. 10장은 돔을 못 덮어 낱알 하나하나가 홀로 실루엣에 서고, 중턱에서 45°로
-// 기운 낱알의 뾰족한 끝이 **지느러미(fin)**로 읽혔다. 겹칠 만큼 깔면 그 끝이 옆 낱알에 묻힌다.
-// 방위는 황금각으로 흩어 규칙적인 줄무늬를 피하고, phi는 sqrt 분포로 아래(넓은 쪽)에 몰아준다.
-// v3.2: phi 상한 1.24rad(71°)가 **결정적 실수였다.** 71°는 회전타원의 적도조차 못 넘어서
-// 비늘이 더미 위쪽에만 얹히고, 정면에서 보이는 더미 높이의 아래 3/4가 맨 돔으로 남았다
-// (렌더 판정: "매끈한 검은 공 위에 긁힌 자국"). 100°까지 내려 적도 아래까지 덮는다.
-// 개수도 16 → 20으로 올렸다 — 덮을 면적이 늘었고, 겹쳐야 뾰족한 끝이 옆 낱알에 묻혀 지느러미가 안 된다.
-const SHINGLE_COUNT = 20;
-const SHINGLE_PHI_LO = 0.2;
-const SHINGLE_PHI_SPAN = 1.55; // 최대 1.75rad ≈ 100°
-const GOLDEN_ANGLE = 2.39996;
-/** 비늘마다 제 길이축으로 조금씩 기울인다 — 전부 돔에 딱 붙으면 명암이 같아 한 덩어리로 뭉친다. */
+// 하층 16 + 상층 8. 상층이 한가운데를 덮어 포물선 꼭대기의 구멍·매끈 채움을 가린다.
+const SHINGLE_LOWER = 16;
+const SHINGLE_UPPER = 8;
 function shingleLean(i: number): number {
-  return ((((i * 5) % 7) - 3) / 3) * 0.42;
+  return ((((i * 5) % 7) - 3) / 3) * 0.16;
 }
 
 interface SeedDef {
@@ -222,8 +229,8 @@ interface SeedDef {
   yaw: number;
 }
 // flaxseed.png 실측: 앞쪽 3알이 서로 다른 각도로 흩어져 놓인다. 더미 밑동과 안 겹치게(R1).
-// v3.1: v2에서 서로 안 겹치는 게 확인된 오프셋·요각으로 되돌렸다(v3의 값은 오른쪽 두 알이
-// 교차해 나비 모양이 됐다 — 관통은 파손 판정 항목이다).
+// 투명 배경에서 너무 떨어지면 뒷 각도에서 뜬 파편으로 읽히지만, 붙이면 히어로에서 정체가 사라진다.
+// 히어로(az=0) 구성을 우선한다 — 도감 썸네일과 기본 쇼케이스 각도다.
 const SEEDS: Record<'a' | 'b' | 'c', SeedDef> = {
   a: { offset: [-0.68, 0.62], yaw: 0.5 },
   b: { offset: [0.0, 0.92], yaw: -0.35 },
@@ -236,17 +243,25 @@ export const createFlaxseed: IngredientBuilder = (rng) => {
 
   const cluster = new THREE.Group();
 
-  // 더미 — 채움 돔 위에 비늘 낱알 10장. 전체를 한 그룹으로 묶어 **마지막에 한 번만** 접지한다.
+  // 더미 — 채움은 구멍 막개, 실루엣은 비늘. 전체를 한 그룹으로 묶어 **마지막에 한 번만** 접지한다.
   const heap = new THREE.Group();
   heap.add(new THREE.Mesh(buildFill(rng), bodyMat));
-  for (let i = 0; i < SHINGLE_COUNT; i++) {
-    const u = (i + 0.5) / SHINGLE_COUNT;
-    const phi = SHINGLE_PHI_LO + SHINGLE_PHI_SPAN * Math.sqrt(u);
+  const placeShingle = (i: number, r: number, y: number): void => {
     const { bodyGeo, rimGeo } = buildSeed(rng, SHINGLE_PROFILE, SHINGLE_SEGMENTS, SHINGLE_HALF_LENGTH, SHINGLE_RADIUS, false);
     const seed = new THREE.Group();
     seed.add(new THREE.Mesh(bodyGeo, bodyMat));
     seed.add(new THREE.Mesh(rimGeo, rimMat));
-    heap.add(shingleTransform(seed, i * GOLDEN_ANGLE, phi, i * 1.7, shingleLean(i)));
+    heap.add(shingleOnHeap(seed, i * GOLDEN_ANGLE, r, y, i * 1.7, shingleLean(i)));
+  };
+  for (let i = 0; i < SHINGLE_LOWER; i++) {
+    const u = (i + 0.5) / SHINGLE_LOWER;
+    const r = HEAP_RADIUS * (0.18 + 0.8 * Math.sqrt(u));
+    placeShingle(i, r, heapY(r));
+  }
+  for (let i = 0; i < SHINGLE_UPPER; i++) {
+    const u = (i + 0.5) / SHINGLE_UPPER;
+    const r = HEAP_RADIUS * 0.42 * Math.sqrt(u);
+    placeShingle(SHINGLE_LOWER + i, r, heapY(r) + 0.045);
   }
   cluster.add(placeAndGround(heap, [0, 0], -0.2));
 
