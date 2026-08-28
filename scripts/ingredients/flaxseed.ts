@@ -232,9 +232,9 @@ interface SeedDef {
 // 투명 배경에서 너무 떨어지면 뒷 각도에서 뜬 파편으로 읽히지만, 붙이면 히어로에서 정체가 사라진다.
 // 히어로(az=0) 구성을 우선한다 — 도감 썸네일과 기본 쇼케이스 각도다.
 const SEEDS: Record<'a' | 'b' | 'c', SeedDef> = {
-  a: { offset: [-0.68, 0.62], yaw: 0.5 },
-  b: { offset: [0.0, 0.92], yaw: -0.35 },
-  c: { offset: [0.7, 0.58], yaw: 1.3 },
+  a: { offset: [-0.58, 0.53], yaw: -2.15 },
+  b: { offset: [0.0, 0.78], yaw: -1.35 },
+  c: { offset: [0.6, 0.5], yaw: -0.95 },
 };
 
 export const createFlaxseed: IngredientBuilder = (rng) => {

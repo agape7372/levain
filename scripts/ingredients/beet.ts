@@ -273,6 +273,10 @@ export const createBeet: IngredientBuilder = (rng) => {
   capGeo.rotateX(TILT_X);
   stubGeo.rotateX(TILT_X);
 
+  const stubGeo = buildStub(rng);
+  // 회전은 UV를 낸 뒤에 — position만 바뀌고 UV는 그대로라 나이테가 안 틀어진다.
+  for (const g of [skinGeo, capGeo, stubGeo]) orientLaid(g);
+
   const skinMat = stdMaterial({ color: SKIN_COLOR });
   const cutfaceMat = stdMaterial({ map: paintBeetCutfaceTexture(), color: 0xffffff });
 

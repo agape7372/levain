@@ -27,10 +27,12 @@ async function main() {
   const spec = wanted.length > 0 ? wanted.join(',') : 'all';
 
   // 고정 포트는 잔존 프로세스에 취약 — 선호 포트만 주고 실제 URL은 배너에서 파싱
+  // POSIX에선 detached로 그룹 리더를 만들어야 killTree가 그룹째 죽일 수 있다
   const vite = spawn('npx', ['vite', '--port', String(PORT)], {
     cwd: root,
     shell: true,
     stdio: 'pipe',
+    detached: process.platform !== 'win32',
   });
   let viteLog = '';
   vite.stdout.on('data', (d) => (viteLog += String(d)));
@@ -83,6 +85,7 @@ async function main() {
 }
 
 // Windows에서 shell:true 자식의 kill()은 cmd 래퍼만 죽인다 — 프로세스 트리째 종료
+// POSIX도 child.kill()은 sh 래퍼만 죽인다 — detached 그룹째(-pid) 죽인다.
 function killTree(child) {
   if (process.platform === 'win32') {
     try {
@@ -90,7 +93,13 @@ function killTree(child) {
     } catch {
       /* 이미 종료 */
     }
-  } else child.kill();
+  } else {
+    try {
+      process.kill(-child.pid, 'SIGKILL');
+    } catch {
+      child.kill();
+    }
+  }
 }
 
 main().catch((e) => {

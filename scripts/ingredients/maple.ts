@@ -18,13 +18,17 @@
 // 팬으로 닫힌 프리즘을 지어 뒷면 사본 없이 전 각도에서 실루엣이 남게 한다.
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
-import { facet, mergeByMaterial, sliceTriangles, stdMaterial, uvTopPlanar } from '../breads/lib';
+import { bakeTexture, facet, mergeByMaterial, sliceTriangles, stdMaterial, uvTopPlanar } from '../breads/lib';
 
 // 팔레트 — assets/prompts/ingredients/maple.json geometry.surface[0] 손 전사.
 // "#8F6224"(잎맥 골)·"#D9A85C"(도드라진 면 하이라이트)는 버킷을 안 만든다 — 잎맥은 VEIN_DIP
 // 함몰, 하이라이트는 페이싯 N·L 감쇠로 공짜.
 const RIM_COLOR = 0xe8c787; // "a light cream edge ... tracing the leaf's thin candy rim"
 const BODY_COLOR = 0xb8823a; // "a warm caramel-tan body"
+const VEIN_COLOR = 0x8f6224; // "a deeper toffee-brown groove sunk into the leaf's veins" — v3에서 텍스처로 실현
+// 드롭: "#D9A85C"(도드라진 면 하이라이트)는 버킷도 텍스처 톤도 안 만든다 — 안쪽 평면 자체의
+// 페이싯 N·L 감쇠가 이미 공짜로 만들고, 텍스처에 3번째 톤을 넣으면 64px에서 잎맥선과 섞여
+// 얼룩이 된다(64px 판독이 이 자산의 최고 강점이라 지키는 쪽을 골랐다).
 
 type Role = 'vein' | 'tooth' | 'sinus' | 'stem';
 interface OutlinePoint {
@@ -155,6 +159,7 @@ function buildCandy(): { rimGeo: THREE.BufferGeometry; bodyGeo: THREE.BufferGeom
     b.y -= VEIN_DIP;
     veinPts.set(i, { a: push(a), b: push(b) });
   }
+  // 바닥 팬(-Y, 반전 순서).
   for (let i = 0; i < N; i++) {
     const i1 = (i + 1) % N;
     const va = veinPts.get(i);
@@ -185,9 +190,71 @@ function buildCandy(): { rimGeo: THREE.BufferGeometry; bodyGeo: THREE.BufferGeom
   const total = baked.attributes.position.count / 3;
   const rimGeo = sliceTriangles(baked, 0, rimTriCount);
   const bodyGeo = sliceTriangles(baked, rimTriCount, total);
-  uvTopPlanar(rimGeo);
-  uvTopPlanar(bodyGeo);
+  uvTopPlanar(rimGeo); // 테두리 버킷은 순색 — UV는 mergeByMaterial의 attribute 일관성용
+  uvLeafLocal(bodyGeo); // 몸통 버킷은 잎맥 텍스처 — 잎 로컬 좌표에 고정해야 잎맥이 뾰족점을 향한다
   return { rimGeo, bodyGeo };
+}
+
+// ── 잎맥 텍스처 ────────────────────────────────────────────────────────────────────────
+// uvTopPlanar/uvDome은 **지오메트리 bbox**로 정규화하는데, 잎 외곽선은 중심 대칭이 아니라
+// (윗 로브 r=1.0 vs 밑동 r=0.58) bbox 중심이 잎 중심과 다르다 — 그 UV를 쓰면 잎맥 6방향이
+// 뾰족점에서 어긋난다. 그래서 **LEAF_RADIUS로 직접 정규화하는 잎 로컬 투영**을 쓴다
+// (빌더 로컬 헬퍼 — lib.ts는 건드리지 않는다).
+const UV_SPAN = LEAF_RADIUS * 2.2; // 톱니가 r=1.045까지 나가고 꼭지가 0.7까지 뻗는다 — 여유 포함
+function uvLeafLocal(g: THREE.BufferGeometry): void {
+  const pos = g.attributes.position;
+  const uv = new Float32Array(pos.count * 2);
+  for (let i = 0; i < pos.count; i++) {
+    uv[i * 2] = pos.getX(i) / UV_SPAN + 0.5;
+    uv[i * 2 + 1] = pos.getZ(i) / UV_SPAN + 0.5;
+  }
+  g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+}
+
+const TEX_SIZE = 256; // R3 상한. 잎 지름이 텍스처 전폭이라 1px ≈ 0.0036 world — 잎맥선 폭 5px
+// 잎맥 방향 — 뾰족점 5개 + 잎자루(-90°). 중앙에서 여섯 갈래로 뻗는 palmate 잎맥이 단풍잎의
+// 교과서적 단서다. 뾰족점 각도는 BASE_OUTLINE에서 뽑아 하드코딩을 피한다.
+const VEIN_ANGLES_DEG: readonly number[] = [...BASE_OUTLINE.filter((p) => p.tip).map((p) => p.angleDeg), STEM_ANGLE_DEG];
+const VEIN_HALF_WIDTH = 0.018; // world. 중심에서 이 폭, 끝으로 갈수록 좁아진다
+const VEIN_TAPER = 0.6; // 끝에서 (1-이 값)배 폭
+
+function paintVeinTexture(): THREE.CanvasTexture {
+  const body: readonly [number, number, number] = [(BODY_COLOR >> 16) & 0xff, (BODY_COLOR >> 8) & 0xff, BODY_COLOR & 0xff];
+  const vein: readonly [number, number, number] = [(VEIN_COLOR >> 16) & 0xff, (VEIN_COLOR >> 8) & 0xff, VEIN_COLOR & 0xff];
+  const rays = VEIN_ANGLES_DEG.map((d) => (d * Math.PI) / 180);
+
+  return bakeTexture(TEX_SIZE, (ctx, size) => {
+    const img = ctx.createImageData(size, size);
+    for (let py = 0; py < size; py++) {
+      // CanvasTexture 기본 flipY=true — 캔버스 맨 윗줄(py=0)이 메시 V=1이다(fig.ts 실측 관례).
+      const v = 1 - (py + 0.5) / size;
+      for (let px = 0; px < size; px++) {
+        const u = (px + 0.5) / size;
+        const localX = (u - 0.5) * UV_SPAN;
+        const localZ = (v - 0.5) * UV_SPAN;
+        const dist = Math.hypot(localX, localZ);
+        const theta = Math.atan2(localZ, localX); // uvLeafLocal과 같은 관례(x=cos, z=sin)
+        const halfWidth = VEIN_HALF_WIDTH * (1 - VEIN_TAPER * Math.min(1, dist / LEAF_RADIUS));
+        let onVein = false;
+        for (const phi of rays) {
+          // 광선까지의 수직거리 — 반대쪽 반평면(cos<0)은 제외해야 잎맥이 양방향으로 안 뻗는다.
+          const d = theta - phi;
+          if (Math.cos(d) <= 0) continue;
+          if (dist * Math.abs(Math.sin(d)) < halfWidth) {
+            onVein = true;
+            break;
+          }
+        }
+        const c = onVein ? vein : body;
+        const o = (py * size + px) * 4;
+        img.data[o] = c[0];
+        img.data[o + 1] = c[1];
+        img.data[o + 2] = c[2];
+        img.data[o + 3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+  });
 }
 
 interface CandyDef {
@@ -206,7 +273,8 @@ const CANDIES: readonly CandyDef[] = [
 
 export const createMaple: IngredientBuilder = () => {
   const rimMat = stdMaterial({ color: RIM_COLOR });
-  const bodyMat = stdMaterial({ color: BODY_COLOR });
+  // 텍스처가 색을 싣는다 — color는 흰색으로 두고 곱셈을 항등으로(lemon.ts 과육 패턴).
+  const bodyMat = stdMaterial({ map: paintVeinTexture(), color: 0xffffff });
 
   const group = new THREE.Group();
   for (const def of CANDIES) {

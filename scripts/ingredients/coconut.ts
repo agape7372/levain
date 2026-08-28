@@ -128,6 +128,9 @@ interface ShredCategory {
   tipToast: boolean;
 }
 
+// v6: 통토스트 0.15 -> 0.11, 끝토스트 0.35 -> 0.32 (합 0.50 -> 0.43). 밝은 hex로 갈아탄
+// 만큼만 비중을 덜었다 — 프롬프트가 통짜 갈색은 "a few"라고 못박고 있고, 가닥 수가 54 -> 70으로
+// 늘어 **절대 개수**(27 -> 30)는 오히려 유지된다. 배경 대비를 지키는 건 개수 쪽이다.
 function pickCategory(rng: () => number): ShredCategory {
   const r = rng();
   // 레퍼런스 갈색 화소 ~9–18%. 채움은 아이보리 원판이므로 가닥 끝이 테스타를 맡는다.
