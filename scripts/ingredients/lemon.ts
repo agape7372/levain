@@ -230,13 +230,11 @@ const NORMAL_GAP = 0.56;
 interface SliceDef {
   uv: readonly [number, number];
   roll: number;
-  /** 눕힘 각 (rad, 0=수평). a·b가 다르다 — 위 v4 주석. */
-  tilt: number;
 }
 
 const SLICES: Record<'a' | 'b', SliceDef> = {
-  a: { uv: [-0.28, 0.3], roll: 0, tilt: TILT_A },
-  b: { uv: [0.28, -0.3], roll: 0.314, tilt: TILT_B },
+  a: { uv: [-LATERAL / 2, -NORMAL_GAP / 2], roll: 0 },
+  b: { uv: [LATERAL / 2, NORMAL_GAP / 2], roll: 0.314 },
 };
 
 function buildSlice(): { rindGeo: THREE.BufferGeometry; pulpBottomGeo: THREE.BufferGeometry; pulpTopGeo: THREE.BufferGeometry } {
@@ -290,7 +288,7 @@ export const createLemon: IngredientBuilder = (_rng) => {
     sub.add(new THREE.Mesh(rindGeo, rindMat), new THREE.Mesh(pulpBottomGeo, pulpMat), new THREE.Mesh(pulpTopGeo, pulpMat));
     sub.quaternion
       .setFromAxisAngle(AXIS_Y, YAW)
-      .multiply(new THREE.Quaternion().setFromAxisAngle(AXIS_X, def.tilt))
+      .multiply(new THREE.Quaternion().setFromAxisAngle(AXIS_X, TILT))
       .multiply(new THREE.Quaternion().setFromAxisAngle(AXIS_Y, def.roll));
     sub.position.set(def.uv[0] * LAT[0] + def.uv[1] * OUT[0], 0, def.uv[0] * LAT[1] + def.uv[1] * OUT[1]);
 

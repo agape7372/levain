@@ -246,62 +246,6 @@ function paintFleshTexture(rng: () => number): THREE.CanvasTexture {
   });
 }
 
-/**
- * 자른 원판 조각 — 윗면(살, 법선 정확히 +Y) + 테두리·아랫면(껍질).
- * 프로필 4점 = 아랫극·아랫림·윗림·윗극. 극과 림의 높이를 같게 둬 buildRevolvedShell의 극 팬
- * 분기가 그대로 평평한 원판 뚜껑이 된다(몸통 절단면과 같은 트릭 — CRIB "같은 높이의 극+림 두 점").
- * 생성 순서가 아랫면 팬 SEG · 옆 테두리 2·SEG · 윗면 팬 SEG라 윗면만 sliceTriangles로 가른다.
- */
-function buildSlice(rng: () => number): { fleshGeo: THREE.BufferGeometry; skinGeo: THREE.BufferGeometry } {
-  const { geometry, ringStart } = buildRevolvedShell(
-    [
-      [0, -1],
-      [1, -1],
-      [1, 1],
-      [0, 1],
-    ],
-    SLICE_SEGMENTS,
-    SLICE_HALF_THICKNESS,
-    () => [SLICE_RADIUS, SLICE_RADIUS],
-  );
-
-  // 테두리 두 링(1·2)에만 저주파 혹 — 두 링에 같은 각도 함수를 먹여 윤곽이 정원을 벗어나되
-  // 옆벽은 수직으로 남는다(링마다 다르게 주면 테두리가 비틀린다). 극점은 반지름 0이라 제외.
-  const pos = geometry.attributes.position as THREE.BufferAttribute;
-  const phase = rng() * Math.PI * 2;
-  for (const ri of [1, 2]) {
-    for (let i = ringStart[ri]; i < ringStart[ri + 1]; i++) {
-      const x = pos.getX(i);
-      const z = pos.getZ(i);
-      const theta = Math.atan2(z, x);
-      const wave = Math.sin(3 * theta + phase) + 0.5 * Math.sin(5 * theta - phase);
-      const m = 1 + (SLICE_KNOB_AMP * wave) / 1.5; // /1.5 = 최대 진폭 정규화
-      pos.setXYZ(i, x * m, pos.getY(i), z * m);
-    }
-  }
-  pos.needsUpdate = true;
-
-  jitterVertices(geometry, rng, JITTER_AMP); // 두께 0.17에 진폭 0.008 — R4 여유 충분
-  const baked = facet(geometry);
-  const triCount = baked.attributes.position.count / 3;
-  const skinGeo = sliceTriangles(baked, 0, triCount - SLICE_SEGMENTS);
-  const fleshGeo = sliceTriangles(baked, triCount - SLICE_SEGMENTS, triCount);
-  uvTopPlanar(fleshGeo); // 절단면이 로컬 XZ 평면 — 몸통 절단면과 같은 정투영이라 텍스처를 공유한다
-  uvTopPlanar(skinGeo);
-  for (const g of [skinGeo, fleshGeo]) g.translate(SLICE_OFFSET_X, 0, SLICE_OFFSET_Z);
-  return { fleshGeo, skinGeo };
-}
-
-/** 조각들을 공유 지면 y=0에 앉힌다(R1 "뜨는 파트 금지") — 회전을 다 구운 뒤 bbox를 재서 내린다. */
-function groundPiece(geos: readonly THREE.BufferGeometry[]): void {
-  const box = new THREE.Box3();
-  for (const g of geos) {
-    g.computeBoundingBox();
-    box.union(g.boundingBox as THREE.Box3);
-  }
-  for (const g of geos) g.translate(0, -box.min.y, 0);
-}
-
 export const createSweetpotato: IngredientBuilder = (rng) => {
   const { geometry, skinTriCount, capTriCount, ringStart } = buildHalfShell(PROFILE, SEGMENTS, RADIUS, HALF_LENGTH);
 
@@ -336,10 +280,6 @@ export const createSweetpotato: IngredientBuilder = (rng) => {
   capGeo.rotateY(ROTATE_Y);
   skinGeo.rotateX(ROTATE_X);
   skinGeo.rotateY(ROTATE_Y);
-  groundPiece([skinGeo, capGeo]);
-
-  const slice = buildSlice(rng);
-  groundPiece([slice.skinGeo, slice.fleshGeo]);
 
   // 공유 지면 y=0 (R1). 런타임이 bbox 중심으로 다시 정규화하므로 샷 프레이밍에는 영향 0.
   const box = new THREE.Box3().setFromBufferAttribute(skinGeo.attributes.position as THREE.BufferAttribute);
@@ -349,14 +289,11 @@ export const createSweetpotato: IngredientBuilder = (rng) => {
   capGeo.translate(0, ground, 0);
 
   const skinMat = stdMaterial({ color: SKIN_COLOR });
-  // 텍스처 1장을 두 절단면이 공유한다 — 머티리얼 인스턴스가 같아야 mergeByMaterial이 mesh 2개로 접는다.
   const fleshMat = stdMaterial({ map: paintFleshTexture(rng), color: 0xffffff });
 
   const group = new THREE.Group();
   group.add(new THREE.Mesh(skinGeo, skinMat));
   group.add(new THREE.Mesh(capGeo, fleshMat));
-  group.add(new THREE.Mesh(slice.skinGeo, skinMat));
-  group.add(new THREE.Mesh(slice.fleshGeo, fleshMat));
 
   return mergeByMaterial(group);
 };

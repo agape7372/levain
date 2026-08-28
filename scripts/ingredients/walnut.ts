@@ -11,7 +11,7 @@
 // 림 버킷으로 분리(sliceTriangles). 호두는 방사대칭이 아니라 골 축(로컬 Z) 양측대칭.
 import * as THREE from 'three';
 import type { IngredientBuilder } from './types';
-import { buildRevolvedShell, facet, mergeByMaterial, sliceTriangles, stdMaterial, uvDome } from '../breads/lib';
+import { buildRevolvedShell, facet, jitterVertices, mergeByMaterial, sliceTriangles, stdMaterial, uvDome } from '../breads/lib';
 
 // 팔레트 — assets/prompts/ingredients/walnut.json geometry.surface 손 전사 (JSON import 금지, types.ts §7).
 // "#9A6E42"(원문: 골 안쪽)은 **자른면** 색으로 재배치 — 골은 N·L 감쇠가 이미 어둡게 만든다.
@@ -67,16 +67,6 @@ function reliefWeight(hFrac: number, rFrac: number): number {
   return hUp * hDown * inward;
 }
 
-/** 주름 전용 추가 감쇠 — 크라운(h 0.60~0.90)에서 0으로 죽인다.
- * ★v4.2: r2에서도 크라운에 **소용돌이 주름**이 남았다. 원인은 골(cos 2θ)이 아니라 주름 필드다:
- * 위상에 hFrac이 섞여 있어(사행 목적) 극점으로 갈수록 5·9주기 마루가 회전하면서 수렴한다 —
- * 반지름이 0으로 줄어드는 링에서 그 회전이 소용돌이로 보인다.
- * 크라운에서 주름만 끄면 남는 변조는 **매끈한 2주기 골뿐**이라 안장(saddle)으로 깔끔하게 닫힌다.
- * 실제 호두도 접힘은 옆구리에 몰려 있고 두 엽의 꼭대기는 매끈하다 — 레퍼런스와도 맞다. */
-function wrinkleFalloff(hFrac: number): number {
-  return 1 - smoothstep(0.6, 0.9, hFrac);
-}
-
 function smoothstep(edge0: number, edge1: number, x: number): number {
   const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
   return t * t * (3 - 2 * t);
@@ -92,39 +82,6 @@ function wrinkleField(theta: number, hFrac: number): number {
 // 요 — 레퍼런스(walnut.png)는 골이 대각선. az 0/180이 두 엽을 보게 구워 둔다. 바꾸지 마라.
 const YAW_RADIANS = (-32 * Math.PI) / 180;
 
-/**
- * 링별로 진폭을 조절하는 지터. lib.jitterVertices와 rng 소비 순서(정점당 3회)가 같다.
- * ★v4.2: 크라운의 **소용돌이/별 주름**의 진짜 원인이 여기였다. types.ts R2가 경고하는
- * "지터 진폭 > 극 근처 링의 컬럼 간격" 조건을 이 재료가 정확히 밟고 있었다:
- * 40세그먼트에서 rFrac 0.30 링의 컬럼 간격은 2π·(0.30·0.52)/40 ≈ 0.024인데 진폭이 0.012라
- * 이웃 정점끼리 자리를 넘나들 만큼 흔들렸다. 몸통에서는 같은 진폭이 페이셋 결로 잘 보인다 —
- * **한 값으로 통일할 수 없는 문제**라 링 반지름에 비례해 상한을 건다(간격의 35%).
- * 극점(반지름 0)은 팬 40장의 공유 꼭짓점이라 아예 제외한다(poppyseed의 jitterExceptPoles 선례).
- * rng는 극점에서도 소비해 시드 스트림을 단순하게 유지한다.
- */
-function jitterTapered(geometry: THREE.BufferGeometry, ringStart: readonly number[], rng: () => number): void {
-  const pos = geometry.attributes.position as THREE.BufferAttribute;
-  const ampByVertex = new Float64Array(pos.count);
-  for (let ri = 0; ri < PROFILE.length; ri++) {
-    const rFrac = PROFILE[ri][0];
-    if (rFrac <= 1e-6) continue; // 극점 — amp 0으로 남긴다
-    const meanRadius = rFrac * 0.5 * (RADIUS_X + RADIUS_Z);
-    const columnSpacing = (2 * Math.PI * meanRadius) / SEGMENTS;
-    const amp = Math.min(JITTER_AMP, 0.35 * columnSpacing);
-    for (let s = 0; s < SEGMENTS; s++) ampByVertex[ringStart[ri] + s] = amp;
-  }
-  for (let i = 0; i < pos.count; i++) {
-    const amp = ampByVertex[i];
-    pos.setXYZ(
-      i,
-      pos.getX(i) + (rng() - 0.5) * 2 * amp,
-      pos.getY(i) + (rng() - 0.5) * 2 * amp,
-      pos.getZ(i) + (rng() - 0.5) * 2 * amp,
-    );
-  }
-  pos.needsUpdate = true;
-}
-
 function buildWalnut(rng: () => number): { kernelGeo: THREE.BufferGeometry; rimGeo: THREE.BufferGeometry } {
   const { geometry, ringStart } = buildRevolvedShell(PROFILE, SEGMENTS, HEIGHT_SCALE, () => [RADIUS_X, RADIUS_Z]);
   const pos = geometry.attributes.position as THREE.BufferAttribute;
@@ -135,17 +92,16 @@ function buildWalnut(rng: () => number): { kernelGeo: THREE.BufferGeometry; rimG
     if (rFrac <= 1e-6) continue;
     const weight = reliefWeight(hFrac, rFrac);
     if (weight <= 0) continue;
-    const wrinkleWeight = weight * wrinkleFalloff(hFrac);
     const base = ringStart[ri];
     for (let s = 0; s < SEGMENTS; s++) {
       const t = (s / SEGMENTS) * Math.PI * 2;
       const c2t = Math.cos(2 * t);
       const wr = wrinkleField(t, hFrac);
       const idx = base + s;
-      const radialScale = 1 + c2t * GROOVE_RADIAL_AMP * weight + wr * WRINKLE_RADIAL_AMP * wrinkleWeight;
+      const radialScale = 1 + (c2t * GROOVE_RADIAL_AMP + wr * WRINKLE_RADIAL_AMP) * weight;
       pos.setX(idx, pos.getX(idx) * radialScale);
       pos.setZ(idx, pos.getZ(idx) * radialScale);
-      pos.setY(idx, pos.getY(idx) + c2t * GROOVE_AMP * weight + wr * WRINKLE_Y_AMP * wrinkleWeight);
+      pos.setY(idx, pos.getY(idx) + (c2t * GROOVE_AMP + wr * WRINKLE_Y_AMP) * weight);
     }
   }
 
