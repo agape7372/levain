@@ -77,6 +77,19 @@ export interface GameApi {
   /** 첫 재료 선물 받기 — 이미 받았으면 false */
   claimStarterGift(id: IngredientId): boolean;
 
+  // ── 보상형 광고 (확장기획 §10) — 전부 사용자 선택형, 슬롯 1종(재료 배송)만 v1 구현 ──
+  ads: {
+    /** SDK 탑재 여부 — false면 UI가 슬롯 자체를 숨긴다(버전 스큐 방어) */
+    available(): boolean;
+    /** 오늘 남은 배송 횟수 (전체 하루 상한과 슬롯 상한 중 낮은 쪽) */
+    deliveryRemaining(): number;
+    /**
+     * 광고 시청 → 성공하면 재료 1개 지급. 시청 실패·취소·상한 도달은 null(무차감 — §10 금지 목록).
+     * 시청과 지급 사이에 시간이 걸리므로 Promise — UI는 로딩 상태를 스스로 관리한다.
+     */
+    watchForDelivery(): Promise<IngredientId | null>;
+  };
+
   /** 개발자 모드 (설정 버전 7탭 — 사용자 본인 치트. 배선은 app.ts) */
   dev: {
     matureActive(): void;

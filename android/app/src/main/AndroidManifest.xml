@@ -28,6 +28,11 @@
             android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
+        <!-- AdMob — 실 앱 ID는 사용자 발급 게이트. 테스트 App ID(Google 공식)로 시작,
+             교체 전까지는 광고 요청이 전부 테스트 모드로만 동작한다 (2026-08-30, 확장기획 §10) -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/admob_app_id" />
     </application>
 
     <!-- Permissions -->

@@ -505,6 +505,54 @@ export function createRecipesScreen(
     intro.textContent = copy.economy.exchangeIntro;
     wrapEl.appendChild(intro);
 
+    // 광고 배송 — SDK 없으면(웹·구셸) 행 자체가 없다. 버전 스큐 방어(2026-08-30, 확장기획 §10)
+    if (api.ads.available()) {
+      const adRow = document.createElement('div');
+      adRow.className = 'option-item exchange-row';
+      const adTexts = document.createElement('span');
+      adTexts.className = 'exchange-texts';
+      const adLabel = document.createElement('span');
+      adLabel.textContent = copy.economy.adDeliveryTitle;
+      const adHint = document.createElement('span');
+      adHint.className = 'hint';
+      adTexts.append(adLabel, adHint);
+      const adBtn = document.createElement('button');
+      adBtn.type = 'button';
+      adBtn.className = 'btn btn-primary btn-slim';
+      adRow.append(adTexts, adBtn);
+      wrapEl.appendChild(adRow);
+
+      const paintAdRow = (): void => {
+        const remaining = api.ads.deliveryRemaining();
+        adHint.textContent = remaining > 0
+          ? copy.economy.adDeliveryRemaining(remaining)
+          : copy.economy.adDeliveryDone;
+        const locked = remaining <= 0;
+        adBtn.classList.toggle('is-locked', locked);
+        adBtn.setAttribute('aria-disabled', String(locked));
+        adBtn.textContent = copy.economy.adDeliveryTitle;
+      };
+      adBtn.addEventListener('click', () => {
+        if (api.ads.deliveryRemaining() <= 0) {
+          toast(copy.economy.adDeliveryDone);
+          return;
+        }
+        adBtn.disabled = true;
+        adBtn.textContent = copy.economy.adDeliveryWatching;
+        void api.ads.watchForDelivery().then((id) => {
+          adBtn.disabled = false;
+          paintAdRow();
+          if (id === null) {
+            toast(copy.economy.adDeliveryFailed);
+            return;
+          }
+          toast(copy.economy.adDeliveryGot(copy.recipes.ingredientNames[id]));
+          paint();
+        });
+      });
+      paintAdRow();
+    }
+
     const list = document.createElement('div');
     list.className = 'option-list';
     list.style.marginTop = '12px';

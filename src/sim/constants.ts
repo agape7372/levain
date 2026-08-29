@@ -148,6 +148,17 @@ export const NOTIFY_SLOT_DORMANT = 2;
 export const NOTIFY_SLOT_MOLD = 3; // 곰팡이 임박 경고 — 정확히 1건
 export const NOTIFY_SLOT_PEAK = 4; // 한창때 — 옵트인(설정 기본 off)일 때만 존재하는 4번째 슬롯
 
+// ── 보상형 광고 (확장기획 §10 — A/B 시작 가설값, 확정 아님) ──────────────────
+// 전부 사용자 선택형. 슬롯별 하루 상한 + 전체 하루 상한. 세션 상한(2회)은 저장이 아니라
+// 앱 세션 개념이라 platform/ads.ts 모듈 상태가 든다.
+export const AD_SLOT_DAILY = {
+  delivery: 3, // 재료 배송 — 광고 1회 = 재료 1개 (v1 유일 구현 슬롯)
+  // recovery: 1, hint: 1, dryBoost: — §10의 나머지 슬롯은 sim 액션 신설이 필요해 후속 라운드
+} as const;
+export const AD_TOTAL_DAILY = 5;
+export const AD_SESSION_CAP = 2;
+export const AD_LEDGER_KEEP_D = 7; // 원장 보존 일수 — 상한 산수엔 오늘치만 필요, 여유 7일
+
 /** 부피(fill) — 급여 시점=1.0 기준 */
 export const FILL_MIN = 0.6;
 export const FILL_MAX = 1.6;

@@ -333,6 +333,14 @@ export const copy = {
     atCap: (cap: number) => `이 재료는 ${cap}개까지 둘 수 있어요`,
     bought: (name: string) => `${name} 1개를 가져왔어요`,
     sold: (n: number) => `가루 ${n}개로 바꿨어요`,
+    // 재료 배송(확장기획 §10) — 전부 사용자 선택형. "무료"라고 안 하는 이유: 광고를 대가로
+    // 말하는 게 정직하다(죄책감 유발 없이, 담백하게 "영상 보고" 정도로).
+    adDeliveryTitle: '영상 보고 재료 받기',
+    adDeliveryRemaining: (n: number) => `오늘 ${n}번 더 받을 수 있어요`,
+    adDeliveryDone: '오늘은 다 받았어요. 내일 다시 와 주세요',
+    adDeliveryWatching: '재생 중…',
+    adDeliveryFailed: '영상을 불러오지 못했어요',
+    adDeliveryGot: (name: string) => `${name}을(를) 선물로 받았어요`,
     noStock: '바꿀 재료가 없어요',
     missionsTitle: '가루 모으기',
     missionsIntro: '지금까지의 횟수는 그대로 쌓여요',
@@ -386,6 +394,7 @@ export const copy = {
     quietTo: '끝',
     exportSave: '기록 내보내기',
     importSave: '기록 불러오기',
+    privacy: '개인정보처리방침',
     reset: '처음부터 다시 시작',
     resetConfirm: '지금까지의 기록이 모두 사라져요. 정말 다시 시작할까요?',
     resetConfirm2: '구운 빵 기록도 함께 사라져요. 마지막으로 한 번 더 확인해요',

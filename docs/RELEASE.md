@@ -98,6 +98,22 @@ npx @capacitor/assets generate --android \
 - key.properties의 storePassword/keyPassword 둘 다 채울 것 — 하나라도 비면
   "Given final block not properly padded".
 
+## 6-2. AdMob (2026-08-30 도입 — 확장기획 §10)
+
+`@capacitor-community/admob` 8.1.0. **네이티브 SDK라 OTA로 못 나간다** — 새 AAB + 심사가 전제.
+이후의 슬롯 배치·상한 수치 조정은 웹 레이어라 OTA 가능.
+
+- **`AndroidManifest.xml`에 `com.google.android.gms.ads.APPLICATION_ID` meta-data가 없으면
+  앱이 시작 즉시 크래시한다.** 지금은 `@string/admob_app_id`(strings.xml)를 가리키고,
+  값은 **Google 공식 테스트 App ID**다. 실 ID 발급(AdMob 콘솔)은 사용자 게이트 —
+  발급되면 `strings.xml`의 `admob_app_id`와 `src/platform/ads.ts`의 `REWARDED_AD_ID` 둘 다 교체.
+- **`Capacitor.isPluginAvailable('AdMob')` 단독 판정 금지** — 이 플러그인은 웹 스텁을 등록해서
+  브라우저에서도 true다(2026-08-30 실측으로 잡음). `isNative() &&` 를 앞에 둔다.
+- 광고를 켠 AAB를 올리기 전에 **Data Safety·앱 콘텐츠 폼을 먼저 갱신**할 것
+  (`docs/STORE_LISTING.md` 2026-08-30 개정판: 광고 있음·광고 ID 사용·기기 ID 공유).
+  처리방침도 게시본(`ota/privacy.html`)까지 같이 배포해야 앱 내 링크와 어긋나지 않는다.
+- SSV 미사용(백엔드 0) — 클라이언트 보상. 콘솔에서 SSV 설정을 켜지 말 것.
+
 ## 7. Play Console 내부테스트 제출물 체크리스트
 
 - [ ] 서명 AAB (`bundleRelease` + keystore)

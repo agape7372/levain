@@ -3,7 +3,7 @@
 // NaN·범위 밖 숫자는 버리지 않고 clamp로 살린다 — 필드 하나 때문에 기록 전체를 잃지 않는다.
 // 파싱 순서: JSON.parse → migrate(raw) → validateAndClamp(현행 스키마) — 마이그레이션이
 // 검증보다 먼저다. 구버전 저장본이 신버전 가드에 걸려 null(새 게임)이 되는 사고 방지.
-import type { BakeGrade, CollectionEntry, FeedRatio, Flour, Location, SimState } from '../sim';
+import type { AdGrant, BakeGrade, CollectionEntry, FeedRatio, Flour, Location, SimState } from '../sim';
 import { RATIOS, TEMP_MULT } from '../sim';
 // MASS_MAX·ACID_MAX는 sim/index.ts가 재수출하지 않는데 sim/**는 M2 범위 밖(수정 금지)이다.
 // 범위 수치를 여기에 하드코딩하지 않기 위해(CLAUDE.md 규칙 9) constants에서 직접 가져온다.
@@ -61,6 +61,8 @@ export interface SharedState {
   inventory: Record<IngredientId, number>;
   /** 무료 경제 카운터 (§9 Phase 7) — 키 부재 = 전부 0 (inventory와 같은 무버전 착륙) */
   economy: EconomyState;
+  /** 광고 지급 원장 (확장기획 §10) — 키 부재 = [] (무버전 추가 키, 2026-08-30) */
+  ads: AdGrant[];
   /**
    * 보관 통 (GDD §6-2) — 떼어낸 르방의 총 그램. 빵 원가가 여기서 나간다.
    * 전역인 이유: 도감·재료와 같은 층이라 르방을 바꿔도 같은 통이다.
@@ -174,7 +176,7 @@ function economyOf(v: unknown): EconomyState {
 /** 전역(집) 소유 상태 — 하위 키가 없으면 기본값 (inventory가 예고대로 무이행 착륙, flour 패턴) */
 function sharedOf(v: unknown): SharedState {
   if (!isObject(v)) {
-    return { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0 };
+    return { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0, ads: [] };
   }
   return {
     collection: collectionOf(v.collection),
@@ -184,7 +186,23 @@ function sharedOf(v: unknown): SharedState {
     // 옛 클라이언트가 이 저장본을 읽어도 미지 키만 버리고 살아남게 한다(위 economyOf 주석).
     // 선물 적립을 안 하는 이유: mass가 "아직 안 뗀 예치금"이라 떼어내기 한 번이면 그대로 들어온다.
     pantry: Math.round(num(v.pantry, 0, PANTRY_MAX, 0)),
+    // 광고 지급 원장 — 같은 등급의 무버전 추가 키(2026-08-30, 확장기획 §10 멱등성).
+    // 불량 줄은 개별로 버린다 — 원장이 깨져도 상한 산수가 0에서 다시 시작할 뿐이다.
+    ads: adsOf(v.ads),
   };
+}
+
+function adsOf(v: unknown): AdGrant[] {
+  if (!Array.isArray(v)) return [];
+  const out: AdGrant[] = [];
+  for (const g of v) {
+    if (!isObject(g)) continue;
+    if (typeof g.slot !== 'string' || g.slot.length === 0 || g.slot.length > 32) continue;
+    const at = num(g.at, 0, Number.MAX_SAFE_INTEGER, -1);
+    if (at < 0) continue;
+    out.push({ slot: g.slot, at });
+  }
+  return out.slice(-200); // 폭주 방어 — 상한 산수엔 최근분이면 충분
 }
 
 function settingsOf(v: unknown): SaveSettings {

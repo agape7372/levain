@@ -4,4 +4,6 @@
     <string name="title_activity_main">르방이</string>
     <string name="package_name">com.zaballgam.levain</string>
     <string name="custom_url_scheme">com.zaballgam.levain</string>
+    <!-- Google 공식 테스트 App ID — 실 ID 발급(AdMob 콘솔)은 사용자 게이트, 교체 전까지 테스트 광고만 -->
+    <string name="admob_app_id">ca-app-pub-3940256099942544~3347511713</string>
 </resources>

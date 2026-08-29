@@ -33,7 +33,8 @@ import { createShowcaseScreen } from './ui/screens/showcase';
 import { mountOnboarding } from './ui/screens/onboarding';
 import { openStarterGift } from './ui/components/ingredientPicker';
 import type { GameApi } from './ui/gameApi';
-import { LABEL_STAGE, RECIPES, INGREDIENTS } from './sim';
+import { LABEL_STAGE, RECIPES, INGREDIENTS, adRemaining } from './sim';
+import { adsAvailable, showRewarded } from './platform/ads';
 import { basesCompleted, missionViews } from './store/economy';
 import type { BakeGrade, SimEvent } from './sim';
 
@@ -170,6 +171,16 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     buyIngredient: (id) => store.buyIngredient(id),
     exchangeIngredient: (id) => store.exchangeIngredient(id),
     claimStarterGift: (id) => store.claimStarterGift(id),
+
+    ads: {
+      available: () => adsAvailable(),
+      deliveryRemaining: () => adRemaining(store.getAdLedger(), clock.now(), 'delivery'),
+      watchForDelivery: async () => {
+        const result = await showRewarded();
+        if (result !== 'rewarded') return null;
+        return store.adDeliveryReward();
+      },
+    },
 
     dev: {
       matureActive: () => store.devMatureActive(),

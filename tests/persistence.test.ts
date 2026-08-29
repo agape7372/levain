@@ -22,7 +22,7 @@ function envelopeAt(now = T0): SaveEnvelope {
     starters: [{ id: 's1', name: null, ordinal: 1, sim: initialState(now) }],
     activeStarterId: 's1',
     nextStarterOrdinal: 2,
-    shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0 },
+    shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0, ads: [] },
     settings: { muted: true, haptics: false, notifyEnabled: true, notifyPeak: false, quietStartH: 22, quietEndH: 8 },
     flags: { onboarded: true, pendingBake: { recipeId: 'loaf', grade: 'best' }, retapHints: 0 },
   };
@@ -147,7 +147,7 @@ describe('validateAndClamp — 있는데 불량이면 살린다', () => {
     expect(env?.settings).toEqual({ muted: false, haptics: true, notifyEnabled: true, notifyPeak: false, quietStartH: 22, quietEndH: 8 });
     expect(env?.flags).toEqual({ onboarded: false, pendingBake: null, retapHints: 0 });
     expect(env?.shared).toEqual({
-      collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0,
+      collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0, ads: [],
     });
     expect(env?.activeStarterId).toBe('s1'); // 없는 activeStarterId → 첫 르방
     expect(env?.nextStarterOrdinal).toBe(2); // max(ordinal)+1 바닥

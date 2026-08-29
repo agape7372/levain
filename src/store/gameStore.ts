@@ -6,14 +6,15 @@
 // 멀티는 전부 이 층에서 — 활성 르방만 advance/dispatch하고, 비활성은 닫힌 함수 모델
 // 덕분에 그냥 둔다(전환 시 advance 1회면 정산 끝). 백그라운드 시뮬 0.
 import type {
-  Action, BriefingKey, CollectionEntry, IngredientId, NotifyPlan, SimEvent, SimState, Snapshot,
+  Action, AdGrant, BriefingKey, CollectionEntry, IngredientId, NotifyPlan, SimEvent, SimState, Snapshot,
 } from '../sim';
 import {
   LABEL_STAGE, REWIND_TOLERANCE_MS, STARTER_SLOTS_FREE,
   advance, applyAction, betterGrade, deriveBriefing, deriveSnapshot, initialState,
   isPlayable, planNotificationsAll, playableRules, reanchor, ruleByVariantId, stageOf,
   RECIPES, variantIdOf, DAY, INGREDIENT_SOFT_CAP, INGREDIENT_FLOUR_COST,
-  canBakeBread, recipeById, PANTRY_MAX,
+  canBakeBread, recipeById, PANTRY_MAX, INGREDIENTS,
+  canWatchAd, recordAdGrant,
 } from '../sim';
 import type { Clock } from '../platform/clock';
 import type { StorageAdapter } from '../platform/storage';
@@ -81,6 +82,15 @@ export interface GameStore {
   exchangeIngredient(id: IngredientId): boolean;
   /** 첫 재료 선물 1개 (온보딩 §9) — 이미 받았으면 false. 기존 저장본도 1회 받는다 */
   claimStarterGift(id: IngredientId): boolean;
+  /** 광고 지급 원장 (확장기획 §10) — 읽기 전용, 상한 산수는 sim/ads.ts 순수 함수로 */
+  getAdLedger(): AdGrant[];
+  /**
+   * 재료 배송 보상 (§10 슬롯 1) — 상한 확인 → 원장 기록 + 재료 1 지급을 같은 persist에 커밋.
+   * 지급 경로는 grantInto 재사용(소프트캡·자동 환전 규칙 우회 없음). 대상은 캡 미만 재료 중
+   * 미보유(0개) 우선 랜덤 — "신규 보장(가능한 경우)"의 최소 구현. 지급 불가면 null·무기록.
+   */
+  adDeliveryReward(): IngredientId | null;
+
   /**
    * 변형 굽기 (§8-2 해금 공식) — 원자적: 첫 굽기 = 재료 1 차감 + 도감 발견이 같은
    * dispatch(persist 1회) 안에서 커밋. 발견된 변형 재굽기는 재료 재소비 없음(mass만).
@@ -122,7 +132,7 @@ export function newEnvelope(now: number): SaveEnvelope {
     starters: [{ id: 's1', name: null, ordinal: 1, sim: initialState(now) }],
     activeStarterId: 's1',
     nextStarterOrdinal: 2,
-    shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0 },
+    shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0, ads: [] },
     settings: defaultSettings(),
     flags: defaultFlags(),
   };
@@ -385,6 +395,27 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     getCollection: () => env.shared.collection,
     getInventory: () => env.shared.inventory,
     getPantry: () => env.shared.pantry,
+    getAdLedger: () => env.shared.ads,
+
+    // 광고 자체(SDK·시청)는 platform 소관 — 여기는 "보상 지급"만. 호출자(app.ts)가
+    // 광고 시청 완료를 확인한 뒤에만 부른다. 상한 재확인은 여기서도 한다(캡 우회 방지 —
+    // UI 판정과 지급 판정이 다른 스냅샷을 볼 가능성을 닫는다).
+    adDeliveryReward(): IngredientId | null {
+      const now = clock.now();
+      if (canWatchAd(env.shared.ads, now, 'delivery') !== 'ok') return null;
+      // 신규 보장(가능한 경우) — 미보유(0개) 재료 중에서 우선, 없으면 캡 미만 전체에서.
+      const under = INGREDIENTS.filter((i) => (env.shared.inventory[i.id] ?? 0) < INGREDIENT_SOFT_CAP);
+      if (under.length === 0) return null;
+      const zero = under.filter((i) => (env.shared.inventory[i.id] ?? 0) === 0);
+      const pool = zero.length > 0 ? zero : under;
+      const pick = pool[Math.floor(Math.random() * pool.length)].id;
+      const before = earnedNow();
+      env = { ...env, shared: { ...env.shared, ads: recordAdGrant(env.shared.ads, now, 'delivery') } };
+      grantInto(pick, 1);
+      persist(now);
+      emit(earnEvents(before));
+      return pick;
+    },
 
     grantIngredient(id: IngredientId, count: number): void {
       const before = earnedNow();

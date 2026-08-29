@@ -5,6 +5,8 @@ export { applyAction, initialState } from './actions';
 export { deriveSnapshot, effSinceFeedMs, activityAt, phaseAt, stageOf, boundariesH, moldStageAt, clamp, smoothstep, rateMult } from './derive';
 export { planNotifications, planNotificationsAll, clampQuiet } from './notifyPlan';
 export { deriveBriefing } from './briefing';
+export { adCountsToday, adRemaining, canWatchAd, recordAdGrant, sameLocalDay } from './ads';
+export type { AdGrant, AdSlotId } from './ads';
 export * from './ingredients';
 export {
   RECIPES, recipeById, sourFit, bakeScore, gradeOf, betterGrade, canBakeBread, canBakeDiscard,
@@ -17,4 +19,5 @@ export {
   MISSION_FEED_STEP, MISSION_BAKE_STEP, MISSION_REWARD_FLOUR,
   STAGE_REWARD_FLOUR, RECIPE_REWARD_FLOUR,
   SPLIT_MIN_G, PANTRY_MAX,
+  AD_SLOT_DAILY, AD_TOTAL_DAILY, AD_SESSION_CAP,
 } from './constants';
