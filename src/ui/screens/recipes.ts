@@ -528,7 +528,10 @@ export function createRecipesScreen(
         label.textContent = copy.recipes.ingredientNames[ing.id];
         const hint = document.createElement('span');
         hint.className = 'hint';
-        hint.textContent = copy.economy.have(have);
+        // 캡 도달은 숫자만으론 안 읽힌다 — "왜 못 사는지"를 행에서 미리 말한다 (탭 토스트의 예고편)
+        hint.textContent = have >= INGREDIENT_SOFT_CAP
+          ? copy.economy.haveFull(have)
+          : copy.economy.have(have);
         const texts = document.createElement('span');
         texts.className = 'exchange-texts';
         texts.append(label, hint);

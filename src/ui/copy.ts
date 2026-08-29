@@ -308,7 +308,8 @@ export const copy = {
     /** 재료 쇼케이스 한 줄 — 호환성 데이터에서 파생한다(재료가 늘어도 문구는 안 는다) */
     ingredientHeadline: (n: number) => (n > 0 ? `빵 ${n}종에 넣을 수 있어요` : ''),
     /** 도감-재료 미발견 탭 — 도감-빵의 variantHint와 같은 자리 */
-    galleryIngredientLocked: '아직 만나지 못한 재료예요',
+    // 교환소 안내를 붙인 이유: 이 카드가 뜨는 화면 상단에 교환소 버튼이 있다 — 힌트가 바로 실행된다
+    galleryIngredientLocked: '아직 만나지 못한 재료예요 · 교환소에서 가루로 가져올 수 있어요',
     needIngredient: (name: string) => `${name}이(가) 있으면 만들 수 있어요`,
     variantConfirm: (name: string, ingredientName: string, g: number) =>
       `${name}, 처음 만들어 봐요. ${ingredientName} 1개와 르방 ${g}g을 써요`,
@@ -325,6 +326,7 @@ export const copy = {
     exchangeTitle: '재료 바꾸기',
     exchangeIntro: '가루로 원하는 재료를 가져올 수 있어요',
     have: (n: number) => `${n}개 있어요`,
+    haveFull: (n: number) => `${n}개 있어요 · 가득 찼어요`,
     buy: (cost: number) => `가루 ${cost}개로 가져오기`,
     sell: (gain: number) => `가루 ${gain}개로 바꾸기`,
     notEnough: '가루가 조금 모자라요',
@@ -354,6 +356,8 @@ export const copy = {
     dormant: '르방이 깊이 잠들었어요. 잊지 말고 깨워 주세요',
     reviveSecond: '다시 밥 줄 시간이에요',
     moldWarn: '르방이 표면에 반점이 보여요. 아직 늦지 않았어요',
+    peak: '르방이가 한창 부풀어 있어요. 지금이 굽기 좋은 때예요',
+    channelWarn: '중요 알림', // Android 채널명 — 놓치면 잃는 신호(반점·깊은 잠) 전용
     permissionHint: '밥 시간을 알려드릴까요',
     permissionSettings: '알림은 시스템 설정에서 켤 수 있어요',
   },
@@ -366,6 +370,7 @@ export const copy = {
     dormant: (_n: number) => '깊이 잠든 르방이가 있어요. 잊지 말고 깨워 주세요',
     reviveSecond: (_n: number) => '다시 밥 줄 시간이에요',
     moldWarn: (_n: number) => '표면에 반점이 보이는 르방이가 있어요. 아직 늦지 않았어요',
+    peak: (_n: number) => '한창 부풀어 있는 르방이가 있어요',
   } as Record<string, (n: number) => string>,
 
   settings: {
@@ -373,6 +378,12 @@ export const copy = {
     sound: '소리',
     haptics: '진동',
     notify: '밥 시간 알림',
+    notifyPeak: '한창때 알림',
+    quiet: '방해 없는 시간',
+    quietValue: (s: number, e: number) => (s === e ? '없음' : `${s}시부터 ${e}시까지`),
+    quietBody: '이 시간에 걸린 알림은 끝나는 시각으로 미뤄서 보내드려요',
+    quietFrom: '시작',
+    quietTo: '끝',
     exportSave: '기록 내보내기',
     importSave: '기록 불러오기',
     reset: '처음부터 다시 시작',
@@ -391,8 +402,14 @@ export const copy = {
   onboarding: {
     welcome: '밀가루와 물로 새 생명을 깨워 볼까요',
     stir: '천천히 저어 주세요',
+    stirDone: '이대로 깨우기',
     born: '르방이가 태어났어요',
     firstWeek: '첫 일주일은 매일 한두 번 밥을 주면 돼요',
+  },
+
+  a11y: {
+    // 시각 요소의 보조기술 라벨 — 화면에는 안 보인다
+    canvas: '르방이가 사는 유리병',
   },
 
   time: {

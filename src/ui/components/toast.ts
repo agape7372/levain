@@ -13,6 +13,9 @@ export function toast(text: string, ms = 2600): void {
   if (!container) {
     container = document.createElement('div');
     container.className = 'toast-container';
+    // 스크린리더 통지 — 컨테이너에 걸어야 자식 추가가 폴라이트하게 읽힌다 (2026-08-30 a11y)
+    container.setAttribute('role', 'status');
+    container.setAttribute('aria-live', 'polite');
     document.getElementById('ui-root')?.appendChild(container);
   }
   const active = Array.from(container.children).filter((c) => !c.classList.contains('evicting'));

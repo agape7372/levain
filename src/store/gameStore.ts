@@ -323,7 +323,11 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     // 알림을 끄면 빈 플랜을 밀어 예약을 걷어낸다 — 안 그러면 예약이 산 채로 남는다.
     // 전 르방 병합 플랜 (§5-6) — 슬롯 3개 그대로, 같은 슬롯은 가장 이른 시각+집계 문구
     const plan: NotifyPlan = env.settings.notifyEnabled
-      ? planNotificationsAll(env.starters.map((r) => r.sim), now)
+      ? planNotificationsAll(env.starters.map((r) => r.sim), now, {
+          peakOptIn: env.settings.notifyPeak,
+          quietStartH: env.settings.quietStartH,
+          quietEndH: env.settings.quietEndH,
+        })
       : { slots: [] };
     deps.onNotifyPlan(plan);
   }

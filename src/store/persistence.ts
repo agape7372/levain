@@ -21,6 +21,11 @@ export interface SaveSettings {
   muted: boolean;
   haptics: boolean;
   notifyEnabled: boolean;
+  /** "한창때" 옵트인 알림 — v2 무버전 추가 키(2026-08-30). 기본 off */
+  notifyPeak: boolean;
+  /** 조용시간(로컬 시각, 시 단위) — v2 무버전 추가 키. start===end면 조용시간 없음 */
+  quietStartH: number;
+  quietEndH: number;
 }
 
 export interface PendingBake {
@@ -86,6 +91,9 @@ export const defaultSettings = (): SaveSettings => ({
   muted: false,
   haptics: true,
   notifyEnabled: true,
+  notifyPeak: false,
+  quietStartH: 22, // sim/constants QUIET_START_H와 같은 값 — 저장엔 값으로 굳는다
+  quietEndH: 8,
 });
 
 export const defaultFlags = (): SaveFlags => ({ onboarded: false, pendingBake: null, retapHints: 0 });
@@ -186,6 +194,9 @@ function settingsOf(v: unknown): SaveSettings {
     muted: bool(v.muted, d.muted),
     haptics: bool(v.haptics, d.haptics),
     notifyEnabled: bool(v.notifyEnabled, d.notifyEnabled),
+    notifyPeak: bool(v.notifyPeak, d.notifyPeak),
+    quietStartH: Math.round(num(v.quietStartH, 0, 23, d.quietStartH)),
+    quietEndH: Math.round(num(v.quietEndH, 0, 23, d.quietEndH)),
   };
 }
 

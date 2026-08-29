@@ -146,6 +146,7 @@ export const QUIET_END_H = 8;
 export const NOTIFY_SLOT_FEED = 1;
 export const NOTIFY_SLOT_DORMANT = 2;
 export const NOTIFY_SLOT_MOLD = 3; // 곰팡이 임박 경고 — 정확히 1건
+export const NOTIFY_SLOT_PEAK = 4; // 한창때 — 옵트인(설정 기본 off)일 때만 존재하는 4번째 슬롯
 
 /** 부피(fill) — 급여 시점=1.0 기준 */
 export const FILL_MIN = 0.6;

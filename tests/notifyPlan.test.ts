@@ -186,3 +186,85 @@ describe('planNotificationsAll — 멀티 르방 병합 (확장기획 §5-6)', (
     expect(withAlive.slots.every((s) => s.count === undefined)).toBe(true); // 산 놈 혼자 = 병합 없음
   });
 });
+
+describe('clampQuiet — 사용자 설정 조용시간 (2026-08-30)', () => {
+  it('낮 창(9~18): 10:00은 당일 18:00으로', () => {
+    const at = local(2024, 0, 15, 10, 0);
+    expect(clampQuiet(at, 9, 18)).toBe(local(2024, 0, 15, 18, 0));
+  });
+
+  it('낮 창(9~18): 08:59·18:00은 그대로', () => {
+    const a = local(2024, 0, 15, 8, 59);
+    const b = local(2024, 0, 15, 18, 0);
+    expect(clampQuiet(a, 9, 18)).toBe(a);
+    expect(clampQuiet(b, 9, 18)).toBe(b);
+  });
+
+  it('start === end: 조용시간 없음 — 모든 시각 그대로', () => {
+    const at = local(2024, 0, 15, 23, 30);
+    expect(clampQuiet(at, 8, 8)).toBe(at);
+  });
+
+  it('밤 창 커스텀(23~7): 22:30은 그대로, 23:30은 다음날 07:00', () => {
+    expect(clampQuiet(local(2024, 0, 15, 22, 30), 23, 7)).toBe(local(2024, 0, 15, 22, 30));
+    expect(clampQuiet(local(2024, 0, 15, 23, 30), 23, 7)).toBe(local(2024, 0, 16, 7, 0));
+  });
+});
+
+describe('피크 옵트인 슬롯 (2026-08-30, 설정 기본 off)', () => {
+  it('옵트인 없으면 피크 슬롯 없음 — 기존 3슬롯 그대로', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const plan = planNotifications(initialState(t0), t0);
+    expect(plan.slots.some((sl) => sl.copyKey === 'peak')).toBe(false);
+    expect(plan.slots.length).toBe(3);
+  });
+
+  it('옵트인: 피크 슬롯 at = peakStart(4.5h) 시각, id 4', () => {
+    const t0 = local(2024, 0, 15, 6, 0); // 피크 10:30 — 조용시간 밖
+    const plan = planNotifications(initialState(t0), t0, { peakOptIn: true });
+    const peak = plan.slots.find((sl) => sl.copyKey === 'peak');
+    expect(peak).toBeDefined();
+    expect(peak!.id).toBe(4);
+    expect(peak!.at).toBe(t0 + 4.5 * HOUR);
+    expect(plan.slots.length).toBe(4);
+  });
+
+  it('★클램프가 밴드를 지나치면 스킵 — 19시 급여: 피크 23:30이 조용시간, 밀면 08:00 > 밴드 끝 01:00', () => {
+    const t0 = local(2024, 0, 15, 19, 0);
+    const plan = planNotifications(initialState(t0), t0, { peakOptIn: true });
+    expect(plan.slots.some((sl) => sl.copyKey === 'peak')).toBe(false);
+  });
+
+  it('클램프가 밴드 안에 떨어지면 민 시각을 쓴다 — 23시 급여+조용 3~4시: 03:30→04:00 < 밴드 끝 05:00', () => {
+    const t0 = local(2024, 0, 15, 23, 0);
+    const plan = planNotifications(initialState(t0), t0, { peakOptIn: true, quietStartH: 3, quietEndH: 4 });
+    const peak = plan.slots.find((sl) => sl.copyKey === 'peak');
+    expect(peak).toBeDefined();
+    expect(peak!.at).toBe(local(2024, 0, 16, 4, 0));
+  });
+
+  it('냉장에선 옵트인해도 피크 슬롯 없음 — 주 1회 케어 모드', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const s: SimState = { ...initialState(t0), location: 'fridge' };
+    const plan = planNotifications(s, t0, { peakOptIn: true });
+    expect(plan.slots.some((sl) => sl.copyKey === 'peak')).toBe(false);
+  });
+});
+
+describe('부활 알림 위치 배율 (2026-08-30 수정 — room 고정식은 냉장 이동 시 거짓 알림)', () => {
+  it('부활 중 냉장(0.08×): at = 8h/0.08 = 100h 뒤 — 게이트(wallFor)와 같은 회계', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const s: SimState = {
+      ...initialState(t0),
+      reviveProgress: 1,
+      lastFedAt: t0,
+      location: 'fridge',
+      locAnchorAt: t0,
+      effBaseMs: 0,
+    };
+    const plan = planNotifications(s, t0);
+    expect(plan.slots.length).toBe(1);
+    expect(plan.slots[0].copyKey).toBe('reviveSecond');
+    expect(plan.slots[0].at).toBe(clampQuiet(t0 + 100 * HOUR));
+  });
+});

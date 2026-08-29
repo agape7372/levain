@@ -49,6 +49,9 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   initOta();
 
   const canvas = document.getElementById('c') as HTMLCanvasElement;
+  // 보조기술 라벨 — 캔버스는 그림이자 상호작용면인데 접근성 트리에선 빈 노드였다 (2026-08-30 a11y)
+  canvas.setAttribute('role', 'img');
+  canvas.setAttribute('aria-label', copy.a11y.canvas);
   const stage = document.getElementById('stage') as HTMLElement;
   const uiRoot = document.getElementById('ui-root') as HTMLElement;
 

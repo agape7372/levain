@@ -54,6 +54,21 @@ export function openSettings(api: GameApi): void {
     }),
   );
 
+  // 한창때 알림 — 옵트인(기본 off). 마스터 토글(notifyEnabled)이 꺼져 있으면 플랜 자체가
+  // 비니 여기서 따로 게이트하지 않는다 — 켜두면 마스터를 켤 때 같이 살아난다.
+  wrap.appendChild(
+    toggleRow(copy.settings.notifyPeak, s.notifyPeak, (v) => api.setSettings({ notifyPeak: v })),
+  );
+
+  // 방해 없는 시간 — 시 단위 2선택. 시작=끝이면 조용시간 없음 (copy.quietValue가 '없음'으로 말한다)
+  const quietRow = actionRow('', () => openQuietModal(api, syncQuietLabel));
+  const syncQuietLabel = (): void => {
+    const cur = api.getSettings();
+    quietRow.textContent = `${copy.settings.quiet}: ${copy.settings.quietValue(cur.quietStartH, cur.quietEndH)}`;
+  };
+  syncQuietLabel();
+  wrap.appendChild(quietRow);
+
   wrap.appendChild(
     actionRow(copy.settings.exportSave, () => {
       void api.exportSave().then(() => toast(copy.settings.exported));
@@ -126,6 +141,54 @@ export function openSettings(api: GameApi): void {
   wrap.appendChild(version);
 
   openModal(wrap, { title: copy.settings.title });
+}
+
+/** 방해 없는 시간 편집 — 변경 즉시 저장·재예약(setSettings가 replan까지 태운다) */
+function openQuietModal(api: GameApi, onChanged?: () => void): void {
+  const s = api.getSettings();
+  const wrap = document.createElement('div');
+
+  const body = document.createElement('p');
+  body.className = 'modal-body';
+  body.textContent = copy.settings.quietBody;
+  wrap.appendChild(body);
+
+  const hourSelect = (value: number, onChange: (h: number) => void): HTMLSelectElement => {
+    const sel = document.createElement('select');
+    sel.className = 'quiet-select';
+    for (let h = 0; h < 24; h++) {
+      const opt = document.createElement('option');
+      opt.value = String(h);
+      opt.textContent = `${h}시`;
+      if (h === value) opt.selected = true;
+      sel.appendChild(opt);
+    }
+    sel.addEventListener('change', () => onChange(Number(sel.value)));
+    return sel;
+  };
+
+  const rows = document.createElement('div');
+  rows.className = 'settings-rows';
+  rows.style.marginTop = '12px';
+  const addRow = (label: string, sel: HTMLSelectElement): void => {
+    const row = document.createElement('div');
+    row.className = 'settings-row';
+    const span = document.createElement('span');
+    span.textContent = label;
+    row.append(span, sel);
+    rows.appendChild(row);
+  };
+  addRow(copy.settings.quietFrom, hourSelect(s.quietStartH, (h) => {
+    api.setSettings({ quietStartH: h });
+    onChanged?.();
+  }));
+  addRow(copy.settings.quietTo, hourSelect(s.quietEndH, (h) => {
+    api.setSettings({ quietEndH: h });
+    onChanged?.();
+  }));
+  wrap.appendChild(rows);
+
+  openModal(wrap, { title: copy.settings.quiet });
 }
 
 /** 개발자 섹션 — 성장·재료·멀티·도감 치트. 게이트(슬롯 상한 등)는 store 규칙 그대로 */

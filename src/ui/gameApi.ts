@@ -25,6 +25,9 @@ export interface GameSettings {
   muted: boolean;
   haptics: boolean;
   notifyEnabled: boolean;
+  notifyPeak: boolean;
+  quietStartH: number;
+  quietEndH: number;
 }
 
 export interface GameApi {

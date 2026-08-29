@@ -33,6 +33,36 @@ export function mountOnboarding(opts: {
     el.style.pointerEvents = 'none';
     el.style.background = 'transparent';
 
+    // 진행 헤어라인 — 700px 요건이 무피드백이면 "얼마나 더?"를 알 길이 없다(2026-08-30 a11y).
+    // 반죽 자체가 손을 따라오는 게 1차 피드백이고, 이 선은 '얼마나 남았나'만 담백하게 말한다.
+    const track = document.createElement('div');
+    track.className = 'onboard-stir-track';
+    const fillEl = document.createElement('div');
+    fillEl.className = 'onboard-stir-fill';
+    track.appendChild(fillEl);
+    el.appendChild(track);
+
+    let done = false;
+    const finish = (): void => {
+      if (done) return;
+      done = true;
+      opts.canvas.removeEventListener('pointermove', onMove);
+      clearTimeout(fallbackTimer);
+      track.remove();
+      step3();
+    };
+
+    // 대체 경로 — 드래그가 어려운 사용자(모터 장애·포인터 문제)를 위해 10초 뒤 버튼을 연다.
+    // 즉시 열면 의식이 스킵 버튼으로 전락하니, 시도할 시간을 먼저 준다. 버튼은 el 안이라
+    // pointerEvents:none을 뚫도록 자기만 auto로 되살린다.
+    const fallbackTimer = setTimeout(() => {
+      if (done) return;
+      btn.textContent = copy.onboarding.stirDone;
+      btn.style.display = '';
+      btn.style.pointerEvents = 'auto';
+      btn.addEventListener('click', finish, { once: true });
+    }, 10_000);
+
     let stirred = 0;
     let lastX = 0;
     let lastY = 0;
@@ -41,10 +71,8 @@ export function mountOnboarding(opts: {
       if (lastX !== 0) stirred += Math.hypot(e.clientX - lastX, e.clientY - lastY);
       lastX = e.clientX;
       lastY = e.clientY;
-      if (stirred > 700) {
-        opts.canvas.removeEventListener('pointermove', onMove);
-        step3();
-      }
+      fillEl.style.transform = `scaleX(${Math.min(1, stirred / 700).toFixed(3)})`;
+      if (stirred > 700) finish();
     };
     opts.canvas.addEventListener('pointermove', onMove);
   }

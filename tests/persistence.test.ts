@@ -23,7 +23,7 @@ function envelopeAt(now = T0): SaveEnvelope {
     activeStarterId: 's1',
     nextStarterOrdinal: 2,
     shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0 },
-    settings: { muted: true, haptics: false, notifyEnabled: true },
+    settings: { muted: true, haptics: false, notifyEnabled: true, notifyPeak: false, quietStartH: 22, quietEndH: 8 },
     flags: { onboarded: true, pendingBake: { recipeId: 'loaf', grade: 'best' }, retapHints: 0 },
   };
 }
@@ -42,7 +42,7 @@ function v1EnvelopeAt(now = T0): Record<string, unknown> {
       },
       flake: { madeAt: now - 2000, maturity: 7 },
     },
-    settings: { muted: true, haptics: false, notifyEnabled: true },
+    settings: { muted: true, haptics: false, notifyEnabled: true, notifyPeak: false, quietStartH: 22, quietEndH: 8 },
     flags: { onboarded: true, pendingBake: null, retapHints: 0 },
   };
 }
@@ -144,7 +144,7 @@ describe('validateAndClamp — 있는데 불량이면 살린다', () => {
       savedAt: base.savedAt,
       starters: base.starters,
     });
-    expect(env?.settings).toEqual({ muted: false, haptics: true, notifyEnabled: true });
+    expect(env?.settings).toEqual({ muted: false, haptics: true, notifyEnabled: true, notifyPeak: false, quietStartH: 22, quietEndH: 8 });
     expect(env?.flags).toEqual({ onboarded: false, pendingBake: null, retapHints: 0 });
     expect(env?.shared).toEqual({
       collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0,

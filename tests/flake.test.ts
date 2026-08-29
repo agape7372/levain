@@ -134,7 +134,7 @@ function envelopeAt(now = t0): SaveEnvelope {
     activeStarterId: 's1',
     nextStarterOrdinal: 2,
     shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0 },
-    settings: { muted: true, haptics: false, notifyEnabled: true },
+    settings: { muted: true, haptics: false, notifyEnabled: true, notifyPeak: false, quietStartH: 22, quietEndH: 8 },
     flags: { onboarded: true, pendingBake: null, retapHints: 0 },
   };
 }

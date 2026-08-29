@@ -147,7 +147,7 @@ export interface NotifySlot {
   id: number;
   at: number;
   /** copy.ts 키 — sim은 문구를 모른다 */
-  copyKey: 'feedTime' | 'fridgeWeek' | 'dormant' | 'reviveSecond' | 'moldWarn';
+  copyKey: 'feedTime' | 'fridgeWeek' | 'dormant' | 'reviveSecond' | 'moldWarn' | 'peak';
   /** 냉장 주간 반복 여부 */
   weekly: boolean;
   /** 멀티 르방 병합 수(§5-6) — 2 이상이면 집계 문구. 플랜 일시값, 저장 안 함 */

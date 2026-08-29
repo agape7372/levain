@@ -14,12 +14,17 @@ export interface NotifierPort {
   openSettings(): Promise<void>;
 }
 
-const CHANNEL_ID = 'levain-care';
+// 채널 2분할(2026-08-30): 일상 케어 vs 놓치면 잃는 신호. 시스템 설정에서 따로 조절할 수 있고
+// warn은 importance HIGH(헤드업)다. care id는 기존 값 유지 — 이미 설치된 기기의 채널 설정 보존.
+const CHANNEL_CARE = 'levain-care';
+const CHANNEL_WARN = 'levain-warn';
+/** 경고 채널로 가는 슬롯 — 반점(사망 예고)·깊은 잠(잃기 직전) */
+const WARN_KEYS = new Set<NotifySlot['copyKey']>(['moldWarn', 'dormant']);
 
 function toScheduled(slot: NotifySlot): LocalNotificationSchema {
   return {
     id: slot.id,
-    channelId: CHANNEL_ID,
+    channelId: WARN_KEYS.has(slot.copyKey) ? CHANNEL_WARN : CHANNEL_CARE,
     // 멀티 르방 병합 슬롯(count ≥2)은 집계 문구 (§5-6)
     title:
       slot.count && slot.count > 1
@@ -43,11 +48,17 @@ export function createNotifier(): NotifierPort {
     if (channelReady) return;
     channelReady = true;
     try {
-      // importance 3 = DEFAULT (소리 있음, 헤드업 없음), visibility 1 = PUBLIC
+      // importance 3 = DEFAULT (소리 있음, 헤드업 없음), 4 = HIGH (헤드업), visibility 1 = PUBLIC
       await LocalNotifications.createChannel({
-        id: CHANNEL_ID,
+        id: CHANNEL_CARE,
         name: copy.notify.channel,
         importance: 3,
+        visibility: 1,
+      });
+      await LocalNotifications.createChannel({
+        id: CHANNEL_WARN,
+        name: copy.notify.channelWarn,
+        importance: 4,
         visibility: 1,
       });
     } catch {
