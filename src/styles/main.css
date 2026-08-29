@@ -395,6 +395,8 @@ html {
 }
 .seg button.active { background: var(--cream); color: var(--ink); font-weight: 600; }
 .seg button:disabled { opacity: 0.35; cursor: default; }
+/* 잠금은 disabled 대신 .is-locked — 클릭이 살아야 이유 토스트가 뜬다(항아리 선례 2026-08-26) */
+.seg button.is-locked { opacity: 0.35; }
 /* 도감 이중 세그 — 두 줄을 경계 없이 한 덩어리로 (사용자 확정 2026-08-24) */
 .seg--joined-top { border-radius: 18px 18px 0 0; }
 .seg--joined-bottom { border-radius: 0 0 18px 18px; padding-top: 0; }
@@ -416,6 +418,7 @@ html {
 .btn-ghost { background: transparent; color: var(--ink-faint); font-weight: 400; }
 .btn-wide { min-width: 200px; }
 .btn:disabled { opacity: 0.4; cursor: default; }
+.btn.is-locked { opacity: 0.4; } /* :disabled 대체 — 위 .seg 주석과 같은 이유 */
 
 /* 밥 버튼 옆 보조 액션(말려두기) — 옅은 캡슐, 비활성은 opacity 규칙 공유 */
 .hud-actions { display: flex; gap: 10px; align-items: center; justify-content: center; }

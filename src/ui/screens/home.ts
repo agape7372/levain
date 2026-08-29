@@ -347,9 +347,13 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
       chip.classList.add('pulse');
     }
     lastStage = snap.stage;
+    // "한창" 판정 = 피크 밴드(peakAt~peakEndAt) 소속 — 관찰 카드·타임라인·설명서와 같은 정의
+    // (2026-08-30 통일. 종전 activity≥0.85는 밴드 가장자리 번짐까지 '한창'이라 말해 셋이 어긋났다).
+    // activity 임계는 굽기 등급(GRADE_BEST) 전용으로 남는다 — 등급이 문구보다 살짝 관대한 건
+    // 플레이어에게 유리한 쪽 오차라 거짓말이 아니다.
     const phaseKey =
       snap.phase === 'active'
-        ? snap.activity >= 0.85
+        ? now >= snap.peakAt && now < snap.peakEndAt
           ? 'peak'
           : 'active'
         : snap.phase === 'dormant' && snap.dormancy < 1
@@ -418,11 +422,17 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     jarBody.style.setProperty('--fill', `${fill.toFixed(1)}%`);
     pantryJar.setAttribute('aria-label', pantry > 0 ? copy.pantry.label(pantry) : copy.pantry.empty);
 
-    // 위치 세그먼트 — 냉장은 3단계 해금 전 비활성 (문구 대신 옅은 비활성 — 사용자 규칙)
+    // 위치 세그먼트 — 냉장은 3단계 해금 전 잠금. 옅은 비활성(사용자 규칙)은 유지하되
+    // ★disabled는 쓰지 않는다(항아리와 같은 이유 — 2026-08-26 결함 선례): 클릭이 살아야
+    // locationLocked → lockedHint 토스트가 이유를 말한다. 시각은 .is-locked가 :disabled와 동일.
     const loc = api.location();
     segBtns.forEach((b, key) => {
       b.classList.toggle('active', key === loc);
-      if (key === 'fridge') b.disabled = snap.stage < FRIDGE_STAGE;
+      if (key === 'fridge') {
+        const locked = snap.stage < FRIDGE_STAGE;
+        b.classList.toggle('is-locked', locked);
+        b.setAttribute('aria-disabled', String(locked));
+      }
     });
   }
 

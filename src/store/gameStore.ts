@@ -33,6 +33,8 @@ export interface GameStoreDeps {
   clock: Clock;
   storage: StorageAdapter;
   onNotifyPlan?: (plan: NotifyPlan) => void;
+  /** 저장 실패 통지 — 호출 지점이 많아(주기 tick 포함) 스팸 방지는 배선 쪽(app.ts) 책임 */
+  onSaveFailed?: () => void;
 }
 
 export interface GameStore {
@@ -310,7 +312,10 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
 
   function persist(now: number): boolean {
     env = { ...env, savedAt: now };
-    return save(env, storage);
+    const ok = save(env, storage);
+    // 실패를 조용히 삼키지 않는다 — copy.save.writeFailed가 정의만 되고 배선 0이었다(2026-08-30).
+    if (!ok) deps.onSaveFailed?.();
+    return ok;
   }
 
   function replan(now: number): void {

@@ -9,7 +9,7 @@ import { untilText } from '../format';
 import { breadArt } from './breadArt';
 import { ingredientArtNode } from './ingredientArt';
 import type { GameApi } from '../gameApi';
-import type { CollectionEntry, CompatibilityRule, RecipeDef, SimEvent, Snapshot } from '../../sim';
+import type { CollectionEntry, CompatibilityRule, IngredientId, RecipeDef, SimEvent, Snapshot } from '../../sim';
 import {
   INGREDIENTS, RECIPES, FLOAT_OK_ACTIVITY, rulesForBase, variantIdOf, playableRules,
   INGREDIENT_FLOUR_COST, FLOUR_PER_INGREDIENT, INGREDIENT_SOFT_CAP, MISSION_REWARD_FLOUR,
@@ -172,14 +172,30 @@ export function createRecipesScreen(
   }
 
   /**
-   * 재료 감상 진입 — 3D만. "다시 만들기"는 없다(재료는 굽는 게 아니라 넣는 것이다).
-   * GLB가 아직 없으면 false가 와서 조용히 아무 일도 안 일어난다 — 도감 카드 탭이
-   * 실패 모달을 띄우는 건 과하다.
+   * 재료 감상 진입 — 3D 우선, GLB 미비·로드 실패 시 아트 카드 모달 폴백 (빵 showResult와 대칭).
+   * 종전 "조용히 무반응"은 카드가 눌리는데 아무 일도 안 일어나는 죽은 탭이었다(2026-08-30 수정) —
+   * 30종 GLB가 다 있는 지금 false는 '미비'가 아니라 로드 실패라서 더더욱 침묵할 자리가 아니다.
    */
-  function openIngredientView(id: string): void {
-    if (!deps.openShowcase) return;
-    void deps.openShowcase(id, copy.recipes.ingredientHeadline(playableCountOf(id)), false, {
-      kind: 'ingredient',
+  function openIngredientView(id: IngredientId): void {
+    const headline = copy.recipes.ingredientHeadline(playableCountOf(id));
+    const fallback = (): void => {
+      const body = document.createElement('div');
+      const artWrap = document.createElement('div');
+      artWrap.style.cssText = 'display:flex;justify-content:center;margin-bottom:12px';
+      artWrap.appendChild(ingredientArtNode(id));
+      const p = document.createElement('p');
+      p.className = 'modal-body';
+      p.textContent = headline;
+      p.style.textAlign = 'center';
+      body.append(artWrap, p);
+      openModal(body, { title: copy.recipes.ingredientNames[id] });
+    };
+    if (!deps.openShowcase) {
+      fallback();
+      return;
+    }
+    void deps.openShowcase(id, headline, false, { kind: 'ingredient' }).then((ok) => {
+      if (!ok) fallback();
     });
   }
 
@@ -521,7 +537,11 @@ export function createRecipesScreen(
         buy.type = 'button';
         buy.className = 'btn btn-primary btn-slim';
         buy.textContent = copy.economy.buy(INGREDIENT_FLOUR_COST);
-        buy.disabled = eco.flour < INGREDIENT_FLOUR_COST || have >= INGREDIENT_SOFT_CAP;
+        // ★disabled 금지(항아리·냉장 세그먼트와 같은 원칙) — 클릭이 살아야 아래 핸들러의
+        // atCap·notEnough 토스트가 이유를 말한다. disabled였을 땐 그 토스트가 도달 불가였다.
+        const buyLocked = eco.flour < INGREDIENT_FLOUR_COST || have >= INGREDIENT_SOFT_CAP;
+        buy.classList.toggle('is-locked', buyLocked);
+        buy.setAttribute('aria-disabled', String(buyLocked));
         buy.addEventListener('click', () => {
           if (have >= INGREDIENT_SOFT_CAP) {
             toast(copy.economy.atCap(INGREDIENT_SOFT_CAP));
@@ -539,7 +559,8 @@ export function createRecipesScreen(
         sell.type = 'button';
         sell.className = 'btn btn-ghost btn-slim';
         sell.textContent = copy.economy.sell(FLOUR_PER_INGREDIENT);
-        sell.disabled = have < 1;
+        sell.classList.toggle('is-locked', have < 1); // 탭하면 noStock 토스트가 이유를 말한다
+        sell.setAttribute('aria-disabled', String(have < 1));
         sell.addEventListener('click', () => {
           if (!api.exchangeIngredient(ing.id)) {
             toast(copy.economy.noStock);

@@ -55,10 +55,19 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   const clock = deps.clock ?? systemClock;
   const storage = deps.storage ?? createStorage();
   const notifier = createNotifier();
+  // 저장 실패 토스트 — 주기 tick(60초) 저장도 이 경로를 타므로 30분에 1회만 말한다.
+  // 지속 실패(용량 초과·프라이빗 모드)에서 매 분 토스트는 스팸이고, 1회는 놓치면 끝이라 중간값.
+  let saveFailToldAt = -Infinity;
   const { store, isNew, loadSource, briefing } = await initGameStore({
     clock,
     storage,
     onNotifyPlan: (plan) => void notifier.applyPlan(plan),
+    onSaveFailed: () => {
+      const t = clock.now();
+      if (t - saveFailToldAt < 30 * 60_000) return;
+      saveFailToldAt = t;
+      toast(copy.save.writeFailed);
+    },
   });
 
   // ── 씬 ──
