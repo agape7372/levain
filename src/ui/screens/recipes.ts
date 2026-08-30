@@ -28,6 +28,11 @@ export interface ShowcaseOpts {
    * 김은 갓 구운 빵의 다이제틱 신호라 생재료에 붙으면 거짓말이 된다.
    */
   kind?: 'bread' | 'ingredient';
+  /**
+   * 표시 이름 override — 기본은 앱단이 `copy.recipes(.ingredientNames)`에서 자산 id로 찾는다.
+   * 변형(예: scone--choco-chip)은 그 테이블에 없으니 호출부(변형명은 `variantName(rule)`)가 직접 넘긴다.
+   */
+  name?: string;
 }
 
 export interface RecipesScreenDeps {
@@ -135,39 +140,53 @@ export function createRecipesScreen(
     }
   }
 
-  function openResultModal(recipeId: string, headline: string, large = false): void {
+  /**
+   * title/artId override — 변형(id가 `copy.recipes.names`에 없다)일 때만 호출부가 채운다.
+   * artId는 SVG 폴백 전용: 변형 SVG는 없으니 베이스 모양(recipe.id)으로 그린다.
+   */
+  interface ResultOpts { title?: string; artId?: string }
+
+  function openResultModal(recipeId: string, headline: string, large = false, opts?: ResultOpts): void {
     const body = document.createElement('div');
     const artWrap = document.createElement('div');
     artWrap.style.cssText = 'display:flex;justify-content:center;margin-bottom:12px';
-    artWrap.appendChild(breadArt(recipeId));
+    artWrap.appendChild(breadArt(opts?.artId ?? recipeId));
     const p = document.createElement('p');
     p.className = 'modal-body';
     p.textContent = headline;
     p.style.textAlign = 'center';
     if (large) p.style.cssText += ';font-size:19px;font-weight:600;color:var(--ink)';
     body.append(artWrap, p);
-    openModal(body, { title: copy.recipes.names[recipeId] });
+    openModal(body, { title: opts?.title ?? copy.recipes.names[recipeId] });
   }
 
   /** 결과 표시 — 3D 쇼케이스 우선, GLB 미비 시 카드 리절트 폴백 */
-  function showResult(recipeId: string, headline: string, large = false): void {
+  function showResult(recipeId: string, headline: string, large = false, opts?: ResultOpts): void {
     if (!deps.openShowcase) {
-      openResultModal(recipeId, headline, large);
+      openResultModal(recipeId, headline, large, opts);
       return;
     }
-    void deps.openShowcase(recipeId, headline, large).then((ok) => {
-      if (!ok) openResultModal(recipeId, headline, large);
+    void deps.openShowcase(recipeId, headline, large, opts?.title ? { name: opts.title } : undefined).then((ok) => {
+      if (!ok) openResultModal(recipeId, headline, large, opts);
     });
   }
 
-  /** 감상 진입 — 바로 3D, 하단 "다시 만들기" (§8-3 개편: 상세 화면 폐지) */
-  function openView(recipe: RecipeDef): void {
+  /**
+   * 감상 진입 — 바로 3D, 하단 "다시 만들기" (§8-3 개편: 상세 화면 폐지).
+   * variant를 넘기면 베이스가 아니라 변형 전용 3D/이름을 연다(2026-08-30: 변형 3D 배선).
+   */
+  function openView(recipe: RecipeDef, variant?: { id: string; name: string }): void {
+    const assetId = variant?.id ?? recipe.id;
+    const opts: ResultOpts | undefined = variant ? { title: variant.name, artId: recipe.id } : undefined;
     if (!deps.openShowcase) {
-      openResultModal(recipe.id, '');
+      openResultModal(assetId, '', false, opts);
       return;
     }
-    void deps.openShowcase(recipe.id, '', false, { onRebake: () => openBakeModal(recipe) }).then((ok) => {
-      if (!ok) openResultModal(recipe.id, '');
+    void deps.openShowcase(assetId, '', false, {
+      onRebake: () => openBakeModal(recipe),
+      name: opts?.title,
+    }).then((ok) => {
+      if (!ok) openResultModal(assetId, '', false, opts);
     });
   }
 
@@ -286,14 +305,18 @@ export function createRecipesScreen(
         return;
       }
       const vLabel = selected === 'base' ? null : variantName(selected);
+      // 변형을 구우면 결과 연출도 변형 3D를 보여준다 — 이전엔 recipe.id(베이스)만 넘겨
+      // 라벨은 변형인데 3D는 베이스가 뜨는 어긋남이 있었다(2026-08-30 수정)
+      const assetId = selected === 'base' ? recipe.id : variantIdOf(selected);
+      const resultOpts: ResultOpts | undefined = vLabel ? { title: vLabel, artId: recipe.id } : undefined;
       const baked = events.find((e): e is Extract<SimEvent, { type: 'baked' }> => e.type === 'baked');
       if (baked) {
         const grade = copy.recipes.grades[baked.grade];
-        showResult(recipe.id, vLabel ? `${vLabel} — ${grade}` : grade, true);
+        showResult(assetId, vLabel ? `${vLabel} — ${grade}` : grade, true, resultOpts);
         return;
       }
       if (events.some((e) => e.type === 'bakedDiscard')) {
-        showResult(recipe.id, vLabel ? `${vLabel} — ${copy.recipes.discardDone}` : copy.recipes.discardDone);
+        showResult(assetId, vLabel ? `${vLabel} — ${copy.recipes.discardDone}` : copy.recipes.discardDone, false, resultOpts);
       }
     };
     ok.addEventListener('click', () => {
@@ -331,7 +354,11 @@ export function createRecipesScreen(
   }
 
   // ── 카드 빌더 ──
-  function artOf(recipeId: string): HTMLElement {
+  /**
+   * @param fallbackId SVG 폴백(PNG 404 시)에 쓸 id. 변형은 전용 SVG가 없으니
+   * 베이스 id를 넘기면 campagne 대체 대신 실제 모양(scone/focaccia 등)으로 그려진다.
+   */
+  function artOf(recipeId: string, fallbackId: string = recipeId): HTMLElement {
     const art = document.createElement('div');
     art.className = 'art';
     const img = document.createElement('img');
@@ -339,7 +366,7 @@ export function createRecipesScreen(
     img.alt = '';
     img.addEventListener('error', () => {
       img.remove();
-      art.appendChild(breadArt(recipeId));
+      art.appendChild(breadArt(fallbackId));
     });
     art.appendChild(img);
     return art;
@@ -446,12 +473,15 @@ export function createRecipesScreen(
           const card = document.createElement('button');
           card.type = 'button';
           card.className = 'recipe-card';
-          card.appendChild(artOf(recipe.id)); // 변형 자산 = 베이스 재사용 (§8-2)
+          // 변형 전용 3D/썸네일(2026-08-30 배선) — 이전엔 베이스 재사용이었다(§8-2, 이제 폐기).
+          // PNG 404 시 SVG 폴백은 여전히 베이스 모양(fallbackId)으로 — 변형 전용 SVG는 없다.
+          card.appendChild(artOf(vid, recipe.id));
           const name = document.createElement('div');
           name.className = 'name';
-          name.textContent = variantName(rule);
+          const vname = variantName(rule);
+          name.textContent = vname;
           card.appendChild(name);
-          card.addEventListener('click', () => openView(recipe));
+          card.addEventListener('click', () => openView(recipe, { id: vid, name: vname }));
           grid.appendChild(card);
         } else {
           grid.appendChild(mysteryCard(recipe.id, () => toast(copy.recipes.variantHint)));

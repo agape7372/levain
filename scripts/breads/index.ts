@@ -11,8 +11,9 @@ import { createFocaccia } from './focaccia';
 import { createRye } from './rye';
 import { createLoaf } from './loaf';
 import { createBaguette } from './baguette';
-// [시범 변형 — 초벌 직행 파이프라인 검증, 2026-08-30] breadlab 미리보기 전용.
-// public/breads/로 export하지 않는다(빵은 닫힌 10종 · 고정 예산 2560KB).
+// [변형 3종 — 2026-08-30] 게임 배선 완료. variantIdOf 규약(`${baseId}--${ingredientId}-${form}`)과
+// 파일명이 이미 정합해 export-breads·bake-thumbs가 레지스트리만 보고 그대로 처리한다.
+// public/breads/로 export됨 — 예산은 families.mjs totalKB(2560KB) 안(실측 13종 1459KB).
 import { createSconeChocoChip } from './sconeChocoChip';
 import { createCampagneStrawberryJam } from './campagneStrawberryJam';
 import { createFocacciaOliveFlesh } from './focacciaOliveFlesh';
