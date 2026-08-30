@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
   <!-- Play 피처 그래픽 — 베이지 그라디언트 + 병 + 타이틀 -->
+  <!-- 카피 잠금(STORE_LISTING.md): 키우기·타마고치·레시피·사워도우 금지 — 부제는 짧은 설명과 동일 문장을 쓴다. -->
   <defs>
     <radialGradient id="bg" cx="38%" cy="45%" r="90%">
       <stop offset="0%" stop-color="#F2E6D3"/>
@@ -23,6 +24,6 @@
 
   <!-- 타이틀 (우측) -->
   <text x="480" y="240" font-family="'Pretendard Variable', Pretendard, sans-serif" font-size="96" font-weight="700" fill="#4A3220">르방이</text>
-  <text x="484" y="308" font-family="'Pretendard Variable', Pretendard, sans-serif" font-size="34" font-weight="400" fill="#6B5340">실제 시간으로 키우는 사워도우</text>
+  <text x="484" y="308" font-family="'Pretendard Variable', Pretendard, sans-serif" font-size="34" font-weight="400" fill="#6B5340">살아있는 반죽과의 느린 동거</text>
   <text x="484" y="356" font-family="'Pretendard Variable', Pretendard, sans-serif" font-size="34" font-weight="400" fill="#8A6A4A">하루 한두 번, 밥 주는 시간</text>
 </svg>

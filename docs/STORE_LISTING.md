@@ -37,11 +37,18 @@
 ## 준비된 자산
 
 - 앱 아이콘 512×512: `assets/icon-512.png`
-- 피처 그래픽 1024×500: `assets/feature-graphic.png`
-  (문구에 “키우는 사워도우”가 들어 있음 — 잠금과 어긋남. 공개 전에 SVG 고쳐 다시 굽는 편이 낫다)
-- 스크린샷: `docs/screenshot-home.png` · `docs/screenshot-recipes.png` (에뮬. 실기기 캡처로 교체 권장)
-- 서명 AAB — **재빌드 필요**(AdMob 네이티브 SDK 도입으로 versionCode 상향 + `com.google.android.gms.ads.APPLICATION_ID`
-  meta-data 포함이 전제, RELEASE §1-1 절차). OTA 웹 레이어는 1.3.6 라이브.
+- 피처 그래픽 1024×500: `assets/feature-graphic.png` — 2026-08-30 재굽기. 부제를 짧은 설명과 같은
+  문장으로 교체해 카피 잠금 위반(“키우는 사워도우”)을 없앴다. 다시 구우려면
+  `node scripts/render-feature-graphic.mjs` (SVG + Pretendard를 헤드리스 크롬으로 렌더).
+- 스크린샷(폰): `docs/screenshot-home.png` · `docs/screenshot-recipes.png` (에뮬. 실기기 캡처로 교체 권장)
+- **태블릿 스크린샷 없음** — `scripts/store-shots.mjs`로 1200×1920·1600×2560을 찍어 봤으나 쓸 수 없었다:
+  ① 온보딩(“시작하기”) 화면에서 멈추고 ② 3D 반죽이 렌더되지 않았고 ③ 1600×2560에서는 같은 텍스트
+  블록이 위아래로 두 번 나왔다. 태블릿 폭에서 콘텐츠가 좁은 띠로 남고 나머지가 빈 배경이라
+  **자산 문제가 아니라 태블릿 레이아웃 문제**다. Play 등록정보 저장은 이것 없이 통과하지만,
+  큰 화면 노출을 노린다면 레이아웃부터 손봐야 한다.
+- 서명 AAB: `android/app/build/outputs/bundle/release/app-release.aab`
+  (2026-08-30 빌드, versionCode 2 / versionName 1.3.7, 12.9MB). OTA 매니페스트도 1.3.7이라
+  네이티브와 같은 값 = 다운그레이드 없음(RELEASE §1-1).
 
 ## 앱 콘텐츠 선언
 
@@ -127,10 +134,33 @@ COVID-19 관련 앱인가요? **아니요**
 5. 테스터 이메일 추가 → 선택 URL을 테스터에게 전달
    (Play 스토어 앱이 **그 구글 계정**으로 로그인돼 있어야 함)
 
+## 등록 현황 (2026-08-30)
+
+Play Console에 앱을 만들고 폼을 전부 채웠다. 개발자 계정 `감자볼`(zaballgam@gmail.com, u/2),
+앱 이름 `르방이 — 하루 한두 번, 밥 주는 시간`, 패키지 `com.zaballgam.levain`(확정·변경 불가),
+게임/시뮬레이션·무료·기본 언어 ko-KR.
+
+끝난 것:
+
+- 스토어 등록정보 — 짧은 설명·자세한 설명·아이콘 512·피처 그래픽·폰 스크린샷 2장, 저장 완료
+- 개인정보처리방침 URL `https://levain-ota.vercel.app/privacy.html` (200 확인)
+- 로그인 세부정보 = 제한된 부분 없음 / 광고 = 있음 / 광고 ID = 사용함(광고 또는 마케팅)
+- 콘텐츠 등급 — IARC 설문 14문항 전부 “아니요”, 결과 **전체이용가(G·L·E·3+)**
+- 타겟층 = 만 18세 이상 / 정부 앱·금융 기능·건강 앱 = 해당 없음
+- 데이터 보안 — 기기 또는 기타 ID를 **수집·공유**(광고 또는 마케팅), 전송 중 암호화,
+  임시 처리 아님, **사용자가 수집 여부를 선택 가능**(광고는 사용자가 버튼을 눌러야만 재생되고
+  `ensureInit`이 그때 처음 불린다 — `src/platform/ads.ts`), 계정 생성 없음
+- 앱 카테고리·연락처 이메일
+- 내부 테스트 임시 출시 `2 (1.3.7)` 생성 + 출시 노트 작성
+
 ## 남은 사용자 작업
 
-1. Play Console 개발자 계정 준비·로그인
-2. 위 순서로 앱 생성 + 폼 붙여넣기
-3. `bundleRelease`로 AAB 굽기 (versionName 정렬 여부 결정)
-4. 내부테스트 테스터 이메일
+1. **AAB 업로드** — `android/app/build/outputs/bundle/release/app-release.aab`를 내부 테스트
+   임시 출시 `2 (1.3.7)`에 끌어다 놓기. (자동화 브리지는 10MB까지라 12.9MB 파일을 못 올린다.)
+2. **테스터 목록 선택** — 계정에 이미 `자두`(33) · `종이톡 내부 테스터`(2) · `포도알 테스터`(26)가 있다.
+   누구에게 돌릴지는 사용자 판단.
+3. 출시 검토 → 내부 테스트 출시
+4. 실 AdMob ID — 지금 AAB는 **Google 테스트 ID**다. AdMob 콘솔에서 앱을 만들어도 Play에 게시되기
+   전에는 “스토어 추가”가 안 돼 광고 게재가 제한된다(podoal 앱 2개가 지금 그 상태). 그래서 순서는
+   Play 게시 → AdMob 앱 등록·스토어 연결 → `strings.xml`·`ads.ts` 교체 → 새 AAB.
 5. 공개가 목표면 비공개 테스트 12명 모집
