@@ -256,7 +256,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   };
   const openShowcase = async (
     id: string, headline: string, large: boolean,
-    opts?: { onRebake?: () => void; kind?: 'bread' | 'ingredient' },
+    opts?: { onRebake?: () => void; kind?: 'bread' | 'ingredient'; name?: string },
   ): Promise<boolean> => {
     const kind = opts?.kind ?? 'bread';
     const dir = kind === 'ingredient' ? 'ingredients' : 'breads';
@@ -265,8 +265,9 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     } catch {
       return false;
     }
+    // 변형(id가 copy.recipes(.ingredientNames)에 없다)은 호출부가 name을 직접 넘긴다
     const name =
-      (kind === 'ingredient' ? copy.recipes.ingredientNames[id] : copy.recipes.names[id]) ?? id;
+      opts?.name ?? (kind === 'ingredient' ? copy.recipes.ingredientNames[id] : copy.recipes.names[id]) ?? id;
     const screen = createShowcaseScreen(id, name, headline, large, {
       onShow: () => {
         showcaseActive = true;

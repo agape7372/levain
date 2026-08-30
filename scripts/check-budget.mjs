@@ -1,8 +1,8 @@
 // GLB 예산 검사 — 패밀리별 상한 (VISUAL §8). 사용: npm run check-budget
 //
-// 예산 정본 = scripts/lib/families.mjs. 빵은 닫힌 10종이라 고정 합계(2560KB),
-// 재료는 12 → 30종으로 자라니 **개수 비례**(64KB/개)로 잰다 — 고정 상수면 재료가 늘 때마다
-// 손으로 올리게 되고 그건 예산을 지킨 게 아니라 예산을 결과에 맞춘 것이다.
+// 예산 정본 = scripts/lib/families.mjs. 빵은 베이스 10종 + 변형(유한한 호환성 규칙 수만큼)이라
+// 고정 합계(2560KB), 재료는 12 → 30종으로 자라니 **개수 비례**(160KB/개)로 잰다 — 고정 상수면
+// 재료가 늘 때마다 손으로 올리게 되고 그건 예산을 지킨 게 아니라 예산을 결과에 맞춘 것이다.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
