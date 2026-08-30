@@ -14,6 +14,32 @@ import { smoothParams, type RenderParams } from './renderParams';
 const VIEW_H = 5.4;
 const LOOK_Y = 0.8; // 병 몸통 중심보다 살짝 위 — 상단 HUD 헤드룸 확보
 
+type LightRig = {
+  key: { color: number; intensity: number };
+  ambient: { color: number; intensity: number };
+  fill: { color: number; intensity: number };
+  /** 측면 노출 2차 캘리브레이션(2026-08-30) 전용 — HOME_LIGHT는 생략(=끔), SHOWCASE_LIGHT만 갖는다. */
+  hemi?: { sky: number; ground: number; intensity: number };
+};
+
+// 홈 씬(병·반죽·천) 조명 — 프로토타입 계승 + 차가운 필 (VISUAL §1-3). 게임 화면 전체가 이 조명을
+// 쓰므로 **여기는 건드리지 않는다** — 빵 쇼케이스 파리티 캘리브레이션은 SHOWCASE_LIGHT로 분리.
+const HOME_LIGHT: LightRig = {
+  key: { color: 0xffe2b0, intensity: 1.4 },
+  ambient: { color: 0xfff0dc, intensity: 0.55 },
+  fill: { color: 0xdce8ff, intensity: 0.15 },
+};
+// 빵 쇼케이스 전용 조명(2026-08-30 캘리브레이션, 2차 개정) — breadlab.ts/thumbsHarness.ts와 동일
+// 값·근거(docs/VISUAL.md §1-3). 빵 GLB는 정본 hex 그대로 보여야 하므로 enterShowcase()/exitShowcase()
+// 에서만 이 값으로 스왑한다 — 홈 씬(병·반죽·천)은 절대 이 조명을 쓰지 않는다.
+// hemi: sky=검정이라 윗면(normal +Y) 기여가 정확히 0 — 윗면 파리티는 그대로, 수직 측벽만 순증된다.
+const SHOWCASE_LIGHT: LightRig = {
+  key: { color: 0xffffff, intensity: 2.4 },
+  ambient: { color: 0xffffff, intensity: 0.7656 },
+  fill: { color: 0xffffff, intensity: 0.3 },
+  hemi: { sky: 0x000000, ground: 0xffffff, intensity: 1.7 },
+};
+
 export class SceneHost {
   private renderer: THREE.WebGLRenderer | null = null;
   private scene = new THREE.Scene();
@@ -41,6 +67,12 @@ export class SceneHost {
   private cloth: Cloth | null = null;
   private jar: Jar | null = null;
   private showcase: BreadShowcase | null = null;
+  /** 조명 3등 — 쇼케이스 진입/이탈 시 HOME_LIGHT ↔ SHOWCASE_LIGHT 스왑 대상 */
+  private keyLight: THREE.DirectionalLight | null = null;
+  private ambientLight: THREE.AmbientLight | null = null;
+  private fillLight: THREE.DirectionalLight | null = null;
+  /** 쇼케이스 측면 노출 보정 전용 — HOME_LIGHT엔 hemi가 없으므로 exitShowcase()가 intensity 0으로 끈다. */
+  private hemiLight: THREE.HemisphereLight | null = null;
   // 고무줄 마커 제거(사용자 확정) — setBandY 계열 전부 삭제됨
   /** 홈 씬 오브젝트 — 쇼케이스 진입 시 통째로 숨긴다 */
   private homeGroup: THREE.Object3D[] = [];
@@ -72,14 +104,22 @@ export class SceneHost {
     this.camera.position.set(0, 8.0, 5.6);
     this.camera.lookAt(0, LOOK_Y, 0);
 
-    // 조명: 프로토타입 계승 + 차가운 필 (VISUAL §1-3)
-    const key = new THREE.DirectionalLight(0xffe2b0, 1.4);
+    // 조명: 홈 씬 값(HOME_LIGHT)으로 초기화 — 쇼케이스 진입 시에만 스왑(VISUAL §1-3)
+    const key = new THREE.DirectionalLight(HOME_LIGHT.key.color, HOME_LIGHT.key.intensity);
     key.position.set(-2, 6, 2);
     this.scene.add(key);
-    this.scene.add(new THREE.AmbientLight(0xfff0dc, 0.55));
-    const fill = new THREE.DirectionalLight(0xdce8ff, 0.15);
+    const ambient = new THREE.AmbientLight(HOME_LIGHT.ambient.color, HOME_LIGHT.ambient.intensity);
+    this.scene.add(ambient);
+    const fill = new THREE.DirectionalLight(HOME_LIGHT.fill.color, HOME_LIGHT.fill.intensity);
     fill.position.set(2.5, 3, -2);
     this.scene.add(fill);
+    // HOME_LIGHT엔 hemi가 없으므로 intensity 0으로 시작(끔) — enterShowcase()가 SHOWCASE_LIGHT.hemi로 켠다.
+    const hemi = new THREE.HemisphereLight(0x000000, 0xffffff, 0);
+    this.scene.add(hemi);
+    this.hemiLight = hemi;
+    this.keyLight = key;
+    this.ambientLight = ambient;
+    this.fillLight = fill;
 
     this.scene.add(createGroundShadow());
 
@@ -246,12 +286,29 @@ export class SceneHost {
     });
   }
 
+  /** 조명 3등을 rig 값으로 스왑 (enterShowcase/exitShowcase 전용, 다른 경로에서 호출 금지) */
+  private applyLightRig(rig: LightRig): void {
+    this.keyLight?.color.setHex(rig.key.color);
+    if (this.keyLight) this.keyLight.intensity = rig.key.intensity;
+    this.ambientLight?.color.setHex(rig.ambient.color);
+    if (this.ambientLight) this.ambientLight.intensity = rig.ambient.intensity;
+    this.fillLight?.color.setHex(rig.fill.color);
+    if (this.fillLight) this.fillLight.intensity = rig.fill.intensity;
+    // rig.hemi 부재(HOME_LIGHT) = 0으로 꺼서 원복 — sky/ground 색은 항상 고정, intensity만 스왑한다.
+    const hemi = rig.hemi ?? { sky: 0x000000, ground: 0xffffff, intensity: 0 };
+    this.hemiLight?.color.setHex(hemi.sky);
+    this.hemiLight?.groundColor.setHex(hemi.ground);
+    if (this.hemiLight) this.hemiLight.intensity = hemi.intensity;
+  }
+
   /** 쇼케이스 진입 — 홈 씬 숨기고 GLB 턴테이블. 로드 실패는 reject (호출자 폴백) */
   async enterShowcase(url: string): Promise<void> {
     if (!this.showcase) throw new Error('scene not mounted');
     await this.showcase.load(url);
     for (const o of this.homeGroup) o.visible = false;
     this.showcase.show();
+    // 빵 GLB는 정본 hex 파리티 조명(SHOWCASE_LIGHT)으로 — 홈 씬 진입 전까지만 유효(exitShowcase가 원복)
+    this.applyLightRig(SHOWCASE_LIGHT);
     // 드래그 회전 — 쇼케이스 전용 임시 리스너 (반죽 입력과 분리)
     let lastX: number | null = null;
     const onDown = (e: PointerEvent): void => {
@@ -287,6 +344,7 @@ export class SceneHost {
     for (const o of this.homeGroup) o.visible = true;
     // 덮개는 걷힌 상태가 기본 — cover()가 아닌 한 다시 나타나지 않게
     if (this.cloth && !this.cloth.covering) this.cloth.mesh.visible = false;
+    this.applyLightRig(HOME_LIGHT); // 조명 원복 — 홈 씬은 항상 HOME_LIGHT
   }
 
   isShowcasing(): boolean {
@@ -485,6 +543,10 @@ export class SceneHost {
     this.showcase?.dispose();
     this.showcase = null;
     this.homeGroup = [];
+    this.keyLight = null;
+    this.ambientLight = null;
+    this.fillLight = null;
+    this.hemiLight = null;
     this.feedSeq = null;
     this.watchSeq = null;
   }

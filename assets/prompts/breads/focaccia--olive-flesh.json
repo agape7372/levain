@@ -1,29 +1,51 @@
 {
   "id": "focaccia--olive-flesh",
-  "version": 1,
+  "version": 4,
   "name_ko": "올리브 포카치아",
-  "subject": "a thin rectangular slab of focaccia bread studded with chopped olive flesh",
+  "subject": "a thin rectangular slab of focaccia bread with a few chopped olive pieces pressed into the dimpled top",
   "geometry": {
     "silhouette": "a thin rectangular slab, flat top, low uniform height",
     "crust": [
       "matte golden surface #D9A552 across the top",
-      "finger-dimple pits distributed evenly across the entire top surface",
-      "inside each dimple a small pool of darker, more saturated golden-amber color #B8813C, as if olive oil has gathered there",
-      "scattered rosemary leaves, whole black olives, and coarse salt crystals pressed into the surface",
-      "irregular dark purple-black chopped olive flesh chunks #3B2F2F embedded inside and around the oil-filled dimples across the whole top surface"
+      "fingertip-pressed dimple pits, each one a little different — slightly oval, softly uneven rims, varied depths — the honest irregularity of hand-dimpled dough",
+      "inside three or four dimples, a small pool of darker golden-amber #B8813C following each dimple's own shape; the rest stay plain",
+      "about nine solid olive pieces #3B2F2F (deep warm plum-brown), hand-chopped so every piece has its own shape, size and tilt, each pressed snugly into or beside a dimple so it sits half-sunken, the dough hugging its edges, in loose casual clusters that leave quiet plain areas",
+      "a few small rosemary leaves and a small pinch of salt flakes, sparse",
+      "side walls and bottom plain golden crumb"
     ]
   },
-  "style_ref": "shared-style-v2",
+  "style_ref": "shared-style-v3",
   "camera": "three-quarter top-front view, object centered, 15% margin",
   "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
   "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
-  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "cheese topping", "tomato slices", "extra glossy oil sheen"],
-  "views": ["three-quarter top-front", "front elevation", "top-down"],
-  "output": { "aspect": "1:1", "size": 1024 },
-  "prompt_flat": "A cozy low-poly stylized 3D render of a thin rectangular slab of focaccia bread studded with chopped olive flesh, a single game asset object on a plain backdrop. Geometry: a thin rectangular slab with a flat top and low uniform height. Crust: a matte golden surface (#D9A552) covers the top; finger-dimple pits are distributed evenly across the entire top surface; inside each dimple sits a small pool of darker, more saturated golden-amber color (#B8813C), as if olive oil has gathered there — expressed purely as color, not as shine; scattered rosemary leaves, whole black olives, and coarse salt crystals are pressed into the surface; irregular dark purple-black chopped olive flesh chunks (#3B2F2F) are embedded inside and around the oil-filled dimples across the whole top surface. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no specular highlights, no cheese topping, no tomato slices, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
-  "followup_views": [
-    "Same exact olive focaccia slab, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
-    "Same exact olive focaccia slab, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the dimple grid, olive flesh chunks, rosemary, whole olives, and salt are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "cheese topping",
+    "tomato slices"
   ],
-  "notes_ko": "베이스 focaccia.json의 geometry(얇은 사각 슬랩, 딤플 그리드, 오일 색 표현)를 그대로 계승하고 다진 올리브 과육 청크(#3B2F2F)만 딤플 주변에 추가했다. negative에 치즈·토마토·추가 광택 차단 — '올리브'라는 재료어가 지중해식 토핑(치즈·토마토) 연상을 유발하기 쉬워 명시적으로 막았다."
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy softly-stylized clay-like 3D render of a rustic freshly baked slab of focaccia with a few chopped olive pieces pressed into the hand-dimpled top, a single game asset object on a plain backdrop. Geometry: a thin rectangular slab with a flat top, low uniform height and softly rounded edges. Crust: an oven-warm matte golden-brown surface (#D9A552) across the top, marked by fingertip-pressed dimple pits, spaced a little unevenly the way fingertips actually land — each one a little different, slightly oval with softly uneven rims and varied depths, the honest irregularity of hand-dimpled dough. Inside three or four of the dimples a small pool of darker golden-amber (#B8813C) settles, following each dimple's own shape; the rest stay plain. Toppings: about nine solid olive pieces in deep warm plum-brown (#3B2F2F), hand-chopped so every piece has its own shape, size and tilt — a couple of generous pieces, several smaller ones — each pressed snugly into or beside a dimple so it sits half-sunken, the dough hugging its edges, gathered in loose casual clusters that leave quiet plain areas; a few small rosemary leaves and a small pinch of salt flakes, kept sparse. The side walls and bottom stay plain golden crumb. Overall style: softly stylized clay-like 3D render, smooth rounded forms with gentle sculpted detail, soft matte shading, warm pastel palette, miniature diorama feel, cozy handmade bakery feel, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow on the background. Stylized soft matte render only — no photorealism, no glossy plastic, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact olive focaccia slab, identical proportions, colors, dimple layout and olive placement — now shown in a front elevation view (straight-on side view): the low slab profile with plain golden side walls and the gentle rise of the dimpled top edge. Do not change the pose, proportions or topping layout between views. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact olive focaccia slab, identical proportions, colors, dimple layout and olive placement — now shown in a top-down view (directly from above): the hand-pressed dimples each a little different, the three or four amber oil pools, and the nine hand-chopped olive pieces in their loose casual clusters, with quiet plain areas between them. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "v2(2026-08-30, appetizing v3 적용): 'distributed evenly across the entire top surface'·'across the whole top surface'가 극단 과밀·옆면 도트의 원인. 올리브 약 9개·오일 웅덩이 3~4개로 개수 명시, 반쯤 파묻힘, 불균일 클러스터+빈 딤플 유지, 옆면 토핑 금지 명문화, 로즈마리·소금은 sparse로 강등. low-poly faceted 제거. | v3(2026-08-30): v2 산출이 완벽 원형 균일 딤플(기계 펀칭)·균일 키세스 올리브로 사용자 기각. 딤플=수제 변형(타원·불균일 림·크기 제각각), 올리브=다진 청크 3계층 문법. | v4(2026-08-30): negative 감량 규율 적용(스콘 v5와 동일 진단) — 구조 금지 13개만, 딤플 수제 변형·올리브 다양화 전부 양성 서술로."
 }

@@ -1,0 +1,21 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": [
+    "assets/breads/src/focaccia--olive-flesh.png (three-quarter top-front, v4)",
+    "assets/breads/src/focaccia--olive-flesh-2.png (front elevation)",
+    "assets/breads/src/focaccia--olive-flesh-3.png (top-down)"
+  ],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "objectOccupiesEnoughOfFrame": "foregroundCoverage 0.2588, largestComponentFraction 1.0 (check_reference_admission.py)",
+    "strongSilhouette": "thin rectangular slab, clear in front-elevation and top-down views",
+    "majorMaterialsVisible": "matte crust + glossy oil pool + near-matte olive chunk, all visible across the three views",
+    "hiddenSideInferable": "underside occluded in all views but is a flat plain crust cap by construction (base focaccia.ts precedent) -- never faces the turntable camera above the horizon",
+    "procedurallyApproximable": "grid slab + revolved-shell chunks + vertex displacement; no smoke, liquid caustics, glass, or lace anywhere (the oil pool is a flat painted/geometric fake, not simulated liquid)"
+  },
+  "notConditional": "three views supplied (3/4, front elevation, top-down) so the single-view rotational-symmetry caveat does not apply",
+  "stylizationLevel": "smooth matte clay (2026-08-30 finish-contract change: facet() is deprecated for this round, computeVertexNormals()+toNonIndexed() is the target look)",
+  "complexity": "simple",
+  "askForBetterInput": "not needed"
+}

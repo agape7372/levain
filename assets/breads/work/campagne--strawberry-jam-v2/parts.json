@@ -1,0 +1,10 @@
+{
+  "note": "Parts as the builder constructs them, BEFORE the mandatory final mergeByMaterial (scripts/breads/campagneStrawberryJam.ts). Dome = 1 indexed mesh (grooved+slashed dome shell, wedge sectors deleted). Cut-face x2 = 2 indexed meshes (mirrored jam-swirl cross-section grid, one per exposed wedge boundary). mergeByMaterial fuses all three into ONE final mesh (they share the single atlas material), for the consumer's <=2-mesh cap (scripts/breads/types.ts section 1). Actual measured stats (breadlab-shot): 5108 tri / 2716 vert / 1 mesh / 1 material / 1 texture / 188.8KB GLB.",
+  "parts": [
+    { "name": "root", "kind": "container", "module": "createCampagneStrawberryJam", "triangles": 5108 },
+    { "name": "dome", "kind": "part", "module": "buildDome (buildGroovedDomeShell + slash displacement + cutWedge)", "triangles": "majority of 5108 -- 16-groove lathe profile x 32 segments, minus the 6/32 deleted wedge sectors" },
+    { "name": "cut-face", "kind": "repeated-archetype", "module": "buildCutFace (jam-swirl channel + pore dimples + flecks template -- see the 2 numbered instances below for the actual built meshes)", "triangles": "22 radial x 26 rows grid per instance" },
+    { "name": "cut-face-a", "kind": "part", "module": "buildCutFace(column=CUT_COL_A, reverse=false)", "triangles": "22 radial x 26 rows grid, remainder of the 5108 total split across the two faces" },
+    { "name": "cut-face-b", "kind": "part", "module": "buildCutFace(column=CUT_COL_B, reverse=true)", "triangles": "22 radial x 26 rows grid, mirrored winding" }
+  ]
+}

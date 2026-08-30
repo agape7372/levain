@@ -63,8 +63,91 @@ renderOrder 명시 고정 → 알파 소팅 오류 구조적 차단.
 
 - 배경: 라디얼 그라디언트(중심 #F2E6D3 → 가장자리 #E0CFB5) — CSS(캔버스 투명) 또는 셰이더 쿼드 1장.
 - 접지: 병 아래 베이크드 소프트 섀도 — 라디얼 알파 평면 1장(#4A3220, max 알파 0.12). 실시간 섀도맵 금지.
-- 조명: 현행(키 0xffe2b0 1.4 + 앰비언트 0xfff0dc 0.55) + 반대편 차가운 필 라이트 0.15.
+- **홈 씬(병·반죽·천) 조명**: 키 0xffe2b0 1.4 + 앰비언트 0xfff0dc 0.55 + 반대편 차가운 필 0xdce8ff 0.15
+  (`src/render/SceneHost.ts` `HOME_LIGHT`). 게임 화면 전체가 이 조명을 쓰므로 **여기는 건드리지 않는다**.
 - ~~시간대 틴트~~ 컷(v2).
+
+**빵 전시 조명(캘리브레이션, 2026-08-30)** — `scripts/breadlab.ts`·`scripts/thumbsHarness.ts`·
+`src/render/SceneHost.ts`(`SHOWCASE_LIGHT`, 빵 쇼케이스 진입 중에만 스왑)가 공유:
+
+```
+key     = DirectionalLight(0xffffff, 2.4)   position (-2, 6, 2)
+ambient = AmbientLight(0xffffff, 0.7656)
+fill    = DirectionalLight(0xffffff, 0.3)   position (2.5, 3, -2)
+```
+
+이전 값(키 0xffe2b0 1.4 + 앰비언트 0xfff0dc 0.75 + 필 0xdce8ff 0.2)은 정본 hex보다 렌더가 항상
+어둡고 채널별로 다르게 어두웠다(크러스트 #D9A552(217,165,82) → 렌더 (168,112,44)) — 원인은 키 색
+0xffe2b0의 B채널이 ×0.69라 파랑을 가장 심하게 깎았기 때문. 사용자 확정 방침(황금·앰버 연출 폐기,
+자연 주광=중성 화이트밸런스)에 따라 3灯 전부 순백(0xffffff)으로 바꾸고 세기만으로 노출을 맞춘다.
+
+**유도**: 빵 GLB는 `MeshLambertMaterial`(런타임·하네스 공통 `forceLambert` 강제 교체)로 렌더되고,
+윗면(normal +Y)의 출력은 `albedo · (dotNL_key·Ik + dotNL_fill·If + Ia) / π`다(three 0.185, 기본
+`NoToneMapping`+`SRGBColorSpace`, 색관리 활성 — 물리 단위 라이트). 키·필 위치가 고정이라
+`dotNL_key = 6/√44 ≈ 0.9045`, `dotNL_fill = 3/√19.25 ≈ 0.6838`(둘 다 좌표 기하로만 결정, 카메라
+각과 무관). 이 항이 정확히 π가 되면 윗면이 정본 hex 그대로 나온다 — 세 세기를 그 식에 맞춰
+역산(`Ik=2.4, If=0.3` 고정 시 `Ia = π − dotNL_key·Ik − dotNL_fill·If ≈ 0.7656`). 3灯을 전부 순백으로
+두면 R/G/B가 항상 같은 배율을 받으므로 "채널 편향 없음"이 산수로 보장된다.
+
+**실측(top-down 고정, PIL)**: focaccia·cracker·pancake·scone--choco-chip·focaccia--olive-flesh
+크러스트가 오차 0.0%, campagne·wholewheat·baguette·scone·loaf가 ±0.5~2.2%(무편향) — 전부 ±5%
+허용치 안. 포화 0건(순백 픽셀 0, ≥254 채널 0건, 렌더 10종·프레임 20장 실측). 캘리브레이션 방법·
+전체 수치는 팀리드 보고(2026-08-30) 참조.
+
+**측면 노출 2차 캘리브레이션(2026-08-30)** — 위 1차는 윗면(+Y)만 타깃으로 역산돼 수직 측벽(크럼
+컷페이스·크림 사이드)이 레퍼런스보다 그레이시하게 죽었다(예: `scone--choco-chip` 크림 옆면
+`#F4EAD4`가 렌더에서 회백색, `campagne--strawberry-jam` 컷 페이스가 정본 대비 -22%). 원인은 키·필이
+윗면 dotNL만 맞추도록 역산돼 있어 수직 normal(dotNL_key/fill이 훨씬 작음)엔 앰비언트 0.7656만
+남기 때문.
+
+*레퍼런스 실측(assets/breads/src/*.png, PIL, 윗면 vs 시각적으로 가장 밝은 측벽 패치, 각 30×30px 평균)*:
+같은 알베도로 직접 비교 가능한 쌍만 정규화 없이, 다른 알베도 쌍은 `측정/정본hex`로 나눈 "쉐이딩
+계수"의 비로 비교했다.
+
+| 빵 | 윗면 계수 | 측벽 계수 | 측/윗 비 |
+|---|---|---|---|
+| `focaccia--olive-flesh`(크러스트=측벽, 같은 알베도 `#D9A552`) | 1.00 | 1.05 | 1.05 |
+| `loaf`(윗면 `#C68958` / 측벽 `#F4EAD4`) | 1.07 | 0.97 | 0.91 |
+| `scone--choco-chip`(윗면 `#D6A15C` / 측벽 `#F4EAD4`) | 1.05 | 0.93 | 0.89 |
+
+세 빵의 비가 0.89~1.05로 모여 **측/윗 비 목표 ≈ 0.9**로 잡았다(±10% 허용 시 0.81~0.99를 커버).
+
+**메커니즘**: `HemisphereLight(sky=0x000000, ground=0xffffff, intensity)`를 key/ambient/fill과 별개로
+추가한다. three의 `getHemisphereLightIrradiance`는 `mix(ground, sky, 0.5·dot(N,up)+0.5)`이고, 이
+값도 ambient와 동일하게 `RE_IndirectDiffuse`에서 `albedo/π`를 곱해 최종 출력에 더해진다(직사광의
+`dotNL·color`와 같은 합산 경로). `sky=검정`이므로:
+- 윗면(N=(0,1,0)): `dot(N,up)=1` → 가중치가 100% sky(검정)로 쏠려 기여 = 0. **윗면 파리티가 산수로
+  그대로 유지**된다(회귀 없음 — key/ambient/fill 세 값은 1차 캘리브레이션 그대로 손대지 않았다).
+- 수직 측벽(N·up≈0): 가중치 0.5 → `0.5·ground/π`만큼 순증. 앰비언트 재조정이 불필요하다(sky=0이라
+  윗면에서 상쇄할 것이 없다).
+
+`intensity`는 이론상 수직면에 `0.5·intensity/π`를 더하지만, three의 색공간 관리(선형 계산 후
+sRGB 인코딩)가 있어 sRGB 픽셀 기준 실측 증분은 이론치보다 작다(intensity 1.7 → 이론 +0.27, 실측
+scone/loaf 측벽 +0.16) — 최종 값은 실측으로 맞췄다. **확정값: intensity=1.7**
+(`scripts/breadlab.ts`·`scripts/thumbsHarness.ts`·`src/render/SceneHost.ts`의 `SHOWCASE_LIGHT.hemi`
+세 곳 동일). `HOME_LIGHT`엔 `hemi` 필드가 없다 = 홈 씬은 계속 hemisphere 0(끔), 쇼케이스
+진입/이탈 시 `applyLightRig`가 `rig.hemi ?? {intensity:0}`으로 스왑한다.
+
+**전/후 실측(breadlab-shot 3/4뷰, PIL)**:
+
+| 빵 | 윗면(불변) | 측벽 이전 | 측벽 이후 | 목표(≈0.9×윗면) | 오차 |
+|---|---|---|---|---|---|
+| `loaf` | 1.00(=정본) | 0.72 | 0.88 | 0.90 | -2% |
+| `scone--choco-chip` | 1.00(=정본) | 0.73 | 0.88 | 0.90 | -2% |
+| `focaccia--olive-flesh` | 1.00(=정본) | 1.00 | 1.00(불변) | — | 원래 문제 없음(측벽 두께가 얕아 normal이 여전히 위쪽에 가까움) |
+
+윗면은 이전/이후 완전히 동일한 픽셀값(196,135,87) 등 — 1차 캘리브레이션 회귀 0건, 산수 그대로 검증됨.
+
+**포화 검사**: `loaf`·`scone--choco-chip`·`focaccia--olive-flesh`·`campagne--strawberry-jam`·
+`baguette`·`cracker` 6종 × 3/4·azimuth 90° 2각도, 순백 픽셀 0건, 채널 254↑ 비율 기존과 동일 수준
+(추가 증분이 새 클리핑을 만들지 않음 — 측벽 목표가 1.0을 넘지 않게 잡았기 때문).
+
+**알려진 부작용**: `campagne--strawberry-jam`은 자체 `PARITY_GAIN`(구 앰버 조명 시절 보정값,
+`scripts/breads/campagneStrawberryJam.ts`)이 아직 `[1,1,1]`로 되돌려지지 않은 채 남아 있어, 이번
+hemisphere 증분과 겹쳐 컷 페이스가 다른 빵보다 더 크게 밝아진다(측/윗 비 목표를 초과할 수 있음).
+스펙 파일 자체가 "패밀리 조명이 재보정되면 게인을 되돌리라"고 명시하고 있어 지금이 그 시점이지만,
+`scripts/breads/*.ts` 빌더 수정은 이번 작업 범위 밖(동시 작업 중인 변형 3종과 충돌)이라 손대지
+않았다 — 후속 작업에서 게인 리셋 필요.
 
 ## 2. 기포 시스템 (파티클 아님 — 셰이더 절차)
 

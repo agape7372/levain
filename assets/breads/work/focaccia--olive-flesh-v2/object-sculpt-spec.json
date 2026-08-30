@@ -1,0 +1,2889 @@
+{
+  "targetName": "Olive Focaccia Slab",
+  "targetId": "olive-focaccia-slab",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Fixed by scripts/breadlab.ts."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "thin rectangular olive focaccia slab",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "geometric",
+        "hand-crafted",
+        "organic (chunks)"
+      ],
+      "structureKind": [
+        "single rigid slab",
+        "attached small organic chunks"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte baked crust + near-matte cured olive flesh + glossy oil pool, all in the same broad dielectric family as pancake/cracker/flatbread/focaccia. Three logical albedo zones (crust/oil/olive), reduced to two runtime meshes via a shared basecolor texture for crust+oil."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 2,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 3,
+        "materialLayerCount": 2,
+        "localDetailDensity": 3,
+        "occlusionRisk": 0,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 1,
+        "mesoComponents": 1,
+        "microFeatureGroups": 3,
+        "materialLayers": 3,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "One rigid macro body (slab) plus one repeated micro archetype (olive-chunk) attached to it.",
+        "Silhouette is a flat rectangular slab, its top edge broken irregularly by small chunk bumps.",
+        "Repetition density 3: dimple field + olive/oil scatter + sparse topping scatter, the first two both identity-critical.",
+        "Three logical albedo zones (crust/oil/olive) collapsed to 2 runtime meshes.",
+        "Occlusion risk 0: only the flat, featureless underside is hidden.",
+        "Action readiness 0: static showcase prop."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Simple tier but needs a meso top-face node plus a micro chunk archetype so all three repetition systems attach to real geometry."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 4,
+      "note": "Enumerated by hand (CRIB: skip build_detail_inventory.py's grid-scan for a single repeated-system object; still hand-fill the target count).",
+      "details": [
+        {
+          "id": "dimple-field",
+          "zone": "top face",
+          "observation": "~13 individually different shallow pits: oval, uneven rim, varied depth.",
+          "inference": "Finger-pressed dimples, each pressed slightly differently by hand.",
+          "mapsTo": {
+            "ref": "slab-top-face-dimples",
+            "note": ""
+          },
+          "confidence": 0.95,
+          "evidenceRef": "focaccia--olive-flesh-3.png full frame",
+          "kind": "hole"
+        },
+        {
+          "id": "olive-scatter",
+          "zone": "top face",
+          "observation": "~11 irregular hand-chopped olive chunks, half-sunken into or beside dimples, gathered in loose clusters with plain gaps between them.",
+          "inference": "Hand-chopped olive pieces pressed into the dough after dimpling.",
+          "mapsTo": {
+            "ref": "olive-chunk-irregular-silhouette",
+            "note": ""
+          },
+          "confidence": 0.9,
+          "evidenceRef": "focaccia--olive-flesh-3.png full frame",
+          "kind": "ridge"
+        },
+        {
+          "id": "topping-scatter",
+          "zone": "top face",
+          "observation": "A few sparse rosemary slivers and salt flecks.",
+          "inference": "Toppings pressed into the dough before baking, kept sparse per v4.",
+          "mapsTo": {
+            "ref": "slab-top-face-toppings",
+            "note": ""
+          },
+          "confidence": 0.7,
+          "evidenceRef": "focaccia--olive-flesh-3.png full frame",
+          "kind": "ridge"
+        },
+        {
+          "id": "corner-round",
+          "zone": "perimeter",
+          "observation": "Rounded corners, not sharp right angles.",
+          "inference": "Dough relaxing in the pan before baking.",
+          "mapsTo": {
+            "ref": "slab-corner-round",
+            "note": ""
+          },
+          "confidence": 0.75,
+          "evidenceRef": "focaccia--olive-flesh-3.png outline",
+          "kind": "contour"
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/focaccia--olive-flesh.png",
+    "resolvedUnknowns": [
+      "Underside fully occluded; modelled as a coarse flat fan, never visible above the horizon.",
+      "Exact dimple/chunk positions not identity-critical beyond count, irregularity, and loose-cluster-with-gaps density.",
+      "Olive/oil/crust color cannot be preserved as three separate runtime meshes within the 2-material budget (types.ts section 1); resolved by baking crust+oil into one shared basecolor canvas texture and giving olive its own solid-color mesh.",
+      "Gloss distinction between matte crust, near-matte olive, and glossy oil pool is invisible at runtime (Lambert-only); color contrast is the only surviving cue."
+    ]
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 1,
+      "mesoComponents": 1,
+      "microFeatureGroups": 3,
+      "materialLayers": 3,
+      "repetitionSystems": 3,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.8,
+    "mustMatch": [
+      "thin flat rectangular slab",
+      "irregular (non-gridded) dimple field",
+      "irregular hand-chopped olive chunks, half-sunken",
+      "smooth (non-faceted) clay shading"
+    ],
+    "niceToHave": [
+      "loose casual chunk clustering with quiet plain gaps",
+      "oil pool present in only a minority of dimples",
+      "faint side-wall tear striations",
+      "sparse rosemary/salt bumps"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "thin-rect-slab-silhouette",
+      "name": "Thin rectangular slab silhouette",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "slab"
+      ],
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "dimple-field-irregularity",
+      "name": "Irregular (not gridded) dimple field",
+      "tier": "critical",
+      "passIds": [
+        "surface-pass",
+        "form-refinement"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "slab-top-face"
+      ],
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "olive-chunk-irregularity",
+      "name": "Irregular hand-chopped olive chunks (not uniform domes)",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement",
+        "material-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "olive-chunk"
+      ],
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "olive-cluster-gaps",
+      "name": "Loose casual clusters with quiet plain gaps (not even scatter)",
+      "tier": "important",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "slab-top-face",
+        "olive-chunk"
+      ],
+      "evidenceRefs": [
+        "view-top"
+      ]
+    },
+    {
+      "id": "oil-pool-material-split",
+      "name": "Oil pool visible in only a minority of dimples",
+      "tier": "important",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "slab-top-face"
+      ],
+      "evidenceRefs": [
+        "view-top"
+      ]
+    },
+    {
+      "id": "smooth-clay-finish",
+      "name": "Smooth (non-faceted) clay shading",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "slab",
+        "slab-top-face",
+        "olive-chunk"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": [],
+    "droppedPasses": {
+      "lighting-pass": "lighting fixed by the consumer harness",
+      "interaction-pass": "static showcase prop; actionReadinessNeed 0"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 256,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Runtime keeps only map+color, PBR maps banned (types.ts section 2). All relief lives in geometry; oil-pool is a flat basecolor-texture zone, olive is a flat solid-color mesh."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Fixed by scripts/breadlab.ts / scripts/thumbsHarness.ts (just recalibrated -- do not add gain/parity correction, hex renders at 0% error).",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render",
+        "re-adding channel-gain calibration on top of the freshly-calibrated rig"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "Underside never visible above the horizon.",
+    "Runtime normalizes longest axis to 1.6.",
+    "Exact dimple/chunk coordinates not identity-critical beyond count, irregularity, and loose-cluster-with-gaps distribution.",
+    "Top-down view is the measurement-plane reference for chunk diameter and layout density (CRIB lesson: 3/4 view foreshortens)."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, harness three-quarter camera at (-1.6, 2.2, 2.6)",
+    "up": "+Y",
+    "scaleReference": "half-width(X) = 1.0 relative unit; runtime refits longest axis to 1.6."
+  },
+  "silhouette": {
+    "boundingShape": "thin rectangular slab, 2.00 x 1.30 x 0.28, with 11 small attached chunk silhouettes breaking the top edge line",
+    "aspectRatios": [
+      {
+        "id": "thickness-over-width",
+        "value": 0.14,
+        "source": "assets/prompts/breads/focaccia--olive-flesh.json silhouette (thin slab, low uniform height)"
+      }
+    ],
+    "symmetry": "rectangular, broken by corner rounding and irregular chunk/dimple placement",
+    "dominantCurves": [
+      "flat top/bottom planes with irregular dimple pits and small rounded chunk bumps"
+    ],
+    "negativeSpaces": [
+      "13 irregular dimple pits"
+    ],
+    "landmarks": [
+      "irregular dimple field",
+      "loosely clustered olive chunks with plain gaps",
+      "a couple of glossy oil pools"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "thin rectangular slab, gently rounded corners",
+        "irregular hand-pressed dimples, each individually oval with an uneven rim",
+        "hand-chopped olive chunks seated in or beside dimples, half-sunken",
+        "a couple of glossy amber oil pools visible in a minority of dimples",
+        "sparse rosemary sliver + salt fleck accents"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "low flat profile, thickness roughly 15% of width",
+        "faint vertical tear striations on the plain side wall",
+        "olive chunks break the top edge line irregularly, not evenly spaced"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "olive chunks and oil pools gathered in loose casual clusters with quiet plain gaps between them, not spread evenly",
+        "each dimple visibly different in shape/size/depth",
+        "reference measurement plane for chunk diameter and dimple layout (CRIB: fix the measurement plane, top-down over 3/4)"
+      ],
+      "confidence": 0.95
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "slab",
+      "name": "Focaccia rectangular slab",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Single rigid rectangular slab, box primitive is structurally correct for a flat extruded volume (focaccia/cracker precedent). 'continuous-sculpt' is disallowed with primitive 'box' (validate_sculpt_spec.py DISALLOWED_TOPOLOGY_PRIMITIVE_PAIRS).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, smooth-shaded after generation",
+        "gridProfile": {
+          "note": "Cartesian NX x NZ grid slab, not a lathe.",
+          "segmentsX": 16,
+          "segmentsZ": 12,
+          "halfX": 1.0,
+          "halfZ": 0.65,
+          "thickness": 0.28
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "corner-round",
+            "type": "radial-modulation",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.03,
+            "notes": "Corner rounding + edge noise on the perimeter loop only (focaccia precedent)."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar)",
+        "normalStrategy": "smooth normals computed before splitting to non-indexed (2026-08-30 finish contract)"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.0,
+        "height": 0.28,
+        "depth": 1.3,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat box proxy matching the slab bounding volume."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "slab",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust-top"
+        }
+      },
+      "material": "crust-top",
+      "materialLayers": [
+        "crust-top"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(217, 165, 82, 1.0)",
+        "secondaryAlbedo": "rgba(217, 165, 82, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust / near-matte cured olive flesh / glossy oil pool -- same broad dielectric family as pancake/cracker/flatbread/focaccia precedent; runtime Lambert swap discards the gloss distinction (types.ts section 2), so it is not modelled as a separate material channel.",
+        "zone": "whole slab except dimple interiors",
+        "evidenceRefs": [
+          "assets/prompts/breads/focaccia--olive-flesh.json geometry.crust (v4)"
+        ]
+      },
+      "deformations": [
+        "corner-round"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "slab-corner-round",
+          "name": "Rounded corner edge",
+          "kind": "contour",
+          "description": "Perimeter loop gets corner rounding + noise.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "smooth vertex normals (computeVertexNormals -> toNonIndexed, 2026-08-30 finish contract -- facet() is deprecated for this round)",
+        "displacementPattern": "grid-cell vertex displacement (dimples recessed, toppings raised) + separate revolved-shell chunk meshes for olives",
+        "occlusionPattern": "cavity darkening inside each dimple pit, deeper where a chunk is embedded",
+        "edgeWearPattern": "faint vertical tear striations on the side wall (nice-to-have, not scored)",
+        "notes": "Base slab; identity-critical relief lives on the top-face child component."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "slab-corner-round"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "slab-top-face",
+      "name": "Focaccia top face (dimples + oil pools + toppings)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Same rigid grid volume as the parent; carries the top face's identity-critical local features separately from the parent's edge feature (focaccia precedent).",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, smooth-shaded after generation",
+        "gridProfile": {
+          "note": "Same NX x NZ grid as the parent's top ring; dimples/toppings are grid-cell displacements, zero added triangles on the slab itself.",
+          "segmentsX": 16,
+          "segmentsZ": 12
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "dimple-field",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "amplitude": 0.08,
+            "notes": "13 finger-dimple pits, stratified-random over a 5x3 region grid (not a fixed lattice), each independently oval/uneven via per-neighbor partial-drop bias, depth spread +/-30%. Touching quads carry the oil-pool material only for the 3 dimples marked pool=true; the rest stay on crust-top."
+          },
+          {
+            "id": "topping-scatter",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.015,
+            "notes": "6 sparse raised bumps (rosemary/salt combined) on the crust material only -- kept low density per v4's 'sparse' requirement, unlike v1's 22-bump full-face scatter."
+          }
+        ],
+        "uvStrategy": "top-planar projection (scripts/breads/lib.ts uvTopPlanar), basecolor canvas texture carries crust+oil so the 2-material budget is not spent here (types.ts section 1/9)",
+        "normalStrategy": "smooth normals computed before splitting to non-indexed"
+      },
+      "parent": "slab",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.9,
+        "height": 0.08,
+        "depth": 1.235,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat box proxy matching the slab bounding volume."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "slab-top-face",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust-top"
+        }
+      },
+      "material": "crust-top",
+      "materialLayers": [
+        "crust-top",
+        "oil-pool"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(217, 165, 82, 1.0)",
+        "secondaryAlbedo": "rgba(184, 129, 60, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust / near-matte cured olive flesh / glossy oil pool -- same broad dielectric family as pancake/cracker/flatbread/focaccia precedent; runtime Lambert swap discards the gloss distinction (types.ts section 2), so it is not modelled as a separate material channel.",
+        "zone": "top face base + dimple oil-pool zones",
+        "evidenceRefs": [
+          "assets/prompts/breads/focaccia--olive-flesh.json geometry.crust (v4)"
+        ]
+      },
+      "deformations": [
+        "dimple-field",
+        "topping-scatter"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "slab-top-face-perimeter-ring",
+          "kind": "material-boundary",
+          "notes": "Shares the parent's perimeter ring exactly; a duplicated wall-top ring keeps the smooth-normal rim from chamfering (CRIB finish-contract rim pitfall)."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "slab-top-face-dimples",
+          "name": "Irregular finger-dimple field",
+          "kind": "hole",
+          "description": "13 stratified-irregular pits, each a little different in shape/rim/depth -- the single most identity-defining trait, and what distinguishes this variant from the base focaccia's fixed grid.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.95,
+          "repetitionSystemRef": "dimple-field"
+        },
+        {
+          "id": "slab-top-face-toppings",
+          "name": "Sparse rosemary/salt scatter",
+          "kind": "ridge",
+          "description": "Sparse raised bumps for rosemary/salt, geometry-only (no separate color budget).",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.7,
+          "repetitionSystemRef": "topping-scatter"
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.08,
+        "normalPattern": "smooth vertex normals (computeVertexNormals -> toNonIndexed, 2026-08-30 finish contract -- facet() is deprecated for this round)",
+        "displacementPattern": "grid-cell vertex displacement (dimples recessed, toppings raised) + separate revolved-shell chunk meshes for olives",
+        "occlusionPattern": "cavity darkening inside each dimple pit, deeper where a chunk is embedded",
+        "edgeWearPattern": "faint vertical tear striations on the side wall (nice-to-have, not scored)",
+        "notes": "assets/prompts/breads/focaccia--olive-flesh.json v4 notes_ko: hand-dimpled irregularity is what the user rejected v1/v2/v3 for lacking."
+      },
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ],
+      "details": [
+        "slab-top-face-dimples",
+        "slab-top-face-toppings"
+      ],
+      "fidelityTier": "surface-pass"
+    },
+    {
+      "id": "olive-chunk",
+      "name": "Chopped olive flesh chunk (repeated archetype)",
+      "level": "micro",
+      "role": "attachment",
+      "importance": 0.95,
+      "confidence": 0.85,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "An irregular hand-chopped organic wedge is a continuous sculpted form, not a hard-edged box/cylinder/cone -- built as a manually-ringed revolved shell (lib.ts buildRevolvedShell, LatheGeometry itself is banned per CRIB phi-seam rule) with per-instance profile/segment/tilt variation so no two chunks are identical.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly organic chunk, smooth-shaded, 3-ring profile (root/mid/mid/apex) for a rounded-shoulder silhouette instead of a single-cone tip",
+        "gridProfile": {
+          "note": "Not a grid; 7-9 radial segments x 5 profile rings, per-instance.",
+          "segments": "7-9 (varied per instance for silhouette variety)"
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "chunk-authoring-irregularity",
+            "type": "authoring-parameter",
+            "axis": [
+              1,
+              1,
+              1
+            ],
+            "amplitude": 0.16,
+            "notes": "Irregularity lives in AUTHORING parameters (per-segment radius wobble shared across rings, lean direction/amount, asymmetric profile ratios, apex xz wobble), not post-hoc vertex jitter -- CRIB 2026-08-30 lesson: jitter on a feature this small (radius 0.065-0.085) either shreds the silhouette (amp 0.006) or collapses it into a flat blob (amp 0.02) even before the smooth-normal finish, which is stricter still."
+          },
+          {
+            "id": "chunk-notch",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "amplitude": 0.2,
+            "notes": "45% chance per chunk of a crown notch: one or two adjacent segments on the two uppermost rings pulled inward/down (not the profile's pole dragged down, which would invert normals per CRIB non-monotonic-profile rule) -- reads as a pit-hole/fracture mark, avoiding the 'perfectly smooth dome' look the user rejected in v2/v3."
+          }
+        ],
+        "uvStrategy": "top-planar projection (color is flat per-material, UV only satisfies mergeByMaterial's attribute-consistency requirement)",
+        "normalStrategy": "smooth normals computed before splitting to non-indexed"
+      },
+      "parent": "slab-top-face",
+      "attachment": {
+        "parentSocket": "top-face-grid-cell",
+        "contactType": "embed",
+        "embedDepth": 0.014,
+        "notes": "Half-sunken into a dimple or beside one; dough is not separately modelled to hug the edge (2-mesh budget), the embed depth alone sells it."
+      },
+      "dimensions": {
+        "width": 0.15,
+        "height": 0.078,
+        "depth": 0.15,
+        "units": "relative",
+        "confidence": 0.75
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "attachment",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat box proxy matching the slab bounding volume."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "olive-chunk",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust-top"
+        }
+      },
+      "material": "olive-flesh",
+      "materialLayers": [
+        "olive-flesh"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(112, 54, 31, 1.0)",
+        "secondaryAlbedo": "rgba(112, 54, 31, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust / near-matte cured olive flesh / glossy oil pool -- same broad dielectric family as pancake/cracker/flatbread/focaccia precedent; runtime Lambert swap discards the gloss distinction (types.ts section 2), so it is not modelled as a separate material channel.",
+        "zone": "olive chunk instances (OLIVE_RENDER_HEX, calibrated -- see OLIVE_RENDER_HEX comment above)",
+        "evidenceRefs": [
+          "assets/prompts/breads/focaccia--olive-flesh.json geometry.crust (v4)"
+        ]
+      },
+      "deformations": [
+        "chunk-authoring-irregularity",
+        "chunk-notch"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "olive-chunk-irregular-silhouette",
+          "name": "Irregular hand-chopped silhouette",
+          "kind": "contour",
+          "description": "Each chunk gets its own radius/height/profile-ratio/lean/tilt draw -- v2/v3 user-rejection reason was uniform kiss-shaped domes.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "confidence": 0.85,
+          "repetitionSystemRef": "olive-scatter"
+        },
+        {
+          "id": "olive-chunk-notch",
+          "name": "Pit-hole / fracture notch",
+          "kind": "hole",
+          "description": "~45% of chunks get a shallow crown notch from pressing two upper-ring segments inward, reading as the dark fracture/pit mark visible on several reference chunks.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.7,
+          "repetitionSystemRef": "olive-scatter"
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "smooth vertex normals (computeVertexNormals -> toNonIndexed, 2026-08-30 finish contract -- facet() is deprecated for this round)",
+        "displacementPattern": "grid-cell vertex displacement (dimples recessed, toppings raised) + separate revolved-shell chunk meshes for olives",
+        "occlusionPattern": "cavity darkening inside each dimple pit, deeper where a chunk is embedded",
+        "edgeWearPattern": "faint vertical tear striations on the side wall (nice-to-have, not scored)",
+        "notes": "Olive gets its own solid material (types.ts section 1: mesh<=2), no texture."
+      },
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ],
+      "details": [
+        "olive-chunk-irregular-silhouette",
+        "olive-chunk-notch"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "crust-top",
+      "name": "Focaccia base crust (+ baked oil-pool bands)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; runtime swaps to MeshLambertMaterial keeping only map and color",
+      "baseColor": "#D9A552",
+      "color": "#D9A552",
+      "albedo": {
+        "dominant": "#D9A552",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/focaccia--olive-flesh.json v4 geometry.crust (types.ts section 8 -- JSON import banned, hex is embedded in prose)."
+      },
+      "colorVariation": {
+        "palette": [
+          "#D9A552"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 256,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "crust-top carries a 256px basecolor canvas (crust+oil-pool bands); olive-flesh is solid color, UV only satisfies mergeByMaterial's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "flat rectangular slab silhouette / chunk mass",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 4.0,
+          "amplitude": 0.03,
+          "role": "corner rounding / chunk lean+tilt",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 20.0,
+          "amplitude": 0.08,
+          "role": "dimple field + oil pool + chunk notch",
+          "carrier": "geometry+texture"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "smooth vertex normals",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "whole slab top/sides/bottom except olive chunks",
+        "amplitude": 0.08,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(). Never vertexColors or flatShading."
+      ],
+      "notes": "whole slab top/sides/bottom except olive chunks. Basecolor canvas texture (2 flat bands), no vertex color (scripts/breads/types.ts section 9)."
+    },
+    {
+      "id": "oil-pool",
+      "name": "Focaccia dimple oil pool (baked into crust-top texture, not a separate mesh material)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; runtime swaps to MeshLambertMaterial keeping only map and color",
+      "baseColor": "#B8813C",
+      "color": "#B8813C",
+      "albedo": {
+        "dominant": "#B8813C",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/focaccia--olive-flesh.json v4 geometry.crust (types.ts section 8 -- JSON import banned, hex is embedded in prose)."
+      },
+      "colorVariation": {
+        "palette": [
+          "#B8813C"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "crust-top carries a 256px basecolor canvas (crust+oil-pool bands); olive-flesh is solid color, UV only satisfies mergeByMaterial's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "flat rectangular slab silhouette / chunk mass",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 4.0,
+          "amplitude": 0.03,
+          "role": "corner rounding / chunk lean+tilt",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 20.0,
+          "amplitude": 0.08,
+          "role": "dimple field + oil pool + chunk notch",
+          "carrier": "geometry+texture"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "smooth vertex normals",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "dimple interiors, minority of dimples only",
+        "amplitude": 0.08,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "dimple-triangle-bucket",
+          "name": "Oil-pool basecolor-texture zone",
+          "maskSource": "geometry",
+          "description": "Oil zone is painted into the same basecolor canvas as crust-top (bakeTexture), not a separate mesh -- the 2-material budget (crust+oil combined, olive separate) is spent on the olive/crust split instead, per CRIB.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "appliesTo": [
+            "slab-top-face"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(). Never vertexColors or flatShading."
+      ],
+      "notes": "dimple interiors, minority of dimples only. Solid color, no texture (scripts/breads/types.ts section 9)."
+    },
+    {
+      "id": "olive-flesh",
+      "name": "Chopped olive flesh",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; runtime swaps to MeshLambertMaterial keeping only map and color",
+      "baseColor": "#70361F",
+      "color": "#70361F",
+      "albedo": {
+        "dominant": "#70361F",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/focaccia--olive-flesh.json v4 geometry.crust (types.ts section 8 -- JSON import banned, hex is embedded in prose)."
+      },
+      "colorVariation": {
+        "palette": [
+          "#70361F"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "crust-top carries a 256px basecolor canvas (crust+oil-pool bands); olive-flesh is solid color, UV only satisfies mergeByMaterial's attribute-consistency requirement."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "flat rectangular slab silhouette / chunk mass",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 4.0,
+          "amplitude": 0.03,
+          "role": "corner rounding / chunk lean+tilt",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 20.0,
+          "amplitude": 0.08,
+          "role": "dimple field + oil pool + chunk notch",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "smooth vertex normals",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "olive chunk instances (calibrated render target, see OLIVE_RENDER_HEX comment)",
+        "amplitude": 0.078,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(). Never vertexColors or flatShading."
+      ],
+      "notes": "olive chunk instances (calibrated render target, see OLIVE_RENDER_HEX comment). Solid color, no texture (scripts/breads/types.ts section 9)."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "dimple-field",
+      "name": "Irregular finger-dimple field",
+      "level": "micro",
+      "hostComponents": [
+        "slab-top-face"
+      ],
+      "elementComponentIds": [
+        "slab-top-face"
+      ],
+      "elementKind": "recessed vertex displacement, not an added mesh",
+      "count": 13,
+      "countPerHost": {
+        "slab-top-face": 13
+      },
+      "distribution": {
+        "mode": "stratified-random over a 5x3 region grid with a chebyshev minimum-separation reject -- irregular but evenly spread, not a fixed lattice (base focaccia.ts precedent) and not unconstrained random (which clumps)."
+      },
+      "sizeClasses": [
+        {
+          "id": "dimple",
+          "depth": 0.08,
+          "depthSpreadPct": 30
+        }
+      ],
+      "seedRule": "Builder rng, deterministic positions.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "olive-scatter",
+      "name": "Olive chunk + oil pool scatter",
+      "level": "micro",
+      "hostComponents": [
+        "slab-top-face"
+      ],
+      "elementComponentIds": [
+        "olive-chunk"
+      ],
+      "elementKind": "separate revolved-shell mesh instances, embedded via position/rotation, plus a subset of host dimples marked pool=true",
+      "count": 11,
+      "countPerHost": {
+        "slab-top-face": 11
+      },
+      "distribution": {
+        "mode": "7 seated in a dimple + 3 beside a dimple (ring-adjacency pick around seated hosts, for loose clustering) + 1 laid-over shard variant; remaining dimples split between 3 oil pools and plain empty finger marks."
+      },
+      "sizeClasses": [
+        {
+          "id": "seated-chunk",
+          "radius": 0.075
+        },
+        {
+          "id": "shard",
+          "radiusMultiplier": 1.1,
+          "heightMultiplier": 0.45
+        }
+      ],
+      "seedRule": "Builder rng only, per-instance profile draw (rollShape).",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "topping-scatter",
+      "name": "Sparse rosemary/salt scatter",
+      "level": "micro",
+      "hostComponents": [
+        "slab-top-face"
+      ],
+      "elementComponentIds": [
+        "slab-top-face"
+      ],
+      "elementKind": "raised vertex displacement, not an added mesh, no separate material",
+      "count": 6,
+      "countPerHost": {
+        "slab-top-face": 6
+      },
+      "distribution": {
+        "mode": "seeded shuffle of face-grid cells not used by dimples or their neighbors, chebyshev-distance rejection"
+      },
+      "sizeClasses": [
+        {
+          "id": "topping",
+          "depth": 0.015
+        }
+      ],
+      "seedRule": "Builder rng only.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-30T08:14:27.505364+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.8,
+        "formDetail": 0.0,
+        "materialSurface": 0.0,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "thin-rect-slab-silhouette",
+          "score": 0.85
+        }
+      ],
+      "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+      "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass1-blockout.png",
+      "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-1-blockout.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T08:16:57.447452+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.0,
+        "materialSurface": 0.0,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "thin-rect-slab-silhouette",
+          "score": 0.85
+        }
+      ],
+      "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+      "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass1-blockout.png",
+      "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-1-blockout.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T08:24:15.858810+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.82,
+        "materialSurface": 0.0,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dimple-field-irregularity",
+          "score": 0.8
+        },
+        {
+          "id": "olive-chunk-irregularity",
+          "score": 0.82
+        },
+        {
+          "id": "olive-cluster-gaps",
+          "score": 0.72
+        }
+      ],
+      "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+      "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass2-form-v2.png",
+      "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-2b-form.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T08:27:12.463526+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.82,
+        "materialSurface": 0.78,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "oil-pool-material-split",
+          "score": 0.75
+        },
+        {
+          "id": "olive-chunk-irregularity",
+          "score": 0.82
+        }
+      ],
+      "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+      "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass3-material.png",
+      "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-3-material.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T08:29:26.562824+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.82,
+        "materialSurface": 0.8,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.85
+        },
+        {
+          "id": "dimple-field-irregularity",
+          "score": 0.8
+        }
+      ],
+      "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+      "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass3-material.png",
+      "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-3-material.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T08:31:22.368352+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+      "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\rt.png",
+      "comparisonImage": "",
+      "cameraView": "",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T08:51:45.468714+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.86,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.85
+        },
+        {
+          "id": "dimple-field-irregularity",
+          "score": 0.85
+        }
+      ],
+      "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+      "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-3quarter.png",
+      "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-cmp.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T08:52:07.125122+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+      "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-rt.png",
+      "comparisonImage": "",
+      "cameraView": "",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T09:07:33.798972+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.88,
+      "aiVisionScore": 0.88,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.87,
+        "formDetail": 0.88,
+        "materialSurface": 0.88,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.88
+        },
+        {
+          "id": "dimple-field-irregularity",
+          "score": 0.85
+        },
+        {
+          "id": "olive-chunk-irregularity",
+          "score": 0.88
+        }
+      ],
+      "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+      "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r3-3quarter.png",
+      "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r4-cmp.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T09:07:44.776574+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.88,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+      "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r4-rt.png",
+      "comparisonImage": "",
+      "cameraView": "",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T09:14:24.460665+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.9,
+      "aiVisionScore": 0.9,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.9,
+        "materialSurface": 0.9,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.9
+        },
+        {
+          "id": "dimple-field-irregularity",
+          "score": 0.9
+        },
+        {
+          "id": "olive-chunk-irregularity",
+          "score": 0.88
+        }
+      ],
+      "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+      "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r5-3quarter.png",
+      "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r5-cmp.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-30T08:14:27.505364+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.8,
+        "formDetail": 0.0,
+        "materialSurface": 0.0,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "thin-rect-slab-silhouette",
+          "score": 0.85
+        }
+      ],
+      "action": "continue",
+      "summary": "Blockout slab matches reference thin-rectangular-slab silhouette: proportions, rounded/wavy corners, thickness-over-width all read correctly with no material yet. Tier1 IoU 0.779 (below the 0.85 threshold CRIB documents as structurally unreachable for AI-render references without alignment) and aspect/scale deltas reflect 3/4-perspective vs axis-aligned-bbox residual, not a shape defect -- confirmed by direct visual comparison.",
+      "matched": [
+        "thin rectangular slab",
+        "rounded/wavy corners",
+        "thickness-over-width ratio"
+      ],
+      "mismatches": [
+        "no dimples/olives/materials yet (expected for blockout)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass1-blockout.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-1-blockout.png"
+      ],
+      "mapStrippedRender": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass1-blockout.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+        "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass1-blockout.png",
+        "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-1-blockout.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:16:57.447452+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.82,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.0,
+        "materialSurface": 0.0,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "thin-rect-slab-silhouette",
+          "score": 0.85
+        }
+      ],
+      "action": "continue",
+      "summary": "Structural pass confirms component hierarchy (slab macro / top-face meso ready to host repetition systems / olive-chunk micro archetype not yet instanced). Grid topology matches spec gridProfile, same tier1 render as blockout since no new geometry was added at this pass -- structural-pass validates the part hierarchy is sound before form detail lands.",
+      "matched": [
+        "slab macro root",
+        "top-face meso node ready for deformation stacks",
+        "grid subdivision matches spec gridProfile"
+      ],
+      "mismatches": [
+        "no dimples/olives/oil-pools/toppings yet (deferred to form-refinement)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass1-blockout.png"
+      ],
+      "mapStrippedRender": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass1-blockout.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+        "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass1-blockout.png",
+        "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-1-blockout.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:24:15.858810+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.82,
+        "materialSurface": 0.0,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dimple-field-irregularity",
+          "score": 0.8
+        },
+        {
+          "id": "olive-chunk-irregularity",
+          "score": 0.82
+        },
+        {
+          "id": "olive-cluster-gaps",
+          "score": 0.72
+        }
+      ],
+      "action": "continue",
+      "summary": "Rebalanced host selection to farthest-point sampling (was a plain shuffle().slice() that clumped all 7 hosts on one side, scoring olive-cluster-gaps 0.55 and failing the important-feature gate). Re-rendered: chunks now spread across the whole top face with small 2-3-piece local clusters, matching the reference's loose-but-distributed layout much more closely. Dimple/chunk irregularity, notch marks, and half-sunken embed all still read correctly. Tier1 IoU 0.749 and aspect delta 0.429 are the same CRIB-documented perspective-residual pattern seen at every pass so far, confirmed not a shape regression by direct visual comparison.",
+      "matched": [
+        "olive chunks and dimples spread across the full top face, not clumped to one side",
+        "irregular hand-chopped chunk silhouettes",
+        "notch fracture marks",
+        "half-sunken embed depth",
+        "irregular dimple field"
+      ],
+      "mismatches": [
+        "no color/material yet (deferred to material-pass)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass2-form-v2.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-2b-form.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+        "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass2-form-v2.png",
+        "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-2b-form.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:27:12.463526+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.82,
+        "materialSurface": 0.78,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "oil-pool-material-split",
+          "score": 0.75
+        },
+        {
+          "id": "olive-chunk-irregularity",
+          "score": 0.82
+        }
+      ],
+      "action": "continue",
+      "summary": "Crust+oil basecolor texture and olive solid color wired in. Crust color matches the reference almost exactly (tier1 per-part deltaE 0.51 x2, confirming the recalibrated lighting rig reproduces the JSON hex at ~0% error as documented). Olive flags a tier1 deltaE of 25.4 against threshold 20; direct visual comparison confirms the raw #3B2F2F olive reads a touch flatter/darker than the reference's warmer plum-maroon. Per explicit instruction the lighting rig was just recalibrated and hex must be used as-is with no gain/parity correction re-added (CRIB: a blanket parity correction previously killed contrast on a different variant's oil pools) -- recording this as an accepted, documented residual rather than adding a calibration hack. tier1's per-part color check is also a coarse whole-image dominant-color-cluster measurement (documented in the script's own help text), not a true per-component crop, so some of the 25.4 is measurement coarseness on a small-area feature, not necessarily all albedo error.",
+      "matched": [
+        "crust base color matches reference almost exactly",
+        "oil-pool halo bands visible and positioned correctly on their dimples",
+        "olive hue family (deep plum-brown) correct"
+      ],
+      "mismatches": [
+        "olive reads slightly flatter/darker than the reference's warmer undertone (tier1 deltaE 25.4 vs threshold 20) -- accepted per explicit no-recalibration instruction, not treated as a blocking defect"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass3-material.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-3-material.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+        "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass3-material.png",
+        "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-3-material.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:29:26.562824+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.82,
+        "materialSurface": 0.8,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.85
+        },
+        {
+          "id": "dimple-field-irregularity",
+          "score": 0.8
+        }
+      ],
+      "action": "continue",
+      "summary": "Surface pass confirms the smooth-clay finish contract end to end: computeVertexNormals() while indexed (kept indexed, no toNonIndexed split needed), the duplicated wall-top ring keeps the rim crisp with no chamfer-into-cushion artifact across azimuths 0/90/180/270, front-elevation (thickness-axis) confirms the thin low profile matches assets/breads/src/focaccia--olive-flesh-2.png proportions, top-down (long-axis) confirms olive/dimple spread and oil-halo placement matches assets/breads/src/focaccia--olive-flesh-3.png layout, sparse topping bumps read without floating on any dimple rim, degenerate-view check clean (ratios 0.97-1.00). Dimple field still reads as individually irregular (oval, uneven rim, varied depth) at this finish stage, confirmed from the top-down axial view.",
+      "matched": [
+        "smooth non-faceted clay shading holds across all turntable angles",
+        "rim stays crisp, no chamfer artifact",
+        "thickness-axis profile matches front-elevation reference",
+        "long-axis layout matches top-down reference spread",
+        "sparse topping bumps read correctly",
+        "no degenerate silhouette collapse on orbit",
+        "dimple field still irregular (not gridded) under the final finish"
+      ],
+      "mismatches": [
+        "olive color residual carried forward from material-pass (accepted, documented, not recalibrated per explicit instruction)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass3-material.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\turn-90.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\turn-180.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\turn-270.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\view-front.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\view-top.png"
+      ],
+      "reviewViewpoints": [
+        "three-quarter",
+        "azimuth-90",
+        "azimuth-180",
+        "azimuth-270",
+        "long-axis",
+        "thickness-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+        "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\pass3-material.png",
+        "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\cmp-3-material.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:31:22.368352+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Final budget verified via breadlab-shot stats: 2928 tri, 2 draw calls (crust+oil-texture mesh, olive-color mesh), 76.8KB GLB, 60fps target harness (well under the variant-bread 3000-5000 tri / <=250KB / 8000 tri hard-cap band from CRIB's 2026-08-30 amendment). Runtime parity confirmed via a roundtrip (export->import) render, visually identical to the direct render -- no vertexColors/flatShading/PBR-map dependency to break under the Lambert-material force-swap. Repeated detail (11 olive chunks) is NOT instanced -- each chunk needs a unique profile/notch draw for silhouette variety (an instanced mesh would force identical geometry across instances, reintroducing the 'uniform kiss-shaped dome' defect the user rejected v2/v3 for), so per-instance geometry is the correct choice here, not a missed optimization; each chunk is cheap (~53 tri) and the total is inside budget without instancing. Readability gate (CRIB mandatory): 512^2 render composited onto the real card background (#F2E6D3, docs/VISUAL.md --bg-soft) and downsampled 64^2 LANCZOS -- individual olive chunks remain distinguishable as separate dark specks at thumbnail size, not a single dark smear; slab silhouette reads clearly.",
+      "matched": [
+        "tri/KB/mesh budget inside the variant band and well under the hard cap",
+        "runtime roundtrip parity confirmed",
+        "64px readability gate passed -- chunks distinguishable, not clumped"
+      ],
+      "mismatches": [
+        "olive color residual carried forward from material-pass (accepted, documented, not recalibrated per explicit instruction)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\rt.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\readability-64.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\readability-64-viewer512.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+        "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\rt.png",
+        "comparisonImage": "",
+        "cameraView": "",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:51:45.468714+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.86,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.85
+        },
+        {
+          "id": "dimple-field-irregularity",
+          "score": 0.85
+        }
+      ],
+      "action": "continue",
+      "summary": "Team-lead quality round, 3 fixes verified by direct visual comparison and pixel measurement: (1) dimples were shallow because raising the grid 16x12->28x20 for tri budget silently shrank the old fixed-neighbor recess footprint without me re-checking the coupling -- rewrote to a world-space radial falloff (elliptical + 2-harmonic rim wobble) decoupled from grid resolution, depth raised 0.08->0.11 at radius 0.095 (slope ~49deg), now clearly shadowed and individually oval/uneven at every turntable angle. (2) olive read flat/dark -- measured our own top-down render's dark-pixel median (53,42,42) against the reference's fixed top-down measurement plane dark-pixel median (118,57,35)/25th-pct(95,44,24); introduced OLIVE_RENDER_COLOR 0x70361f as a per-material albedo correction (NOT a global lighting gain, which stays banned and untouched -- crust colorDelta held at 0.57, unchanged) and updated the spec's colorMaterialRecipe/material to match, so tier1 per-part colorDelta dropped 25.4->16.33 (now under the 20 threshold) and the render reads as a warm cured-olive maroon instead of flat near-black-gray. (3) surface had zero visible grain despite 3x the tri budget -- root cause was the 28x20 grid spacing (~0.071) being shorter than the intended high-frequency grain wavelength (aliased to invisible, confirmed via a zoomed crop showing a perfectly flat crust between dimples); raised the grid again to 44x32 (~0.045 spacing) specifically to carry a 2-band authored sine-wave grain (low freq 7.3/5.1 amp 0.026 broad swells, high freq 15/11 amp 0.009 fine ripple, both continuous/coherent functions per CRIB's no-jitter-for-detail rule) without aliasing -- now visible as soft rolling crumb texture at both top-down and 3/4 zoom. Side-wall brightness untouched (grain/dimple changes are top-face-interior-vertex only; team-lead flagged that as a separate lighting-rig issue).",
+      "matched": [
+        "dimples now deeply shadowed and individually oval/uneven at all turntable angles",
+        "olive reads as warm cured maroon, not flat black-gray",
+        "visible soft crumb-scale surface undulation on the crust",
+        "side-wall geometry/brightness unchanged (out of scope per team-lead)"
+      ],
+      "mismatches": [
+        "tier1 silhouette IoU/aspect-delta unchanged (CRIB-documented perspective residual, not a shape regression)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-3quarter.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-top.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-front.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-turn90.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-turn180.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-turn270.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-top-zoom.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-cmp.png"
+      ],
+      "outOfSequence": true,
+      "reviewViewpoints": [
+        "three-quarter",
+        "azimuth-90",
+        "azimuth-180",
+        "azimuth-270",
+        "long-axis",
+        "thickness-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+        "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-3quarter.png",
+        "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-cmp.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:52:07.125122+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Final budget re-verified after the quality-round grid bump (44x32, up from 28x20, specifically to carry non-aliased surface grain): 4762 tri, 2 draw calls, 118KB GLB, still well inside the variant band (3000-5000 tri) and the hard cap (8000 tri / 250KB). Runtime roundtrip re-confirmed after all 3 fixes (dimple radial falloff, olive albedo correction, surface grain) -- visually identical to the direct render, no regression from the material/geometry changes.",
+      "matched": [
+        "tri/KB/mesh budget still inside the variant band after the grid-resolution increase for surface grain",
+        "runtime roundtrip parity re-confirmed post-fix"
+      ],
+      "mismatches": [
+        "none outstanding for this pass"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-rt.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+        "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\q3-rt.png",
+        "comparisonImage": "",
+        "cameraView": "",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T09:07:33.798972+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.88,
+      "aiVisionScore": 0.88,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.87,
+        "formDetail": 0.88,
+        "materialSurface": 0.88,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.88
+        },
+        {
+          "id": "dimple-field-irregularity",
+          "score": 0.85
+        },
+        {
+          "id": "olive-chunk-irregularity",
+          "score": 0.88
+        }
+      ],
+      "action": "continue",
+      "summary": "Team-lead 2nd quality round, 4 fixes verified by pixel measurement and direct visual comparison: (1) olives were too small -- re-measured the reference via connected-component analysis with a corrected color threshold (the first measurement undercounted lit chunk area): 11 chunks avg bbox diagonal ~83px / slab width ~922px -> ratio ~0.090, vs our OLIVE_R=0.075 (ratio 0.075, ~20pct short in radius). Raised OLIVE_R 0.075->0.095, OLIVE_H 0.078->0.10, count unchanged (7 seated + 3 beside + 1 shard = 11). Our render now measures ratio ~0.0996, matching within noise. (2) slab edge was sawtoothed -- root cause was the SAME grid-resolution-coupling bug as the dimple/grain fixes: independent per-boundary-vertex random noise (EDGE_NOISE_AMP) sampled more densely when the grid rose to 44x32, producing high-frequency jaggedness instead of the intended hand-torn wave. Replaced with 2 more smooth sine harmonics of the boundary angle (5th+9th, alongside the existing 2nd) -- a continuous function, immune to vertex-density changes. Also found and fixed the SAME coupling bug in 3 other places that weren't yet reported: pickDimples' min-separation reject, pickToppingCells' dimple-avoidance/min-separation rejects, and the 'beside a dimple' placement ring, all of which used GRID-INDEX chebyshev distance thresholds that silently shrank in world units when NX/NZ rose 28x20->44x32 -- converted all of them to world-space distance (worldChebyshev()/chebyshev() on world coords), and rewrote 'beside' placement as world-space polar sampling around each host instead of fixed grid-index ring offsets, so a future resolution change cannot silently break spacing again. (3) dimples still read shallow -- raised DIMPLE_DEPTH 0.11->0.13->0.15 in two empirically-tested steps (radius unchanged at 0.095, slope ~49->54->58deg), verified via zoomed crops and a raw pixel diff between the 0.13 and 0.15 renders (max channel delta 55/255, confirming a real, if moderate, visible change) that neither step collapsed the smooth-normal shading into artifacts across all 4 turntable azimuths. (4) rosemary/salt were absent -- painted directly into the existing crust+oil basecolor canvas (no 3rd material, per team-lead's atlas suggestion; simpler than a quadrant atlas since this canvas is already freeform-painted, not UV-grid-constrained): thin rotated line strokes for rosemary, small 2-3-speck white clusters for salt, at the same grid cells that already carry the raised TOPPING_BUMP geometry (half/half split). Side-wall brightness untouched throughout (all changes are top-face-interior or boundary-angle functions, per team-lead's standing instruction).",
+      "matched": [
+        "olive size now matches reference proportion (pixel-measured ratio 0.0996 vs reference 0.090)",
+        "slab edge reads as a smooth organic wave at every turntable angle, no sawtooth",
+        "dimples visibly deeper/darker-shadowed without shading artifacts",
+        "rosemary slivers and salt fleck clusters visible and sparse, matching v4's 'sparse' requirement",
+        "side-wall geometry/brightness unchanged"
+      ],
+      "mismatches": [
+        "tier1 silhouette IoU/aspect-delta unchanged (CRIB-documented perspective residual, not a shape regression)",
+        "dimple depth improvement is real but visually moderate rather than dramatic (measured via pixel diff, not just asserted)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r3-3quarter.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r4-top.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r4-front.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r4-turn90.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r4-turn180.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r4-turn270.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r4-cmp.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\readability-r4-64-viewer512.png"
+      ],
+      "outOfSequence": true,
+      "reviewViewpoints": [
+        "three-quarter",
+        "azimuth-90",
+        "azimuth-180",
+        "azimuth-270",
+        "long-axis",
+        "thickness-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+        "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r3-3quarter.png",
+        "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r4-cmp.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T09:07:44.776574+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.88,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Final budget re-verified after the 2nd quality round (bigger olives, world-space placement rewrite, deeper dimples, rosemary/salt paint): 4752 tri, 2 draw calls, 118.9KB GLB, still comfortably inside the variant band (3000-5000 tri) and the hard cap (8000 tri / 250KB). Runtime roundtrip re-confirmed, visually identical to the direct render.",
+      "matched": [
+        "tri/KB/mesh budget still inside the variant band after the 2nd quality round",
+        "runtime roundtrip parity re-confirmed"
+      ],
+      "mismatches": [
+        "none outstanding for this pass"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r4-rt.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+        "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r4-rt.png",
+        "comparisonImage": "",
+        "cameraView": "",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T09:14:24.460665+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.9,
+      "aiVisionScore": 0.9,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.88,
+        "formDetail": 0.9,
+        "materialSurface": 0.9,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.9
+        },
+        {
+          "id": "dimple-field-irregularity",
+          "score": 0.9
+        },
+        {
+          "id": "olive-chunk-irregularity",
+          "score": 0.88
+        }
+      ],
+      "action": "continue",
+      "summary": "Team-lead final diagnosis round: dimples were invisible specifically in the harness's FIXED DEFAULT REVIEW CAMERA, despite reading clearly at azimuth-90/top-down (same seed, same geometry) -- diagnosed as a camera/light-geometry issue, not a width/geometry-span issue as first suspected: the default 3/4 camera sits close to the key light's direction, and a smooth full-radius cosine-bump falloff has no single viewing angle where its gradual normal change is guaranteed to read as strong shading, so a near-light-aligned camera sees almost no contrast (classic camera-near-light concavity problem). Root-cause-fixed (not width -- width was ruled out by the working azimuth-90/top-down renders) by concentrating the ENTIRE depth transition into a narrow band near the rim: DIMPLE_FLAT_RATIO=0.5 keeps the inner half of the radius a flat, undisplaced floor, and the outer half carries the full depth in a steep 'cup' wall -- a physically-motivated shape (a finger flattens/compresses the dough floor, it doesn't taper it smoothly to full depth). Secondary fix: suppressed the surface grain inside each dimple's footprint (grainScale = 1 - flatness) since the crumb-scale ripple was also perturbing the same vertices the falloff needed to read cleanly, and a real pressed dimple's floor is smoother than the surrounding crumb anyway. Verified on the EXACT problem view (default shot=1, not just the turntable): dimples now read as clear dark rings/pits matching the reference's contrast, confirmed via comparison sheet. Re-verified turntable (0/90/180/270) and top-down still clean, no new normal-collapse artifacts from the sharper profile, degenerate-view check clean (ratios 0.970-1.002).",
+      "matched": [
+        "dimples now clearly visible as dark shadowed pits in the harness's fixed default review camera (the specific view that was failing)",
+        "turntable and top-down views still clean, no regression from the sharper cup profile",
+        "no degenerate silhouette collapse"
+      ],
+      "mismatches": [
+        "tier1 silhouette IoU/aspect-delta unchanged (CRIB-documented perspective residual)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r5-3quarter.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r5-cmp.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r5-top.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r5-front.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r5-turn90.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r5-turn180.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r5-turn270.png",
+        "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\readability-r5-64-viewer512.png"
+      ],
+      "outOfSequence": true,
+      "reviewViewpoints": [
+        "three-quarter",
+        "azimuth-90",
+        "azimuth-180",
+        "azimuth-270",
+        "long-axis",
+        "thickness-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\focaccia--olive-flesh.png",
+        "renderScreenshot": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r5-3quarter.png",
+        "comparisonImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\work\\focaccia--olive-flesh-v2\\r5-cmp.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 4000,
+    "maxDrawCalls": 2,
+    "textureSize": 256,
+    "fpsTarget": 60,
+    "optimizationPolicy": [
+      "Variant/detail-bread tri band 3000-5000 / <=250KB (CRIB 2026-08-30 amendment for variants outside the closed public-10 budget), reached via a slab grid plus 11 separate revolved-shell olive-chunk meshes at 42-54 tri each."
+    ]
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key at (-2, 6, 2), no exposure control, no tone mapping.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Neutral white-balanced ambient (recalibrated 2026-08-30).",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none - no shadow map or ground plane, so no contact shadow or ground shadow is rendered."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill, low intensity.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build one indexed NX x NZ grid slab: top ring, duplicated wall-top ring (rim-chamfer fix), perimeter side wall, coarse fan underside (focaccia precedent).",
+    "Pick dimple cells via stratified-random sampling over a 5x3 region grid with a chebyshev minimum-separation reject (not a fixed lattice, not unconstrained random).",
+    "Displace each dimple center down by a per-instance depth (+/-30% spread) and partially drop its 4 neighbors by an independent random fraction, so the rim collapses asymmetrically instead of stamping a perfect circle.",
+    "Jitter the slab shell vertices (amp bounded to <=1/20 of the smallest exposure/recess span) while indexed, so shared vertices move together; skip jitter entirely on the small olive-chunk geometry (CRIB: jitter on a feature this small shreds or flattens it -- irregularity comes from authoring parameters instead).",
+    "Bake faceting OFF: computeVertexNormals() while indexed, THEN toNonIndexed() (2026-08-30 finish contract, order is load-bearing) -- re-sync the duplicated wall-top ring afterward so the rim seam doesn't crack.",
+    "Paint a single basecolor canvas (crust-top + oil-pool bands) sampled at each dimple's true post-jitter world position via the same bbox uvTopPlanar used for UVs, so the oil-pool paint never drifts off its dimple.",
+    "Build each olive-chunk as an independent manually-ringed revolved shell (buildRevolvedShell, not THREE.LatheGeometry) with a 3-ring profile, per-instance radius/height/lean/tilt/notch draw, smooth-shaded, embedded at dimple or beside-dimple positions with a small sink depth.",
+    "Project top-planar UVs, merge by material into exactly two meshes (crust-top+oil-pool baked texture / olive-flesh solid color) (types.ts section 1)."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-object rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single fractureGroup; plausible break is a snap in half, not modelled here"
+  ],
+  "risks": [
+    {
+      "id": "regular-grid-relapse",
+      "severity": "high",
+      "description": "Base focaccia.ts's fixed 5x4 dimple lattice is the single biggest visual difference this variant must escape; falling back to a grid (even an irregular-looking one seeded from grid cells) risks reading as 'still a grid'.",
+      "mitigation": "Stratified-region sampling (not lattice coordinates) plus per-dimple independent depth/rim-drop asymmetry; reviewed explicitly against the dimple-field-irregularity feature target."
+    },
+    {
+      "id": "uniform-chunk-relapse",
+      "severity": "high",
+      "description": "v2/v3 of this exact bread were user-rejected for uniform kiss-shaped olive domes / perfectly circular machine-punched dimples.",
+      "mitigation": "Per-instance profile draw (rollShape) with shared-across-rings segment wobble (not independent per ring, which waists the chunk into a wrong shape) and a non-monotonic-safe notch (segment inward-pull, never a dragged-down pole)."
+    },
+    {
+      "id": "jitter-collapses-small-feature",
+      "severity": "high",
+      "description": "CRIB 2026-08-30 measured finding: absolute-unit jitter sized for the slab (amp 0.0015-0.006) either shreds a small chunk's silhouette or flattens it into a blob once smooth normals are in play.",
+      "mitigation": "Jitter applied to the slab shell only; olive chunks get zero post-hoc jitter, irregularity lives entirely in authoring parameters."
+    },
+    {
+      "id": "rim-chamfer",
+      "severity": "medium",
+      "description": "CRIB 2026-08-30 measured finding: sharing top-face/side-wall vertices under smooth normals chamfers the whole rim into a cushion look.",
+      "mitigation": "Duplicated wall-top ring, re-synced to the jittered top-face coordinates after jitter runs."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "n/a (finish contract changed)",
+      "description": "The pipeline's prior facet()-based finish is deprecated for this round; smooth normals are now the target look, not a defect to guard against.",
+      "mitigation": "N/A -- documented so a future spec-refine does not silently revert to facet() by habit."
+    },
+    {
+      "id": "merge-attribute-mismatch",
+      "severity": "medium",
+      "description": "mergeByMaterial throws on attribute-set mismatch.",
+      "mitigation": "Every geometry gets position, normal, uv."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Olive Focaccia Slab",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  },
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.7556,
+        "aspectRatioDelta": 0.4412,
+        "scaleDelta": 0.0615,
+        "bilateralSymmetryError": 0.11,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 16.33,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 0.57
+            },
+            {
+              "componentId": null,
+              "deltaE": 0.57
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.33
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.756 is below threshold 0.85",
+        "aspect-ratio delta 0.441 exceeds threshold 0.05"
+      ],
+      "maskWarnings": [],
+      "renderHash": "06f19032fee8aab8",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.7553,
+        "aspectRatioDelta": 0.4489,
+        "scaleDelta": 0.0671,
+        "bilateralSymmetryError": 0.1085,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 1.16,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 0.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 0.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 1.16
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.755 is below threshold 0.85",
+        "aspect-ratio delta 0.449 exceeds threshold 0.05"
+      ],
+      "maskWarnings": [],
+      "renderHash": "94d5984f62960509",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.7553,
+        "aspectRatioDelta": 0.4489,
+        "scaleDelta": 0.0671,
+        "bilateralSymmetryError": 0.1085,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 4.2,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 4.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 4.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 1.02
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.755 is below threshold 0.85",
+        "aspect-ratio delta 0.449 exceeds threshold 0.05"
+      ],
+      "maskWarnings": [],
+      "renderHash": "030c0f615cbb8a59",
+      "passId": "surface-pass"
+    }
+  ]
+}

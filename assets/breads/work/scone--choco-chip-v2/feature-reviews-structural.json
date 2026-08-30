@@ -1,0 +1,3 @@
+[
+  {"id": "wedge-apex-front-silhouette", "score": 0.82, "tier": "critical", "notes": "Component hierarchy (root -> wedge-body -> wedge-top-face, choc-chunk archetype parented to wedge-top-face) renders with no floating parts across all turntable azimuths; every chip anchors visibly into the shared top face surface, no gaps between shell and chip bases at any angle checked (90/180/270)."}
+]

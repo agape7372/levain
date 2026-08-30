@@ -61,14 +61,28 @@ const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-1.1, 1.1, 1.1, -1.1, 0.1, 30);
 applyView(view);
 
-// 조명 = thumbsHarness 동일
-const key = new THREE.DirectionalLight(0xffe2b0, 1.4);
+// 조명 = thumbsHarness 동일. 파리티 캘리브레이션(2026-08-30, docs/VISUAL.md §1-3): 중성 화이트밸런스
+// (0xffffff 3灯 전부) + 세기만으로 노출을 맞춘다 — 이전 앰버 키(0xffe2b0)는 B채널을 ×0.69로 깎아
+// 정본 hex가 렌더에서 항상 어둡고 채널별로 편향되게 만든 원인이었다. 유도: MeshLambertMaterial의
+// top face(normal +Y) 출력은 albedo·(dotNL_key·Ik + dotNL_fill·If + Ia)/π — 이 항이 정확히 π가
+// 되면 정면으로 빛을 받는 면(윗면)이 정본 hex 그대로 렌더된다. 키·필 위치가 고정이라
+// dotNL_key≈0.9045·dotNL_fill≈0.6838(둘 다 상수), 세 세기를 그 식에 맞춰 역산했다(Ik=2.4/If=0.3/Ia≈0.7656).
+const key = new THREE.DirectionalLight(0xffffff, 2.4);
 key.position.set(-2, 6, 2);
 scene.add(key);
-scene.add(new THREE.AmbientLight(0xfff0dc, 0.75));
-const fill = new THREE.DirectionalLight(0xdce8ff, 0.2);
+scene.add(new THREE.AmbientLight(0xffffff, 0.7656));
+const fill = new THREE.DirectionalLight(0xffffff, 0.3);
 fill.position.set(2.5, 3, -2);
 scene.add(fill);
+// 측면 노출 캘리브레이션(2026-08-30 2차, VISUAL §1-3): 위 3灯은 윗면(normal +Y)만 타깃으로 역산돼
+// 수직 벽(측면)이 레퍼런스보다 어둡게(그레이시하게) 죽었다. HemisphereLight(sky=검정,ground=흰색)를
+// 더한다 — three의 getHemisphereLightIrradiance는 mix(ground, sky, 0.5·dot(N,up)+0.5)이고, 이 값은
+// (ambient와 동일하게) RE_IndirectDiffuse에서 albedo/π를 곱해 최종 출력에 더해진다. N=(0,1,0)인
+// 윗면은 dot=1 → 가중치가 sky(검정)에 100% 쏠려 기여 0/π=0(윗면 파리티 불변, 산수로 보장). 수직 벽은
+// dot≈0 → 0.5·ground/π만큼 순증(sky=0이라 앰비언트 재조정 불필요). 세기 1.7 → 수직면 +0.5·1.7/π≈0.27
+// 이론치, 실측(scone/loaf 측벽)으론 +0.16 — 레퍼런스 실측 측/윗면 비(0.886~1.05, 평균 0.175 언더슈트)에
+// 렌더를 맞춘 값(비선형 sRGB 인코딩 탓에 이론치와 실측이 정확히 일치하진 않는다). 검증표는 VISUAL §1-3.
+scene.add(new THREE.HemisphereLight(0x000000, 0xffffff, 1.7));
 
 let controls: OrbitControls | null = null;
 if (view === 'orbit') {

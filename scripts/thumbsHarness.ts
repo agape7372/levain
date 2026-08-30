@@ -27,13 +27,17 @@ const camera = new THREE.OrthographicCamera(-1.1, 1.1, 1.1, -1.1, 0.1, 30);
 camera.position.set(-1.6, 2.2, 2.6); // 3/4 top-front — 프롬프트 카메라 지문과 일치
 camera.lookAt(0, 0, 0);
 
-const key = new THREE.DirectionalLight(0xffe2b0, 1.4);
+// 파리티 캘리브레이션(2026-08-30) — breadlab.ts와 동일 값·근거. docs/VISUAL.md §1-3 참조.
+const key = new THREE.DirectionalLight(0xffffff, 2.4);
 key.position.set(-2, 6, 2);
 scene.add(key);
-scene.add(new THREE.AmbientLight(0xfff0dc, 0.75));
-const fill = new THREE.DirectionalLight(0xdce8ff, 0.2);
+scene.add(new THREE.AmbientLight(0xffffff, 0.7656));
+const fill = new THREE.DirectionalLight(0xffffff, 0.3);
 fill.position.set(2.5, 3, -2);
 scene.add(fill);
+// 측면 노출 2차 캘리브레이션(2026-08-30) — breadlab.ts와 동일 값·근거(sky=검정이라 윗면 기여 0,
+// 수직 벽만 순증). docs/VISUAL.md §1-3 참조.
+scene.add(new THREE.HemisphereLight(0x000000, 0xffffff, 1.7));
 
 const loader = new GLTFLoader();
 loader.setMeshoptDecoder(MeshoptDecoder);
