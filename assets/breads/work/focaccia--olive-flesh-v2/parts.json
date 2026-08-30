@@ -1,0 +1,20 @@
+{
+  "note": "Parts as the builder constructs them, BEFORE the mandatory final mergeByMaterial (scripts/breads/focacciaOliveFlesh.ts). Slab = 1 mesh (crust-top + oil-pool baked into one basecolor texture). Olive-chunk = 11 separate revolved-shell meshes, each with a per-instance seg (12-16) and profile draw for silhouette variety -- NOT instanced, deliberately (see optimization-pass review: instancing would force identical geometry across chunks, reintroducing the uniform-dome defect the user rejected v2/v3 for). mergeByMaterial then fuses all 11 chunk meshes into 1 olive-flesh mesh and leaves the slab as its own mesh, for the consumer's 2-mesh/2-material cap (scripts/breads/types.ts sections 1-2). Triangle counts: slab is analytic (2*NX*NZ + 6*(NX+NZ) = 2*28*20 + 6*48 = 1408), chunk counts are per-instance (10*seg, seg in [12,16] => 120-160 each); breadlab-shot reported 2928 total for the seed used in review, consistent with 1408 slab + ~1520 across 11 chunks (avg ~138, i.e. avg seg ~13.8).",
+  "parts": [
+    { "name": "root", "kind": "container", "module": "createFocacciaOliveFlesh", "triangles": 2928 },
+    { "name": "slab", "kind": "part", "module": "buildSlabGeometry", "triangles": 1408 },
+    { "name": "slab-top-face", "kind": "folded-relief", "module": "buildSlabGeometry (dimple-field/topping-scatter deformation stack, baked into the same 'slab' mesh -- no separate geometry, per author_spec.py TOP_FACE.geometryDescriptor)", "triangles": "included in slab's 1408" },
+    { "name": "olive-chunk", "kind": "repeated-archetype", "module": "buildChunk/rollShape (repetitionSystem olive-scatter template -- see the 11 numbered instances below for the actual built meshes)", "triangles": "120-160 per instance" },
+    { "name": "olive-chunk-1", "kind": "part", "module": "buildChunk", "triangles": "120-160 (10*seg, seg 12-16)" },
+    { "name": "olive-chunk-2", "kind": "part", "module": "buildChunk", "triangles": "120-160 (10*seg, seg 12-16)" },
+    { "name": "olive-chunk-3", "kind": "part", "module": "buildChunk", "triangles": "120-160 (10*seg, seg 12-16)" },
+    { "name": "olive-chunk-4", "kind": "part", "module": "buildChunk", "triangles": "120-160 (10*seg, seg 12-16)" },
+    { "name": "olive-chunk-5", "kind": "part", "module": "buildChunk", "triangles": "120-160 (10*seg, seg 12-16)" },
+    { "name": "olive-chunk-6", "kind": "part", "module": "buildChunk", "triangles": "120-160 (10*seg, seg 12-16)" },
+    { "name": "olive-chunk-7", "kind": "part", "module": "buildChunk", "triangles": "120-160 (10*seg, seg 12-16)" },
+    { "name": "olive-chunk-8", "kind": "part", "module": "buildChunk", "triangles": "120-160 (10*seg, seg 12-16)" },
+    { "name": "olive-chunk-9", "kind": "part", "module": "buildChunk", "triangles": "120-160 (10*seg, seg 12-16)" },
+    { "name": "olive-chunk-10", "kind": "part", "module": "buildChunk", "triangles": "120-160 (10*seg, seg 12-16)" },
+    { "name": "olive-chunk-11 (shard)", "kind": "part", "module": "buildChunk", "triangles": "120-160 (10*seg, seg 12-16)" }
+  ]
+}

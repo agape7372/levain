@@ -1,0 +1,2866 @@
+{
+  "targetName": "Scone Choco Chip",
+  "targetId": "scone-choco-chip",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\scone--choco-chip.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Not solved and deliberately not matched to the reference. The review camera is fixed by scripts/breadlab.ts applyView (orthographic at (-1.6, 2.2, 2.6) looking at the origin)."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 2,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "chocolate chunk scone wedge (baked-good prop)",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "organic soft-clay wedge",
+        "hard-faceted inclusions (contrast)"
+      ],
+      "structureKind": [
+        "single continuous lofted mass",
+        "discrete embedded inclusions"
+      ],
+      "motionPotential": [
+        "static showcase prop",
+        "whole-object rotation only"
+      ],
+      "materialFamilies": [
+        "baked dough (matte dielectric)",
+        "chocolate (matte dielectric, faceted)"
+      ],
+      "notes": "Fill from direct visual inspection before writing the final spec. Do not use fixed domain profiles. Set primaryDomain to object, character, or hybrid."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 0,
+        "componentCount": 0,
+        "hierarchyDepth": 0,
+        "repetitionDensity": 0,
+        "materialLayerCount": 0,
+        "localDetailDensity": 0,
+        "occlusionRisk": 0,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 1,
+        "mesoComponents": 2,
+        "microFeatureGroups": 3,
+        "materialLayers": 3,
+        "repetitionSystems": 1
+      },
+      "reasoning": [
+        "Assess 'Scone Choco Chip' from the image before finalizing componentTree/materials."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro"
+      ],
+      "needsRepetitionSystems": false,
+      "needsMaterialLocalOverrides": false,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Choose simple/moderate/complex/ultra-complex from observed structure, not from a hardcoded domain."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 3,
+      "note": "Enumerate every identity-defining small detail before authoring the spec. Each detail must map to a component.localFeatures entry or material.localOverrides entry, never prose only. Use forge/stage1_intake/build_detail_inventory.py to scan zones.",
+      "details": [
+        {
+          "id": "chunk-half-sunken-embed",
+          "name": "chunk half sunken embed",
+          "kind": "bevel",
+          "mapsTo": {
+            "ref": "choc-chunk-half-sunken",
+            "note": ""
+          }
+        },
+        {
+          "id": "crust-two-tone-boundary",
+          "name": "crust two tone boundary",
+          "kind": "seam",
+          "mapsTo": {
+            "ref": "crust-rim-boundary",
+            "note": ""
+          }
+        },
+        {
+          "id": "fissure-crack-pair",
+          "name": "fissure crack pair",
+          "kind": "hole",
+          "mapsTo": {
+            "ref": "wedge-top-face-fissures",
+            "note": ""
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/scone--choco-chip.png"
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 1,
+      "mesoComponents": 2,
+      "microFeatureGroups": 0,
+      "materialLayers": 3,
+      "repetitionSystems": 1,
+      "reviewViewpoints": 2
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.8,
+    "mustMatch": [
+      "rounded-triangle apex-front wedge silhouette, height/width ~0.47",
+      "hard two-tone crust split surviving the runtime Lambert swap",
+      "~7 chocolate chunks, half-sunken, size-hierarchy, loose clusters with quiet plain gaps",
+      "side/cut faces completely plain - no chunks",
+      "smooth clay finish on dough, flat-faceted exception on chocolate"
+    ],
+    "niceToHave": [
+      "exact chunk positions",
+      "the reference's soft AI-generated ambient occlusion in chunk crevices, which the flat-lit harness cannot reproduce"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "wedge-apex-front-silhouette",
+      "name": "Rounded-triangle wedge silhouette, apex-front, correct height/width",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "wedge-body"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "crust-two-tone-split",
+      "name": "Hard two-tone crust split at the rim",
+      "tier": "critical",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "wedge-body",
+        "wedge-top-face"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "choc-chunk-half-sunken-cluster",
+      "name": "Chocolate chunks half-sunken, size-hierarchy, loose clusters (not a grid, not a bump)",
+      "tier": "critical",
+      "passIds": [
+        "surface-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "wedge-top-face",
+        "choc-chunk"
+      ],
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "cut-faces-plain",
+      "name": "Side/cut faces stay completely plain (no chunks)",
+      "tier": "critical",
+      "passIds": [
+        "surface-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "wedge-body"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "crack-fissure-pair",
+      "name": "1-2 soft crack fissures on the top face",
+      "tier": "important",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "wedge-top-face"
+      ],
+      "evidenceRefs": [
+        "view-top"
+      ]
+    },
+    {
+      "id": "smooth-clay-finish",
+      "name": "Smooth clay finish on dough, flat-faceted exception on chocolate",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "wedge-body",
+        "choc-chunk"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": [],
+    "droppedPasses": {
+      "lighting-pass": "lighting is fixed by the consumer harness and is not authorable in the model (spec.lookDevTargets.lightingPass.authority)",
+      "interaction-pass": "static showcase prop with no sockets, hinges or colliders beyond a bounding proxy; preSpecAssessment scores actionReadinessNeed 0"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 0,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Consumer runtime keeps only map and color (docs/VISUAL.md section 8 bans PBR maps outright); all fidelity is moved into geometry."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Lighting is fixed by the consumer: scripts/breadlab.ts mirrors scripts/thumbsHarness.ts (warm directional key 0xffe2b0 at (-2,6,2) intensity 1.4, ambient 0xfff0dc at 0.75, cool fill 0xdce8ff at (2.5,3,-2) intensity 0.2). This lighting rig was recalibrated 2026-08-30 to reproduce canonical prompt-JSON hex with 0% top-face error - albedo must be used as-is, no parity gain.",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "applying a parity/albedo correction multiplier - the harness already reproduces canonical hex"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "Underside is never visible: the wedge rests flat on its bottom face and every review azimuth is above the horizon.",
+    "The harness normalizes the longest axis to 1.6, so absolute dimensions are arbitrary and only the authored ratios carry meaning.",
+    "Exact chunk positions are not identity-critical; count, size hierarchy, half-sunken embed and loose clustering are what the review scores.",
+    "Front-elevation reference image is excluded as shape evidence (known generation error); only its height/width ratio is used."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, the direction the harness three-quarter camera at (-1.6, 2.2, 2.6) looks from",
+    "up": "+Y",
+    "scaleReference": "wedge width = ~1.98 relative units. Absolute scale is meaningless: the consumer runtime refits the longest axis to 1.6, so only ratios matter (scripts/breads/types.ts section 7)."
+  },
+  "silhouette": {
+    "boundingShape": "rounded-triangle wedge, 1.98 wide x 0.933 tall x 1.34 deep in relative units",
+    "aspectRatios": [
+      {
+        "id": "height-over-width",
+        "value": 0.47,
+        "source": "scone--choco-chip-3.png top-down + prompt JSON 'height is roughly half its width'"
+      }
+    ],
+    "symmetry": "asymmetric (hand-cut wedge, apex-front, no mirror plane)",
+    "dominantCurves": [
+      "rounded shoulder rising from rim to a near-flat plateau",
+      "rounded-triangle outline with three blunt corners"
+    ],
+    "negativeSpaces": [
+      "none - solid wedge, no internal cavity"
+    ],
+    "landmarks": [
+      "apex corner faces +Z (camera-front)",
+      "crust rim at radiusFraction 0.98 of the outline",
+      "chunk cluster confined to the top face only"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "rounded-triangle wedge, apex pointing front-and-slightly-side, resting flat on wide bottom face",
+        "hard two-tone crust split: golden top face vs plain cream side/cut faces",
+        "about seven chocolate chunks on the top face only, each a distinct facet cluster, half-sunken"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "rounded-triangle outline, 18-sided polygon approximation, apex front",
+        "two soft crack fissures crossing the top face, not reaching the rim",
+        "chunk size hierarchy clearly visible: 2 larger pieces, ~4 medium, 1 small shard",
+        "chunks scattered with visible gaps between them, never a uniform grid"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "view-front-ratio-only",
+      "view": "front elevation (EXCLUDED as shape evidence - generation error, renders as a slab not a wedge)",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "height/width ratio only (~0.46-0.47) is usable; the pose/silhouette in this image is a known bad generation and is not used as shape evidence (assets/breads/work/CRIB.md)"
+      ],
+      "confidence": 0.4
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Scone Choco Chip",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the wedge body and its chunk cluster; emits no geometry of its own.",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 3,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 1.98,
+        "height": 0.933,
+        "depth": 1.34,
+        "units": "relative",
+        "confidence": 0.95
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding-box proxy; chip inclusions are far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "none"
+        }
+      },
+      "material": "crust-crumb",
+      "materialLayers": [
+        "crust-crumb"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(244, 234, 212, 1.0)",
+        "secondaryAlbedo": "rgba(214, 161, 92, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte baked crust/crumb/chocolate surface: opaque dielectric, roughness 1.0, no specular lobe.",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/breads/scone--choco-chip.json geometry.crust"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "wedge-apex-orientation",
+          "name": "Apex-front asymmetric orientation",
+          "kind": "assembly-placement",
+          "description": "The wedge apex (narrow corner) faces the camera-front direction (+Z toward (-1.6,2.2,2.6)); this is asymmetric, not radially uniform, so orientation must be verified at first blockout render (CRIB.md orientation-first-iteration rule - the base scone family measured a 180-degree miss here before).",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "n/a",
+        "displacementPattern": "n/a",
+        "occlusionPattern": "cavity darkening inside fissures and around embedded chunk bases",
+        "edgeWearPattern": "none - a freshly baked surface carries no edge wear",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "wedge-apex-orientation"
+      ],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "wedge-body",
+      "name": "Scone wedge body (bottom + side/cut faces)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A single continuous, smoothly-varying lofted mass with no internal seams: a fixed rounded-triangle outline (18-point lookup table, not a circle) swept through a height profile from flat bottom to the shared crust rim. Decision tree step 6. Not assembled-solid: the outline is an organic hand-cut wedge, not a hard-faced box/cylinder.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly-adjacent prop, smooth clay finish (docs/BREADS.md finish-contract 2026-08-30)",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.97,
+              0.0
+            ],
+            [
+              1.0,
+              0.04
+            ],
+            [
+              1.0,
+              0.2
+            ],
+            [
+              0.99,
+              0.48
+            ],
+            [
+              0.98,
+              0.82
+            ]
+          ],
+          "segments": 18,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "outline-lookup",
+            "type": "radial-modulation",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 1.0,
+            "notes": "Not sinusoidal: a fixed 18-point (x,z) lookup table (OUTLINE) replaces the unit circle per sector, producing the rounded-triangle apex-front silhouette. Applied identically to wedge-body and wedge-top-face so the shared rim ring stays welded."
+          },
+          {
+            "id": "crumb-ridging",
+            "type": "radial-modulation",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.04,
+            "notes": "Per-ring/per-sector radius jitter on the cut-face rings only (not the rim), giving the plain cut face a crumb-like ridged texture instead of a flat gradient panel under smooth shading."
+          }
+        ],
+        "uvStrategy": "constant flat-color atlas UV (scripts/breads/lib.ts pattern, bakeTexture 64px quadrants)",
+        "normalStrategy": "computeVertexNormals() on indexed geometry, THEN toNonIndexed() - smooth clay finish, order is load-bearing (docs/BREADS.md finish-contract)"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.98,
+        "height": 0.933,
+        "depth": 1.34,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "static-prop",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding-box proxy; chip inclusions are far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "wedge-body",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "none"
+        }
+      },
+      "material": "crust-crumb",
+      "materialLayers": [
+        "crust-crumb"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(244, 234, 212, 1.0)",
+        "secondaryAlbedo": "rgba(214, 161, 92, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte baked crust/crumb/chocolate surface: opaque dielectric, roughness 1.0, no specular lobe.",
+        "zone": "side and cut faces, bottom cap",
+        "evidenceRefs": [
+          "assets/prompts/breads/scone--choco-chip.json geometry.crust"
+        ]
+      },
+      "deformations": [
+        "outline-lookup",
+        "crumb-ridging"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "wedge-crust-rim",
+          "kind": "material-boundary",
+          "notes": "Shared ring at the last body profile point (0.98, 0.82*H). Body and top face both lathe this exact ring, duplicated as two coincident rings (RIM_A/RIM_B) so the crust edge stays a hard crease under smooth-normal shading instead of blending into the shoulder."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "wedge-body-crumb-ridging",
+          "name": "Cut-face crumb ridging",
+          "kind": "surface-relief",
+          "description": "Low-frequency per-ring/per-sector radius jitter (amplitude 0.04) on the plain cream cut faces only, replacing what would otherwise be a flat shaded gradient under the smooth-clay finish.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "smooth (computeVertexNormals, per finish-contract)",
+        "displacementPattern": "crumb ridging only",
+        "occlusionPattern": "cavity darkening inside fissures and around embedded chunk bases",
+        "edgeWearPattern": "none - a freshly baked surface carries no edge wear",
+        "notes": "Runtime replaces material with MeshLambertMaterial keeping only map+color; all relief here is geometric."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "wedge-body-crumb-ridging"
+      ],
+      "fidelityTier": "form-refinement"
+    },
+    {
+      "id": "wedge-top-face",
+      "name": "Scone top crust face",
+      "level": "meso",
+      "role": "surface",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous lofted cap sharing the wedge-body's outline lookup and rim ring, rising from the rim through a rounded shoulder to a near-flat plateau. Decision tree step 6. Not conforming-shell: this IS the wedge's own top surface volume, not a skin over another form.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly-adjacent prop, smooth clay finish",
+        "latheProfile": {
+          "points": [
+            [
+              0.98,
+              0.82
+            ],
+            [
+              0.94,
+              0.858
+            ],
+            [
+              0.87,
+              0.888
+            ],
+            [
+              0.74,
+              0.912
+            ],
+            [
+              0.6,
+              0.922
+            ],
+            [
+              0.45,
+              0.928
+            ],
+            [
+              0.3,
+              0.931
+            ],
+            [
+              0.15,
+              0.9325
+            ],
+            [
+              0.0,
+              0.933
+            ]
+          ],
+          "segments": 18,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "outline-lookup",
+            "type": "radial-modulation",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 1.0,
+            "notes": "Identical lookup table to wedge-body so the shared rim ring stays welded."
+          },
+          {
+            "id": "crack-fissures",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "amplitude": 0.06,
+            "notes": "2 shallow linear grid-cell dips (grid-cell dip, not continuous falloff - a displacement smaller than the vertex spacing disappears silently) running across FISSURE_RING_FRACS rings, stopping before the outer/inner rings so they never cross onto the plain cut faces or pinch the crown into a star fold."
+          }
+        ],
+        "uvStrategy": "constant flat-color atlas UV (same atlas as wedge-body)",
+        "normalStrategy": "computeVertexNormals() on indexed geometry, THEN toNonIndexed()"
+      },
+      "parent": "wedge-body",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.96,
+        "height": 0.113,
+        "depth": 1.32,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding-box proxy; chip inclusions are far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "wedge-top-face",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "none"
+        }
+      },
+      "material": "crust-top",
+      "materialLayers": [
+        "crust-top"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(214, 161, 92, 1.0)",
+        "secondaryAlbedo": "rgba(244, 234, 212, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte baked crust/crumb/chocolate surface: opaque dielectric, roughness 1.0, no specular lobe.",
+        "zone": "top crust face",
+        "evidenceRefs": [
+          "assets/prompts/breads/scone--choco-chip.json geometry.crust"
+        ]
+      },
+      "deformations": [
+        "outline-lookup",
+        "crack-fissures"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "wedge-crust-rim",
+          "kind": "material-boundary",
+          "notes": "Shares the body's perimeter ring exactly; this ring is the two-tone crust boundary."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "wedge-top-face-fissures",
+          "name": "Crack fissure pair",
+          "kind": "recessed-detail-scatter",
+          "description": "2 soft crack fissures (depth 0.06) dipped into grid cells across the top face, stopping short of the rim and the crown so they read as gentle creases rather than a torn or star-folded surface.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.06,
+        "normalPattern": "smooth (computeVertexNormals)",
+        "displacementPattern": "fissure grid-cell dips",
+        "occlusionPattern": "cavity darkening inside fissures and around embedded chunk bases",
+        "edgeWearPattern": "none - a freshly baked surface carries no edge wear",
+        "notes": "assets/prompts/breads/scone--choco-chip.json notes_ko: without the fissures and two-tone split the object reads as a plain dome, so both are identity-critical."
+      },
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ],
+      "details": [
+        "wedge-top-face-fissures"
+      ],
+      "fidelityTier": "surface-pass"
+    },
+    {
+      "id": "choc-chunk",
+      "name": "Chocolate chunk (repeated inclusion archetype)",
+      "level": "meso",
+      "role": "inclusion",
+      "importance": 1.0,
+      "confidence": 0.85,
+      "primitive": "cylinder",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A hard, discrete, hand-chopped block with flat facets - decision tree step 4 (distinct faces you could point to and count). Modeled as a low-side-count truncated cone/frustum (cylinder primitive with independent top/base radii) rather than a lathe: the reference's chocolate reads as faceted and angular, the opposite surface language from the soft dough it sits in, which is the deliberate material contrast (docs/BREADS.md finish-contract hard-inclusion exception - flat/facet normals stay valid here even though the shell converted to smooth).",
+      "geometryDescriptor": {
+        "topologyIntent": "hand-chopped irregular block, flat-faceted (exception to shell smooth finish)",
+        "latheProfile": {
+          "points": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "segments": 6,
+          "phiStart": 0.0,
+          "phiLength": 6.283185307179586
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "chunk-irregularity",
+            "type": "radial-modulation",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.1,
+            "notes": "Per-instance authored irregularity (never post-hoc xyz jitter, which breaks the half-sunken seal): side count 5-7, anisotropy, asymmetric top-center lean, per-vertex radius variance +/-10%, so no two chunks share a silhouette."
+          }
+        ],
+        "uvStrategy": "constant flat-color atlas UV (same atlas as the shell, dedicated quadrant)",
+        "normalStrategy": "facet (flat normals, split vertices) - the one deliberate exception to the shell's smooth finish"
+      },
+      "parent": "wedge-top-face",
+      "attachment": {
+        "parentId": "wedge-top-face",
+        "parentSocket": "wedge-top-face jittered surface point",
+        "contactType": "embed",
+        "localStart": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "localEnd": [
+          0.0,
+          -0.075,
+          0.0
+        ],
+        "contactNormal": [
+          0,
+          1,
+          0
+        ],
+        "embedDepth": 0.075,
+        "gapTolerance": 0.01,
+        "notes": "Anchored to the shell's own jittered surface coordinate AFTER the shell jitter pass, embedded to CHIP_EMBED depth so the dough visibly hugs the base edge rather than the chunk sitting on top like a bump."
+      },
+      "dimensions": {
+        "width": 0.255,
+        "height": 0.109,
+        "depth": 0.255,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "inclusion",
+        "pivot": {
+          "mode": "custom",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Bounding-box proxy; chip inclusions are far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "choc-chunk",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "none"
+        }
+      },
+      "material": "chocolate",
+      "materialLayers": [
+        "chocolate"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(59, 36, 24, 1.0)",
+        "secondaryAlbedo": "rgba(214, 161, 92, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Closest class in the allowed set for a matte baked crust/crumb/chocolate surface: opaque dielectric, roughness 1.0, no specular lobe.",
+        "zone": "chocolate chunk inclusions",
+        "evidenceRefs": [
+          "assets/prompts/breads/scone--choco-chip.json geometry.crust"
+        ]
+      },
+      "deformations": [
+        "chunk-irregularity"
+      ],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "choc-chunk-half-sunken",
+          "name": "Half-sunken embed",
+          "kind": "profile-curvature",
+          "description": "Exposed height/width ratio held below 0.5 (measured target ~0.23-0.30) and embed depth exceeds local shell-surface roughness, so every chunk reads as pressed-in rather than a bump or a spike growing out of the surface - the single most load-bearing identity feature per the prompt JSON ('sits half-sunken, the dough hugging its edges').",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "facet (flat, deliberate exception)",
+        "displacementPattern": "none - added geometry, not displacement",
+        "occlusionPattern": "cavity darkening inside fissures and around embedded chunk bases",
+        "edgeWearPattern": "none - a freshly baked surface carries no edge wear",
+        "notes": "Hard inclusion vs soft dough is the intended material contrast; using the shell's smooth shading here would read the chunk as a soft growth off the dough rather than a distinct ingredient."
+      },
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [
+        "choc-chunk-half-sunken"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "crust-top",
+      "name": "Top crust",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#D6A15C",
+      "color": "#D6A15C",
+      "albedo": {
+        "dominant": "#D6A15C",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/scone--choco-chip.json geometry.crust, the curated prompt that generated the reference. Deliberately NOT sampled from reference pixels (those carry the generator's baked key light)."
+      },
+      "colorVariation": {
+        "palette": [
+          "#D6A15C"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "Flat-color atlas texture (64px, one quadrant per material) so three colors can share a single stdMaterial and stay within the mesh<=2 budget (scripts/breads/types.ts section 1) without vertex colors (section 2 forbids them)."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.47,
+          "role": "wedge profile: plateau + rounded shoulder",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 18.0,
+          "amplitude": 0.04,
+          "role": "outline lookup table + crumb ridging",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 7.0,
+          "amplitude": 0.06,
+          "role": "fissures / chunk facets",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices (chocolate only) or smooth vertex normals (dough)",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "top face of the wedge",
+        "amplitude": 0.06,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "fissure-cavity-shading",
+          "name": "Fissure cavity shading",
+          "maskSource": "geometry",
+          "description": "Fissure walls tilt away from the key light and darken on their own; no mask or map is used.",
+          "evidenceRefs": [
+            "view-top"
+          ],
+          "appliesTo": [
+            "wedge-top-face"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: bake faceting (chocolate only) as split vertices instead."
+      ],
+      "notes": "top face of the wedge. Packed into a shared 64px flat-color atlas with the other two materials so the merged output stays at 1 mesh / 1 material."
+    },
+    {
+      "id": "crust-crumb",
+      "name": "Side/cut crumb",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#F4EAD4",
+      "color": "#F4EAD4",
+      "albedo": {
+        "dominant": "#F4EAD4",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/scone--choco-chip.json geometry.crust, the curated prompt that generated the reference. Deliberately NOT sampled from reference pixels (those carry the generator's baked key light)."
+      },
+      "colorVariation": {
+        "palette": [
+          "#F4EAD4"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "Flat-color atlas texture (64px, one quadrant per material) so three colors can share a single stdMaterial and stay within the mesh<=2 budget (scripts/breads/types.ts section 1) without vertex colors (section 2 forbids them)."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.47,
+          "role": "wedge profile: plateau + rounded shoulder",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 18.0,
+          "amplitude": 0.04,
+          "role": "outline lookup table + crumb ridging",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 7.0,
+          "amplitude": 0.06,
+          "role": "fissures / chunk facets",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices (chocolate only) or smooth vertex normals (dough)",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "side and cut faces, bottom cap",
+        "amplitude": 0.06,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "crust-rim-boundary",
+          "name": "Two-tone crust boundary",
+          "maskSource": "geometry",
+          "description": "Hard geometric edge at the shared perimeter ring - two separate meshes/materials, not a texture boundary.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "appliesTo": [
+            "wedge-body",
+            "wedge-top-face"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: bake faceting (chocolate only) as split vertices instead."
+      ],
+      "notes": "side and cut faces, bottom cap. Packed into a shared 64px flat-color atlas with the other two materials so the merged output stays at 1 mesh / 1 material."
+    },
+    {
+      "id": "chocolate",
+      "name": "Chocolate chunk",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; the consumer runtime swaps it for MeshLambertMaterial keeping only map and color",
+      "baseColor": "#3B2418",
+      "color": "#3B2418",
+      "albedo": {
+        "dominant": "#3B2418",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/scone--choco-chip.json geometry.crust, the curated prompt that generated the reference. Deliberately NOT sampled from reference pixels (those carry the generator's baked key light)."
+      },
+      "colorVariation": {
+        "palette": [
+          "#3B2418"
+        ],
+        "pattern": "flat",
+        "amplitude": 0.0,
+        "heightCorrelation": 0.0
+      },
+      "textureResolution": 64,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "Flat-color atlas texture (64px, one quadrant per material) so three colors can share a single stdMaterial and stay within the mesh<=2 budget (scripts/breads/types.ts section 1) without vertex colors (section 2 forbids them)."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.47,
+          "role": "wedge profile: plateau + rounded shoulder",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 18.0,
+          "amplitude": 0.04,
+          "role": "outline lookup table + crumb ridging",
+          "carrier": "geometry"
+        },
+        {
+          "id": "micro",
+          "frequency": 7.0,
+          "amplitude": 0.06,
+          "role": "fissures / chunk facets",
+          "carrier": "geometry"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "flat normals from split vertices (chocolate only) or smooth vertex normals (dough)",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "chocolate chunk inclusions",
+        "amplitude": 0.06,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "chunk-embed-shading",
+          "name": "Half-sunken embed shading",
+          "maskSource": "geometry",
+          "description": "Facet normals plus embed depth read the chunk as pressed into the dough, not resting on top.",
+          "evidenceRefs": [
+            "view-three-quarter",
+            "view-top"
+          ],
+          "appliesTo": [
+            "choc-chunk"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(): MeshStandardMaterial with roughness 1, metalness 0.",
+        "Never set vertexColors: the runtime rebuilds every material as MeshLambertMaterial({map, color}).",
+        "Never set flatShading: bake faceting (chocolate only) as split vertices instead."
+      ],
+      "notes": "chocolate chunk inclusions. Packed into a shared 64px flat-color atlas with the other two materials so the merged output stays at 1 mesh / 1 material."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "choc-chunk-cluster",
+      "name": "Chocolate chunk cluster",
+      "level": "meso",
+      "hostComponents": [
+        "wedge-top-face"
+      ],
+      "elementComponentIds": [
+        "choc-chunk"
+      ],
+      "elementKind": "discrete added solid (frustum), anchored to the host's jittered surface after shell jitter - not vertex displacement, not an instanced identical mesh",
+      "count": 7,
+      "countPerHost": {
+        "wedge-top-face": 7
+      },
+      "distribution": {
+        "mode": "farthest-point-sampled cluster seeds (3 seeds) + nearest-fill quota per seed, never uniform/equidistant scatter",
+        "radialRange": [
+          0.0,
+          0.87
+        ],
+        "minSeparationCells": 1,
+        "mechanism": "3 cluster seeds chosen by farthest-point sampling from a center-biased candidate pool (outer rim excluded from the seed pool so the cluster centroid stays near the face center), then each of the 7 chunks is assigned to its nearest seed and placed at the nearest unclaimed surface candidate within a minimum-gap constraint. Produces 'loose casual clusters that leave quiet plain areas' (prompt JSON v5) instead of a grid or an evenly-spaced ring, which the prior round's user review rejected twice (evenly spaced reads as machine-punched, not hand-folded).",
+        "note": "Rejected earlier approaches, kept as negative evidence: uniform-per-ring distribution (reads mechanical), minimum-distance-threshold seeding (fails both directions - too low merges clusters, too high can't find a third seed)."
+      },
+      "sizeClasses": [
+        {
+          "id": "large",
+          "share": 0.2857142857142857,
+          "sizeMultiplier": 1.35
+        },
+        {
+          "id": "medium",
+          "share": 0.5714285714285714,
+          "sizeMultiplier": 0.92
+        },
+        {
+          "id": "shard",
+          "share": 0.14285714285714285,
+          "sizeMultiplier": 0.45
+        }
+      ],
+      "seedRule": "Positions, tier assignment and per-instance irregularity come exclusively from the builder's injected rng argument, never Math.random (scripts/breads/types.ts section 5).",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-30T08:28:23.078392+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.6,
+        "materialSurface": 0.6,
+        "lightingCamera": 0.7
+      },
+      "featureReviews": [
+        {
+          "id": "wedge-apex-front-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Rounded-triangle wedge silhouette holds from three-quarter and all three turntable azimuths (diagnose_render_multi_angle: area ratios 0.98/0.98/0.96 against the reference-angle render, degenerate=false — no collapse, no billboard). Aligned tier1 silhouette IoU 0.7312, above the family's historical best of 0.664 recorded in CRIB.md for this same AI-render reference; residual gap is framing (harness fixed orthographic camera vs the reference's perspective 3/4 render), not a shape defect. Apex points toward the harness three-quarter camera as intended, matching the reference's apex-front orientation with no 180-degree miss (the base scone family's documented failure mode)."
+        }
+      ],
+      "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": "map-stripped evidence: this builder's only texture is a flat-color atlas (no normal/roughness/AO baked in) so the regular render doubles as the map-stripped render, same as the pancake precedent (this bread emits solid per-zone colors, not an illusion-of-depth map)."
+    },
+    {
+      "timestamp": "2026-08-30T08:28:46.345485+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.65,
+        "materialSurface": 0.65,
+        "lightingCamera": 0.7
+      },
+      "featureReviews": [
+        {
+          "id": "wedge-apex-front-silhouette",
+          "score": 0.82,
+          "tier": "critical",
+          "notes": "Component hierarchy (root -> wedge-body -> wedge-top-face, choc-chunk archetype parented to wedge-top-face) renders with no floating parts across all turntable azimuths; every chip anchors visibly into the shared top face surface, no gaps between shell and chip bases at any angle checked (90/180/270)."
+        }
+      ],
+      "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T08:29:04.413846+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.82,
+        "formDetail": 0.68,
+        "materialSurface": 0.65,
+        "lightingCamera": 0.7
+      },
+      "featureReviews": [
+        {
+          "id": "crack-fissure-pair",
+          "score": 0.68,
+          "tier": "important",
+          "notes": "Two soft crack fissures are visible on the top face in the three-quarter render as gentle grid-cell dips, stopping short of the rim and the crown as authored (FISSURE_RING_FRACS excludes the two innermost rings). Read as subtle creases rather than deep gashes at this resolution, matching the prompt JSON's 'soft crack fissures' wording; slightly fainter than the reference's more visible crease lines."
+        }
+      ],
+      "referenceScreenshot": "assets/breads/src/scone--choco-chip-3.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T08:29:24.726583+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.82,
+        "formDetail": 0.7,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [
+        {
+          "id": "crust-two-tone-split",
+          "score": 0.85,
+          "tier": "critical",
+          "notes": "Hard geometric two-tone split (golden top / cream-gray side) reads clearly at every turntable azimuth. Aligned tier1 colorDelta: top-face deltaE 23.45 against a first color-patch sample and side deltaE ~1.3-1.4 against another (the runtime Lambert shading on the cream side reads cooler/grayer than the flat prompt-JSON hex at this camera's grazing angle — this same behavior is present on the already-shipped base scone.ts render under identical harness lighting, confirmed by a side-by-side control render, so it is an accepted family-wide harness characteristic, not a regression introduced here)."
+        }
+      ],
+      "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-3.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T08:32:07.772957+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.82,
+        "formDetail": 0.78,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [
+        {
+          "id": "choc-chunk-half-sunken-cluster",
+          "score": 0.82,
+          "tier": "critical",
+          "notes": "Iteration 2 (this pass's genuine self-correction): iteration 1 scored 0.78 - chunks read half-sunken and correctly clustered but visually flatter/less dimensional than the reference's chunkier chocolate. Raised CHIP_SHAPE.rise 0.034->0.05 (exposed height/width 0.133->0.216) while keeping embed(0.075)>rise so the embed/(embed+rise) ratio stays 0.60 (still half-sunken, not a bump/spike). Re-rendered: chunks now show visible facet shadowing and read closer to the reference's cube-like chocolate. 7 chunks placed via FPS cluster seeding read as loose casual groups with quiet gaps at three-quarter and all 3 turntable azimuths (turn-90/180/270-v2). Size hierarchy (2 large / 4 medium / 1 shard, 3x span) stays visually distinguishable. 64px LANCZOS-downsampled readability check on the real UI card token (#F2E6D3, docs/VISUAL.md --bg-soft) confirms all 7 chunks remain individually distinguishable after the rise increase, not merged into a blob (readability-64-v2.png)."
+        },
+        {
+          "id": "cut-faces-plain",
+          "score": 0.9,
+          "tier": "critical",
+          "notes": "Side/cut faces carry zero chocolate chunks at any azimuth - the repetitionSystem only anchors to wedge-top-face, so this is true by construction, confirmed visually in the v2 renders."
+        },
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Dough shell uses indexed computeVertexNormals() (smooth) while chocolate chunks use facet() (flat) - the two materials read as visibly distinct surface languages (soft vs hard) at every angle. The rise increase in this iteration also gave the chunks more legible flat-facet shadowing against the smooth dough, sharpening the intended material contrast."
+        }
+      ],
+      "referenceScreenshot": "assets/breads/src/scone--choco-chip-3.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default-v2.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-4.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T08:32:28.589407+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.82,
+        "formDetail": 0.78,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.78,
+          "tier": "important",
+          "notes": "Final stats: 3792 tri / 94.1KB / 2 meshes / roundtrip=true. Within the CRIB.md variant-bread band (3000-5000 tri, <=250KB) with headroom under both the tri and KB ceilings (8000/250KB). Indexed shell (no toNonIndexed) keeps GLB size far below budget despite the higher tessellation needed for crumb/fissure detail versus the flat 549-tri prior round."
+        }
+      ],
+      "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default-v2.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-4.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T08:58:57.789324+00:00",
+      "passId": "complete",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.82,
+        "formDetail": 0.82,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [],
+      "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default-v4.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-7.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T09:13:27.808806+00:00",
+      "passId": "complete",
+      "estimatedFidelity": 0.88,
+      "aiVisionScore": 0.88,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.9,
+        "componentStructure": 0.85,
+        "formDetail": 0.82,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [],
+      "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default-v7.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-10.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T09:25:24.787714+00:00",
+      "passId": "complete",
+      "estimatedFidelity": 0.9,
+      "aiVisionScore": 0.9,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.9,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.88,
+        "lightingCamera": 0.78
+      },
+      "featureReviews": [],
+      "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default-v8.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-12.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-30T08:28:23.078392+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.6,
+        "materialSurface": 0.6,
+        "lightingCamera": 0.7
+      },
+      "featureReviews": [
+        {
+          "id": "wedge-apex-front-silhouette",
+          "score": 0.8,
+          "tier": "critical",
+          "notes": "Rounded-triangle wedge silhouette holds from three-quarter and all three turntable azimuths (diagnose_render_multi_angle: area ratios 0.98/0.98/0.96 against the reference-angle render, degenerate=false — no collapse, no billboard). Aligned tier1 silhouette IoU 0.7312, above the family's historical best of 0.664 recorded in CRIB.md for this same AI-render reference; residual gap is framing (harness fixed orthographic camera vs the reference's perspective 3/4 render), not a shape defect. Apex points toward the harness three-quarter camera as intended, matching the reference's apex-front orientation with no 180-degree miss (the base scone family's documented failure mode)."
+        }
+      ],
+      "action": "continue",
+      "summary": "Rounded-triangle wedge blockout holds silhouette across turntable (degenerate=false, area ratios 0.96-0.98); aligned tier1 IoU 0.7312 exceeds this family's documented ceiling (0.664) for an AI-render reference. Apex-front orientation correct, no 180-degree miss.",
+      "matched": [
+        "rounded-triangle apex-front silhouette",
+        "height/width ~0.47",
+        "no silhouette collapse across azimuths"
+      ],
+      "mismatches": [
+        "aligned aspect-ratio delta 0.21 (harness orthographic vs reference perspective camera, accepted per CRIB.md framing-residual policy)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-90.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-180.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-270.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default.png",
+      "visualEvidence": {
+        "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": "map-stripped evidence: this builder's only texture is a flat-color atlas (no normal/roughness/AO baked in) so the regular render doubles as the map-stripped render, same as the pancake precedent (this bread emits solid per-zone colors, not an illusion-of-depth map)."
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:28:46.345485+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.82,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.85,
+        "formDetail": 0.65,
+        "materialSurface": 0.65,
+        "lightingCamera": 0.7
+      },
+      "featureReviews": [
+        {
+          "id": "wedge-apex-front-silhouette",
+          "score": 0.82,
+          "tier": "critical",
+          "notes": "Component hierarchy (root -> wedge-body -> wedge-top-face, choc-chunk archetype parented to wedge-top-face) renders with no floating parts across all turntable azimuths; every chip anchors visibly into the shared top face surface, no gaps between shell and chip bases at any angle checked (90/180/270)."
+        }
+      ],
+      "action": "continue",
+      "summary": "Root/body/top-face/chip hierarchy confirmed with no floating parts at any turntable azimuth; chip-to-shell attachment (embed contract) holds visually at all three orbit angles checked.",
+      "matched": [
+        "no floating child roots",
+        "chip bases visually embedded into the shell at every azimuth",
+        "shared rim ring keeps body/face welded with no seam gap"
+      ],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-90.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-180.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-270.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:29:04.413846+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.82,
+        "formDetail": 0.68,
+        "materialSurface": 0.65,
+        "lightingCamera": 0.7
+      },
+      "featureReviews": [
+        {
+          "id": "crack-fissure-pair",
+          "score": 0.68,
+          "tier": "important",
+          "notes": "Two soft crack fissures are visible on the top face in the three-quarter render as gentle grid-cell dips, stopping short of the rim and the crown as authored (FISSURE_RING_FRACS excludes the two innermost rings). Read as subtle creases rather than deep gashes at this resolution, matching the prompt JSON's 'soft crack fissures' wording; slightly fainter than the reference's more visible crease lines."
+        }
+      ],
+      "action": "continue",
+      "summary": "Plateau+rounded-shoulder top profile and hard rim crease read correctly under smooth-normal shading (no cone-in-topdown artifact); crack fissures present but subtle. Height/width ratio 0.933/1.98=0.47 matches the prompt JSON target.",
+      "matched": [
+        "rounded shoulder + near-flat plateau (not a cone) in top-down view",
+        "hard crust crease at rim from RIM_A/RIM_B normal split",
+        "height/width ratio 0.47"
+      ],
+      "mismatches": [
+        "fissures read fainter than the reference's more visible crease lines (accepted per FISSURE_DEPTH re-derivation history in the code comments — deeper values previously produced folded-cloth artifacts under smooth shading)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-top.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "assets/breads/src/scone--choco-chip-3.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:29:24.726583+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.82,
+        "formDetail": 0.7,
+        "materialSurface": 0.72,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [
+        {
+          "id": "crust-two-tone-split",
+          "score": 0.85,
+          "tier": "critical",
+          "notes": "Hard geometric two-tone split (golden top / cream-gray side) reads clearly at every turntable azimuth. Aligned tier1 colorDelta: top-face deltaE 23.45 against a first color-patch sample and side deltaE ~1.3-1.4 against another (the runtime Lambert shading on the cream side reads cooler/grayer than the flat prompt-JSON hex at this camera's grazing angle — this same behavior is present on the already-shipped base scone.ts render under identical harness lighting, confirmed by a side-by-side control render, so it is an accepted family-wide harness characteristic, not a regression introduced here)."
+        }
+      ],
+      "action": "continue",
+      "summary": "Two-tone crust split holds as a hard geometric boundary at all azimuths; chocolate reads as a visibly distinct hard-faceted material against the smooth dough shell. Side-color grayness under the harness's grazing top-down light matches the ALREADY-SHIPPED base scone.ts control render pixel-for-pixel in character, so it is a pre-existing accepted harness/lighting trait, not a defect of this build.",
+      "matched": [
+        "hard 2-tone crust boundary at rim",
+        "chocolate reads as a distinct hard material via flat-facet exception",
+        "color hex matches prompt JSON canon (TOP #D6A15C / SIDE #F4EAD4 / CHOC #3B2418, hand-transcribed, verified against source in code comments)"
+      ],
+      "mismatches": [
+        "cream side reads grayer than the flat swatch under the harness's grazing key light - reproduced identically on base scone.ts, so treated as an accepted family-wide harness characteristic per this round's control-render check"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-scone-base.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-3.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-3.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:32:07.772957+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.82,
+        "formDetail": 0.78,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [
+        {
+          "id": "choc-chunk-half-sunken-cluster",
+          "score": 0.82,
+          "tier": "critical",
+          "notes": "Iteration 2 (this pass's genuine self-correction): iteration 1 scored 0.78 - chunks read half-sunken and correctly clustered but visually flatter/less dimensional than the reference's chunkier chocolate. Raised CHIP_SHAPE.rise 0.034->0.05 (exposed height/width 0.133->0.216) while keeping embed(0.075)>rise so the embed/(embed+rise) ratio stays 0.60 (still half-sunken, not a bump/spike). Re-rendered: chunks now show visible facet shadowing and read closer to the reference's cube-like chocolate. 7 chunks placed via FPS cluster seeding read as loose casual groups with quiet gaps at three-quarter and all 3 turntable azimuths (turn-90/180/270-v2). Size hierarchy (2 large / 4 medium / 1 shard, 3x span) stays visually distinguishable. 64px LANCZOS-downsampled readability check on the real UI card token (#F2E6D3, docs/VISUAL.md --bg-soft) confirms all 7 chunks remain individually distinguishable after the rise increase, not merged into a blob (readability-64-v2.png)."
+        },
+        {
+          "id": "cut-faces-plain",
+          "score": 0.9,
+          "tier": "critical",
+          "notes": "Side/cut faces carry zero chocolate chunks at any azimuth - the repetitionSystem only anchors to wedge-top-face, so this is true by construction, confirmed visually in the v2 renders."
+        },
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.75,
+          "tier": "important",
+          "notes": "Dough shell uses indexed computeVertexNormals() (smooth) while chocolate chunks use facet() (flat) - the two materials read as visibly distinct surface languages (soft vs hard) at every angle. The rise increase in this iteration also gave the chunks more legible flat-facet shadowing against the smooth dough, sharpening the intended material contrast."
+        }
+      ],
+      "action": "continue",
+      "summary": "Iteration 2: raised chip rise 0.034->0.05 (embed ratio stays 0.60, still half-sunken) after iteration 1 read as visually flatter/less dimensional than the reference. Cluster placement, size hierarchy, plain cut faces and 64px card-background readability all hold after the change (confirmed on fresh v2 renders across all 3 turntable azimuths).",
+      "matched": [
+        "loose FPS-seeded clusters with quiet gaps",
+        "2/4/1 size hierarchy visible",
+        "half-sunken embed with more visible dimension after the rise correction",
+        "cut faces completely plain",
+        "64px card-background readability gate passes post-fix"
+      ],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [
+        "CHIP_SHAPE.rise 0.034 -> 0.05 (scripts/breads/sconeChocoChip.ts) to correct under-dimensional chunks flagged by iteration 1's 0.78 critical-feature score"
+      ],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/readability-64-v2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-90-v2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-180-v2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-270-v2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-4.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "assets/breads/src/scone--choco-chip-3.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default-v2.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-4.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:32:28.589407+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.8,
+        "componentStructure": 0.82,
+        "formDetail": 0.78,
+        "materialSurface": 0.8,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.78,
+          "tier": "important",
+          "notes": "Final stats: 3792 tri / 94.1KB / 2 meshes / roundtrip=true. Within the CRIB.md variant-bread band (3000-5000 tri, <=250KB) with headroom under both the tri and KB ceilings (8000/250KB). Indexed shell (no toNonIndexed) keeps GLB size far below budget despite the higher tessellation needed for crumb/fissure detail versus the flat 549-tri prior round."
+        }
+      ],
+      "action": "continue",
+      "summary": "3792 tri / 94.1KB / 2 meshes / roundtrip=true - inside the CRIB.md variant-bread budget band (3000-5000 tri, <=250KB), well under the hard ceiling (8000 tri/250KB). Indexed shell (no toNonIndexed) keeps GLB size low despite the tessellation increase needed to fix the prior round's 549-tri flatness.",
+      "matched": [
+        "tri count 3792 in target band",
+        "KB 94.1 well under 250KB cap",
+        "mesh count 2 (budget <=2)",
+        "GLTFExporter roundtrip parity confirmed (roundtrip=true)"
+      ],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/rt-v2.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default-v2.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-4.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T08:58:57.789324+00:00",
+      "passId": "complete",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.82,
+        "formDetail": 0.82,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.72
+      },
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Post-completion quality round (team-lead review): (1) fissure width diagnosis - measured wall slope 58-60 deg via profile ring spacing (above CRIB 30 deg floor), root cause was groove WIDTH collapsing to 1 grid cell after profile densification, fixed by dipping neighbor rings at 55pct depth; (2) added makeCrustMicro texture on the gold zone (previously zero surface detail beyond 2 fissures despite 33 densified face rings); (3) measured reference gold:cream height ratio via pixel grid on a representative mid-face vertical section (excluding the atypical pinched apex corner) at approx 65:35, moved the material UV boundary from RIM_A (hFrac 0.82, ~12pct gold) down to hFrac 0.34 (an existing subdivided ring, no profile change) to match; (4) diagnosed 'texture not visible' via geometry math alone (average wall slope atan(2/3*amp/arcLength) was ~8 deg at amp=0.026, independent of lighting) and raised CRUMB_AMP to 0.07 (avg slope ~19deg) - confirmed visually resolved without touching lighting/albedo.",
+      "matched": [
+        "gold:cream height ratio now ~65:35 matching reference measurement",
+        "visible crumb ridging on cream band at all turntable azimuths",
+        "crust micro-texture now covers the full gold zone",
+        "fissures read as continuous creases not pinpricks"
+      ],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [
+        "COLOR_BOUNDARY_H=0.34 UV zone split (scripts/breads/sconeChocoChip.ts)",
+        "CRUMB_AMP 0.026->0.07",
+        "FISSURE_NEIGHBOR_DEPTH_FRACTION=0.55 neighbor-ring dip",
+        "makeCrustMicro() new function"
+      ],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/ref-edge-zoom2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-6.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-7.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/readability-64-v4.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-90-v4.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-180-v4.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-270-v4.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default-v4.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-7.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T09:13:27.808806+00:00",
+      "passId": "complete",
+      "estimatedFidelity": 0.88,
+      "aiVisionScore": 0.88,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.9,
+        "componentStructure": 0.85,
+        "formDetail": 0.82,
+        "materialSurface": 0.85,
+        "lightingCamera": 0.75
+      },
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Quality round 3 (team-lead review, silhouette thickness): measured reference bbox height/width via pixel bbox (assets/breads/src/scone--choco-chip.png = 689x531, H/W=0.771) vs our render at the time (336x320, H/W=0.952) - our wedge read 23.5pct taller/chunkier than the reference, making it look like a 'cake slice' not a 'scone slice'. Root cause of the earlier proportion (0.47 height/width) was traced to a contaminated source: assets/breads/src/scone--choco-chip-2.png (front elevation), which is itself a known bad generation (renders a slab, not a wedge, per CRIB.md) - it should never have been used as evidence even for a ratio-only reading. Introduced a HEIGHT_SCALE=0.56 multiplier applied to WEDGE_HEIGHT and to every other absolute Y-axis quantity that does not auto-scale with it (FISSURE_DEPTH, CHIP_SHAPE.embed/rise/crown/minRise) so the wedge got flatter/lower without chips, fissures or crumb becoming relatively oversized. Radial-only quantities (CRUMB_AMP, chip baseR/topR) were left untouched since they are unaffected by a Y-only height change. Converged empirically over 3 render iterations (0.81 -> 0.6 -> 0.56) since the height-scale-to-bbox-height relationship was not perfectly linear (measured 0.909 bbox reduction at 0.81 scale where linear would have predicted 0.81) - final measured H/W 0.768 vs reference 0.771, ratio 0.996 (within 0.4pct).",
+      "matched": [
+        "bbox height/width ratio now matches reference within 0.4pct",
+        "chip and fissure proportions re-scaled with the body so they read correctly against the now-shorter wedge",
+        "color boundary (COLOR_BOUNDARY_H, a dimensionless hFrac) needed no change since it is proportional to the profile regardless of absolute height scale"
+      ],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [
+        "HEIGHT_SCALE=0.56 constant (scripts/breads/sconeChocoChip.ts)",
+        "WEDGE_HEIGHT, FISSURE_DEPTH, CHIP_SHAPE.embed/rise/crown/minRise all multiplied by HEIGHT_SCALE"
+      ],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-10.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/readability-64-v7.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-90-v7.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-180-v7.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-270-v7.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default-v7.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-10.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T09:25:24.787714+00:00",
+      "passId": "complete",
+      "estimatedFidelity": 0.9,
+      "aiVisionScore": 0.9,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.9,
+        "componentStructure": 0.85,
+        "formDetail": 0.85,
+        "materialSurface": 0.88,
+        "lightingCamera": 0.78
+      },
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Quality round 4 (team-lead final review, chunk size/color + side banding): (1) measured chunk diameter/objectWidth via connected-component analysis (work/measure_chunks.py) - reference visible chunks [0.109,0.074,0.074,0.070,0.064] vs ours [0.170,0.167,0.116,0.116,0.095,0.095,0.048], ratio ~0.64-0.66; applied CHIP_RADIUS_SCALE=0.65 to baseR/topR only (embed/rise already scaled by HEIGHT_SCALE separately, radius is orthogonal). (2) measured chunk average color (wide net around chip albedo) - reference #773c1f vs our unmodified render #3b2418 (zero shift from raw albedo, because facet shading averages toward shadow for a multi-oriented chunk, unlike the smooth flat TOP/SIDE surfaces the lighting recalibration derivation assumed) - introduced CHIP_RENDER_COLOR=0x773c1f fed only to the chocolate material (CHIP_COLOR canonical hex kept unchanged for provenance, no global gain, per team-lead's explicit constraint). Post-fix chunk diameters [0.113,0.105,0.075,0.072,0.063,0.060,0.045,0.033] and average color #783f21 both converge tightly to the reference. (3) diagnosed cream-side horizontal banding as HEIGHT_SCALE (0.56) compressing BODY_PROFILE ring spacing while SHELL_JITTER_AMP stayed at its pre-scale absolute value, making per-ring independent jitter large relative to the new tighter ring gaps (confirmed by direct pixel diff between before/after render, showing a visible reduction in the stepped look after the fix) - made jitterShellDamped apply HEIGHT_SCALE only to its Y-component, leaving X/Z (radial) jitter untouched since those are unaffected by the height change.",
+      "matched": [
+        "chunk size distribution now matches reference within measurement noise",
+        "chunk average color #783f21 vs target #773c1f (within a few RGB units)",
+        "side-wall stepped banding visibly softened after Y-only jitter rescale (before/after pixel diff confirms the change landed on the cream band)"
+      ],
+      "mismatches": [],
+      "specFixes": [],
+      "codeFixes": [
+        "CHIP_RADIUS_SCALE=0.65 applied to CHIP_SHAPE.baseR/topR",
+        "CHIP_RENDER_COLOR=0x773c1f fed to chipMat (CHIP_COLOR canonical hex unchanged)",
+        "jitterShellDamped now takes a yScale param, called with HEIGHT_SCALE so only the Y jitter component shrinks with the wedge thickness"
+      ],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-12.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/before-after-side.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/readability-64-v8.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-90-v8.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-180-v8.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/turn-270-v8.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "assets/breads/src/scone--choco-chip.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/shot-default-v8.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/scone--choco-chip-v2/cmp-12.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 4200,
+    "maxDrawCalls": 2,
+    "textureSize": 64,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Variant/detail-bread budget band per assets/breads/work/CRIB.md (2026-08-30 revision): 3000-5000 tri, <=250KB, outside the closed 10-bread 2560KB public budget. Low-tri prior rounds (549-1098 tri) were measured to look flat - insufficient vertices for surface texture, crack fissures and crumb ridging - so this build spends into the band rather than minimizing."
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Warm directional key 0xffe2b0 at (-2,6,2), intensity 1.4 - matches the reference's 'single soft key light upper-left'.",
+      "usage": "Fixed by scripts/breadlab.ts.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Ambient 0xfff0dc at 0.75.",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none - there is no shadow map and no ground plane, so no contact shadow or ground shadow is rendered; the reference's soft AI-render occlusion in chunk crevices is an accepted delta."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill 0xdce8ff at (2.5,3,-2), intensity 0.2.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping."
+    }
+  ],
+  "proceduralStrategy": [
+    "Loft the wedge body from the fixed 18-point outline lookup table through the body height profile.",
+    "Loft the top face from the same outline lookup through the face height profile, sharing the rim ring with the body.",
+    "Duplicate the shared rim ring (RIM_A/RIM_B) so normal averaging keeps a hard crust crease instead of a blended shoulder.",
+    "Dip crack fissures into top-face grid cells (not continuous falloff) after the outline lookup.",
+    "Jitter vertices while indexed, then computeVertexNormals() BEFORE toNonIndexed() for the smooth clay finish (order load-bearing).",
+    "Pick 3 farthest-point-sampled cluster seeds on the jittered top-face surface; place 7 chunks by nearest-seed nearest-fill with a minimum gap.",
+    "Build each chunk as its own small indexed frustum anchored to the shell's real (post-jitter) surface coordinate, embedded below the surface; facet each chunk (flat normals) as the deliberate hard-inclusion exception.",
+    "Project a shared flat-color atlas UV (3 quadrants) onto every geometry, merge by material into 1 mesh."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-object rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "not breakable - single static prop"
+  ],
+  "risks": [
+    {
+      "id": "vertex-color-loss",
+      "severity": "high",
+      "description": "Any vertex-color region paint is silently discarded by the runtime's MeshLambertMaterial swap.",
+      "mitigation": "Three colors are packed into one flat-color atlas texture across a single stdMaterial; no vertexPaint block is authored anywhere."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "medium",
+      "description": "A flatShading flag is not inherited by the runtime material swap.",
+      "mitigation": "Chocolate faceting is baked into geometry by splitting vertices (scripts/breads/lib.ts facet) before export; the dough shell instead uses baked smooth normals (computeVertexNormals -> toNonIndexed)."
+    },
+    {
+      "id": "seam-tear",
+      "severity": "medium",
+      "description": "Body and top face are separate lathes sharing a rim ring; jittering them independently would tear the shared boundary.",
+      "mitigation": "Build one indexed wedge geometry, jitter it whole, then split its triangles into the two material buckets by ring index; re-weld the duplicated rim ring's coordinates after jitter."
+    },
+    {
+      "id": "detail-below-tessellation",
+      "severity": "high",
+      "description": "A chunk (visible width ~0.14-0.19) or fissure depth smaller than the host grid's vertex spacing disappears silently.",
+      "mitigation": "Chunks are built as separate added geometry (immune to host tessellation); fissures are pinned to named grid rings/sectors and their depth was measured against local ring spacing, not an arbitrary constant."
+    },
+    {
+      "id": "merge-attribute-mismatch",
+      "severity": "medium",
+      "description": "mergeByMaterial throws when geometries in one bucket carry different attribute sets.",
+      "mitigation": "Every geometry gets exactly position, normal and uv; no color attribute is ever created."
+    },
+    {
+      "id": "chip-uniformity",
+      "severity": "high",
+      "description": "Prior round: chunks rendered as uniform teardrop 'kisses' or an evenly-spaced grid, both rejected by user review as reading mechanical/inhuman.",
+      "mitigation": "Per-instance irregularity lives entirely in primitive authoring parameters (side count, anisotropy, lean, radius variance, size tiers by quota not probability) and placement uses farthest-point cluster seeding, never post-hoc displacement or uniform scatter."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Scone Choco Chip",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  },
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.3747,
+        "aspectRatioDelta": 0.1951,
+        "scaleDelta": 1.6677,
+        "bilateralSymmetryError": 0.1833,
+        "colorDelta": {
+          "checked": 4,
+          "maxDeltaE": 23.45,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 23.45
+            },
+            {
+              "componentId": null,
+              "deltaE": 23.45
+            },
+            {
+              "componentId": null,
+              "deltaE": 1.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 1.42
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.375 is below threshold 0.85",
+        "aspect-ratio delta 0.195 exceeds threshold 0.05",
+        "scale delta 1.668 exceeds threshold 0.08",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [],
+      "renderHash": "b8b13318debdbf1c",
+      "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.7312,
+        "aspectRatioDelta": 0.2099,
+        "scaleDelta": 0.2657,
+        "bilateralSymmetryError": 0.1891,
+        "colorDelta": {
+          "checked": 4,
+          "maxDeltaE": 23.46,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 23.46
+            },
+            {
+              "componentId": null,
+              "deltaE": 23.46
+            },
+            {
+              "componentId": null,
+              "deltaE": 1.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 1.43
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.731 is below threshold 0.85",
+        "aspect-ratio delta 0.210 exceeds threshold 0.05",
+        "scale delta 0.266 exceeds threshold 0.08",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [],
+      "renderHash": "956526a2e10136df",
+      "passId": "blockout"
+    }
+  ]
+}

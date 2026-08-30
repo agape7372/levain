@@ -1,0 +1,3 @@
+[
+  {"id": "crust-two-tone-split", "score": 0.85, "tier": "critical", "notes": "Hard geometric two-tone split (golden top / cream-gray side) reads clearly at every turntable azimuth. Aligned tier1 colorDelta: top-face deltaE 23.45 against a first color-patch sample and side deltaE ~1.3-1.4 against another (the runtime Lambert shading on the cream side reads cooler/grayer than the flat prompt-JSON hex at this camera's grazing angle — this same behavior is present on the already-shipped base scone.ts render under identical harness lighting, confirmed by a side-by-side control render, so it is an accepted family-wide harness characteristic, not a regression introduced here)."}
+]

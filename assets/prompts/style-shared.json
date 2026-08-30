@@ -1,16 +1,38 @@
 {
-  "id": "shared-style-v2",
+  "id": "shared-style-v3",
   "keywords": [
-    "low-poly faceted geometry",
-    "soft clay-like matte shading",
+    "softly stylized clay-like 3D render",
+    "smooth rounded forms with gentle sculpted detail",
+    "soft matte shading",
     "warm pastel palette",
     "miniature diorama feel",
-    "flat color facets",
     "clean simple silhouette",
+    "cozy handmade bakery feel",
     "stylized 3D game asset render"
   ],
   "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
   "lighting": "single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background",
   "negative_tail": "Stylized matte render only — no photorealism, no glossy plastic, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
-  "notes_ko": "v2 변경: (1) 배경을 크림(#F2E6D3)에서 페일 세이지(#DFEAE0)로 — 식빵·스콘의 크림색 옆면(#F4EAD4)이 배경과 거의 동일해 image-to-3D 세그먼테이션이 번지는 문제. (2) 'rounded silhouette' 제거 — 크래커(각진 사각)·스콘(웨지)·식빵(각진 팬 옆면) 실루엣과 충돌. (3) 그림자 금지 명시 — 접지 그림자가 3D 변환 시 실루엣에 번지거나 알베도에 어두운 테두리로 구워짐."
+  "notes_ko": "v2 변경: (1) 배경을 크림(#F2E6D3)에서 페일 세이지(#DFEAE0)로 — 식빵·스콘의 크림색 옆면(#F4EAD4)이 배경과 거의 동일해 image-to-3D 세그먼테이션이 번지는 문제. (2) 'rounded silhouette' 제거 — 크래커(각진 사각)·스콘(웨지)·식빵(각진 팬 옆면) 실루엣과 충돌. (3) 그림자 금지 명시 — 접지 그림자가 3D 변환 시 실루엣에 번지거나 알베도에 어두운 테두리로 구워짐. | v3 변경(2026-08-30, 사용자 피드백 'AI food 징그러움'): (1) 'low-poly faceted'·'flat color facets' 키워드 제거 — 크럼까지 결정질로 만들어 식감을 죽였고, 3D 파이프라인도 스무스 클레이 룩으로 전환됨. (2) appetizing 원칙 8조 신설 — 과밀 균일 충전('scattered across'류 문구가 원인), 돌출 스터드, 완벽 나선, 벌집 기공, 곰팡이성 더스팅, 순검정 토핑을 프롬프트 문구 단위로 차단. 모든 신규·재생성 프롬프트는 rules를 본문에 반영하고 negative_additions를 negative에 합칠 것. 기존 v2 산출 이미지는 유효(재생성 시에만 v3 적용). | v3 추가(2026-08-30, 스콘 v3·v4 기각 실측): 균일 물방울 반복·면당 1개 등간격 배분 차단 조항 2건. | 깜빠뉴 v2 기각 실측: 금지만 하면 반대 극단으로 튄다 — 물리적 형성 은유로 목표 형태를 양성 서술할 것. | 포카치아 v2 기각 실측: 완벽 원형 딤플·균일 크기가 기계 펀칭으로 읽힘 — 수제 변형 조항 추가. | 정정(2026-08-30): 깜빠뉴 나선은 이미지로는 합격이었다(사용자 확인) — 기각된 건 3D의 스티커 붙임. 나선 자체를 이미지에서 금지한 v2~v4는 과교정으로 폐기, 프롬프트 v1 원복. '금지만 하면 반대 극단' 교훈은 유효하나 사례는 잼 스월이 아니라 일반 원칙으로만 유지. | v5 규율(2026-08-30): 스콘 v4 초코 구멍 사고로 negative_additions 목록 폐기 — 산문 부정 체인이 개념을 주입한다(기본 빵 v1의 짧은 negative는 무사고였다). negative는 구조 금지 상수만. | 어휘 뱅크 추가(2026-08-30, carat.im 등 food-photo 갤러리 참조): 식욕 형용사층 흡수, 실사 전용(광택·김·카메라)은 파이프라인 제약으로 배제.",
+  "appetizing": {
+    "rules": [
+      "state an explicit small count for every topping or inclusion (e.g. 'about eight chips') — never 'scattered across', 'studded across', or 'across the whole surface' (generators read those as maximum-density uniform fill)",
+      "inclusions sit half-sunken INTO the dough with softly rounded, slightly melted-looking tops — never perched on the surface, never poking out as spikes or horns",
+      "on any cut face, inclusions appear as flat cross-section flecks flush with the crumb — never as protruding bumps; side walls otherwise stay plain",
+      "placement is uneven and loosely clustered, with calm plain areas left empty — never a grid, never even spacing, never polka dots",
+      "swirls and fillings are loose, hand-folded ribbons of uneven thickness, broken in places — never a perfect spiral, target, or bullseye",
+      "crumb pores are few, soft and irregular — never a dense honeycomb of holes",
+      "flour dusting is a barely-there haze — never white blotches or speckles (reads as mold)",
+      "topping colors stay warm and edible (warm dark brown, deep plum) — never pure black",
+      "repeated inclusions must vary — clearly different sizes (big/medium/shard tiers), each at its own angle, and say 'No two pieces look the same'; the word 'chips' breeds identical teardrop kisses, prefer 'irregular hand-chopped chunks'",
+      "never ask for a small count of inclusions on a specific face ('two or three on the cut faces') — generators distribute them one-per-face, dead-center, in an even row; either give a face many irregular pieces or keep it completely plain",
+      "never only ban a shape — name the replacement positively with a physical formation metaphor ('bakes the way a rolled-up dough sheet spread with jam bakes'); a bare ban ('never a perfect spiral') makes the generator jump to the opposite extreme (a thin pen-drawn squiggle)",
+      "every round feature (dimple, oil pool, pore, hole) stays roundish but hand-made: slightly oval, rim gently uneven, and each one a little different in size and depth — never perfect circles, never clean-punched holes, no two alike",
+      "keep the negative tail short — structural bans only (photorealism, text, props); every 'no X' teaches the generator the word X (a long ban list injected 'holes' into chocolate chunks). Shape and placement corrections belong in positive description, never in the ban list"
+    ],
+    "negative_additions": [
+      "(폐기 — 이 목록을 프롬프트에 합치지 말 것. v5 규율: negative는 구조 금지만, 나머지는 양성 서술)"
+    ],
+    "vocabulary_ko": "식욕 어휘 뱅크(음식 사진 프롬프트 갤러리에서 흡수, 실사 전용 어휘는 제외): freshly baked / oven-warm / golden-brown / buttery / crumbly / soft-baked / tender crumb / gently toasted rim. 조명은 'warm, inviting'까지만 — steam·condensation·glossy·camera 기종 표기는 실사 전용이라 금지 유지(알베도 얼룩·Lambert 무효). 새 프롬프트는 이 어휘 2~3개를 본문에 녹일 것."
+  }
 }

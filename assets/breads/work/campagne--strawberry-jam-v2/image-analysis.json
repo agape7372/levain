@@ -1,0 +1,89 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": {
+    "campagne--strawberry-jam.png": "three-quarter top-front, wedge cut visible on the near-right, jam spiral facing camera",
+    "campagne--strawberry-jam-2.png": "front elevation (straight-on side view), cut wedge dead center",
+    "campagne--strawberry-jam-3.png": "top-down, wedge and cross slash both fully visible"
+  },
+  "layer1_identification": {
+    "workType": "a round country boule (campagne) loaf with one quarter-wedge sliced away, revealing a spiral strawberry-jam swirl baked through the crumb",
+    "broadClassification": "food prop / stylized low-poly clay 3D render, game asset",
+    "primaryDomain": "object",
+    "confidence": 0.97,
+    "note": "reference images are themselves AI-rendered low-poly faceted stylized renders, not photographs; runtime target is smooth matte clay per 2026-08-30 finish contract, so facet edges in the reference are a style cue, not a geometry target"
+  },
+  "layer2_form_silhouette": {
+    "boundingVolume": "round dome (hemisphere-like, flatter than a full sphere) with one 90-degree wedge removed down to the base, exposing a flat radial cut face",
+    "symmetry": "base form is radially symmetric (round boule) but broken twice: a 4-fold cross slash across the crown, and a single missing wedge sector between two of the slash arms (net symmetry: none, single dominant viewing side)",
+    "shapeLanguage": "smooth geometric dome base with hand-crafted surface treatment (dense banneton rings, torn slash ears) plus one deliberate flat cut",
+    "measurements_px_frontElevation": {
+      "domeWidth": "~1160 (full width)",
+      "domeHeight": "~440 (crown to base)",
+      "heightOverWidth": "~0.38 -- matches base campagne.ts DOME_HEIGHT=0.76 on a unit radius"
+    },
+    "derivedRatios": {
+      "wedgeSpan": "the missing wedge reads as one quarter of the circle (~90 degrees) in the top-down view",
+      "cutFaceHeightFraction": "cut face spans the full dome height, flat and vertical, from base to the crown's slash line"
+    }
+  },
+  "layer3_decomposition": {
+    "macro": ["domed boule body", "wedge cutaway (negative space + two new flat cut faces)"],
+    "meso": [
+      "crust crown: dense concentric banneton-ring banding covering the entire visible dome, alternating warm mid-brown and lighter dusted bands",
+      "cross slash: 4 raised, sharply pointed ridges ('ears') meeting at the apex, reading almost as a 4-point starburst rather than a soft cross",
+      "cut faces: two new flat radial faces where the wedge was removed"
+    ],
+    "micro": [
+      "jam spiral: a tight red-pink Archimedean-like spiral running through the pale crumb on both exposed cut faces, roughly 3.5-4 visible turns, fairly regular width (less ragged than a hand-rolled cinnamon-bun swirl)",
+      "crumb: pale cream-white background around the spiral, small open crumb texture implied but not sharply detailed",
+      "crust edge at the cut: a thin, slightly darker crust rim where the crust meets the exposed crumb"
+    ]
+  },
+  "layer4_spatial": [
+    "<cross slash, centered-on, dome crown> contact: the 4 ears all meet at a single apex point at the top of the dome",
+    "<wedge cutaway, between, two slash ears> contact: the missing wedge sits squarely between two adjacent slash arms in the top-down view, not overlapping either arm",
+    "<jam spiral, embedded-in, crumb> contact: the spiral is a baked-in cross-section pattern, not a topical smear -- it appears identically on both exposed cut faces (a real physical roll would look near-mirrored/continuous across the two faces, but here it can be treated as two independent instances of the same spiral pattern for a stylized game asset)",
+    "<crust rim, wrapping, cut face edge> contact: the crust forms a thin continuous rim around each cut face's outer arc, same as the intact dome's outer crust"
+  ],
+  "layer5_materials": {
+    "crust": {
+      "substance": "baked dough surface, dielectric, matte",
+      "metalness": 0.0,
+      "roughness": "~1.0, no visible specular highlight",
+      "relief": "dense, closely-packed concentric ring texture (far denser than the base campagne's 8 grooves -- reads as 15-20+ bands), each ring a shallow ridge/valley pair"
+    },
+    "crumb": {
+      "substance": "baked bread interior, dielectric, matte",
+      "metalness": 0.0,
+      "roughness": "~1.0",
+      "relief": "flat cut plane, faint open-crumb suggestion, no visible pores at this resolution"
+    },
+    "jamSwirl": {
+      "substance": "cooked fruit preserve, dielectric",
+      "metalness": 0.0,
+      "roughness": "slightly lower than crumb -- reads a touch richer/more saturated than a flat matte paint, but no distinct specular highlight is visible at this render scale",
+      "relief": "the reference shows the jam as flush with the crumb face (no visible groove) -- but the prompt JSON negative list explicitly bans 'glossy jam sheen', so the intended read is a baked-in color band, not a wet pool; the img2threejs v1 build's decision to physically channel/recess the jam band (not just paint it) is what separated it from a 'stickered on' look and is retained here for that reason"
+    }
+  },
+  "layer6_color": {
+    "source": "assets/prompts/breads/campagne--strawberry-jam.json geometry (authoritative, hand-transcribed, JSON overrides image on any conflict)",
+    "crustAlbedo": "#A9713F blended to a darker brown toward the base (JSON: 'amber to dark brown surface #A9713F to a darker brown blend across the dome')",
+    "crumbAlbedo": "pale cream, no hex in JSON -- reuse campagne.ts/baguette.json CRUMB #F4EAD4 (documented series-shared constant)",
+    "jamAlbedo": "#B23A4E (JSON: 'a deep red strawberry jam swirl #B23A4E spirals through the pale open crumb')",
+    "finish": "crust matte; crumb matte; jam slightly richer but not glossy per the negative prompt list",
+    "observedVsSpec": "reference crust reads warmer/more saturated on the sunlit crown facets than a flat #A9713F fill, and cooler/darker toward the base and inside the slash trenches -- consistent with the base campagne.ts tone-banding (dark/mid/light quantized by ridge phase + t) rather than a smooth gradient; jam color in the reference cut face is close to the JSON hex, slightly darkened at the spiral's inner core"
+  },
+  "layer7_identity_features": [
+    "very dense banneton ring banding across the entire dome -- the single biggest visual difference from the base campagne.ts's 8-groove pattern",
+    "cross slash reads as 4 sharp pointed ears/blades meeting at one apex, closer to a pinwheel/star silhouette than a soft cross",
+    "exactly one quarter-wedge missing, sitting between two slash arms, exposing two new flat radial cut faces",
+    "jam spiral: 3.5-4 fairly regular turns, present identically on both cut faces, centered roughly in the middle of each cut face and reaching close to (but not touching) the outer crust rim",
+    "no visible loose flour dust specks in this v4 render -- the light bands read as part of the continuous ring pattern itself, not scattered dust (differs from the JSON's 'light flour dusting scattered unevenly' wording; JSON still governs color/feature presence per project convention, so a light sparse dusting is kept but de-emphasized relative to the ring banding, which is the dominant crust texture)"
+  ],
+  "layer8_uncertainty": [
+    "far hemisphere of the dome (opposite the wedge) is not directly shown from behind, but by radial symmetry of the base form it is treated as a smooth continuation of the same ring-banded crust -- no new geometry class inferred there",
+    "exact jam spiral turn count/thickness is not pixel-identical between the two cut faces in the reference (foreshortening in the 3/4 view) -- top-down view (-3.png) is treated as the fixed measurement plane per CRIB's 'fix the measurement plane' lesson",
+    "crumb pore/texture detail is not resolvable at the reference's render scale -- treated as a stylization choice (understated pores), not a missing feature",
+    "this is a REDO round: campagne--strawberry-jam already has one hand-inherited (non-gated) build in git history (scripts/breads/campagneStrawberryJam.ts) with real render research documented in its head comment -- numeric constants from that research are reusable per CRIB/BREADS.md ('변형 계승은 수치만'), but the gate sequence is being run fresh, not skipped, per team-lead instruction"
+  ]
+}

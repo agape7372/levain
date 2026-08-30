@@ -1,0 +1,21 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": [
+    "assets/breads/src/campagne--strawberry-jam.png (three-quarter top-front)",
+    "assets/breads/src/campagne--strawberry-jam-2.png (front elevation)",
+    "assets/breads/src/campagne--strawberry-jam-3.png (top-down)"
+  ],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "objectOccupiesEnoughOfFrame": "foregroundCoverage 0.2211, largestComponentFraction 1.0 (check_reference_admission.py)",
+    "strongSilhouette": "round domed boule, clear in all three views; one 90-degree wedge removed exposing a flat cut face",
+    "majorMaterialsVisible": "matte crust (amber-to-dark-brown banded rings) + pale matte crumb + glossy-looking jam swirl, all visible in every view (jam only in the cut faces)",
+    "hiddenSideInferable": "far hemisphere of the dome is a smooth continuation of the same banded-ring crust visible in all three views -- no unseen geometry class",
+    "procedurallyApproximable": "revolved dome shell + radial slash/ear displacement + a wedge boolean-style cutaway + a parametric spiral relief on the two new cut faces; no smoke, liquid caustics, glass, cloth, or hair"
+  },
+  "notConditional": "three views supplied (3/4, front elevation, top-down) so the single-view rotational-symmetry caveat does not apply",
+  "stylizationLevel": "smooth matte clay (2026-08-30 finish-contract: computeVertexNormals()+toNonIndexed() or indexed-retained, facet() only for justified exceptions)",
+  "complexity": "simple",
+  "askForBetterInput": "not needed"
+}

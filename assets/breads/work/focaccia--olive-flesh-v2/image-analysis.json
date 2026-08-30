@@ -1,0 +1,92 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": {
+    "focaccia--olive-flesh.png": "three-quarter top-front, 1536x1024, v4 regenerated 2026-08-30 15:31 (user-approved)",
+    "focaccia--olive-flesh-2.png": "front elevation (straight-on side view), 1536x1024",
+    "focaccia--olive-flesh-3.png": "top-down, 1536x1024"
+  },
+  "layer1_identification": {
+    "workType": "a thin rectangular slab of focaccia bread with chopped olive pieces pressed into a hand-dimpled top",
+    "broadClassification": "food prop / stylized clay-like 3D render, game asset",
+    "primaryDomain": "object",
+    "confidence": 0.97,
+    "note": "reference images are themselves AI-rendered stylized clay renders, not photographs; target look is soft matte clay, not photoreal"
+  },
+  "layer2_form_silhouette": {
+    "boundingVolume": "thin rectangular slab (extruded rounded rectangle), flat top and bottom",
+    "symmetry": "rectangular footprint, broken by organic corner rounding and a slightly wavy/torn perimeter edge (visible vertical creases on the side wall in the front-elevation view)",
+    "shapeLanguage": "geometric base form with organic surface treatment (hand-dimpled, hand-torn edge)",
+    "measurements_px_frontElevation": {
+      "slabWidth": "~1060 (full width of the bar)",
+      "slabThickness": "~155",
+      "thicknessOverWidth": "~0.146 -- thin, low profile"
+    },
+    "derivedRatios": {
+      "topDownAspect": "width:depth roughly 3:2 (rectangular, longer than deep, matches base focaccia.ts HALF_X=1.0/HALF_Z=0.65)",
+      "cornerRounding": "corners visibly rounded, not sharp right angles"
+    }
+  },
+  "layer3_decomposition": {
+    "macro": ["slab body"],
+    "meso": ["top face (carries all dimple/topping detail)", "side wall (plain crust, faint vertical tear striations)", "bottom (occluded, plain)"],
+    "micro": [
+      "finger-pressed dimples: each individually oval, uneven rim, varied depth -- not a stamped circle",
+      "olive chunks: irregular hand-chopped polygonal wedges, each with its own tilt/size, most seated in or beside a dimple, half-sunken",
+      "oil pools: small round-ish glossy amber pools inside a minority of the dimples only",
+      "rosemary needles: a few sparse thin green slivers resting on the surface, not embedded",
+      "salt flakes: a small sparse scatter of tiny bright white specks"
+    ]
+  },
+  "layer4_spatial": [
+    "<olive chunk, embedded-in, dimple> contact: embed, half-sunken -- dough visibly hugs the chunk's edges (not resting on top)",
+    "<olive chunk, beside, dimple> contact: some chunks sit adjacent to a dimple rather than centered in one, overlap/rest",
+    "<oil pool, embedded-in, dimple> contact: embed, fills the concave dimple interior, no chunk present in that dimple",
+    "<rosemary needle, resting-on, top face> contact: flush-with, thin sliver laid on the surface, not pressed in",
+    "<salt fleck, resting-on, top face> contact: flush-with, tiny surface speck",
+    "no floating parts; every topping sits on or in the slab's top face"
+  ],
+  "layer5_materials": {
+    "crust": {
+      "substance": "baked dough surface, dielectric, matte",
+      "metalness": 0.0,
+      "roughness": "~1.0, no specular lobe visible",
+      "relief": "soft rounded bumps and dimples, smooth clay shading (not faceted in this v4 render)"
+    },
+    "oliveChunk": {
+      "substance": "cured olive flesh, dielectric",
+      "metalness": 0.0,
+      "roughness": "slightly lower than crust -- a small soft specular highlight is visible on the top of several chunks, distinguishing it from the fully matte dough",
+      "relief": "irregular fractured polygonal chunk, not a smooth dome; a visible darker pit-hole/fracture mark near the chunk's center on several pieces"
+    },
+    "oilPool": {
+      "substance": "liquid (olive oil), dielectric",
+      "metalness": 0.0,
+      "roughness": "low -- glossy, a small bright specular highlight is visible, the only clearly glossy surface in the whole object",
+      "translucency": "semi-translucent amber pool, flat and following the dimple's concave floor"
+    },
+    "runtimeNote": "consumer runtime force-replaces every material with MeshLambertMaterial keeping only map+color (types.ts section 2), so the olive/oil gloss distinction above is not reproducible at runtime -- color contrast is the only channel available and is treated as the dominant cue instead"
+  },
+  "layer6_color": {
+    "source": "assets/prompts/breads/focaccia--olive-flesh.json v4 geometry.crust (authoritative, hand-transcribed, JSON overrides image on any conflict)",
+    "topFaceAlbedo": "#D9A552 (matte golden)",
+    "oilPoolAlbedo": "#B8813C (darker golden-amber)",
+    "oliveAlbedo": "#3B2F2F (deep warm plum-brown)",
+    "finish": "crust matte; olive near-matte with a faint highlight; oil pool glossy",
+    "observedVsSpec": "rendered olive reads slightly warmer/lighter than raw #3B2F2F in the lit crop (small top highlight), and the top-down crop reads the crust a touch cooler/lighter than the 3/4 crop -- CRIB 'fix the measurement plane' lesson: top-down is the reference plane, and per CRIB the lighting rig was just recalibrated so no gain/parity correction is applied here, hex used as-is"
+  },
+  "layer7_identity_features": [
+    "hand-dimpled top: each dimple visibly different -- oval not circular, rim uneven, depth varies -- this is the single most identity-defining trait distinguishing it from the base focaccia.ts's regular 5x4 grid",
+    "olive chunks are irregular hand-chopped wedges (not uniform 'kiss' domes), roughly 9-11 visible pieces, clustered loosely with quiet plain gaps between clusters rather than spread evenly",
+    "oil pools appear in only a minority of dimples (2-4 out of the total dimple count visible across views), the rest of the dimples stay plain (empty finger marks)",
+    "sparse rosemary + salt accents, not a dense scatter",
+    "side wall shows faint vertical tear/crease texture in the front-elevation view (organic hand-stretched dough edge, not a perfectly smooth extruded wall)",
+    "gently rounded corners"
+  ],
+  "layer8_uncertainty": [
+    "underside is fully occluded in all three views; modelled as a plain flat crust cap, never visible above the horizon",
+    "exact dimple/chunk coordinates are not identity-critical beyond count, irregularity, and loose-cluster-with-gaps distribution -- procedurally seeded",
+    "top-down view shows a slightly different apparent olive count/spacing than the 3/4 view due to perspective foreshortening in the 3/4 shot; top-down is treated as the count/spacing reference per CRIB's 'fix the measurement plane' rule",
+    "the v4 render is smooth-shaded (no facets), consistent with the pipeline's 2026-08-30 smooth-finish decision -- no conflict to resolve there",
+    "side-wall tear striations are a nice-to-have, not scored as a mustMatch feature given the 2-material budget is already spent on crust/oil/olive"
+  ]
+}

@@ -1,0 +1,3712 @@
+{
+  "targetName": "Strawberry Jam Campagne",
+  "targetId": "strawberry-jam-campagne",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "C:\\Users\\agape\\Desktop\\코딩\\levain\\assets\\breads\\src\\campagne--strawberry-jam.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 0.0,
+    "aspect": 1.0,
+    "orientation": {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "roll": 0.0
+    },
+    "positionHint": [
+      -1.6,
+      2.2,
+      2.6
+    ],
+    "note": "Fixed by scripts/breadlab.ts."
+  },
+  "suitability": "pass",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "round campagne boule with a wedge cut exposing a strawberry-jam swirl",
+      "primaryDomain": "object",
+      "formLanguage": [
+        "geometric (dome)",
+        "hand-crafted (rings, slash)",
+        "organic (jam swirl)"
+      ],
+      "structureKind": [
+        "single rotationally-symmetric body minus one sector",
+        "two flat interior cut faces"
+      ],
+      "motionPotential": [
+        "static prop",
+        "whole-object transform"
+      ],
+      "materialFamilies": [
+        "ceramic"
+      ],
+      "notes": "Matte baked crust + matte crumb + non-glossy baked jam band, all in the same broad dielectric family as campagne/wholewheat precedent. Three logical albedo zones (crust/crumb/jam), reduced to a single shared basecolor atlas + target of 1 runtime mesh."
+    },
+    "complexity": {
+      "tier": "simple",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 3,
+        "materialLayerCount": 3,
+        "localDetailDensity": 3,
+        "occlusionRisk": 0,
+        "actionReadinessNeed": 0
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 1,
+        "microFeatureGroups": 6,
+        "materialLayers": 3,
+        "repetitionSystems": 5
+      },
+      "reasoning": [
+        "One rotationally-symmetric macro body (dome) minus a sector, plus one repeated meso cut-face archetype.",
+        "Silhouette is a flattened dome broken by 4 slash ears and one missing wedge.",
+        "Repetition density 3: dense ring field + slash ears + cut-face pair, all identity-critical, plus pore/fleck micro scatters on the cut face.",
+        "Three logical albedo zones (crust/crumb/jam) collapsed toward 1 runtime mesh via a shared atlas.",
+        "Occlusion risk 0: the dome is convex and the wedge only removes material, it does not hide anything new.",
+        "Action readiness 0: static showcase prop."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "simple",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": false,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Simple tier but needs a meso cut-face node (repeated x2) plus 5 repetition systems so ring density, slash count, cut-face pairing, and the two cut-face micro scatters all attach to real geometry."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 4,
+      "note": "Enumerated by hand (CRIB: skip build_detail_inventory.py's grid-scan for a single repeated-system object; still hand-fill the target count).",
+      "details": [
+        {
+          "id": "banneton-rings",
+          "zone": "dome crust",
+          "observation": "~16 closely-packed concentric ring bands covering nearly the whole dome.",
+          "inference": "Banneton (proofing basket) coil markings, denser than the base campagne variant.",
+          "mapsTo": {
+            "ref": "dome-banneton-rings",
+            "note": ""
+          },
+          "confidence": 0.9,
+          "evidenceRef": "campagne--strawberry-jam-3.png full frame",
+          "kind": "ridge"
+        },
+        {
+          "id": "starburst-slash",
+          "zone": "dome crown",
+          "observation": "4 sharp pointed ears meeting at one apex, reading as a starburst.",
+          "inference": "A deep cross-hatch score cut before baking, oven-sprung into raised, pointed ears.",
+          "mapsTo": {
+            "ref": "dome-starburst-slash",
+            "note": ""
+          },
+          "confidence": 0.9,
+          "evidenceRef": "campagne--strawberry-jam-3.png full frame",
+          "kind": "ridge"
+        },
+        {
+          "id": "wedge-cutaway",
+          "zone": "dome, one sector",
+          "observation": "One sector missing between two slash arms, exposing an interior jam swirl.",
+          "inference": "A wedge sliced away for photography/display, or to show off the filling.",
+          "mapsTo": {
+            "ref": "dome-wedge-cutaway",
+            "note": ""
+          },
+          "confidence": 0.95,
+          "evidenceRef": "campagne--strawberry-jam.png full frame",
+          "kind": "hole"
+        },
+        {
+          "id": "jam-swirl",
+          "zone": "cut faces",
+          "observation": "A ~3.5-4 turn red-pink spiral running through the pale crumb, present on both exposed cut faces.",
+          "inference": "A rolled dough layer with jam spread before rolling, baked, then sliced perpendicular to the roll axis.",
+          "mapsTo": {
+            "ref": "cut-face-jam-swirl",
+            "note": ""
+          },
+          "confidence": 0.9,
+          "evidenceRef": "campagne--strawberry-jam-2.png full frame",
+          "kind": "hole"
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+    "resolvedUnknowns": [
+      "Bottom cap fully occluded; modelled as a plain flat crust cap, never visible above the horizon.",
+      "Exact pore/fleck positions not identity-critical beyond count, irregularity, and correlation with the jam-swirl distance field.",
+      "Crust/crumb/jam color cannot be preserved as three separate runtime meshes within the 2-mesh budget (types.ts section 1); resolved by baking all three into one shared basecolor atlas rendered as (ideally) a single mesh.",
+      "The reference's exact jam-thickness irregularity (foreshortened differently between the 3/4 and front-elevation crops) is treated as approximate; the front-elevation view is used as the primary spiral-shape reference since it shows the full spiral face-on."
+    ]
+  },
+  "qualityContract": {
+    "qualityBar": "simple",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 1,
+      "mesoComponents": 1,
+      "microFeatureGroups": 3,
+      "materialLayers": 3,
+      "repetitionSystems": 3,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.8,
+    "mustMatch": [
+      "dense concentric banneton ring field",
+      "pointed 4-blade starburst slash",
+      "one wedge cutaway exposing a jam-swirl cross-section",
+      "jam swirl reads as baked-in structure, not a sticker",
+      "smooth (non-faceted) clay shading"
+    ],
+    "niceToHave": [
+      "crumb pore texture",
+      "light flour dusting along the ridges",
+      "jam edge flecks/bleed"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": [
+      "three-quarter",
+      "azimuth-90",
+      "azimuth-180",
+      "azimuth-270"
+    ]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "dome-silhouette",
+      "name": "Flattened dome silhouette with wedge cutaway",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": [
+        "root",
+        "dome"
+      ],
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "wedge-cutaway-orientation",
+      "name": "Wedge faces the 3/4 review camera correctly",
+      "tier": "critical",
+      "passIds": [
+        "blockout",
+        "structural-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "dome",
+        "cut-face"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "dense-banneton-rings",
+      "name": "Dense (not sparse) concentric banneton ring field",
+      "tier": "critical",
+      "passIds": [
+        "surface-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "dome"
+      ],
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "starburst-slash",
+      "name": "Pointed 4-blade starburst slash (not a soft cross)",
+      "tier": "critical",
+      "passIds": [
+        "form-refinement"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "dome"
+      ],
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "jam-swirl-not-sticker",
+      "name": "Jam swirl reads as baked-in structure, not a painted decal",
+      "tier": "critical",
+      "passIds": [
+        "surface-pass",
+        "material-pass"
+      ],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": [
+        "cut-face"
+      ],
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "crust-gradient-and-dusting",
+      "name": "Crust tonal banding (dark/mid/light)",
+      "tier": "important",
+      "passIds": [
+        "material-pass"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "dome"
+      ],
+      "evidenceRefs": [
+        "view-front",
+        "view-top"
+      ]
+    },
+    {
+      "id": "crumb-pore-texture",
+      "name": "Crumb reads as bread texture, not flat putty",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "material-pass"
+      ],
+      "minimumScore": 0.6,
+      "mustPass": false,
+      "componentRefs": [
+        "cut-face"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "smooth-clay-finish",
+      "name": "Smooth (non-faceted) clay shading",
+      "tier": "important",
+      "passIds": [
+        "surface-pass",
+        "optimization-pass"
+      ],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": [
+        "dome",
+        "cut-face"
+      ],
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": [],
+    "droppedPasses": {
+      "lighting-pass": "lighting fixed by the consumer harness",
+      "interaction-pass": "static showcase prop; actionReadinessNeed 0"
+    }
+  },
+  "lookDevTargets": {
+    "qualityPriority": "runtime-budget",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": false,
+      "normalOrBumpRequired": false,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 0,
+      "preferredTextureResolution": 512,
+      "independentMapChannels": [],
+      "requiredSurfaceFrequencyBands": [
+        "macro",
+        "meso",
+        "micro"
+      ],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.0,
+        "stopOnLowConfidence": false,
+        "script": "not run",
+        "acceptedLimitation": "Runtime keeps only map+color, PBR maps banned (types.ts section 2). All relief lives in geometry; crust/crumb/jam are baked into one shared basecolor atlas."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "ambient",
+        "background",
+        "no shadow map",
+        "no tone mapping"
+      ],
+      "authority": "Fixed by scripts/breadlab.ts / scripts/thumbsHarness.ts (recalibrated 2026-08-30, docs/VISUAL.md section 1-3 -- do not add gain/parity correction unless a fresh measured 3-tuple justifies it).",
+      "mustAvoid": [
+        "authoring lights into the model",
+        "relying on a contact shadow the harness does not render",
+        "re-adding a blanket channel-gain correction across the whole surface (kills contrast on features that need it, per CRIB)"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "Bottom cap never visible above the horizon.",
+    "Runtime normalizes longest axis to 1.6.",
+    "Exact pore/fleck coordinates not identity-critical beyond count, irregularity, and their correlation with the jam-swirl distance field.",
+    "Top-down view is the measurement-plane reference for ring density and wedge angle (CRIB lesson: 3/4 view foreshortens)."
+  ],
+  "coordinateFrame": {
+    "front": "+Z, harness three-quarter camera at (-1.6, 2.2, 2.6)",
+    "up": "+Y",
+    "scaleReference": "unit radius dome; runtime refits longest axis to 1.6."
+  },
+  "silhouette": {
+    "boundingShape": "round flattened dome (unit radius, height 0.76) with one ~67.5deg wedge removed down to the base",
+    "aspectRatios": [
+      {
+        "id": "height-over-diameter",
+        "value": 0.38,
+        "source": "assets/prompts/breads/campagne--strawberry-jam.json + campagne.ts front-elevation measurement"
+      }
+    ],
+    "symmetry": "base form radially symmetric, broken by 4-fold slash + one missing wedge sector -- net symmetry none, single dominant viewing side",
+    "dominantCurves": [
+      "smooth dome profile r=sqrt(1-t^2) with dense ring modulation"
+    ],
+    "negativeSpaces": [
+      "one quarter-ish wedge sector removed to the base"
+    ],
+    "landmarks": [
+      "dense banneton ring field",
+      "4-blade starburst slash",
+      "jam-swirl cut faces"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "view-three-quarter",
+      "view": "three-quarter top-front",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "dense concentric banneton rings across the whole dome",
+        "4 sharp pointed slash ears meeting at the apex",
+        "one wedge missing between two ears, exposing a jam-swirl cut face facing the camera"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-front",
+      "view": "front elevation",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "dome height/width ratio ~0.38",
+        "the cut wedge sits centered, spiral clearly visible",
+        "spiral has ~3.5-4 fairly regular turns"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "id": "view-top",
+      "view": "top-down",
+      "imageRegion": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "units": "normalized"
+      },
+      "observations": [
+        "wedge sits squarely between two of the 4 slash arms",
+        "ring density and wedge angle both fully visible -- fixed measurement plane per CRIB"
+      ],
+      "confidence": 0.97
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Strawberry Jam Campagne Boule",
+      "level": "macro",
+      "role": "assembly",
+      "importance": 1.0,
+      "confidence": 0.95,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Transform-only assembly node carrying the dome body and cut faces; it emits no geometry of its own (campagne.ts precedent).",
+      "geometryDescriptor": {
+        "topologyIntent": "transform node only",
+        "gridProfile": {
+          "note": "No geometry of its own; children own the lathe profile and cut-face grids."
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "inherited from children",
+        "normalStrategy": "inherited from children"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 2.0,
+        "height": 0.76,
+        "depth": 2.0,
+        "units": "relative",
+        "confidence": 0.95
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "root",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "cylinder",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat cylinder proxy matching the loaf's bounding volume; surface relief and the wedge cutaway are far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "root",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust"
+        }
+      },
+      "material": "crust",
+      "materialLayers": [
+        "crust"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(169, 113, 63, 1.0)",
+        "secondaryAlbedo": "rgba(244, 234, 212, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust / matte crumb / non-glossy baked jam band -- same broad dielectric family as campagne/wholewheat precedent (the prompt JSON's negative list explicitly bans 'glossy jam sheen'); runtime Lambert swap discards any gloss distinction anyway (types.ts section 2).",
+        "zone": "assembly node, inherits from children",
+        "evidenceRefs": [
+          "assets/prompts/breads/campagne--strawberry-jam.json geometry"
+        ]
+      },
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "smooth vertex normals (computeVertexNormals -> toNonIndexed, 2026-08-30 finish contract -- facet() is deprecated for this round)",
+        "displacementPattern": "lathe-profile groove modulation + angular slash falloff + radial-band vertex channel (jam)",
+        "occlusionPattern": "cavity darkening inside grooves, the slash trench, and the jam channel",
+        "edgeWearPattern": "none - a freshly baked surface carries no edge wear",
+        "notes": "Assembly node; no surface of its own."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter",
+        "view-top"
+      ],
+      "details": [],
+      "fidelityTier": "blockout"
+    },
+    {
+      "id": "dome",
+      "name": "Campagne dome body (dense rings + starburst slash + wedge cutaway)",
+      "level": "macro",
+      "role": "body",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "One continuous, smoothly varying rotationally symmetric mass (dome shell) minus one angular sector -- built as a manually-ringed revolved shell (lib.ts buildRevolvedShell, LatheGeometry itself is banned per CRIB phi-seam rule), same family as base campagne.ts/domeShell.ts. Decision tree step 6: a sphere/hemisphere primitive cannot carry the flat base cap, ring-groove profile modulation, or the removed wedge sector.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, smooth-shaded after generation",
+        "gridProfile": {
+          "note": "Lathe profile computed procedurally from grooveCount/grooveZone/grooveDepth (scripts/breads/domeShell.ts buildDomeProfile) -- this spec records the authoring parameters, not the sampled point array.",
+          "segments": 32,
+          "grooveCount": 16,
+          "grooveZone": [
+            0.08,
+            0.97
+          ],
+          "grooveHalfWidthT": 0.009,
+          "grooveDepth": 0.022
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "banneton-rings",
+            "type": "radial-modulation",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 0.022,
+            "notes": "16 concentric V-notch rings baked into the lathe profile, axially symmetric (no sector grid needed)."
+          },
+          {
+            "id": "starburst-slash",
+            "type": "angular-falloff-displacement",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "amplitude": 0.1,
+            "notes": "4-fold cosine angular falloff trench with a raised ear ridge on either side, running from the apex down to tFrac=SLASH_T_END -- taller/narrower than the base campagne's cross for a pointed-blade/starburst read."
+          },
+          {
+            "id": "wedge-cutaway",
+            "type": "sector-removal",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "amplitude": 1.0,
+            "notes": "6 of 32 sectors (67.5 degrees) deleted between the 45deg and 135deg slash arms, exposing the interior via two new cut-face components."
+          }
+        ],
+        "uvStrategy": "shared basecolor atlas canvas, top-down polar projection for the crust region (scripts/breads/lib.ts uvDome-style projection, computed before the wedge sectors are deleted so the projection center/radius are not skewed)",
+        "normalStrategy": "smooth normals computed before splitting to non-indexed (2026-08-30 finish contract, order load-bearing)"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 2.0,
+        "height": 0.76,
+        "depth": 2.0,
+        "units": "relative",
+        "confidence": 0.9
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "body",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "cylinder",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat cylinder proxy matching the loaf's bounding volume; surface relief and the wedge cutaway are far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "dome",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust"
+        }
+      },
+      "material": "crust",
+      "materialLayers": [
+        "crust"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(169, 113, 63, 1.0)",
+        "secondaryAlbedo": "rgba(244, 234, 212, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust / matte crumb / non-glossy baked jam band -- same broad dielectric family as campagne/wholewheat precedent (the prompt JSON's negative list explicitly bans 'glossy jam sheen'); runtime Lambert swap discards any gloss distinction anyway (types.ts section 2).",
+        "zone": "whole dome crust surface",
+        "evidenceRefs": [
+          "assets/prompts/breads/campagne--strawberry-jam.json geometry"
+        ]
+      },
+      "deformations": [
+        "banneton-rings",
+        "starburst-slash",
+        "wedge-cutaway"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "dome-cut-face-boundary",
+          "kind": "material-boundary",
+          "notes": "Wedge boundary columns are shared vertices with the two cut-face components -- no gap, no re-displacement after cutting."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "dome-banneton-rings",
+          "name": "Dense concentric banneton ring field",
+          "kind": "ridge",
+          "description": "16 closely-packed concentric V-notch rings across nearly the whole dome -- the single most identity-defining crust trait for this variant vs the base campagne's 8 grooves.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.9,
+          "repetitionSystemRef": "banneton-rings"
+        },
+        {
+          "id": "dome-starburst-slash",
+          "name": "Pointed 4-blade starburst slash",
+          "kind": "ridge",
+          "description": "4 sharp, tall, pointed ears meeting at one apex -- reads as a starburst/pinwheel rather than the base campagne's soft rounded cross.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter"
+          ],
+          "confidence": 0.9,
+          "repetitionSystemRef": "slash-ears"
+        },
+        {
+          "id": "dome-wedge-cutaway",
+          "name": "Quarter-wedge cutaway",
+          "kind": "hole",
+          "description": "One sector removed down to the base, sitting squarely between two slash arms, exposing the jam-swirl cross-section on two new flat faces.",
+          "evidenceRefs": [
+            "view-top",
+            "view-three-quarter",
+            "view-front"
+          ],
+          "confidence": 0.95,
+          "repetitionSystemRef": "cut-face-pair"
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.022,
+        "normalPattern": "smooth vertex normals (computeVertexNormals -> toNonIndexed, 2026-08-30 finish contract -- facet() is deprecated for this round)",
+        "displacementPattern": "lathe-profile groove modulation + angular slash falloff + radial-band vertex channel (jam)",
+        "occlusionPattern": "cavity darkening inside grooves, the slash trench, and the jam channel",
+        "edgeWearPattern": "none - a freshly baked surface carries no edge wear",
+        "notes": "assets/prompts/breads/campagne--strawberry-jam.json geometry.crust: 'spiral banneton ring markings pressed concentrically across the whole top surface (the defining feature)' + 'a cross-shaped slash cut into the center of the dome, opened into a raised burst ear along each cut line'."
+      },
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter",
+        "view-front"
+      ],
+      "details": [
+        "dome-banneton-rings",
+        "dome-starburst-slash",
+        "dome-wedge-cutaway"
+      ],
+      "fidelityTier": "surface-pass"
+    },
+    {
+      "id": "cut-face",
+      "name": "Wedge cut face (jam-swirl cross-section, repeated archetype)",
+      "level": "meso",
+      "role": "surface",
+      "importance": 1.0,
+      "confidence": 0.9,
+      "primitive": "lathe",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "A flat radial fan slice sharing the parent dome's revolved profile at one fixed phi value (not a solid of revolution itself) -- same primitive family as the pancake.ts precedent (disk-top-face uses primitive 'lathe' for a flat disk face). Carries real 3D relief (jam channel + pore dimples + crumb bump), not a flat billboard, so 'plane-card' would misrepresent it.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly prop, smooth-shaded after generation, custom radial x vertical grid (not the parent's ring/sector grid)",
+        "gridProfile": {
+          "note": "22 radial x 26 vertical uniform grid, positioned analytically from the dome's own profile function (not copied ring geometry) so the interior grid resolution is independent of the dome's grooved-and-clumped ring spacing.",
+          "radial": 22,
+          "rows": 26
+        },
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [
+          {
+            "id": "jam-swirl-channel",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              0,
+              0
+            ],
+            "amplitude": 0.026,
+            "notes": "Recessed channel (not a painted-on flat band) following a 3.7-turn spiral with wobbling radius/thickness -- CRIB lesson from the rejected build: a flat colored band alone reads as a 'sticker'; a physically channeled groove whose color and relief read the SAME distance field does not."
+          },
+          {
+            "id": "crumb-pore-dimples",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              0,
+              0
+            ],
+            "amplitude": 0.014,
+            "notes": "18 small elliptical pit dimples sharing their positions with the texture's dark pore specks, so the shading dip lands on the painted pore, not beside it."
+          },
+          {
+            "id": "crumb-low-freq-bump",
+            "type": "vertex-displacement",
+            "axis": [
+              0,
+              0,
+              0
+            ],
+            "amplitude": 0.007,
+            "notes": "Very low-frequency (wavelength >> jam-band width) sine bump so the crumb face is not a dead flat plane, without disturbing the jam channel's own relief."
+          }
+        ],
+        "uvStrategy": "parametric (rho-fraction, height-fraction) atlas coordinates, computed BEFORE relief displacement so the vertex-displacement channels never drift the painted texture off its own relief",
+        "normalStrategy": "smooth normals computed before splitting to non-indexed"
+      },
+      "parent": "dome",
+      "attachment": null,
+      "dimensions": {
+        "width": 2.0,
+        "height": 0.76,
+        "depth": 0.01,
+        "units": "relative",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "surface",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "cylinder",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "Flat cylinder proxy matching the loaf's bounding volume; surface relief and the wedge cutaway are far below collider resolution."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "cut-face",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "crust"
+        }
+      },
+      "material": "jam",
+      "materialLayers": [
+        "crust",
+        "crumb",
+        "jam"
+      ],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(244, 234, 212, 1.0)",
+        "secondaryAlbedo": "rgba(178, 58, 78, 1.0)",
+        "materialClass": "ceramic",
+        "materialClassConfidence": 0.75,
+        "materialClassRationale": "Matte baked crust / matte crumb / non-glossy baked jam band -- same broad dielectric family as campagne/wholewheat precedent (the prompt JSON's negative list explicitly bans 'glossy jam sheen'); runtime Lambert swap discards any gloss distinction anyway (types.ts section 2).",
+        "zone": "cut-face crumb background + jam spiral band + outer crust rim",
+        "evidenceRefs": [
+          "assets/prompts/breads/campagne--strawberry-jam.json geometry"
+        ]
+      },
+      "deformations": [
+        "jam-swirl-channel",
+        "crumb-pore-dimples",
+        "crumb-low-freq-bump"
+      ],
+      "joints": [],
+      "seams": [
+        {
+          "id": "cut-face-outer-rim",
+          "kind": "material-boundary",
+          "notes": "Outer boundary column is shared exactly with the dome's own wedge-boundary ring vertices (post-jitter world coordinates), so there is zero seam gap."
+        }
+      ],
+      "localFeatures": [
+        {
+          "id": "cut-face-jam-swirl",
+          "name": "Strawberry jam spiral (color+relief shared field)",
+          "kind": "hole",
+          "description": "~3.7-turn spiral channel through the pale crumb -- color and recess depth are both driven by the SAME signed-distance-to-band function so the painted band can never drift off the carved channel.",
+          "evidenceRefs": [
+            "view-front",
+            "view-three-quarter"
+          ],
+          "confidence": 0.9,
+          "repetitionSystemRef": null
+        },
+        {
+          "id": "cut-face-pores",
+          "name": "Crumb pore dimples",
+          "kind": "hole",
+          "description": "18 small dark pore dimples scattered through the crumb, some overlapping the jam band edge to make the boundary read as baked-in rather than a clean painted edge.",
+          "evidenceRefs": [
+            "view-three-quarter"
+          ],
+          "confidence": 0.75,
+          "repetitionSystemRef": "crumb-pore-dimples"
+        },
+        {
+          "id": "cut-face-flecks",
+          "name": "Jam edge flecks",
+          "kind": "ridge",
+          "description": "20 small jam-colored flecks scattered just outside the main band, reading as jam bleed into the surrounding crumb.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "confidence": 0.6,
+          "repetitionSystemRef": "jam-edge-flecks"
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.026,
+        "normalPattern": "smooth vertex normals (computeVertexNormals -> toNonIndexed, 2026-08-30 finish contract -- facet() is deprecated for this round)",
+        "displacementPattern": "lathe-profile groove modulation + angular slash falloff + radial-band vertex channel (jam)",
+        "occlusionPattern": "cavity darkening inside grooves, the slash trench, and the jam channel",
+        "edgeWearPattern": "none - a freshly baked surface carries no edge wear",
+        "notes": "assets/prompts/breads/campagne--strawberry-jam.json geometry.crust: 'on the exposed cross-section, a deep red strawberry jam swirl #B23A4E spirals through the pale open crumb'."
+      },
+      "evidenceRefs": [
+        "view-front",
+        "view-three-quarter"
+      ],
+      "details": [
+        "cut-face-jam-swirl",
+        "cut-face-pores",
+        "cut-face-flecks"
+      ],
+      "fidelityTier": "surface-pass"
+    }
+  ],
+  "materials": [
+    {
+      "id": "crust",
+      "name": "Campagne crust (banded rings + starburst ears)",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; runtime swaps to MeshLambertMaterial keeping only map and color",
+      "baseColor": "#A9713F",
+      "color": "#A9713F",
+      "albedo": {
+        "dominant": "#A9713F",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/campagne--strawberry-jam.json geometry (types.ts section 8 -- JSON import banned, hex is embedded in prose)."
+      },
+      "colorVariation": {
+        "palette": [
+          "#A9713F"
+        ],
+        "pattern": "quantized bands",
+        "amplitude": 0.3,
+        "heightCorrelation": 0.4
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "All three logical materials (crust/crumb/jam) are baked into ONE shared 512px basecolor atlas canvas and rendered as a single mesh/material at build time (types.ts sections 1+9) -- crust occupies its own atlas region"
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "dome silhouette / wedge cutaway",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 8.0,
+          "amplitude": 0.05,
+          "role": "banneton rings / starburst slash ears",
+          "carrier": "geometry+texture"
+        },
+        {
+          "id": "micro",
+          "frequency": 20.0,
+          "amplitude": 0.026,
+          "role": "jam channel / pore dimples / flecks",
+          "carrier": "geometry+texture"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "smooth vertex normals",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "whole dome crust surface, baked into the shared atlas",
+        "amplitude": 0.026,
+        "scale": 1.0,
+        "silhouetteAffects": true
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(). Never vertexColors or flatShading."
+      ],
+      "notes": "whole dome crust surface, baked into the shared atlas. Basecolor canvas texture, no vertex color (scripts/breads/types.ts section 9)."
+    },
+    {
+      "id": "crumb",
+      "name": "Cut-face crumb background",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; runtime swaps to MeshLambertMaterial keeping only map and color",
+      "baseColor": "#F4EAD4",
+      "color": "#F4EAD4",
+      "albedo": {
+        "dominant": "#F4EAD4",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/campagne--strawberry-jam.json geometry (types.ts section 8 -- JSON import banned, hex is embedded in prose)."
+      },
+      "colorVariation": {
+        "palette": [
+          "#F4EAD4"
+        ],
+        "pattern": "quantized bands",
+        "amplitude": 0.3,
+        "heightCorrelation": 0.4
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "All three logical materials (crust/crumb/jam) are baked into ONE shared 512px basecolor atlas canvas and rendered as a single mesh/material at build time (types.ts sections 1+9) -- crumb occupies the atlas's face region"
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "dome silhouette / wedge cutaway",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 8.0,
+          "amplitude": 0.05,
+          "role": "banneton rings / starburst slash ears",
+          "carrier": "geometry+texture"
+        },
+        {
+          "id": "micro",
+          "frequency": 20.0,
+          "amplitude": 0.026,
+          "role": "jam channel / pore dimples / flecks",
+          "carrier": "geometry+texture"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "smooth vertex normals",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "cut-face background around the jam spiral, baked into the shared atlas",
+        "amplitude": 0.026,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(). Never vertexColors or flatShading."
+      ],
+      "notes": "cut-face background around the jam spiral, baked into the shared atlas. Basecolor canvas texture, no vertex color (scripts/breads/types.ts section 9)."
+    },
+    {
+      "id": "jam",
+      "name": "Strawberry jam spiral",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial carrier; runtime swaps to MeshLambertMaterial keeping only map and color",
+      "baseColor": "#B23A4E",
+      "color": "#B23A4E",
+      "albedo": {
+        "dominant": "#B23A4E",
+        "secondary": [],
+        "samplingNotes": "Hand-transcribed from assets/prompts/breads/campagne--strawberry-jam.json geometry (types.ts section 8 -- JSON import banned, hex is embedded in prose)."
+      },
+      "colorVariation": {
+        "palette": [
+          "#B23A4E"
+        ],
+        "pattern": "quantized bands",
+        "amplitude": 0.3,
+        "heightCorrelation": 0.4
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "uv",
+        "repeat": [
+          1.0,
+          1.0
+        ],
+        "anisotropy": 1,
+        "texelDensityIntent": "All three logical materials (crust/crumb/jam) are baked into ONE shared 512px basecolor atlas canvas and rendered as a single mesh/material at build time (types.ts sections 1+9) -- jam is painted within the crumb's atlas region, following the same distance field as the geometry channel"
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.0,
+          "amplitude": 0.5,
+          "role": "dome silhouette / wedge cutaway",
+          "carrier": "geometry"
+        },
+        {
+          "id": "meso",
+          "frequency": 8.0,
+          "amplitude": 0.05,
+          "role": "banneton rings / starburst slash ears",
+          "carrier": "geometry+texture"
+        },
+        {
+          "id": "micro",
+          "frequency": 20.0,
+          "amplitude": 0.026,
+          "role": "jam channel / pore dimples / flecks",
+          "carrier": "geometry+texture"
+        }
+      ],
+      "roughness": {
+        "base": 1.0,
+        "variation": 0.0,
+        "map": "none",
+        "localResponse": "inert - runtime Lambert swap discards roughness"
+      },
+      "metalness": {
+        "base": 0.0,
+        "variation": 0.0
+      },
+      "normal": {
+        "pattern": "smooth vertex normals",
+        "strength": 1.0,
+        "scale": 1.0,
+        "space": "object"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0.0,
+        "scale": 1.0
+      },
+      "displacement": {
+        "pattern": "cut-face jam swirl band + halo + edge flecks, baked into the shared atlas",
+        "amplitude": 0.026,
+        "scale": 1.0,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.0,
+        "contactShadowBias": 0.0,
+        "notes": "No AO channel on the runtime Lambert material."
+      },
+      "wear": {
+        "edgeWear": 0.0,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.0,
+        "cavityBias": 0.0,
+        "color": "#000000"
+      },
+      "localOverrides": [
+        {
+          "id": "jam-edge-fleck-mask",
+          "name": "Jam edge bleed/fleck mask",
+          "maskSource": "geometry",
+          "description": "A thin band just outside the jam-swirl signed-distance boundary gets scattered jam-colored flecks (jam-edge-flecks repetition system), reading as fruit bleeding slightly into the surrounding crumb rather than a hard painted edge.",
+          "evidenceRefs": [
+            "view-front"
+          ],
+          "appliesTo": [
+            "cut-face"
+          ]
+        }
+      ],
+      "shaderNotes": [
+        "Emit via scripts/breads/lib.ts stdMaterial(). Never vertexColors or flatShading."
+      ],
+      "notes": "cut-face jam swirl band + halo + edge flecks, baked into the shared atlas. Basecolor canvas texture, no vertex color (scripts/breads/types.ts section 9)."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "banneton-rings",
+      "name": "Concentric banneton ring field",
+      "level": "meso",
+      "hostComponents": [
+        "dome"
+      ],
+      "elementComponentIds": [
+        "dome"
+      ],
+      "elementKind": "recessed profile modulation, not an added mesh",
+      "count": 16,
+      "countPerHost": {
+        "dome": 16
+      },
+      "distribution": {
+        "mode": "evenly spaced in tFrac across the groove zone, baked directly into the lathe profile",
+        "zone": [
+          0.08,
+          0.97
+        ],
+        "halfWidthT": 0.009,
+        "depth": 0.022
+      },
+      "sizeClasses": [
+        {
+          "id": "ring",
+          "halfWidthT": 0.009,
+          "depth": 0.022
+        }
+      ],
+      "seedRule": "Fixed authored values (profile positions), not random -- ring count/spacing re-derived from the top-down view.",
+      "evidenceRefs": [
+        "view-top"
+      ]
+    },
+    {
+      "id": "slash-ears",
+      "name": "Starburst slash arms",
+      "level": "meso",
+      "hostComponents": [
+        "dome"
+      ],
+      "elementComponentIds": [
+        "dome"
+      ],
+      "elementKind": "recessed + raised vertex displacement, not an added mesh",
+      "count": 4,
+      "countPerHost": {
+        "dome": 4
+      },
+      "distribution": {
+        "mode": "4-fold rotational symmetry at 45/135/225/315deg, cosine angular falloff",
+        "halfAngleDeg": 10,
+        "tEnd": 0.5
+      },
+      "sizeClasses": [
+        {
+          "id": "arm",
+          "halfAngleDeg": 10,
+          "depth": 0.1,
+          "earHeight": 0.032
+        }
+      ],
+      "seedRule": "Fixed authored angles, not random -- the starburst pattern is deliberate.",
+      "evidenceRefs": [
+        "view-top",
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "cut-face-pair",
+      "name": "Wedge cut-face pair",
+      "level": "meso",
+      "hostComponents": [
+        "dome"
+      ],
+      "elementComponentIds": [
+        "cut-face"
+      ],
+      "elementKind": "two mirrored instances of the same cut-face archetype, sharing one jam-swirl distance field",
+      "count": 2,
+      "countPerHost": {
+        "dome": 2
+      },
+      "distribution": {
+        "mode": "one at each of the two wedge boundary columns, winding reversed on the second so both face outward"
+      },
+      "sizeClasses": [
+        {
+          "id": "face",
+          "radial": 22,
+          "rows": 26
+        }
+      ],
+      "seedRule": "Fixed columns (WEDGE_FIRST_SECTOR and WEDGE_FIRST_SECTOR+WEDGE_SECTOR_COUNT), not random.",
+      "evidenceRefs": [
+        "view-three-quarter",
+        "view-top"
+      ]
+    },
+    {
+      "id": "crumb-pore-dimples",
+      "name": "Crumb pore dimple field",
+      "level": "micro",
+      "hostComponents": [
+        "cut-face"
+      ],
+      "elementComponentIds": [
+        "cut-face"
+      ],
+      "elementKind": "recessed vertex displacement sharing positions with painted texture pores, not an added mesh",
+      "count": 18,
+      "countPerHost": {
+        "cut-face": 18
+      },
+      "distribution": {
+        "mode": "rejection-sampled within the face disk (excluding the outer crust rim and base), sharing the same rng draw as the larger PORE_COUNT texture-only speckle set"
+      },
+      "sizeClasses": [
+        {
+          "id": "pore",
+          "depth": 0.014
+        }
+      ],
+      "seedRule": "Builder rng, deterministic positions.",
+      "evidenceRefs": [
+        "view-three-quarter"
+      ]
+    },
+    {
+      "id": "jam-edge-flecks",
+      "name": "Jam edge fleck scatter",
+      "level": "micro",
+      "hostComponents": [
+        "cut-face"
+      ],
+      "elementComponentIds": [
+        "cut-face"
+      ],
+      "elementKind": "texture-only paint, no added geometry",
+      "count": 20,
+      "countPerHost": {
+        "cut-face": 20
+      },
+      "distribution": {
+        "mode": "rejection-sampled in a thin band just outside the jam channel's signed-distance boundary"
+      },
+      "sizeClasses": [
+        {
+          "id": "fleck",
+          "radiusFrac": 0.01
+        }
+      ],
+      "seedRule": "Builder rng, deterministic positions.",
+      "evidenceRefs": [
+        "view-front"
+      ]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "root"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-30T10:21:55.594531+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.83,
+      "aiVisionScore": 0.83,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.0,
+        "materialSurface": 0.0,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dome-silhouette",
+          "score": 0.85
+        },
+        {
+          "id": "wedge-cutaway-orientation",
+          "score": 0.85
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/shot-default-v2.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:22:49.388639+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.7,
+      "aiVisionScore": 0.7,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.75,
+        "formDetail": 0.55,
+        "materialSurface": 0.5,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dome-silhouette",
+          "score": 0.82
+        },
+        {
+          "id": "wedge-cutaway-orientation",
+          "score": 0.85
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-90.png",
+      "comparisonImage": "",
+      "cameraView": "azimuth-90",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:23:00.742680+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.75,
+        "materialSurface": 0.68,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dome-silhouette",
+          "score": 0.86
+        },
+        {
+          "id": "wedge-cutaway-orientation",
+          "score": 0.87
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/shot-default-v2.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:23:39.604543+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.78,
+        "materialSurface": 0.68,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "starburst-slash",
+          "score": 0.78
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/shot-default-v2.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:24:26.885151+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.78,
+        "materialSurface": 0.75,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.83
+        },
+        {
+          "id": "crust-gradient-and-dusting",
+          "score": 0.68
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-2.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-front.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+      "cameraView": "front",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:25:17.913550+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.8,
+        "materialSurface": 0.78,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dense-banneton-rings",
+          "score": 0.82
+        },
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.83
+        },
+        {
+          "id": "crumb-pore-texture",
+          "score": 0.65
+        },
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.88
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+      "cameraView": "top-down",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:26:19.998289+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.83,
+      "aiVisionScore": 0.83,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.8,
+        "materialSurface": 0.78,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.88
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/rt.png",
+      "comparisonImage": "",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:39:29.896517+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.6,
+      "aiVisionScore": 0.6,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.78,
+        "materialSurface": 0.45,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.83
+        },
+        {
+          "id": "crust-gradient-and-dusting",
+          "score": 0.45
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top.png",
+      "comparisonImage": "",
+      "cameraView": "top-down",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:40:20.127117+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.78,
+        "materialSurface": 0.82,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.84
+        },
+        {
+          "id": "crust-gradient-and-dusting",
+          "score": 0.82
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v2.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-3.png",
+      "cameraView": "top-down",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:40:36.075048+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.8,
+        "materialSurface": 0.84,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dense-banneton-rings",
+          "score": 0.85
+        },
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.84
+        },
+        {
+          "id": "crumb-pore-texture",
+          "score": 0.78
+        },
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.88
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v2.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-3.png",
+      "cameraView": "top-down",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:50:43.368270+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.65,
+      "aiVisionScore": 0.65,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.65,
+        "materialSurface": 0.6,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.6
+        },
+        {
+          "id": "crust-gradient-and-dusting",
+          "score": 0.62
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v2.png",
+      "comparisonImage": "",
+      "cameraView": "top-down",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:51:16.499799+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.87,
+      "aiVisionScore": 0.87,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.87,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.87,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.87
+        },
+        {
+          "id": "crust-gradient-and-dusting",
+          "score": 0.85
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v3.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-4.png",
+      "cameraView": "top-down",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:51:33.880862+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.87,
+      "aiVisionScore": 0.87,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.87,
+        "componentStructure": 0.88,
+        "formDetail": 0.87,
+        "materialSurface": 0.87,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "starburst-slash",
+          "score": 0.87
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v3.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-4.png",
+      "cameraView": "top-down",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:51:50.120652+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.87,
+      "aiVisionScore": 0.87,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.87,
+        "componentStructure": 0.88,
+        "formDetail": 0.87,
+        "materialSurface": 0.87,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dense-banneton-rings",
+          "score": 0.86
+        },
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.87
+        },
+        {
+          "id": "crumb-pore-texture",
+          "score": 0.78
+        },
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.88
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v3.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-4.png",
+      "cameraView": "top-down",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:52:08.581163+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.87,
+      "aiVisionScore": 0.87,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.87,
+        "componentStructure": 0.88,
+        "formDetail": 0.87,
+        "materialSurface": 0.87,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.88
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/rt-v3.png",
+      "comparisonImage": "",
+      "cameraView": "three-quarter",
+      "notes": "",
+      "aiVisionNotes": ""
+    },
+    {
+      "timestamp": "2026-08-30T10:55:50.930972+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.88,
+      "aiVisionScore": 0.88,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.87,
+        "componentStructure": 0.88,
+        "formDetail": 0.87,
+        "materialSurface": 0.88,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.88
+        }
+      ],
+      "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-2.png",
+      "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-front-v4.png",
+      "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-5.png",
+      "cameraView": "front",
+      "notes": "",
+      "aiVisionNotes": ""
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-30T10:21:55.594531+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.83,
+      "aiVisionScore": 0.83,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.85,
+        "formDetail": 0.0,
+        "materialSurface": 0.0,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dome-silhouette",
+          "score": 0.85
+        },
+        {
+          "id": "wedge-cutaway-orientation",
+          "score": 0.85
+        }
+      ],
+      "action": "continue",
+      "summary": "Dome silhouette, wedge cutaway, jam-swirl cut faces all present and correctly oriented in the first real render. Wedge visibly faces the 3/4 review camera as designed (verified against camera azimuth math and turntable).",
+      "matched": [
+        "dome silhouette",
+        "wedge cutaway present",
+        "jam swirl visible on cut face",
+        "wedge orientation faces camera"
+      ],
+      "mismatches": [
+        "crust ring contrast weaker than reference at this stage",
+        "slash ears read soft before material-pass fix"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-1.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/shot-default.png"
+      ],
+      "mapStrippedRender": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/shot-default-v2.png",
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/shot-default-v2.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:22:49.388639+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.7,
+      "aiVisionScore": 0.7,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.75,
+        "formDetail": 0.55,
+        "materialSurface": 0.5,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dome-silhouette",
+          "score": 0.82
+        },
+        {
+          "id": "wedge-cutaway-orientation",
+          "score": 0.85
+        }
+      ],
+      "action": "refine-code",
+      "summary": "Turntable multi-angle check (turn-90/180/270) revealed the starburst slash ribbon (SLASH_T_END=0.5) extends almost to the base -- reads as a painted stripe down the whole dome side instead of a bounded star confined to the crown, unlike the reference.",
+      "matched": [
+        "dome silhouette",
+        "wedge orientation correct"
+      ],
+      "mismatches": [
+        "slash ribbon over-extends toward the base (SLASH_T_END too low)",
+        "crust ring bands lack contrast versus reference"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "raise SLASH_T_END 0.5->0.68 so slash ears stop above the equator",
+        "add crustHighlight tone (mix CRUST_LIGHT+FLOUR) for the top tonal band to raise ring contrast"
+      ],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-90.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-180.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-270.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-90.png",
+        "comparisonImage": "",
+        "cameraView": "azimuth-90",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:23:00.742680+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.75,
+        "materialSurface": 0.68,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dome-silhouette",
+          "score": 0.86
+        },
+        {
+          "id": "wedge-cutaway-orientation",
+          "score": 0.87
+        }
+      ],
+      "action": "continue",
+      "summary": "Re-rendered after SLASH_T_END and crustHighlight fixes: starburst slash now terminates well above the equator across all 4 orbit angles (turn-90-v2/180-v2/270), ring banding contrast improved. Multi-angle degenerate-view check clean (ratios 1.06/1.14/1.13, no collapse).",
+      "matched": [
+        "dome silhouette",
+        "wedge orientation",
+        "slash ears bounded to the crown",
+        "ring contrast improved",
+        "no silhouette collapse across 4 orbit angles"
+      ],
+      "mismatches": [
+        "ring contrast still short of reference's stronger light/dark banding"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-90-v2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-180-v2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-270.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/shot-default-v2.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:23:39.604543+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.78,
+      "aiVisionScore": 0.78,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.78,
+        "materialSurface": 0.68,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "starburst-slash",
+          "score": 0.78
+        }
+      ],
+      "action": "continue",
+      "summary": "4-blade starburst slash reads as sharp/pointed ears meeting at one apex, bounded to the crown after the structural-pass fix. Smooth-shading finish softens edge contrast versus the reference's faceted look, but the shape itself (blade count, taper, apex meeting point) matches.",
+      "matched": [
+        "4 ears meeting at apex",
+        "ears taper toward tips",
+        "ears bounded above the equator"
+      ],
+      "mismatches": [
+        "smooth shading softens the blade edges vs the faceted reference (accepted per 2026-08-30 finish contract tradeoff)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-90-v2.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/shot-default-v2.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:24:26.885151+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.79,
+      "aiVisionScore": 0.79,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.78,
+        "materialSurface": 0.75,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.83
+        },
+        {
+          "id": "crust-gradient-and-dusting",
+          "score": 0.68
+        }
+      ],
+      "action": "continue",
+      "summary": "Front-elevation render (view-front.png) closely matches the reference composition: mirrored double spiral through pale crumb, jam band color/relief coupled (channel + color read the same distance field), crust tonal banding visible on the sides. Jam swirl reads as baked-in structure, not a decal.",
+      "matched": [
+        "jam spiral channel visibly carved, not flat-painted",
+        "jam color matches JSON hex family",
+        "crust tonal banding present",
+        "flour dusting visible"
+      ],
+      "mismatches": [
+        "overall crust warmth/saturation reads slightly more muted than the reference's golden-amber"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-front.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-2.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-front.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+        "cameraView": "front",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:25:17.913550+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.8,
+        "materialSurface": 0.78,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dense-banneton-rings",
+          "score": 0.82
+        },
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.83
+        },
+        {
+          "id": "crumb-pore-texture",
+          "score": 0.65
+        },
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.88
+        }
+      ],
+      "action": "continue",
+      "summary": "Top-down render (view-top.png) matches the reference composition closely: dense concentric ring field, pointed 4-blade cross visible at center, wedge cutaway sits correctly between two arms. Crumb pore dimples/pores present but subtle at this scale (matches the reference's own understated crumb texture). Smooth clay finish holds cleanly across indexed geometry (no facet artifacts, no rim chamfer observed).",
+      "matched": [
+        "dense concentric ring count matches reference impression",
+        "wedge position between two slash arms",
+        "smooth normals with no visible rim chamfer",
+        "crumb pores present, correlated with texture speckle"
+      ],
+      "mismatches": [
+        "pore contrast is subtle -- an acceptable stylization given the reference's own understated crumb detail at this render scale"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-front.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+        "cameraView": "top-down",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:26:19.998289+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.83,
+      "aiVisionScore": 0.83,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.8,
+        "materialSurface": 0.78,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.88
+        }
+      ],
+      "action": "continue",
+      "summary": "Budget check: 5108 tri / 2716 vert / 1 mesh / 1 material / 1 texture / 188.8KB GLB -- within variant band (3000-5000 target, slightly over by 108 tri; well within the 8000 tri / 250KB hard cap). Roundtrip (GLTFExporter->GLB->GLTFLoader) confirms byte/visual parity (same tri/vert/KB, identical render). 64px LANCZOS readability gate on the real card background (#F2E6D3) shows the dome silhouette, wedge cutaway, and jam spiral all still legible at thumbnail scale.",
+      "matched": [
+        "tri/KB well under hard cap",
+        "mesh=1 (better than the 2-mesh budget line)",
+        "roundtrip parity confirmed",
+        "64px readability gate passes (silhouette + wedge + jam spiral legible)"
+      ],
+      "mismatches": [
+        "5108 tri is marginally above the variant band's soft upper target of 5000 (accepted, not worth a further loop per CRIB 'upper cap is a ceiling, not a target')"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/rt.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/readability-64-viewer512.png"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/rt.png",
+        "comparisonImage": "",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:39:29.896517+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.6,
+      "aiVisionScore": 0.6,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.78,
+        "materialSurface": 0.45,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.83
+        },
+        {
+          "id": "crust-gradient-and-dusting",
+          "score": 0.45
+        }
+      ],
+      "action": "refine-code",
+      "summary": "Team-lead quality review of cmp-2.png (post-pipeline-complete) found 3 color defects, quantified via top-down PIL measurement (measure_colors.py): (1) crust wide-net median (167,114,65) already matched canon #A9713F almost exactly, but domeRingPhase's 50%-duty-cycle cosine spent half the surface area in dark/mid bands, reading far darker/muddier than the reference's own wide-net median (212,170,127) -- reference has wide bright plateaus with only thin dark grooves, ours had roughly equal light/dark coverage. (2) cut-face crumb (a near-vertical face) rendered at (197,188,171) vs canon CRUMB #F4EAD4 -- measured shading factor 0.807 (uniform across channels, no hue shift, just brightness loss) traced to the face's azimuth (56.25/123.75deg) pointing away from the fill light (dot(N,fill)<0, Lambert-clamped to 0), losing a light contribution loaf/scone's calibrated side walls get. (3) crumb pore dots painted at their geometry dimple radius read as dense tan/beige speckle -- same class of defect as the project's prior flour-dust grain-size failure (CRIB: halving radius turned blobs into fine grain).",
+      "matched": [
+        "jam swirl channel/color coupling still holds"
+      ],
+      "mismatches": [
+        "crust reads muddy/dark vs reference's golden brightness (ridge duty-cycle, not albedo, was the cause)",
+        "crumb reads gray vs reference's warm cream (vertical-face shading loss, not albedo error)",
+        "pores read as dense speckle/mold vs reference's subtle grain (paint radius too large)"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "peak domeRingPhase output locally (ridgePeak = ridge^0.38) before scoring crust tone bands, widening the bright plateau without touching the shared domeShell.ts",
+        "add a per-material CRUMB_RENDER render-target (headroom-safe albedo boost) for the cut-face-only crumb family, documented as a 3-tuple (measured/render/target), leaving SLASH_FLESH on the original canon CRUMB since it lives on the horizontal dome face",
+        "halve the PAINT-ONLY radius of crumb pore dots (PORE_PAINT_SCALE=0.5) while leaving the geometry dimple radius untouched"
+      ],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/measure_colors.py",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/crumb-zoom.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top.png",
+        "comparisonImage": "",
+        "cameraView": "top-down",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:40:20.127117+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.78,
+        "materialSurface": 0.82,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.84
+        },
+        {
+          "id": "crust-gradient-and-dusting",
+          "score": 0.82
+        }
+      ],
+      "action": "continue",
+      "summary": "Re-measured top-down (measure_colors.py, wide-net median, fixed measurement plane per CRIB): crust moved from (167,114,65) [canon-exact but muddy] toward (185,150,114) [43% of the way to the reference's own (212,170,127) canon-offset], via a local ridge-peaking transform (ridge^0.38) that widens the bright plateau -- domeShell.ts (shared base) untouched. Crumb moved from (197,188,171) to (199,197,178) via a per-material CRUMB_RENDER compensation (headroom-limited by canon CRUMB already being near-white -- documented 3-tuple). Pore paint radius halved (PORE_PAINT_SCALE=0.5, geometry dimple radius untouched) -- visually confirmed fine grain instead of dense speckle (crumb-zoom-v2.png). tier1 per-part color-delta now flags (maxDeltaE 25.5 > 20) since the coarse whole-image cluster proxy compares against the literal static canon recipe, not the picture reference we deliberately moved toward -- consistent with the same documented tier1 coarseness that already governs the silhouette-IoU ceiling for this asset class (CRIB), not treated as a blocking regression.",
+      "matched": [
+        "crust reads golden/banded not muddy",
+        "crumb reads warm cream not gray",
+        "pores read as fine grain not speckle/mold",
+        "jam swirl structure unaffected"
+      ],
+      "mismatches": [
+        "crust and crumb still short of the reference's own brightness offset from canon (headroom-limited without clipping into unnatural flatness)",
+        "tier1 whole-image color-cluster proxy flags a delta against the static canon recipe (documented coarse limitation, not a real regression)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-3.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/crumb-zoom-v2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/measure_colors.py output"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v2.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-3.png",
+        "cameraView": "top-down",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:40:36.075048+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.85,
+      "aiVisionScore": 0.85,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.8,
+        "materialSurface": 0.84,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dense-banneton-rings",
+          "score": 0.85
+        },
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.84
+        },
+        {
+          "id": "crumb-pore-texture",
+          "score": 0.78
+        },
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.88
+        }
+      ],
+      "action": "continue",
+      "summary": "Re-reviewed after the material-pass color-correction round: ring bands now read as wide bright plateau with thin dark grooves (matching the reference's proportion far better than the prior 50/50 duty-cycle banding), crumb pore texture reads as fine grain instead of dense speckle after halving paint-only radius.",
+      "matched": [
+        "dense ring field now reads bright/golden with legible thin dark grooves",
+        "pore texture reads as subtle grain, no longer speckle/mold impression",
+        "smooth finish unaffected by the color fixes"
+      ],
+      "mismatches": [
+        "still short of reference's peak brightness (headroom-limited)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/crumb-zoom-v2.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-3.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v2.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-3.png",
+        "cameraView": "top-down",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:50:43.368270+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.65,
+      "aiVisionScore": 0.65,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.86,
+        "componentStructure": 0.87,
+        "formDetail": 0.65,
+        "materialSurface": 0.6,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.6
+        },
+        {
+          "id": "crust-gradient-and-dusting",
+          "score": 0.62
+        }
+      ],
+      "action": "refine-code",
+      "summary": "Team-lead review of cmp-3.png (post-2nd-correction) found 3 remaining defects: (1) crust still muddy-brown-dominant vs reference's bright-plateau-dominant look -- ring count itself was over-dense (16 vs the reference's actual ~10-11, counted directly off a zoomed radial strip of -3.png) and the ridge^0.38 peaking was insufficient. (2) crumb brightened but read achromatic/gray -- the prior CRUMB_RENDER (255,254,230) let R and G both approach the 255 ceiling, collapsing the R-G channel gap from canon's 10 down to 1-2, which reads as loss of hue even though luma rose. (3) jam swirl read thin/pale -- same -19.3% fill-light-clamp brightness loss as crumb was never compensated for jam (JAM stayed raw canon), and the geometry band width (SWIRL_HALF 0.030, ~4.8% of RMAX) sat at the low end of the reference's measured 4-11% range. Also: slash ears had real EAR_HEIGHT geometry displacement but no distinct texture treatment, so the raised ridge inherited the same ring-band coloring as the rest of the crust and read as a flat painted tape rather than a raised feature.",
+      "matched": [
+        "jam channel/color coupling and wedge orientation held"
+      ],
+      "mismatches": [
+        "crust ring count over-dense (16 vs measured ~10-11)",
+        "ridge peaking exponent (0.38) insufficient",
+        "crumb render target collapsed R-G channel gap while chasing brightness",
+        "jam never got a fill-light-clamp compensation like crumb did",
+        "jam band width at the low end of measured reference range",
+        "slash ear zone had no distinct color treatment despite real geometry relief"
+      ],
+      "specFixes": [],
+      "codeFixes": [
+        "GROOVE_COUNT 16->11 (counted directly from a zoomed reference radial strip)",
+        "ridge exponent 0.38->0.2, crustShadow threshold 0.09->0.05 (thinner dark accent), score thresholds lowered to push more area into light/highlight bins",
+        "add a dedicated ear-zone crustHighlight texture branch (color+relief coupling, same principle as the jam channel) so the raised ridge reads as a smooth bright feature, not a painted stripe",
+        "redefine CRUMB_RENDER to (255,242,211) -- headroom-max R, but deliberately widen (not close) the G/B gap for warmth instead of chasing brightness",
+        "add JAM_RENDER=(221,72,97) as the same fill-light-clamp compensation already applied to crumb, since jam has ample headroom for full correction (canon far from 255, unlike crumb)",
+        "SWIRL_HALF 0.030->0.038 (measured reference band width 4-11%, typical 6-7%)"
+      ],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-3.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/ref-ring-strip.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/apex-zoom-top.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v2.png",
+        "comparisonImage": "",
+        "cameraView": "top-down",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:51:16.499799+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.87,
+      "aiVisionScore": 0.87,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.87,
+        "componentStructure": 0.88,
+        "formDetail": 0.85,
+        "materialSurface": 0.87,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.87
+        },
+        {
+          "id": "crust-gradient-and-dusting",
+          "score": 0.85
+        }
+      ],
+      "action": "continue",
+      "summary": "Re-measured top-down/front after the 3rd color+geometry round: crust ring count now matches the reference's counted ~10-11 (GROOVE_COUNT 16->11), ridge exponent pushed to 0.2 (from 0.38) so the bright plateau dominates and the dark accent narrowed (threshold 0.09->0.05) -- crust delta-to-reference closed further (silhouette IoU rose 0.702->0.761 tier1 as a side signal). Slash ears now paint as a dedicated smooth crustHighlight ridge (color+relief coupling, same principle validated on the jam channel) instead of inheriting ring-band coloring -- reads as a raised ear, not a flat tape (turn-90-v4/180-v4 confirm at off-axis angles too). Crumb keeps the R-G channel gap (11 vs canon's 10, was collapsed to 1-2 before) instead of chasing brightness -- reads warm cream, confirmed visually (crumb-zoom-v3.png). Jam got the same fill-light-clamp compensation as crumb (JAM_RENDER, full correction since headroom allowed it) plus a wider band (SWIRL_HALF 0.030->0.038) -- reads as the bold, saturated centerpiece of the cut face now, matching the reference's dominant-jam impression.",
+      "matched": [
+        "crust reads bright/golden-dominant not muddy",
+        "ring count matches reference count",
+        "slash ears read as raised feature not flat tape",
+        "crumb keeps warm hue instead of going gray",
+        "jam is bold/saturated and wider, matching reference impression",
+        "no structural regression across 4 orbit angles + roundtrip"
+      ],
+      "mismatches": [
+        "crust and crumb still short of the reference's absolute brightness (documented headroom limits, not a regression)",
+        "tier1 whole-image color-cluster proxy still flags a delta against the static canon recipe (same documented coarse limitation)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-4.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/crumb-zoom-v3.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v3.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-90-v4.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-180-v4.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/readability-64-v3-viewer512.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v3.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-4.png",
+        "cameraView": "top-down",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:51:33.880862+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.87,
+      "aiVisionScore": 0.87,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.87,
+        "componentStructure": 0.88,
+        "formDetail": 0.87,
+        "materialSurface": 0.87,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "starburst-slash",
+          "score": 0.87
+        }
+      ],
+      "action": "continue",
+      "summary": "Team-lead review of cmp-3.png found the slash ears read as flat painted tape despite real EAR_HEIGHT geometry relief -- the raised zone had no distinct texture, only inherited the surrounding ring-band coloring. Fixed with a dedicated ear-zone crustHighlight texture branch (same color+relief coupling principle validated on the jam channel): the whole SLASH_HALF_ANGLE_DEG-wide ear zone now paints as a smooth bright ridge regardless of the local ring phase. Confirmed at multiple angles (view-top-v3.png, turn-90-v4/180-v4.png) -- ears now read as raised pointed blades meeting at the apex.",
+      "matched": [
+        "4 ears read as raised smooth ridges, not flat tape",
+        "ear color now correlates with the actual EAR_HEIGHT relief",
+        "confirmed across top-down and 2 off-axis angles"
+      ],
+      "mismatches": [
+        "smooth shading still softens edge sharpness vs the reference's faceted look (accepted per finish contract)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v3.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-90-v4.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/turn-180-v4.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v3.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-4.png",
+        "cameraView": "top-down",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:51:50.120652+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.87,
+      "aiVisionScore": 0.87,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.87,
+        "componentStructure": 0.88,
+        "formDetail": 0.87,
+        "materialSurface": 0.87,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "dense-banneton-rings",
+          "score": 0.86
+        },
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.87
+        },
+        {
+          "id": "crumb-pore-texture",
+          "score": 0.78
+        },
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.88
+        }
+      ],
+      "action": "continue",
+      "summary": "Re-reviewed after the 3rd color/geometry round: ring count now matches the reference's measured ~10-11, wide bright plateau dominates with thin dark accent lines. Jam swirl reads bolder/more saturated as the cut face's centerpiece. Crumb pore grain unaffected by this round (still fine grain from the prior round's PORE_PAINT_SCALE fix).",
+      "matched": [
+        "ring count and proportion now match the reference",
+        "jam reads as the dominant cut-face feature",
+        "pore texture stays fine-grain",
+        "smooth finish unaffected"
+      ],
+      "mismatches": [
+        "still short of reference's absolute peak brightness (headroom-limited, documented)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v3.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/crumb-zoom-v3.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-4.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-3.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-top-v3.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-4.png",
+        "cameraView": "top-down",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:52:08.581163+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.87,
+      "aiVisionScore": 0.87,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.87,
+        "componentStructure": 0.88,
+        "formDetail": 0.87,
+        "materialSurface": 0.87,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "smooth-clay-finish",
+          "score": 0.88
+        }
+      ],
+      "action": "continue",
+      "summary": "Final budget check after the 3rd correction round: GROOVE_COUNT 16->11 (reference-count-matched) dropped tri from 5108 to 4298 -- now comfortably inside the 3000-5000 variant target band (previously 108 over). GLB 155.4KB (was 182.9-188.8KB), mesh=1, roundtrip parity reconfirmed (rt-v3.png, tris/verts/kb identical, roundtrip:true). 64px LANCZOS readability gate on the real card background re-verified (readability-64-v3.png) -- silhouette, wedge, and now-bolder jam spiral all clearly legible at thumbnail scale, an improvement over the earlier paler jam.",
+      "matched": [
+        "tri now inside the target band (was over by 108, an unrelated side effect of the reference-accurate groove-count fix)",
+        "GLB smaller (155.4KB vs 182.9-188.8KB)",
+        "roundtrip parity holds",
+        "64px readability improved (bolder jam more legible at thumbnail scale)"
+      ],
+      "mismatches": [
+        "none outstanding"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/rt-v3.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/readability-64-v3-viewer512.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/rt-v3.png",
+        "comparisonImage": "",
+        "cameraView": "three-quarter",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    },
+    {
+      "timestamp": "2026-08-30T10:55:50.930972+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.88,
+      "aiVisionScore": 0.88,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.87,
+        "componentStructure": 0.88,
+        "formDetail": 0.87,
+        "materialSurface": 0.88,
+        "lightingCamera": 1.0
+      },
+      "featureReviews": [
+        {
+          "id": "jam-swirl-not-sticker",
+          "score": 0.88
+        }
+      ],
+      "action": "continue",
+      "summary": "Team-lead flagged a regression: the 3rd round's JAM_RENDER (221,72,97, full inverse-shading recovery of the canon hex) over-corrected -- jam is meant to render DARKER than a flat, unshaded albedo, so undoing the fill-light-clamp loss made it read as bright candy-pink ('daughter of the strawberry-milk trap'). Fixed per team-lead's explicit instruction: dropped the hex-inversion approach entirely and instead measured the reference's OWN rendered jam body color directly (front elevation -2.png, HSV crimson mask hue 325-360/0-15 + s>0.35 + v>0.25, 10-70th percentile luma band to exclude rim highlights/deep shadow) = (145,44,36) -- notably darker and far less blue than the canon hex (178,58,78), i.e. brick-red/crimson rather than magenta-pink. Divided by the same 0.807 shading factor to get JAM_RENDER=(180,55,45), then re-measured our own render with the identical mask/percentile method: (146,49,40) -- within a few units of the reference target on the first try, no further iteration needed.",
+      "matched": [
+        "jam now reads as a dark, saturated brick-crimson matching the reference, not bright pink candy",
+        "3-tuple calibration record (reference target/albedo candidate/re-measured render) all documented in-code"
+      ],
+      "mismatches": [
+        "none outstanding on this feature"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-5.png",
+        "/c/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-front-v4.png"
+      ],
+      "outOfSequence": true,
+      "visualEvidence": {
+        "referenceScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/src/campagne--strawberry-jam-2.png",
+        "renderScreenshot": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/view-front-v4.png",
+        "comparisonImage": "C:/Users/agape/Desktop/코딩/levain/assets/breads/work/campagne--strawberry-jam-v2/cmp-5.png",
+        "cameraView": "front",
+        "notes": "",
+        "aiVisionNotes": ""
+      }
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full component tree and material layers"
+    },
+    {
+      "tier": "far",
+      "distance": 30,
+      "strategy": "merge static components and reduce local feature geometry"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "runtime-budget",
+    "targetTriangles": 4200,
+    "maxDrawCalls": 1,
+    "textureSize": 512,
+    "fpsTarget": 60,
+    "optimizationPolicy": [
+      "Variant/detail-bread tri band 3000-5000 / <=250KB (CRIB 2026-08-30 amendment for variants outside the closed public-10 budget). Indexed geometry retained where UV boundaries do not force vertex splitting (CRIB finish-contract note: campagne variant precedent halved GLB size at 2x the tri count)."
+    ]
+  },
+  "lightingFromPhoto": [
+    {
+      "id": "harness-key",
+      "role": "key light",
+      "observation": "Neutral white directional key at (-2, 6, 2), no exposure control, no tone mapping.",
+      "usage": "Fixed by the harness.",
+      "exposure": "no exposure control, no tone mapping."
+    },
+    {
+      "id": "harness-ambient",
+      "role": "ambient fill",
+      "observation": "Neutral white-balanced ambient plus a black-sky hemisphere light for vertical-surface fill (recalibrated 2026-08-30).",
+      "usage": "Fixed by the harness.",
+      "contactShadow": "none - no shadow map or ground plane, so no contact shadow or ground shadow is rendered."
+    },
+    {
+      "id": "harness-fill",
+      "role": "rim/fill light",
+      "observation": "Cool directional fill, low intensity.",
+      "usage": "Fixed by the harness.",
+      "toneMapping": "NoToneMapping."
+    }
+  ],
+  "proceduralStrategy": [
+    "Build one indexed lathe dome shell via buildGroovedDomeShell (domeShell.ts), with GROOVE_COUNT=16 rings baked into the profile (denser than base campagne's 8).",
+    "Displace the 4-fold starburst slash (deeper trench, taller ear, narrower half-angle, shorter t-end than base) in the same (ring,sector) pass used by campagne.ts.",
+    "Build the two cut-face grids analytically from the SAME pre-cut profile function before deleting the wedge sectors, so their outer boundary column is bit-identical to the dome's own wedge-boundary ring vertices (zero seam gap).",
+    "Evaluate one shared jam-swirl signed-distance function for BOTH the geometry channel depth and the atlas texture color on the cut faces, so the painted band and the carved channel can never drift apart (CRIB 'sticker' lesson).",
+    "Jitter only the dome shell vertices while indexed (small amplitude, bounded to <=1/20 of the smallest groove/slash span); apply zero post-hoc jitter to the cut-face grid, whose irregularity comes from the swirl/dimple/bump authoring functions instead (CRIB: jitter shreds small detail).",
+    "Bake faceting OFF: computeVertexNormals() while indexed, THEN toNonIndexed() only if UV-boundary vertex splitting is actually required (2026-08-30 finish contract) -- prefer keeping the whole merged geometry indexed if the atlas UV layout allows it.",
+    "Paint one shared 512px basecolor atlas (crust region + cut-face region) -- crust tonal bands correlated with the ring-groove phase, cut-face crumb/jam/pore/fleck all sampled from the same coordinate space as the geometry displacement.",
+    "Project UVs analytically (top-down polar for crust, parametric rho/height for the cut faces, computed pre-displacement), merge everything by material into as few meshes as the shared atlas allows (types.ts section 1, target 1 mesh)."
+  ],
+  "animationAnchors": [
+    "root pivot supports whole-object rotation for the showcase turntable"
+  ],
+  "destructionAnchors": [
+    "single fractureGroup; plausible break is along the wedge boundary, not modelled here"
+  ],
+  "risks": [
+    {
+      "id": "sticker-relapse",
+      "severity": "high",
+      "description": "The single biggest historical failure mode for this exact bread: a flat colored jam band with no matching geometry channel reads as a decal/sticker (rejected build's own documented finding).",
+      "mitigation": "Color and relief evaluate the same signed-distance-to-band function; never let the texture painter and the vertex displacement diverge."
+    },
+    {
+      "id": "perfect-spiral-artifact",
+      "severity": "medium",
+      "description": "A mathematically perfect Archimedean spiral reads as an artificial drafting-compass curve.",
+      "mitigation": "Non-integer-multiple sine wobble on both radius and thickness, seeded from rng, amplitude tuned down from the rejected build's research to match the new reference's tidier (but not perfect) spiral."
+    },
+    {
+      "id": "wedge-orientation",
+      "severity": "high",
+      "description": "CRIB: asymmetric bread's #1 measured pitfall is a first-pass orientation error (scone: 180deg off, IoU 0.659 -> 0.821 after correction).",
+      "mitigation": "Verify the wedge/cut-face visibility against the 3/4 camera azimuth explicitly at the blockout pass, before investing in surface/material passes."
+    },
+    {
+      "id": "rim-chamfer",
+      "severity": "medium",
+      "description": "CRIB 2026-08-30 measured finding: sharing top-face/side-wall vertices under smooth normals chamfers the whole rim into a cushion look.",
+      "mitigation": "Cut-face boundary column reuses the dome's own (jittered) ring vertices exactly, rather than an independently smoothed shared vertex."
+    },
+    {
+      "id": "dense-grid-coupling",
+      "severity": "medium",
+      "description": "CRIB 2026-08-30 measured finding: grid-index-based distance/threshold checks quietly shrink in world units whenever grid resolution goes up (4 separate defects found in the focaccia--olive-flesh-v2 round alone).",
+      "mitigation": "Every pore/dimple/fleck minimum-separation or radius check in the cut-face code is authored in world units, not grid-cell counts -- grep-audited after any grid resolution change."
+    },
+    {
+      "id": "flat-shading-loss",
+      "severity": "n/a (finish contract changed)",
+      "description": "The pipeline's prior facet()-based finish is deprecated for this round; smooth normals are now the target look, not a defect to guard against.",
+      "mitigation": "N/A -- documented so a future spec-refine does not silently revert to facet() by habit."
+    },
+    {
+      "id": "merge-attribute-mismatch",
+      "severity": "medium",
+      "description": "mergeByMaterial throws on attribute-set mismatch.",
+      "mitigation": "Every geometry gets position, normal, uv."
+    }
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Strawberry Jam Campagne",
+    "index": {
+      "status": "hit",
+      "reason": "current",
+      "fingerprint": "ac4f0bc9028e34083dbb5d5531ae3df7699c8e7641d5f8e6d42e7492ea1be1d0"
+    },
+    "matches": []
+  },
+  "tier1Results": [
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.7507,
+        "aspectRatioDelta": 0.1037,
+        "scaleDelta": 0.094,
+        "bilateralSymmetryError": 0.1252,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 18.41,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 6.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 6.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.41
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.751 is below threshold 0.85",
+        "aspect-ratio delta 0.104 exceeds threshold 0.05",
+        "scale delta 0.094 exceeds threshold 0.08",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [],
+      "renderHash": "65d6174dcee091e0",
+      "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.752,
+        "aspectRatioDelta": 0.1037,
+        "scaleDelta": 0.094,
+        "bilateralSymmetryError": 0.1242,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 19.46,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 5.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 5.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.46
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.752 is below threshold 0.85",
+        "aspect-ratio delta 0.104 exceeds threshold 0.05",
+        "scale delta 0.094 exceeds threshold 0.08",
+        "blockout requires --map-stripped-render evidence"
+      ],
+      "maskWarnings": [],
+      "renderHash": "709994dd3706344d",
+      "passId": "blockout"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.752,
+        "aspectRatioDelta": 0.1037,
+        "scaleDelta": 0.094,
+        "bilateralSymmetryError": 0.1242,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 19.46,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 5.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 5.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.46
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.752 is below threshold 0.85",
+        "aspect-ratio delta 0.104 exceeds threshold 0.05",
+        "scale delta 0.094 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "709994dd3706344d",
+      "passId": "structural-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.752,
+        "aspectRatioDelta": 0.1037,
+        "scaleDelta": 0.094,
+        "bilateralSymmetryError": 0.1242,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 19.46,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 5.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 5.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.46
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.752 is below threshold 0.85",
+        "aspect-ratio delta 0.104 exceeds threshold 0.05",
+        "scale delta 0.094 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "709994dd3706344d",
+      "passId": "form-refinement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.752,
+        "aspectRatioDelta": 0.1037,
+        "scaleDelta": 0.094,
+        "bilateralSymmetryError": 0.1242,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 19.46,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 5.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 5.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.46
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.752 is below threshold 0.85",
+        "aspect-ratio delta 0.104 exceeds threshold 0.05",
+        "scale delta 0.094 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "709994dd3706344d",
+      "passId": "material-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.752,
+        "aspectRatioDelta": 0.1037,
+        "scaleDelta": 0.094,
+        "bilateralSymmetryError": 0.1242,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 19.46,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 5.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 5.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.46
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.752 is below threshold 0.85",
+        "aspect-ratio delta 0.104 exceeds threshold 0.05",
+        "scale delta 0.094 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "709994dd3706344d",
+      "passId": "surface-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.752,
+        "aspectRatioDelta": 0.1037,
+        "scaleDelta": 0.094,
+        "bilateralSymmetryError": 0.1242,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 19.46,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 5.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 5.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.46
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.752 is below threshold 0.85",
+        "aspect-ratio delta 0.104 exceeds threshold 0.05",
+        "scale delta 0.094 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "709994dd3706344d",
+      "passId": "optimization-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.702,
+        "aspectRatioDelta": 0.1037,
+        "scaleDelta": 0.094,
+        "bilateralSymmetryError": 0.1669,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 25.5,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 9.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 25.5
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.702 is below threshold 0.85",
+        "aspect-ratio delta 0.104 exceeds threshold 0.05",
+        "scale delta 0.094 exceeds threshold 0.08",
+        "max per-part color delta-E 25.5 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "8f1c9f24607de53e",
+      "passId": "material-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.7611,
+        "aspectRatioDelta": 0.1037,
+        "scaleDelta": 0.094,
+        "bilateralSymmetryError": 0.1179,
+        "colorDelta": {
+          "checked": 3,
+          "maxDeltaE": 25.26,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 10.24
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.24
+            },
+            {
+              "componentId": null,
+              "deltaE": 25.26
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "silhouette IoU 0.761 is below threshold 0.85",
+        "aspect-ratio delta 0.104 exceeds threshold 0.05",
+        "scale delta 0.094 exceeds threshold 0.08",
+        "max per-part color delta-E 25.26 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "131d7d4760eefb2b",
+      "passId": "material-pass"
+    }
+  ]
+}

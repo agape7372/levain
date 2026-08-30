@@ -1,0 +1,68 @@
+{
+  "protocol": "grimoire/intake/image_analysis.md",
+  "references": {
+    "scone--choco-chip.png": "three-quarter top-front, form + chip layout reference",
+    "scone--choco-chip-2.png": "EXCLUDED as a generation error (renders as a rectangular slab, not a wedge) - height/width ratio only, per assets/breads/work/CRIB.md",
+    "scone--choco-chip-3.png": "top-down, form + chip layout reference"
+  },
+  "layer1_identification": {
+    "workType": "single triangular wedge cut from a round scone, studded with hand-chopped chocolate chunks",
+    "broadClassification": "baked-good prop / stylized low-poly game asset, variant of base scone.ts",
+    "primaryDomain": "object",
+    "confidence": 0.97,
+    "note": "reference is itself a stylized clay-render (AI generated), not a photograph - target look is soft matte clay, not photoreal. This is a variant object: silhouette/profile inherited by measurement from the base scone family, chip system is new."
+  },
+  "layer2_form_silhouette": {
+    "boundingVolume": "thick triangular wedge (rounded-triangle footprint, three convex arcs meeting at three blunt corners), resting flat on its wide bottom face",
+    "symmetry": "asymmetric (hand-cut wedge, no exact mirror), one corner (apex) points toward camera-front",
+    "shapeLanguage": "organic form (soft rounded wedge, no sharp edges) with faceted chocolate inclusions (hard angular blocks) as contrast",
+    "measurements_topdown": {
+      "footprint": "rounded triangle, apex-front, two rounded rear lobes forming the back arc",
+      "heightOverWidth": "roughly 0.46-0.47 (chunky, sturdy slice; never balanced on point, never upright) per assets/prompts/breads/scone--choco-chip.json geometry.silhouette"
+    },
+    "derivedRatios": {
+      "wedgeHeightOverWidth": 0.47
+    }
+  },
+  "layer3_decomposition": {
+    "macro": ["wedge body (revolved/lofted shell: bottom face, side/cut faces, top crust)"],
+    "meso": ["top crust face (golden, crack fissures)", "side crumb faces (plain cream, no chips)", "chocolate chunk cluster (7 pieces)"],
+    "micro": ["individual chocolate chunk (own facets, size, tilt)", "1-2 soft crack fissures on top face", "cut-face crumb texture (fine ridging)"]
+  },
+  "layer4_spatial": [
+    "<top crust face, above, side crumb faces> contact: shared rim edge, hard material-boundary crease (2-tone crust split)",
+    "<chocolate chunks, embedded-in, top crust face> contact: embed - each chunk sits half-sunken, dough visibly hugging its base edge, not resting on top like a bump",
+    "<fissures, recessed-into, top crust face> contact: shallow concave crease, does not cross onto side faces",
+    "no floating parts; wedge rests on its own flat bottom face"
+  ],
+  "layer5_materials": {
+    "surfaces": [
+      {"id": "top-crust", "metalness": 0.0, "roughness": 1.0, "translucency": "opaque", "relief": "smooth clay with 1-2 shallow crack fissures + fine crumb ridging near rim"},
+      {"id": "side-crumb", "metalness": 0.0, "roughness": 1.0, "translucency": "opaque", "relief": "smooth clay, fine vertical crumb ridging, completely plain (no chips)"},
+      {"id": "chocolate-chunk", "metalness": 0.0, "roughness": 1.0, "translucency": "opaque", "relief": "hard flat facets - deliberately different shading language from the soft dough (hard inclusion vs soft matrix)"}
+    ],
+    "runtimeNote": "consumer runtime force-replaces every material with MeshLambertMaterial keeping only map+color (scripts/breads/types.ts section 2); PBR scalars beyond albedo are inert"
+  },
+  "layer6_color": {
+    "source": "assets/prompts/breads/scone--choco-chip.json geometry.crust (authoritative, hand-transcribed) - JSON is color/ratio canon, image is form/proportion canon only (docs/BREADS.md decision)",
+    "topCrustAlbedo": "#D6A15C",
+    "sideCrumbAlbedo": "#F4EAD4",
+    "chocolateAlbedo": "#3B2418",
+    "finish": "matte throughout",
+    "observedVsSpec": "reference top-down crust reads slightly darker (~222) than the 3/4 view (~238) due to camera-angle-dependent AO in the AI render; JSON hex is used as flat albedo per CRIB measurement-fixture rule (top-down as reference plane)"
+  },
+  "layer7_identity_features": [
+    "rounded-triangle wedge silhouette, apex-front, height ~ 0.47x width - identity-critical, must not read as a cone/cylinder or stand upright",
+    "hard 2-tone crust split at the rim (golden top vs plain cream sides) - identity-critical material boundary",
+    "1-2 soft crack fissures on the top crust, not more",
+    "about 7 solid chocolate chunks, hand-chopped: each has its own facet count/size/tilt (no two identical), size hierarchy (2 large, ~4 medium, 1 small shard) reads clearly, gathered in loose casual clusters leaving quiet plain crust between them, NOT a uniform grid and NOT evenly spaced studs",
+    "chunks sit half-sunken into the crust (dough hugs the base edge) - never a bump sitting on top, never a spike growing out of the surface",
+    "side/cut faces stay completely plain - no chunks visible on the cut faces (identity-critical negative: earlier round's edge-chip system was rejected by user for reading as a mechanical row of dots)"
+  ],
+  "layer8_uncertainty": [
+    "underside is never visible (rests flat on display) - modelled as a closed low-detail cap",
+    "exact chunk placement is not identity-critical; count (~7), size hierarchy, hand-chopped facet irregularity, half-sunken embed and loose clustering ARE identity-critical and are procedurally seeded from the builder rng",
+    "front-elevation reference (scone--choco-chip-2.png) is a known generation error (renders as a slab, not a wedge) and is excluded as a shape reference per assets/breads/work/CRIB.md; only its height/width ratio is usable",
+    "reference renders carry soft AI-generated ambient occlusion in the chunk crevices that the flat-lit breadlab harness will not reproduce identically; expected delta, not a defect"
+  ]
+}

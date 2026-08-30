@@ -1,28 +1,46 @@
 {
   "id": "scone--choco-chip",
-  "version": 1,
+  "version": 5,
   "name_ko": "초코칩 스콘",
-  "subject": "a single wedge-shaped scone studded with chocolate chips",
+  "subject": "a single wedge-shaped scone with a few chocolate chips folded into the dough",
   "geometry": {
     "silhouette": "a thick triangular wedge cut from a round scone, resting flat and stable on its wide bottom face with the pointed corner of the triangle facing forward and slightly to the side; its height is roughly half its width, so it is a chunky, sturdy slice, never balanced on a point and never standing upright",
     "crust": [
-      "top face only in pale golden brown #D6A15C",
-      "side faces left uncolored cream #F4EAD4, sharply contrasting with the top",
-      "shallow horizontal crack fissures running across the top surface",
-      "small irregular dark chocolate chip studs #3B2418 embedded across the pale golden top face and visible poking out at the cut edges"
+      "top face only in pale golden brown #D6A15C, with one or two soft crack fissures",
+      "side faces plain cream #F4EAD4 crumb, sharply contrasting with the top, left completely plain",
+      "about seven solid chocolate chunks #3B2418 (warm dark brown), hand-chopped so every piece has its own shape, size and tilt, each pressed snugly into the golden top face so it sits half-sunken, the dough hugging its edges, gathered in loose casual clusters that leave quiet plain areas"
     ]
   },
-  "style_ref": "shared-style-v2",
+  "style_ref": "shared-style-v3",
   "camera": "three-quarter top-front view, object centered, 15% margin",
   "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
   "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
-  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "jam", "cream topping", "balanced on a point", "standing upright", "cone shape", "tower", "chocolate drizzle", "melted chocolate pool"],
-  "views": ["three-quarter top-front", "front elevation", "top-down"],
-  "output": { "aspect": "1:1", "size": 1024 },
-  "prompt_flat": "A cozy low-poly stylized 3D render of a single wedge-shaped scone studded with chocolate chips, a single game asset object on a plain backdrop. Geometry: a thick triangular wedge cut from a round scone, resting flat and stable on its wide bottom face, with the pointed corner of the triangle facing forward and slightly to the side. Its height is roughly half its width, so it reads as a chunky, sturdy slice — never balanced on a point, never standing upright like a tower. Crust: only the top face is colored pale golden brown (#D6A15C); the side faces are left uncolored cream (#F4EAD4), sharply contrasting with the top; shallow horizontal crack fissures run across the top surface; small irregular dark chocolate chip studs (#3B2418) are embedded across the pale golden top face and visible poking out at the cut edges. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — not balanced on a point, not standing upright, not a cone, not a tower — no photorealism, no glossy plastic, no jam, no cream topping, no chocolate drizzle, no melted chocolate pool, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
-  "followup_views": [
-    "Same exact chocolate chip scone, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view). It stays resting flat on its wide bottom face, with the same chunky proportions: height roughly half the width, the flat golden top and the cream sides meeting in a crisp horizontal line, chocolate chips visible at the cut edges. Do not change its pose or proportions between views. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
-    "Same exact chocolate chip scone, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the triangular top face, crack fissures, and chocolate chip studs are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  "negative": [
+    "photorealism",
+    "glossy plastic",
+    "text",
+    "watermark",
+    "plate",
+    "board",
+    "props",
+    "hands",
+    "people",
+    "characters",
+    "facial features"
   ],
-  "notes_ko": "베이스 scone.json의 geometry(웨지 실루엣, 윗면만 착색되는 비대칭 컬러링, 균열)를 그대로 계승하고 초코칩 스터드만 추가했다. 세움/콘/타워 negative는 베이스 그대로 유지, 초콜릿 재료가 유발하기 쉬운 드리즐·녹은 웅덩이를 추가로 차단했다."
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A cozy softly-stylized clay-like 3D render of a rustic freshly baked chocolate chunk scone wedge, a single game asset object on a plain backdrop. Geometry: a thick triangular wedge cut from a round scone, resting flat and stable on its wide bottom face, the pointed corner facing forward and slightly to the side; its height is roughly half its width, a chunky, sturdy slice. Crust: the top face is oven-warm pale golden brown (#D6A15C) with one or two soft crack fissures; the side faces are plain cream (#F4EAD4) tender crumb, meeting the golden top in a crisp line, and they stay completely plain. Chocolate: about seven solid chocolate chunks in warm dark brown (#3B2418), hand-chopped so every piece has its own shape, size and tilt — a couple of generous pieces, several smaller ones — each pressed snugly into the golden top face so it sits half-sunken, the dough hugging its edges, gathered in loose casual clusters that leave quiet plain areas of crust between them, the honest irregularity of a handmade bake. Overall style: softly stylized clay-like 3D render, smooth rounded forms with gentle sculpted detail, soft matte shading, warm pastel palette, miniature diorama feel, cozy handmade bakery feel, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow on the background. Stylized soft matte render only — no photorealism, no glossy plastic, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
+  "followup_views": [
+    "Same exact chocolate chunk scone, identical proportions, colors and chocolate placement — now shown in a front elevation view (straight-on side view): resting flat on its wide bottom face, height roughly half the width, the flat golden top and the plain cream sides meeting in a crisp horizontal line. Do not change its pose, proportions or chocolate layout between views. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
+    "Same exact chocolate chunk scone, identical proportions, colors and chocolate placement — now shown in a top-down view (directly from above): the triangular top face, the soft crack fissures, and the seven hand-chopped chocolate chunks in their loose casual clusters are fully visible, with quiet plain areas between them. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  ],
+  "notes_ko": "v2(2026-08-30, appetizing v3 적용): 'studded across'·'poking out at cut edges'가 전 면 균일 스터드·돌출 뿔을 만든 원인이라 개수 명시(약 8개)·반쯤 파묻힘·불균일 클러스터·여백·단면은 납작 플레이크로 전면 재작성. low-poly faceted 키워드 제거(스무스 클레이 전환). 베이스 웨지 실루엣·2색 대비·세움 방지 negative는 유지. | v3(2026-08-30): 단면 칩 전면 제거 — 'two or three on the cut faces'를 생성기가 면당 1개 정중앙 등간격 일렬로 배분해 사용자 기각('일정한 세 점이 징그럽다'). 소수 개수 지정은 균등 배분을 부른다 — 단면은 완전 무지로. 윗면 칩 약 7개만. | v4(2026-08-30): 윗면 칩이 동일 물방울(키세스) 모양·균일 크기로 나와 사용자 기각. 'chips'가 균일 키세스를 부른다 — 손으로 다진 불규칙 청크(크기 3계층·개별 기울기·'No two pieces look the same')로 교체. | v5(2026-08-30): v4 산출에서 초코 가운데 원형 구멍 — negative 체인(~30개)의 개념 주입 역효과로 진단(산문 부정은 어휘를 주입한다, 기본 빵 v1의 짧은 negative는 무사고). 전면 감량: negative는 구조 금지 11개(v1 수준)만, 형태·배치 교정은 전부 양성 서술(solid chunks, hand-chopped, own shape size tilt, snugly pressed, upper half shows, loose casual clusters, quiet plain areas)."
 }

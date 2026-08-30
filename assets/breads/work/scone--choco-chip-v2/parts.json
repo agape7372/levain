@@ -1,0 +1,9 @@
+{
+  "note": "Parts as the builder constructs them BEFORE the mandatory final mergeByMaterial. scripts/breads/sconeChocoChip.ts builds wedge-body+wedge-top-face as one indexed shell geometry (shared rim ring, split by UV zone) and choc-chunk as 7 individually-authored small solids from the repetitionSystem; mergeByMaterial then fuses everything into 2 meshes (shell material + chocolate material) because the consumer caps a bread at 2 materials/2 meshes (scripts/breads/types.ts sections 1-2). Triangle counts: shell (body+face combined, analytic from ring/segment count 54 rings x 36 segments) ~= 3672, choc-chunk cluster (7 instances, 5-7 sides each) ~= 120, summing to the harness-reported total of 3792.",
+  "parts": [
+    { "name": "root", "kind": "container", "module": "createSconeChocoChip", "triangles": 3792 },
+    { "name": "wedge-body", "kind": "part", "module": "buildShell", "triangles": 2450 },
+    { "name": "wedge-top-face", "kind": "part", "module": "buildShell", "triangles": 1222 },
+    { "name": "choc-chunk", "kind": "repeated-part", "module": "buildChips", "instances": 7, "triangles": 120 }
+  ]
+}

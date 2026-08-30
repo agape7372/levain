@@ -1,0 +1,22 @@
+{
+  "rubric": "grimoire/intake/validation_rubric.md",
+  "verdict": "pass",
+  "evidenceRefs": [
+    "assets/breads/src/scone--choco-chip.png (three-quarter top-front)",
+    "assets/breads/src/scone--choco-chip-3.png (top-down)",
+    "assets/breads/src/scone--choco-chip-2.png (front elevation - EXCLUDED as generation error, height/width ratio only, per CRIB.md)"
+  ],
+  "passCriteriaMet": {
+    "oneObviousTargetObject": true,
+    "objectOccupiesEnoughOfFrame": "foregroundCoverage 0.1657, largestComponentFraction 1.0 (check_reference_admission)",
+    "strongSilhouette": "rounded-triangle wedge outline in top-down, apex-front asymmetric profile in three-quarter",
+    "majorMaterialsVisible": "two-tone matte dough (crust/crumb) + faceted chocolate inclusion, all clearly visible",
+    "hiddenSideInferable": "underside occluded but never faces camera (rests flat on display); cut faces fully visible in three-quarter view",
+    "procedurallyApproximable": "lofted radial shell (base scone.ts family) + discrete additive chip inclusions; no smoke, liquid, glass or lace"
+  },
+  "notConditional": "two admissible views supplied (3/4 + top-down); the excluded front-elevation view does not create a single-view rotational-symmetry gap because the wedge is not radially symmetric and the top-down view already resolves the footprint",
+  "stylizationLevel": "soft matte clay, low-poly-adjacent - shared style with the rest of the bread family",
+  "complexity": "simple",
+  "askForBetterInput": "not needed",
+  "variantNote": "this is a variant of scripts/breads/scone.ts (base scone family); silhouette/profile constants are measured evidence carried forward from that base build (docs/BREADS.md variant rule: inherit numbers, not procedure) - the chip system is this build's new subject matter"
+}
