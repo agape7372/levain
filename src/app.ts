@@ -32,11 +32,12 @@ import { createRecipesScreen } from './ui/screens/recipes';
 import { createShowcaseScreen } from './ui/screens/showcase';
 import { mountOnboarding } from './ui/screens/onboarding';
 import { openStarterGift } from './ui/components/ingredientPicker';
+import { celebrateIngredients, celebrateStageUp } from './ui/components/celebrate';
 import type { GameApi } from './ui/gameApi';
-import { LABEL_STAGE, RECIPES, INGREDIENTS, adRemaining } from './sim';
+import { RECIPES, INGREDIENTS, adRemaining } from './sim';
 import { adsAvailable, showRewarded } from './platform/ads';
 import { basesCompleted, missionViews } from './store/economy';
-import type { BakeGrade, SimEvent } from './sim';
+import type { BakeGrade, NotifySlot, SimEvent } from './sim';
 
 export interface StartAppDeps {
   /** Levain Lab 전용 주입점 — 프로덕션은 생략(systemClock·정식 저장 키) */
@@ -65,7 +66,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   const { store, isNew, loadSource, briefing } = await initGameStore({
     clock,
     storage,
-    onNotifyPlan: (plan) => void notifier.applyPlan(plan),
+    onNotifyPlan: (plan) => void notifier.applyPlan(plan), // 본문 르방 이름은 슬롯 label(store가 싣는다)
     onSaveFailed: () => {
       const t = clock.now();
       if (t - saveFailToldAt < 30 * 60_000) return;
@@ -142,6 +143,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     subscribe: (fn) => store.subscribe(fn),
     inventory: () => store.getInventory(),
     pantry: () => store.getPantry(),
+    collection: () => store.getCollection(),
     feedRatio: () => store.getActiveStarter().sim.feedRatio,
     bakeVariant: (variantId) => store.bakeVariant(variantId),
     starterNameOf: (id) => {
@@ -186,7 +188,11 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       matureActive: () => store.devMatureActive(),
       grantAllIngredients: () => {
         // 카탈로그에서 뽑는다 — 하드코딩하면 재료를 늘릴 때마다 개발자 모드가 조용히 낡는다
+        const inv = store.getInventory();
+        const fresh = INGREDIENTS.filter((ing) => (inv[ing.id] ?? 0) === 0).map((ing) => ing.id);
         for (const ing of INGREDIENTS) store.grantIngredient(ing.id, 9);
+        // 0→1이 된 것만 연출한다 — 300ms 수집 창이 30종을 한 장으로 묶는다(celebrate.ts)
+        if (fresh.length > 0) celebrateIngredients(api, fresh);
       },
       completeCollection: () => store.devCompleteCollection(),
     },
@@ -217,6 +223,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       location.reload();
     },
     requestNotifyPermission: () => notifier.requestPermission(),
+    checkNotifyPermission: () => notifier.checkPermission(),
     openNotifySettings: () => void notifier.openSettings(),
     pendingBake: () => store.getEnvelope().flags.pendingBake,
     clearPendingBake: () => store.setFlags({ pendingBake: null }),
@@ -288,10 +295,9 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     return true;
   };
 
-  const recipes = createRecipesScreen(api, () => store.getCollection(), {
-    openShowcase,
-    onBack: () => showTab('levain'),
-  });
+  // 탭 루트 백버튼은 폐지됐다(2026-09-03) — 탭바가 복귀 수단이고, 하드웨어 백 계약은
+  // router.onRootBack이 그대로 지킨다(레시피 루트 백 = 르방이 탭).
+  const recipes = createRecipesScreen(api, () => store.getCollection(), { openShowcase });
 
   const tabs = document.createElement('nav');
   tabs.id = 'tabs';
@@ -333,6 +339,34 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   });
   showTab('levain');
 
+  // ── 알림 탭 딥링크 (2026-09-03) ──
+  // 콜드 스타트로 들어오면 브리핑·곰팡이 모달이 먼저 뜰 수 있다 — 모달이 닫힐 때까지
+  // 400ms 간격으로 기다렸다가 연다(최대 10회 = 4초). 여전히 열려 있으면 탭만 옮긴다:
+  // home.openFeed가 스스로 hasOpenModal을 확인하므로 모달이 겹치는 일은 없다.
+  const openForNotify = (copyKey: NotifySlot['copyKey']): void => {
+    if (copyKey === 'peak') {
+      showTab('recipes'); // 한창때 = 지금 굽기 좋은 때
+      return;
+    }
+    showTab('levain');
+    if (copyKey === 'feedTime' || copyKey === 'fridgeWeek' || copyKey === 'reviveSecond' || copyKey === 'sour') {
+      home.openFeed();
+    }
+  };
+  notifier.onTapped((copyKey) => {
+    if (!store.getEnvelope().flags.onboarded) return; // 온보딩 전엔 화면 자체가 없다
+    let tries = 0;
+    const run = (): void => {
+      if (hasOpenModal() && tries < 10) {
+        tries += 1;
+        setTimeout(run, 400);
+        return;
+      }
+      openForNotify(copyKey);
+    };
+    run();
+  });
+
   // ── 이벤트 → 사운드·햅틱·토스트 ──
   const onEvents = (events: SimEvent[]): void => {
     for (const e of events) {
@@ -346,8 +380,9 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
           sfxUnlock();
           haptic('success');
           scene.celebrate(); // 기포 3연속 팝 — 다이제틱 축하
-          toast(copy.stage.up(copy.stage.names[e.stage] ?? ''));
-          if (e.stage === LABEL_STAGE) toast(copy.stage.labelUnlocked);
+          // 토스트 2줄(단계·이름표)을 획득 연출 레이어가 대신한다 — 새로 열린 빵까지 같이 보여준다.
+          // 냉장·비율·이름표 해금 문구는 celebrate.ts가 단계에서 파생한다(GDD §5 획득 연출 행).
+          celebrateStageUp(api, e.stage);
           break;
         case 'reviveStarted':
           toast(copy.revive.started);

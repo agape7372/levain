@@ -3,6 +3,7 @@
 import { copy } from '../copy';
 import { openModal } from './modal';
 import { toast } from './toast';
+import { celebrateIngredients } from './celebrate';
 import { ingredientArtNode } from '../screens/ingredientArt';
 import { INGREDIENTS } from '../../sim';
 import type { IngredientId } from '../../sim';
@@ -56,7 +57,10 @@ export function openStarterGift(api: GameApi): void {
     title: copy.economy.giftTitle,
     body: copy.economy.giftBody,
     onPick: (id) => {
-      if (api.claimStarterGift(id)) toast(copy.economy.giftDone(copy.recipes.ingredientNames[id]));
+      if (!api.claimStarterGift(id)) return;
+      toast(copy.economy.giftDone(copy.recipes.ingredientNames[id]));
+      // 첫 재료 = 0→1이 확실한 자리 — 어떤 빵이 열렸는지까지 여기서 보여준다
+      celebrateIngredients(api, [id]);
     },
   });
 }

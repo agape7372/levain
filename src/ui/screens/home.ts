@@ -1,7 +1,7 @@
 // 홈 — 캔버스 위 HUD 오버레이. 상태 문구 탭 = 관찰 카드, 반죽 탭 = poke(게임필).
 import { copy } from '../copy';
 import { agoText, untilText } from '../format';
-import { confirmModal, openModal } from '../components/modal';
+import { confirmModal, hasOpenModal, openModal } from '../components/modal';
 import { openHelp } from '../components/helpModal';
 import { openMoldModal } from '../components/moldModal';
 import { openObserveCard } from '../components/observeCard';
@@ -20,7 +20,9 @@ import type { Screen } from '../router';
 
 const LOCATIONS: Location[] = ['room', 'window', 'fridge'];
 
-export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot): void } {
+export function createHomeScreen(
+  api: GameApi,
+): Screen & { update(snap: Snapshot): void; openFeed(): void } {
   const el = document.createElement('div');
   el.className = 'screen screen--overlay';
 
@@ -447,6 +449,15 @@ export function createHomeScreen(api: GameApi): Screen & { update(snap: Snapshot
     },
     onHide() {
       void unsub; // 홈은 루트 — 실제 해제는 앱 종료 시
+    },
+    // 알림 탭 딥링크(2026-09-03) — 밥 계열 알림을 누르면 비율 모달까지 열어 준다.
+    // 모달 위 모달 금지: 브리핑·곰팡이 모달이 떠 있으면 조용히 접는다(호출자가 재시도).
+    // 곰팡이 확정 상태는 종결 모달이 소유하는 화면이라 여기서 비율 모달을 열지 않는다.
+    openFeed(): void {
+      if (hasOpenModal()) return;
+      const snap = api.getSnapshot();
+      if (snap.phase === 'moldy') return;
+      openRatioModal(snap);
     },
   };
 }

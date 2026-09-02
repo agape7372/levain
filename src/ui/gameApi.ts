@@ -1,5 +1,5 @@
 // UI ↔ store 결합 절단면 — 화면은 이 인터페이스만 안다. 배선은 app.ts (ARCHITECTURE §5).
-import type { Action, FeedRatio, IngredientId, Location, SimEvent, Snapshot } from '../sim';
+import type { Action, CollectionEntry, FeedRatio, IngredientId, Location, SimEvent, Snapshot } from '../sim';
 
 /** 누적 미션 한 줄 — 리셋·기한 없음. remaining은 다음 보상까지 남은 횟수(1~step) */
 export interface MissionProgress {
@@ -26,6 +26,10 @@ export interface GameSettings {
   haptics: boolean;
   notifyEnabled: boolean;
   notifyPeak: boolean;
+  /** 확장 옵트인 3종 (2026-09-03 — 설정 알림 하위 모달) */
+  notifySour: boolean;
+  notifyStage: boolean;
+  notifyFirstWeek: boolean;
   quietStartH: number;
   quietEndH: number;
 }
@@ -53,6 +57,8 @@ export interface GameApi {
   inventory(): Record<IngredientId, number>;
   /** 보관 통 잔량(g) — 빵 원가가 여기서 나간다 (GDD §6-2) */
   pantry(): number;
+  /** 도감(전역) — 베이스 id 또는 `base--ing-form` 변형 키. 획득 연출·시트가 "미발견"을 판정한다 (2026-09-03) */
+  collection(): Record<string, CollectionEntry>;
   /**
    * 현재 급여 비율 — 상단 타임라인이 RATIOS에서 축 눈금을 읽는다(표시 전용 패스스루).
    * Snapshot의 peakAt/peakEndAt을 쓰지 않는 이유: wallFor의 clamp 때문에 피크가 지나면
@@ -105,6 +111,8 @@ export interface GameApi {
   resetGame(): void;
 
   requestNotifyPermission(): Promise<'granted' | 'denied' | 'unavailable'>;
+  /** 조회 전용 — 권한 요청 팝업을 띄우지 않는다(설정 화면의 "꺼져 있어요" 안내 판정용) */
+  checkNotifyPermission(): Promise<'granted' | 'denied' | 'unavailable'>;
   openNotifySettings(): void;
 
   /** 미표시 굽기 결과 (강제종료 복구) — 표시 후 clear */

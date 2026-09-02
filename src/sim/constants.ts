@@ -146,7 +146,13 @@ export const QUIET_END_H = 8;
 export const NOTIFY_SLOT_FEED = 1;
 export const NOTIFY_SLOT_DORMANT = 2;
 export const NOTIFY_SLOT_MOLD = 3; // 곰팡이 임박 경고 — 정확히 1건
-export const NOTIFY_SLOT_PEAK = 4; // 한창때 — 옵트인(설정 기본 off)일 때만 존재하는 4번째 슬롯
+export const NOTIFY_SLOT_PEAK = 4; // 한창때 — 옵트인. 2026-09-03부터 설정 기본 on
+// 확장 슬롯 3종(2026-09-03) — 전부 옵트인(설정 기본 on), 실온·창가 활발 분기에만 존재한다.
+export const NOTIFY_SLOT_SOUR = 5;       // 시큼 진입 — 되돌릴 수 있는 상태라 알린다
+export const NOTIFY_SLOT_STAGE = 6;      // 사이클은 찼고 일수만 남은 단계 승급 예정 시각
+export const NOTIFY_SLOT_FIRSTWEEK = 7;  // 0단계 D2 가짜 부풀기 안내 — 첫 주 튜토리얼(GDD §4)
+/** 하루 알림 상한 — GDD §7 "스팸 금지, 하루 최대 2건". weekly 슬롯은 집계 제외 */
+export const NOTIFY_MAX_PER_DAY = 2;
 
 // ── 보상형 광고 (확장기획 §10 — A/B 시작 가설값, 확정 아님) ──────────────────
 // 전부 사용자 선택형. 슬롯별 하루 상한 + 전체 하루 상한. 세션 상한(2회)은 저장이 아니라

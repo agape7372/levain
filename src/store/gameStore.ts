@@ -331,13 +331,17 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
   function replan(now: number): void {
     if (!deps.onNotifyPlan) return;
     // 알림을 끄면 빈 플랜을 밀어 예약을 걷어낸다 — 안 그러면 예약이 산 채로 남는다.
-    // 전 르방 병합 플랜 (§5-6) — 슬롯 3개 그대로, 같은 슬롯은 가장 이른 시각+집계 문구
+    // 전 르방 병합 플랜 (§5-6) — 같은 슬롯은 가장 이른 시각+집계 문구.
+    // 옵트인 4종은 설정 기본 on(2026-09-03) — 총량은 capPerDay가 하루 2건으로 눌러 준다
     const plan: NotifyPlan = env.settings.notifyEnabled
       ? planNotificationsAll(env.starters.map((r) => r.sim), now, {
           peakOptIn: env.settings.notifyPeak,
+          sourOptIn: env.settings.notifySour,
+          stageOptIn: env.settings.notifyStage,
+          firstWeekOptIn: env.settings.notifyFirstWeek,
           quietStartH: env.settings.quietStartH,
           quietEndH: env.settings.quietEndH,
-        })
+        }, env.starters.map((r) => r.name)) // 슬롯별 르방 이름 → 알림 본문(활성 르방 이름이 아니라 그 슬롯의 주인)
       : { slots: [] };
     deps.onNotifyPlan(plan);
   }

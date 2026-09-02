@@ -67,8 +67,17 @@ export function openObserveCard(api: GameApi): void {
     const flakeBtn = document.createElement('button');
     flakeBtn.className = 'btn btn-ghost';
     flakeBtn.textContent = copy.flake.action;
-    flakeBtn.disabled = snap.phase !== 'active' || snap.mass < SEED_G + FLAKE_COST_G;
+    // 2026-09-03: disabled → is-locked (항아리·냉장·교환소와 같은 결함 4번째).
+    // :disabled면 클릭이 아예 안 떠서 "왜 안 눌리는지"를 말할 길이 없다 — 잠긴 채로 눌러
+    // makeFlake를 그대로 보내면 store의 flakeBlocked 이벤트가 사유 토스트를 띄운다(app.ts).
+    const flakeLocked = snap.phase !== 'active' || snap.mass < SEED_G + FLAKE_COST_G;
+    flakeBtn.classList.toggle('is-locked', flakeLocked);
+    flakeBtn.setAttribute('aria-disabled', String(flakeLocked));
     flakeBtn.addEventListener('click', () => {
+      if (flakeLocked) {
+        api.dispatch({ type: 'makeFlake' }); // 카드는 열어 둔다 — 토스트가 이유를 말한다
+        return;
+      }
       handle.close(); // 모달 위 모달 금지 — 닫고 나서 확인 (recipes.ts 굽기 흐름과 같은 순서)
       confirmModal({
         body: copy.flake.confirm,

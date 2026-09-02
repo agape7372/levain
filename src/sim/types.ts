@@ -147,11 +147,21 @@ export interface NotifySlot {
   id: number;
   at: number;
   /** copy.ts 키 — sim은 문구를 모른다 */
-  copyKey: 'feedTime' | 'fridgeWeek' | 'dormant' | 'reviveSecond' | 'moldWarn' | 'peak';
+  copyKey:
+    | 'feedTime' | 'fridgeWeek' | 'dormant' | 'reviveSecond' | 'moldWarn' | 'peak'
+    | 'sour' | 'stageUp' | 'firstWeek';
   /** 냉장 주간 반복 여부 */
   weekly: boolean;
   /** 멀티 르방 병합 수(§5-6) — 2 이상이면 집계 문구. 플랜 일시값, 저장 안 함 */
   count?: number;
+  /** stageUp 전용 — 오를 단계 번호(문구에 단계 이름이 든다). 플랜 일시값, 저장 안 함 */
+  stage?: number;
+  /**
+   * 이 슬롯이 가리키는 르방의 표시 이름(있을 때만) — 알림 본문에 실린다(2026-09-03).
+   * 병합 슬롯(count ≥ 2)엔 없다(한 마리를 지목할 수 없다). 플랜 일시값, 저장 안 함.
+   * ★활성 르방 이름을 쓰면 안 된다 — 슬롯은 다른 르방 것일 수 있다(멀티 르방).
+   */
+  label?: string;
 }
 
 export interface NotifyPlan {

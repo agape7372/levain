@@ -1,53 +1,36 @@
-// 레시피 탭 — 세그먼트 2분할 [레시피 | 도감], 도감 하위 [빵 | 재료] (사용자 개편 2026-08-24).
-// 완성 빵 탭 = 바로 3D · 변형 굽기 = 굽기 모달에서 재료 추가 · 미발견 = ?-실루엣.
-// 정본: docs/GDD.md §6·§10, docs/VISUAL.md §7, 확장기획 §8.
+// 레시피 탭 — 세그먼트 한 줄 [빵 | 재료] (2026-09-03 개편, 정본: docs/GDD.md §6·§10).
+// 개편 전: [레시피|도감] + 하위 [빵|재료] 두 줄에 같은 빵 10종이 두 번 있었고, 도감-빵은
+// 변형 160장이 `?` 벽으로 평면화돼 있었다(실측 170장·scrollH 9,012px = 10.7화면).
+// 지금은 빵 카드 하나가 굽기·3D·변형 도감을 다 품는 시트(components/breadSheet.ts)로 열린다.
+//
+// 이 파일은 **셸**만 맡는다: 상태 줄·세그먼트·두 그리드·가루 배너.
+// 시각(DOM 모양)은 components/recipeVisuals.ts, 굽기·교환은 components/{breadSheet,exchangeModal}.ts.
+// 인라인 style 0 (2026-08-26 `font:inherit` 사고).
 import { copy } from '../copy';
 import { toast } from '../components/toast';
-import { openModal, confirmModal } from '../components/modal';
+import { openModal } from '../components/modal';
 import { openStarterGift } from '../components/ingredientPicker';
-import { untilText } from '../format';
-import { breadArt } from './breadArt';
+import { openBreadSheet } from '../components/breadSheet';
+import type { OpenShowcase, ShowcaseOpts } from '../components/breadSheet';
+import { openExchangeModal, openMissionsModal } from '../components/exchangeModal';
+import { breadCard, ingredientCard, resultCard, statusLine, updateStatusLine } from '../components/recipeVisuals';
+import type { StatusLineView } from '../components/recipeVisuals';
 import { ingredientArtNode } from './ingredientArt';
+import { untilText } from '../format';
 import type { GameApi } from '../gameApi';
-import type { CollectionEntry, CompatibilityRule, IngredientId, RecipeDef, SimEvent, Snapshot } from '../../sim';
+import type { CollectionEntry, IngredientId, Snapshot } from '../../sim';
 import {
-  INGREDIENTS, RECIPES, FLOAT_OK_ACTIVITY, rulesForBase, variantIdOf, playableRules,
-  INGREDIENT_FLOUR_COST, FLOUR_PER_INGREDIENT, INGREDIENT_SOFT_CAP, MISSION_REWARD_FLOUR,
-  STAGE_REWARD_FLOUR, RECIPE_REWARD_FLOUR,
+  FLOAT_OK_ACTIVITY, INGREDIENTS, RECIPES, playableRules, rulesForBase, variantIdOf,
 } from '../../sim';
 import type { Screen } from '../router';
 
-export type RecipesSegment = 'recipes' | 'gallery';
-type GalleryTab = 'bread' | 'ingredient';
-
-export interface ShowcaseOpts {
-  /** 쇼케이스 하단 "다시 만들기" — 닫힌 뒤 굽기 모달 재진입 */
-  onRebake?: () => void;
-  /**
-   * 자산 패밀리 (기본 bread). 재료는 GLB 경로가 다르고 **김을 뿜지 않는다** —
-   * 김은 갓 구운 빵의 다이제틱 신호라 생재료에 붙으면 거짓말이 된다.
-   */
-  kind?: 'bread' | 'ingredient';
-  /**
-   * 표시 이름 override — 기본은 앱단이 `copy.recipes(.ingredientNames)`에서 자산 id로 찾는다.
-   * 변형(예: scone--choco-chip)은 그 테이블에 없으니 호출부(변형명은 `variantName(rule)`)가 직접 넘긴다.
-   */
-  name?: string;
-}
+export type RecipesSegment = 'bread' | 'ingredient';
+export type { ShowcaseOpts };
 
 export interface RecipesScreenDeps {
-  /** 3D 쇼케이스 열기 — GLB 없으면 false를 돌려주고 카드 리절트로 폴백 */
-  openShowcase?: (id: string, headline: string, large: boolean, opts?: ShowcaseOpts) => Promise<boolean>;
-  /** 뒤로(르방이 탭 복귀) — 헤더 백버튼 */
-  onBack?: () => void;
+  /** 3D 쇼케이스 열기 — GLB 없으면 false를 돌려주고 카드로 폴백 */
+  openShowcase?: OpenShowcase;
 }
-
-const variantName = (rule: CompatibilityRule): string =>
-  copy.recipes.variantName(
-    copy.recipes.ingredientNames[rule.ingredientId],
-    copy.recipes.formNames[rule.form],
-    copy.recipes.names[rule.baseRecipeId],
-  );
 
 export function createRecipesScreen(
   api: GameApi,
@@ -60,648 +43,148 @@ export function createRecipesScreen(
   const wrap = document.createElement('div');
   wrap.className = 'recipes-wrap';
 
-  // ── 헤더 ──
+  // ── 헤더 = 제목 한 줄 ──
+  // 백버튼은 폐지됐다(2026-09-03): 탭바가 복귀 수단이고 하드웨어 백 계약은 app.ts가 그대로 지킨다.
+  // "물에 띄워보기" 버튼도 상태 줄로 흡수됐다 — 같은 판정을 말로 늘 보여주는 쪽이 정보가 많다.
   const head = document.createElement('div');
   head.className = 'recipes-head';
-  const titleGroup = document.createElement('div');
-  titleGroup.className = 'recipes-title-group';
-  if (deps.onBack) {
-    const backBtn = document.createElement('button');
-    backBtn.type = 'button';
-    backBtn.className = 'btn btn-ghost recipes-back';
-    backBtn.textContent = '←';
-    backBtn.setAttribute('aria-label', '뒤로');
-    backBtn.addEventListener('click', deps.onBack);
-    titleGroup.appendChild(backBtn);
-  }
   const title = document.createElement('h1');
   title.className = 'recipes-title';
   title.textContent = copy.tabs.recipes;
-  titleGroup.appendChild(title);
-  const floatBtn = document.createElement('button');
-  floatBtn.type = 'button';
-  floatBtn.className = 'btn btn-ghost';
-  floatBtn.textContent = copy.actions.floatTest;
-  floatBtn.addEventListener('click', onFloatTest);
-  head.append(titleGroup, floatBtn);
+  head.appendChild(title);
 
-  // ── 세그먼트: [레시피 | 도감] + 도감 하위 [빵 | 재료] ──
-  // 두 줄은 경계 없이 착 붙인다(사용자 확정 — 한 덩어리), 줄-그리드만 14px
-  let segment: RecipesSegment = 'recipes';
-  let galleryTab: GalleryTab = 'bread';
+  // ── 상태 줄 — 굽기에 필요한 두 정보(적기·보관량)를 홈으로 돌아가지 않고 여기서 본다 ──
+  function statusView(snap: Snapshot): StatusLineView {
+    const ready = snap.activity >= FLOAT_OK_ACTIVITY;
+    const g = api.pantry();
+    return {
+      name: api.labelText() ?? copy.starter.defaultName(api.starters().ordinal),
+      ready,
+      readyText: ready ? copy.recipes.readyNow : copy.recipes.readyIn(untilText(snap.peakAt, api.now())),
+      pantryText: g > 0 ? copy.pantry.label(g) : copy.pantry.none,
+      pantryEmpty: g <= 0,
+    };
+  }
+  const status = statusLine(statusView(api.getSnapshot()));
+  status.setAttribute('aria-label', copy.actions.floatTest); // 스크린리더엔 동작 이름 — 보이는 글은 상태
+  status.addEventListener('click', () => {
+    const snap = api.getSnapshot();
+    if (snap.activity >= FLOAT_OK_ACTIVITY) toast(copy.floatTest.ok);
+    else toast(copy.floatTest.notYet(untilText(snap.peakAt, api.now())));
+  });
 
+  // ── 세그먼트 한 줄 [빵 | 재료] ──
+  let segment: RecipesSegment = 'bread';
   const segRow = document.createElement('div');
-  segRow.className = 'seg';
+  segRow.className = 'seg recipes-seg';
   const segBtns = new Map<RecipesSegment, HTMLButtonElement>();
-  for (const seg of ['recipes', 'gallery'] as RecipesSegment[]) {
+  for (const seg of ['bread', 'ingredient'] as RecipesSegment[]) {
     const b = document.createElement('button');
+    b.type = 'button';
     b.textContent = copy.recipes.segments[seg];
     b.addEventListener('click', () => setSegment(seg));
     segBtns.set(seg, b);
     segRow.appendChild(b);
   }
 
-  const subRow = document.createElement('div');
-  subRow.className = 'seg seg--joined-bottom';
-  const subBtns = new Map<GalleryTab, HTMLButtonElement>();
-  for (const t of ['bread', 'ingredient'] as GalleryTab[]) {
-    const b = document.createElement('button');
-    b.textContent = copy.recipes.galleryTabs[t];
-    b.addEventListener('click', () => {
-      galleryTab = t;
-      render(api.getSnapshot());
-    });
-    subBtns.set(t, b);
-    subRow.appendChild(b);
-  }
-
-  const content = document.createElement('div');
-  content.style.marginTop = '14px'; // 줄과 카드 그리드 간격 (1.2.2 확정)
-
-  // 가루 배너 — 재료 탭에서만. 세그 간격 규약(세그↔하위줄 0 / 줄↔그리드 14px)은 그대로 두고
-  // 배너가 그 사이에 같은 14px 리듬으로 들어간다 (사용자 확정 간격 불변)
+  // 가루 배너 — 재료 탭에서만 붙는다(다른 탭의 간격은 손대지 않는다)
   const econBar = document.createElement('div');
   econBar.className = 'econ-bar';
+  const content = document.createElement('div');
 
-  wrap.append(head, segRow, subRow, econBar, content);
+  wrap.append(head, status, segRow, content);
   el.appendChild(wrap);
 
   function setSegment(seg: RecipesSegment): void {
     segment = seg;
-    render(api.getSnapshot());
+    paint(api.getSnapshot());
   }
 
-  function onFloatTest(): void {
-    const snap = api.getSnapshot();
-    if (snap.activity >= FLOAT_OK_ACTIVITY) {
-      toast(copy.floatTest.ok);
-    } else {
-      toast(copy.floatTest.notYet(untilText(snap.peakAt, api.now())));
-    }
+  // ── 재료 감상 — 3D 우선, 로드 실패 시 한 줄 카드 폴백 (2026-08-30: 죽은 탭이었던 자리) ──
+  /** 그 재료로 열 수 있는 **빵 종류** 수 — 형태가 여럿이면 같은 빵이 중복 계수되던 버그를 고쳤다 */
+  function playableCountOf(id: string): number {
+    return new Set(playableRules().filter((r) => r.ingredientId === id).map((r) => r.baseRecipeId)).size;
   }
-
-  /**
-   * title/artId override — 변형(id가 `copy.recipes.names`에 없다)일 때만 호출부가 채운다.
-   * artId는 SVG 폴백 전용: 변형 SVG는 없으니 베이스 모양(recipe.id)으로 그린다.
-   */
-  interface ResultOpts { title?: string; artId?: string }
-
-  function openResultModal(recipeId: string, headline: string, large = false, opts?: ResultOpts): void {
-    const body = document.createElement('div');
-    const artWrap = document.createElement('div');
-    artWrap.style.cssText = 'display:flex;justify-content:center;margin-bottom:12px';
-    artWrap.appendChild(breadArt(opts?.artId ?? recipeId));
-    const p = document.createElement('p');
-    p.className = 'modal-body';
-    p.textContent = headline;
-    p.style.textAlign = 'center';
-    if (large) p.style.cssText += ';font-size:19px;font-weight:600;color:var(--ink)';
-    body.append(artWrap, p);
-    openModal(body, { title: opts?.title ?? copy.recipes.names[recipeId] });
-  }
-
-  /** 결과 표시 — 3D 쇼케이스 우선, GLB 미비 시 카드 리절트 폴백 */
-  function showResult(recipeId: string, headline: string, large = false, opts?: ResultOpts): void {
-    if (!deps.openShowcase) {
-      openResultModal(recipeId, headline, large, opts);
-      return;
-    }
-    void deps.openShowcase(recipeId, headline, large, opts?.title ? { name: opts.title } : undefined).then((ok) => {
-      if (!ok) openResultModal(recipeId, headline, large, opts);
-    });
-  }
-
-  /**
-   * 감상 진입 — 바로 3D, 하단 "다시 만들기" (§8-3 개편: 상세 화면 폐지).
-   * variant를 넘기면 베이스가 아니라 변형 전용 3D/이름을 연다(2026-08-30: 변형 3D 배선).
-   */
-  function openView(recipe: RecipeDef, variant?: { id: string; name: string }): void {
-    const assetId = variant?.id ?? recipe.id;
-    const opts: ResultOpts | undefined = variant ? { title: variant.name, artId: recipe.id } : undefined;
-    if (!deps.openShowcase) {
-      openResultModal(assetId, '', false, opts);
-      return;
-    }
-    void deps.openShowcase(assetId, '', false, {
-      onRebake: () => openBakeModal(recipe),
-      name: opts?.title,
-    }).then((ok) => {
-      if (!ok) openResultModal(assetId, '', false, opts);
-    });
-  }
-
-  /**
-   * 재료 감상 진입 — 3D 우선, GLB 미비·로드 실패 시 아트 카드 모달 폴백 (빵 showResult와 대칭).
-   * 종전 "조용히 무반응"은 카드가 눌리는데 아무 일도 안 일어나는 죽은 탭이었다(2026-08-30 수정) —
-   * 30종 GLB가 다 있는 지금 false는 '미비'가 아니라 로드 실패라서 더더욱 침묵할 자리가 아니다.
-   */
   function openIngredientView(id: IngredientId): void {
     const headline = copy.recipes.ingredientHeadline(playableCountOf(id));
     const fallback = (): void => {
-      const body = document.createElement('div');
-      const artWrap = document.createElement('div');
-      artWrap.style.cssText = 'display:flex;justify-content:center;margin-bottom:12px';
-      artWrap.appendChild(ingredientArtNode(id));
-      const p = document.createElement('p');
-      p.className = 'modal-body';
-      p.textContent = headline;
-      p.style.textAlign = 'center';
-      body.append(artWrap, p);
-      openModal(body, { title: copy.recipes.ingredientNames[id] });
+      openModal(resultCard(ingredientArtNode(id), copy.recipes.ingredientNames[id], headline));
     };
-    if (!deps.openShowcase) {
+    const open = deps.openShowcase;
+    if (!open) {
       fallback();
       return;
     }
-    void deps.openShowcase(id, headline, false, { kind: 'ingredient' }).then((ok) => {
+    void open(id, headline, false, { kind: 'ingredient' }).then((ok) => {
       if (!ok) fallback();
     });
   }
 
-  /** 그 재료로 열 수 있는 변형 수 — 쇼케이스 한 줄 문구가 데이터에서 파생된다(재료별 문구 0줄) */
-  function playableCountOf(id: string): number {
-    return playableRules().filter((r) => r.ingredientId === id).length;
-  }
-
-  // ── 굽기 모달 — "기본 + 재료 추가" 옵션 리스트 (home.ts 비율 모달 패턴) ──
-  function openBakeModal(recipe: RecipeDef): void {
-    const name = copy.recipes.names[recipe.id];
-    const collection = getCollection();
-    const inv = api.inventory();
-
-    // 재료 추가 후보: 발견됨(무소비 재굽기) OR 미발견+재고 있음(첫 발견 = 1 소비)
-    const options = rulesForBase(recipe.id).filter((rule) => {
-      const discovered = variantIdOf(rule) in collection;
-      return discovered || (inv[rule.ingredientId] ?? 0) > 0;
-    });
-
-    const wrapEl = document.createElement('div');
-    wrapEl.className = 'option-list';
-    type Choice = 'base' | CompatibilityRule;
-    let selected: Choice = 'base';
-    const items = new Map<Choice, HTMLButtonElement>();
-
-    const addItem = (key: Choice, nameText: string, hintText: string): void => {
-      const item = document.createElement('button');
-      item.className = 'option-item';
-      const nm = document.createElement('span');
-      nm.textContent = nameText;
-      const hint = document.createElement('span');
-      hint.className = 'hint';
-      hint.textContent = hintText;
-      item.append(nm, hint);
-      item.addEventListener('click', () => {
-        selected = key;
-        items.forEach((btn, k) => btn.classList.toggle('selected', k === key));
-      });
-      items.set(key, item);
-      wrapEl.appendChild(item);
-    };
-
-    const baseHint = recipe.kind === 'bread'
-      ? `${copy.recipes.flavor[recipe.id]} · ${copy.recipes.costSuffix(recipe.cost)}`
-      : copy.recipes.flavor[recipe.id];
-    addItem('base', copy.recipes.bakePlain(name), baseHint);
-    for (const rule of options) {
-      const discovered = variantIdOf(rule) in collection;
-      addItem(
-        rule,
-        variantName(rule),
-        discovered
-          ? copy.recipes.madeCount(collection[variantIdOf(rule)].count)
-          : copy.recipes.bakeWithIngredient(copy.recipes.ingredientNames[rule.ingredientId]),
-      );
-    }
-    items.get('base')?.classList.add('selected');
-
-    // 빵은 보관 통 게이트 사전 안내 (기존 mass 게이트 자리 — 원가가 통으로 옮겨졌다, GDD §6-2)
-    if (recipe.kind === 'bread' && api.pantry() < recipe.cost) {
-      toast(copy.pantry.notEnough(recipe.cost));
-      return;
-    }
-
-    const actions = document.createElement('div');
-    actions.className = 'modal-actions';
-    const ok = document.createElement('button');
-    ok.className = 'btn btn-primary';
-    ok.textContent = copy.actions.bake;
-    const runBake = (): void => {
-      const events: SimEvent[] = selected === 'base'
-        ? api.dispatch(recipe.kind === 'bread'
-            ? { type: 'bake', recipeId: recipe.id }
-            : { type: 'bakeDiscard', recipeId: recipe.id })
-        : api.bakeVariant(variantIdOf(selected));
-      const blocked = events.find(
-        (e): e is Extract<SimEvent, { type: 'bakeBlocked' }> => e.type === 'bakeBlocked',
-      );
-      if (blocked) {
-        toast(
-          blocked.reason === 'cooldown' ? copy.recipes.discardCooldown
-          : blocked.reason === 'ingredient' ? copy.recipes.needIngredient(
-              copy.recipes.ingredientNames[(selected as CompatibilityRule).ingredientId])
-          : blocked.reason === 'pantry' ? copy.pantry.notEnough(recipe.cost)
-          : copy.recipes.lockedHint(copy.stage.names[recipe.stage]),
-        );
-        return;
-      }
-      const vLabel = selected === 'base' ? null : variantName(selected);
-      // 변형을 구우면 결과 연출도 변형 3D를 보여준다 — 이전엔 recipe.id(베이스)만 넘겨
-      // 라벨은 변형인데 3D는 베이스가 뜨는 어긋남이 있었다(2026-08-30 수정)
-      const assetId = selected === 'base' ? recipe.id : variantIdOf(selected);
-      const resultOpts: ResultOpts | undefined = vLabel ? { title: vLabel, artId: recipe.id } : undefined;
-      const baked = events.find((e): e is Extract<SimEvent, { type: 'baked' }> => e.type === 'baked');
-      if (baked) {
-        const grade = copy.recipes.grades[baked.grade];
-        showResult(assetId, vLabel ? `${vLabel} — ${grade}` : grade, true, resultOpts);
-        return;
-      }
-      if (events.some((e) => e.type === 'bakedDiscard')) {
-        showResult(assetId, vLabel ? `${vLabel} — ${copy.recipes.discardDone}` : copy.recipes.discardDone, false, resultOpts);
-      }
-    };
-    ok.addEventListener('click', () => {
-      handle.close();
-      // 이 빵으로 통이 정확히 빈다 — 되돌릴 수 없으니 먼저 알린다 (중앙 팝업, 규칙 5)
-      if (recipe.kind === 'bread' && api.pantry() - recipe.cost <= 0) {
-        confirmModal({
-          body: copy.pantry.lastWarn,
-          confirmLabel: copy.actions.bake,
-          cancelLabel: '다음에요',
-          onConfirm: runBake,
-        });
-        return;
-      }
-      runBake();
-    });
-    actions.appendChild(ok);
-    wrapEl.appendChild(actions);
-
-    const handle = openModal(wrapEl, { title: copy.recipes.bakeTitle(name) });
-  }
-
-  function onCardTap(recipe: RecipeDef): void {
-    const snap = api.getSnapshot();
-    if (snap.stage < recipe.stage) {
-      toast(copy.recipes.lockedHint(copy.stage.names[recipe.stage]));
-      return;
-    }
-    // 완성한 빵(bread) = 바로 3D 감상, 그 외 = 굽기 모달 (사용자 확정 2026-08-24)
-    if (recipe.kind === 'bread' && getCollection()[recipe.id]) {
-      openView(recipe);
-      return;
-    }
-    openBakeModal(recipe);
-  }
-
-  // ── 카드 빌더 ──
-  /**
-   * @param fallbackId SVG 폴백(PNG 404 시)에 쓸 id. 변형은 전용 SVG가 없으니
-   * 베이스 id를 넘기면 campagne 대체 대신 실제 모양(scone/focaccia 등)으로 그려진다.
-   */
-  function artOf(recipeId: string, fallbackId: string = recipeId): HTMLElement {
-    const art = document.createElement('div');
-    art.className = 'art';
-    const img = document.createElement('img');
-    img.src = `/breads/thumbs/${recipeId}.png`;
-    img.alt = '';
-    img.addEventListener('error', () => {
-      img.remove();
-      art.appendChild(breadArt(fallbackId));
-    });
-    art.appendChild(img);
-    return art;
-  }
-
-  // 재료 카드 아트는 ingredientArt.ts의 `ingredientArtNode`가 정본이다 —
-  // 선물 피커와 같은 구현을 공유해야 한 쪽만 PNG를 타는 어긋남이 안 생긴다(그 절 주석 참조).
-  const ingredientArtOf = ingredientArtNode;
-
-  /** ?-실루엣 카드 — 미발견·미해금 공용 (도감의 신비 항목) */
-  function mysteryCard(baseRecipeId: string, onTap: () => void): HTMLButtonElement {
-    const card = document.createElement('button');
-    card.type = 'button';
-    card.className = 'recipe-card mystery';
-    card.appendChild(artOf(baseRecipeId));
-    const mark = document.createElement('div');
-    mark.className = 'mystery-mark';
-    mark.textContent = '?';
-    card.appendChild(mark);
-    card.addEventListener('click', onTap);
-    return card;
-  }
-
-  function buildRecipeCard(recipe: RecipeDef, snap: Snapshot, collection: Record<string, CollectionEntry>): HTMLButtonElement {
-    const locked = snap.stage < recipe.stage;
-    const card = document.createElement('button');
-    card.type = 'button';
-    card.className = locked ? 'recipe-card locked' : 'recipe-card';
-    card.appendChild(artOf(recipe.id));
-
-    const name = document.createElement('div');
-    name.className = 'name';
-    name.textContent = copy.recipes.names[recipe.id];
-
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    const entry = collection[recipe.id];
-    if (locked) {
-      meta.textContent = copy.recipes.lockedHint(copy.stage.names[recipe.stage]);
-    } else if (!entry) {
-      const flavor = copy.recipes.flavor[recipe.id];
-      meta.textContent = recipe.kind === 'bread' ? `${flavor} · ${copy.recipes.costSuffix(recipe.cost)}` : flavor;
-    } else if (entry.bestGrade === null) {
-      meta.textContent = copy.recipes.madeCount(entry.count);
-    } else {
-      const gradeSpan = document.createElement('span');
-      gradeSpan.className = 'grade';
-      gradeSpan.textContent = copy.recipes.grades[entry.bestGrade];
-      meta.append(gradeSpan, document.createTextNode(` · ${entry.count}번`));
-    }
-
-    card.append(name, meta);
-    card.addEventListener('click', () => onCardTap(recipe));
-    return card;
-  }
-
+  // ── 빵 그리드 (10장) ──
   let lastStage = -1;
-
-  function renderRecipes(snap: Snapshot): void {
+  function renderBread(snap: Snapshot): void {
     const collection = getCollection();
+    const g = api.pantry();
     const justUnlocked = lastStage >= 0 && snap.stage > lastStage ? snap.stage : -1;
     lastStage = snap.stage;
     const grid = document.createElement('div');
     grid.className = 'recipe-grid';
     for (const recipe of RECIPES) {
-      const card = buildRecipeCard(recipe, snap, collection);
-      // 방금 해금된 카드 — 크림→컬러 wipe 0.5s (VISUAL §7-2)
-      if (justUnlocked >= 0 && recipe.stage === justUnlocked) card.classList.add('just-unlocked');
+      const locked = snap.stage < recipe.stage;
+      const lockedText = copy.recipes.lockedHint(copy.stage.names[recipe.stage]);
+      const isBread = recipe.kind === 'bread';
+      const entry = collection[recipe.id];
+      const rules = rulesForBase(recipe.id);
+      const card = breadCard({
+        id: recipe.id,
+        name: copy.recipes.names[recipe.id],
+        locked,
+        lockedText,
+        // 원가는 **발견 여부와 무관하게 항상** 보인다 — 개편 전엔 한 번 구우면 등급·횟수로
+        // 바뀌어 "몇 그램 필요한지조차 모름"이 됐다. discard 레시피는 그램 원장이 없어 맛 문구.
+        costText: isBread ? copy.recipes.costSuffix(recipe.cost) : copy.recipes.flavor[recipe.id],
+        shortText: isBread && g < recipe.cost ? copy.pantry.short : undefined,
+        gradeText: entry?.bestGrade ? copy.recipes.grades[entry.bestGrade] : undefined,
+        countText: entry ? copy.recipes.madeCount(entry.count) : undefined,
+        progress: {
+          done: rules.filter((r) => variantIdOf(r) in collection).length,
+          total: rules.length,
+        },
+        justUnlocked: justUnlocked >= 0 && recipe.stage === justUnlocked,
+      });
+      card.addEventListener('click', () => {
+        if (locked) {
+          toast(lockedText);
+          return;
+        }
+        openBreadSheet(api, recipe, { openShowcase: deps.openShowcase });
+      });
       grid.appendChild(card);
     }
     content.appendChild(grid);
   }
 
-  // ── 도감-빵: 전량 노출(베이스 10 + 변형 40), 미발견 = ?-실루엣. 메타 없음 ──
-  function renderGalleryBread(snap: Snapshot): void {
-    const collection = getCollection();
-    const grid = document.createElement('div');
-    grid.className = 'recipe-grid';
-
-    for (const recipe of RECIPES) {
-      const discovered = collection[recipe.id] !== undefined;
-      if (discovered) {
-        const card = document.createElement('button');
-        card.type = 'button';
-        card.className = 'recipe-card';
-        card.appendChild(artOf(recipe.id));
-        const name = document.createElement('div');
-        name.className = 'name';
-        name.textContent = copy.recipes.names[recipe.id];
-        card.appendChild(name);
-        card.addEventListener('click', () => openView(recipe));
-        grid.appendChild(card);
-      } else {
-        grid.appendChild(mysteryCard(recipe.id, () => {
-          toast(snap.stage < recipe.stage
-            ? copy.recipes.lockedHint(copy.stage.names[recipe.stage])
-            : copy.recipes.galleryMysteryBase);
-        }));
-      }
-
-      for (const rule of rulesForBase(recipe.id)) {
-        const vid = variantIdOf(rule);
-        if (collection[vid]) {
-          const card = document.createElement('button');
-          card.type = 'button';
-          card.className = 'recipe-card';
-          // 변형 전용 3D/썸네일(2026-08-30 배선) — 이전엔 베이스 재사용이었다(§8-2, 이제 폐기).
-          // PNG 404 시 SVG 폴백은 여전히 베이스 모양(fallbackId)으로 — 변형 전용 SVG는 없다.
-          card.appendChild(artOf(vid, recipe.id));
-          const name = document.createElement('div');
-          name.className = 'name';
-          const vname = variantName(rule);
-          name.textContent = vname;
-          card.appendChild(name);
-          card.addEventListener('click', () => openView(recipe, { id: vid, name: vname }));
-          grid.appendChild(card);
-        } else {
-          grid.appendChild(mysteryCard(recipe.id, () => toast(copy.recipes.variantHint)));
-        }
-      }
-    }
-    content.appendChild(grid);
-  }
-
-  // ── 도감-재료: 밝혀짐 = 보유>0 OR 그 재료를 쓴 발견 변형 존재 (파생 — 저장 없음) ──
-  function renderGalleryIngredients(): void {
+  // ── 재료 그리드 (30장) — 밝혀짐 = 보유>0 OR 그 재료를 쓴 발견 변형 존재 (파생, 저장 없음) ──
+  function renderIngredients(): void {
     const collection = getCollection();
     const inv = api.inventory();
+    const keys = Object.keys(collection);
     const grid = document.createElement('div');
     grid.className = 'recipe-grid';
     for (const ing of INGREDIENTS) {
-      const known = (inv[ing.id] ?? 0) > 0
-        || Object.keys(collection).some((k) => k.includes(`--${ing.id}-`));
-      // 도감-빵과 같은 규약: 카드는 전부 버튼이고 미발견은 힌트 토스트로 답한다.
-      // (개편 전엔 div라 재료 카드만 아무 반응이 없었다 — 규약 불일치였다)
-      const card = document.createElement('button');
-      card.type = 'button';
-      card.className = known ? 'recipe-card' : 'recipe-card mystery';
-      card.appendChild(ingredientArtOf(ing.id));
-      if (known) {
-        const name = document.createElement('div');
-        name.className = 'name';
-        name.textContent = `${copy.recipes.ingredientNames[ing.id]} · ${copy.recipes.ingredientCount(inv[ing.id] ?? 0)}`;
-        card.appendChild(name);
-        card.addEventListener('click', () => openIngredientView(ing.id));
-      } else {
-        const mark = document.createElement('div');
-        mark.className = 'mystery-mark';
-        mark.textContent = '?';
-        card.appendChild(mark);
-        card.addEventListener('click', () => toast(copy.recipes.galleryIngredientLocked));
-      }
+      const count = inv[ing.id] ?? 0;
+      const known = count > 0 || keys.some((k) => k.includes(`--${ing.id}-`));
+      const card = ingredientCard({
+        id: ing.id, name: copy.recipes.ingredientNames[ing.id], known, count,
+      });
+      // 도감-빵과 같은 규약: 카드는 전부 버튼이고 미발견은 힌트 토스트로 답한다
+      card.addEventListener('click', () => {
+        if (known) openIngredientView(ing.id);
+        else toast(copy.recipes.galleryIngredientLocked);
+      });
       grid.appendChild(card);
     }
     content.appendChild(grid);
-  }
-
-  // ── 교환소 (§9) — 가루로 원하는 재료를 가져오고, 남는 재료는 가루로 되돌린다 ──
-  // 도감의 ?-실루엣과 달리 여기선 4종을 전부 이름째 보여준다: 도감은 "만나 본 기록",
-  // 교환소는 "가져올 수 있는 것"이라 축이 다르다 (사용자 확정 도감 규칙 불변).
-  function openExchangeModal(): void {
-    const wrapEl = document.createElement('div');
-
-    const intro = document.createElement('p');
-    intro.className = 'modal-body';
-    intro.textContent = copy.economy.exchangeIntro;
-    wrapEl.appendChild(intro);
-
-    // 광고 배송 — SDK 없으면(웹·구셸) 행 자체가 없다. 버전 스큐 방어(2026-08-30, 확장기획 §10)
-    if (api.ads.available()) {
-      const adRow = document.createElement('div');
-      adRow.className = 'option-item exchange-row';
-      const adTexts = document.createElement('span');
-      adTexts.className = 'exchange-texts';
-      const adLabel = document.createElement('span');
-      adLabel.textContent = copy.economy.adDeliveryTitle;
-      const adHint = document.createElement('span');
-      adHint.className = 'hint';
-      adTexts.append(adLabel, adHint);
-      const adBtn = document.createElement('button');
-      adBtn.type = 'button';
-      adBtn.className = 'btn btn-primary btn-slim';
-      adRow.append(adTexts, adBtn);
-      wrapEl.appendChild(adRow);
-
-      const paintAdRow = (): void => {
-        const remaining = api.ads.deliveryRemaining();
-        adHint.textContent = remaining > 0
-          ? copy.economy.adDeliveryRemaining(remaining)
-          : copy.economy.adDeliveryDone;
-        const locked = remaining <= 0;
-        adBtn.classList.toggle('is-locked', locked);
-        adBtn.setAttribute('aria-disabled', String(locked));
-        adBtn.textContent = copy.economy.adDeliveryTitle;
-      };
-      adBtn.addEventListener('click', () => {
-        if (api.ads.deliveryRemaining() <= 0) {
-          toast(copy.economy.adDeliveryDone);
-          return;
-        }
-        adBtn.disabled = true;
-        adBtn.textContent = copy.economy.adDeliveryWatching;
-        void api.ads.watchForDelivery().then((id) => {
-          adBtn.disabled = false;
-          paintAdRow();
-          if (id === null) {
-            toast(copy.economy.adDeliveryFailed);
-            return;
-          }
-          toast(copy.economy.adDeliveryGot(copy.recipes.ingredientNames[id]));
-          paint();
-        });
-      });
-      paintAdRow();
-    }
-
-    const list = document.createElement('div');
-    list.className = 'option-list';
-    list.style.marginTop = '12px';
-    wrapEl.appendChild(list);
-
-    const balance = document.createElement('p');
-    balance.className = 'modal-body';
-    balance.style.marginTop = '12px';
-
-    const paint = (): void => {
-      const inv = api.inventory();
-      const eco = api.economy();
-      balance.textContent = copy.economy.flourLabel(eco.flour);
-      list.innerHTML = '';
-      for (const ing of INGREDIENTS) {
-        const have = inv[ing.id] ?? 0;
-        const row = document.createElement('div');
-        row.className = 'option-item exchange-row';
-
-        const label = document.createElement('span');
-        label.textContent = copy.recipes.ingredientNames[ing.id];
-        const hint = document.createElement('span');
-        hint.className = 'hint';
-        // 캡 도달은 숫자만으론 안 읽힌다 — "왜 못 사는지"를 행에서 미리 말한다 (탭 토스트의 예고편)
-        hint.textContent = have >= INGREDIENT_SOFT_CAP
-          ? copy.economy.haveFull(have)
-          : copy.economy.have(have);
-        const texts = document.createElement('span');
-        texts.className = 'exchange-texts';
-        texts.append(label, hint);
-
-        const buy = document.createElement('button');
-        buy.type = 'button';
-        buy.className = 'btn btn-primary btn-slim';
-        buy.textContent = copy.economy.buy(INGREDIENT_FLOUR_COST);
-        // ★disabled 금지(항아리·냉장 세그먼트와 같은 원칙) — 클릭이 살아야 아래 핸들러의
-        // atCap·notEnough 토스트가 이유를 말한다. disabled였을 땐 그 토스트가 도달 불가였다.
-        const buyLocked = eco.flour < INGREDIENT_FLOUR_COST || have >= INGREDIENT_SOFT_CAP;
-        buy.classList.toggle('is-locked', buyLocked);
-        buy.setAttribute('aria-disabled', String(buyLocked));
-        buy.addEventListener('click', () => {
-          if (have >= INGREDIENT_SOFT_CAP) {
-            toast(copy.economy.atCap(INGREDIENT_SOFT_CAP));
-            return;
-          }
-          if (!api.buyIngredient(ing.id)) {
-            toast(copy.economy.notEnough);
-            return;
-          }
-          toast(copy.economy.bought(copy.recipes.ingredientNames[ing.id]));
-          paint();
-        });
-
-        const sell = document.createElement('button');
-        sell.type = 'button';
-        sell.className = 'btn btn-ghost btn-slim';
-        sell.textContent = copy.economy.sell(FLOUR_PER_INGREDIENT);
-        sell.classList.toggle('is-locked', have < 1); // 탭하면 noStock 토스트가 이유를 말한다
-        sell.setAttribute('aria-disabled', String(have < 1));
-        sell.addEventListener('click', () => {
-          if (!api.exchangeIngredient(ing.id)) {
-            toast(copy.economy.noStock);
-            return;
-          }
-          toast(copy.economy.sold(FLOUR_PER_INGREDIENT));
-          paint();
-        });
-
-        const actionsEl = document.createElement('span');
-        actionsEl.className = 'exchange-actions';
-        actionsEl.append(buy, sell);
-        row.append(texts, actionsEl);
-        list.appendChild(row);
-      }
-    };
-    paint();
-
-    wrapEl.appendChild(balance);
-    openModal(wrapEl, { title: copy.economy.exchangeTitle });
-  }
-
-  /** 미션 — 누적만 말한다. 남은 기한·연속 기록은 존재하지 않는다 (§9) */
-  function openMissionsModal(): void {
-    const eco = api.economy();
-    const wrapEl = document.createElement('div');
-
-    const intro = document.createElement('p');
-    intro.className = 'modal-body';
-    intro.textContent = copy.economy.missionsIntro;
-    wrapEl.appendChild(intro);
-
-    const rows = document.createElement('div');
-    rows.className = 'observe-rows';
-    rows.style.marginTop = '12px';
-    const addRow = (text: string, sub: string): void => {
-      const row = document.createElement('div');
-      row.className = 'row';
-      const k = document.createElement('span');
-      k.className = 'k';
-      k.textContent = '·';
-      const v = document.createElement('span');
-      v.className = 'v';
-      v.textContent = sub ? `${text} · ${sub}` : text;
-      row.append(k, v);
-      rows.appendChild(row);
-    };
-    addRow(
-      copy.economy.missionFeed(eco.feed.remaining, MISSION_REWARD_FLOUR),
-      copy.economy.missionCount(eco.feed.count),
-    );
-    addRow(
-      copy.economy.missionBake(eco.bake.remaining, MISSION_REWARD_FLOUR),
-      copy.economy.missionCount(eco.bake.count),
-    );
-    addRow(copy.economy.missionStage(STAGE_REWARD_FLOUR), '');
-    addRow(copy.economy.missionRecipe(eco.basesDone, eco.basesTotal, RECIPE_REWARD_FLOUR), '');
-    wrapEl.appendChild(rows);
-
-    openModal(wrapEl, { title: copy.economy.missionsTitle });
   }
 
   function renderEconBar(): void {
@@ -712,68 +195,92 @@ export function createRecipesScreen(
     amount.className = 'econ-amount';
     amount.textContent = copy.economy.flourLabel(eco.flour);
 
-    const actionsEl = document.createElement('span');
-    actionsEl.className = 'econ-actions';
+    const actions = document.createElement('span');
+    actions.className = 'econ-actions';
 
+    const primary = document.createElement('button');
+    primary.type = 'button';
+    primary.className = 'btn btn-primary btn-slim';
     if (eco.giftPending) {
-      const gift = document.createElement('button');
-      gift.type = 'button';
-      gift.className = 'btn btn-primary btn-slim';
-      gift.textContent = copy.economy.giftTitle;
-      gift.addEventListener('click', () => openStarterGift(api));
-      actionsEl.appendChild(gift);
+      primary.textContent = copy.economy.giftTitle;
+      primary.addEventListener('click', () => openStarterGift(api));
     } else {
-      const exchange = document.createElement('button');
-      exchange.type = 'button';
-      exchange.className = 'btn btn-primary btn-slim';
-      exchange.textContent = copy.economy.exchangeTitle;
-      exchange.addEventListener('click', openExchangeModal);
-      actionsEl.appendChild(exchange);
+      primary.textContent = copy.economy.exchangeTitle;
+      primary.addEventListener('click', () => openExchangeModal(api, () => paint(api.getSnapshot(), true)));
     }
+    actions.appendChild(primary);
 
     const missions = document.createElement('button');
     missions.type = 'button';
     missions.className = 'btn btn-ghost btn-slim';
     missions.textContent = copy.economy.missionsTitle;
-    missions.addEventListener('click', openMissionsModal);
-    actionsEl.appendChild(missions);
+    missions.addEventListener('click', () => openMissionsModal(api));
+    actions.appendChild(missions);
 
-    econBar.append(amount, actionsEl);
+    econBar.append(amount, actions);
   }
 
-  function render(snap: Snapshot): void {
+  // ── 재렌더 절약 ──
+  // 그리드 내용을 정하는 값만 모아 키로 만든다. 스냅샷(60초 tick)이 와도 키가 같으면
+  // 상태 줄 텍스트만 갱신하고 카드 40장은 건드리지 않는다.
+  let visible = false;
+  let lastKey = '';
+  function gridKey(snap: Snapshot): string {
+    const inv = api.inventory();
+    const collection = getCollection();
+    const eco = api.economy();
+    let sig = 0;
+    for (const key of Object.keys(collection)) {
+      const e = collection[key];
+      sig += e.count * 3 + (e.bestGrade === null ? 0 : 1);
+    }
+    return [
+      segment, snap.stage, api.pantry(), Object.keys(collection).length, sig,
+      eco.flour, eco.giftPending ? 1 : 0,
+      INGREDIENTS.map((i) => inv[i.id] ?? 0).join(','),
+    ].join('|');
+  }
+
+  function paint(snap: Snapshot, force = false): void {
+    updateStatusLine(status, statusView(snap));
     segBtns.forEach((b, key) => b.classList.toggle('active', key === segment));
-    subBtns.forEach((b, key) => b.classList.toggle('active', key === galleryTab));
-    // 도감일 때만 하위 줄 표시 + 윗줄과 이어붙임 (경계 없이 — 사용자 확정)
-    const gallery = segment === 'gallery';
-    subRow.style.display = gallery ? '' : 'none';
-    segRow.classList.toggle('seg--joined-top', gallery);
-    // 가루 배너는 재료 탭 전용 — 다른 탭의 간격은 손대지 않는다
-    const showEcon = gallery && galleryTab === 'ingredient';
-    econBar.style.display = showEcon ? '' : 'none';
-    if (showEcon) renderEconBar();
+    const key = gridKey(snap);
+    if (!force && key === lastKey) return;
+    lastKey = key;
+    if (segment === 'ingredient') {
+      if (econBar.parentElement === null) wrap.insertBefore(econBar, content);
+      renderEconBar();
+    } else {
+      econBar.remove();
+    }
     content.innerHTML = '';
-    if (!gallery) renderRecipes(snap);
-    else if (galleryTab === 'bread') renderGalleryBread(snap);
-    else renderGalleryIngredients();
+    if (segment === 'bread') renderBread(snap);
+    else renderIngredients();
   }
 
-  const unsub = api.subscribe((snap) => render(snap));
+  // 숨은 탭에선 아무것도 그리지 않는다 — 개편 전엔 60초 tick마다 카드 170장을 다시 만들었다.
+  // 별도 dirty 플래그를 두지 않는 이유: lastKey가 곧 dirty 신호다(내용이 실제로 바뀌었는지까지 안다).
+  const unsub = api.subscribe((snap) => {
+    if (!visible) return;
+    paint(snap);
+  });
 
-  render(api.getSnapshot());
+  paint(api.getSnapshot());
 
   return {
     id: 'recipes',
     el,
     onShow() {
-      render(api.getSnapshot());
+      visible = true;
+      paint(api.getSnapshot());
     },
     onHide() {
-      void unsub; // 도감은 탭 화면 — 실제 해제는 앱 종료 시 (home.ts와 동일 패턴)
+      visible = false;
+      void unsub; // 탭 화면 — 실제 해제는 앱 종료 시 (home.ts와 동일 패턴)
     },
-    /** 탭 재탭 상태 전이 (§8-1 표 개정) — 레시피 ↔ 도감 토글 */
+    /** 탭 재탭 상태 전이 — 빵 ↔ 재료 토글 */
     cycleSegment(): RecipesSegment {
-      setSegment(segment === 'recipes' ? 'gallery' : 'recipes');
+      setSegment(segment === 'bread' ? 'ingredient' : 'bread');
       return segment;
     },
   };

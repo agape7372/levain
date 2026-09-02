@@ -7,11 +7,20 @@ import {
   planNotifications,
   planNotificationsAll,
   clampQuiet,
+  capPerDay,
+  stageOf,
+  STAGES,
   HOUR,
   DAY,
 } from '../src/sim';
-import { NOTIFY_SLOT_FEED } from '../src/sim/constants';
-import type { SimState } from '../src/sim';
+import {
+  NOTIFY_SLOT_FEED,
+  NOTIFY_SLOT_FIRSTWEEK,
+  NOTIFY_SLOT_SOUR,
+  NOTIFY_SLOT_STAGE,
+  SOUR_AFTER_HUNGRY_H,
+} from '../src/sim/constants';
+import type { NotifySlot, SimState } from '../src/sim';
 
 // 로컬 시각 기준 생성 — clampQuiet은 new Date().getHours()(로컬)로 판단한다
 function local(y: number, mo: number, d: number, h: number, mi: number): number {
@@ -266,5 +275,204 @@ describe('부활 알림 위치 배율 (2026-08-30 수정 — room 고정식은 �
     expect(plan.slots.length).toBe(1);
     expect(plan.slots[0].copyKey).toBe('reviveSecond');
     expect(plan.slots[0].at).toBe(clampQuiet(t0 + 100 * HOUR));
+  });
+});
+
+
+// -- 확장 옵트인 슬롯 3종 + 하루 상한 (2026-09-03, GDD 7절) --
+
+/** capPerDay 검사용 최소 슬롯 — id는 검사에 쓰지 않으므로 고정값 */
+function slotOf(copyKey: NotifySlot['copyKey'], at: number, weekly = false): NotifySlot {
+  return { id: 99, at, copyKey, weekly };
+}
+
+describe('확장 옵트인 슬롯 — opts 없이는 존재하지 않는다', () => {
+  it('opts 생략: 신규 슬롯 0 (기존 3슬롯 그대로)', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const plan = planNotifications(initialState(t0), t0);
+    expect(plan.slots.length).toBe(3);
+    expect(plan.slots.some((sl) => sl.copyKey === 'sour')).toBe(false);
+    expect(plan.slots.some((sl) => sl.copyKey === 'stageUp')).toBe(false);
+    expect(plan.slots.some((sl) => sl.copyKey === 'firstWeek')).toBe(false);
+  });
+});
+
+describe('시큼 슬롯 (sourOptIn, id 5)', () => {
+  it('실온 활발: at = 배고픔 14h + 22h 클램프', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const plan = planNotifications(initialState(t0), t0, { sourOptIn: true });
+    const sour = plan.slots.find((sl) => sl.copyKey === 'sour');
+    expect(sour).toBeDefined();
+    expect(sour!.id).toBe(NOTIFY_SLOT_SOUR);
+    expect(sour!.weekly).toBe(false);
+    expect(sour!.at).toBe(clampQuiet(t0 + (14 + SOUR_AFTER_HUNGRY_H) * HOUR));
+  });
+
+  it('냉장·휴면 분기에선 없음 — 주 1회 케어/침묵 규칙 우선', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const fridge: SimState = {
+      ...initialState(t0), location: 'fridge', maturity: 12, createdAt: t0 - 9 * DAY,
+    };
+    expect(planNotifications(fridge, t0, { sourOptIn: true }).slots.some((sl) => sl.copyKey === 'sour')).toBe(false);
+
+    const dormant: SimState = {
+      ...initialState(t0), lastFedAt: t0 - 130 * HOUR, locAnchorAt: t0 - 130 * HOUR,
+    };
+    expect(phaseAt(dormant, t0)).toBe('dormant');
+    expect(planNotifications(dormant, t0, { sourOptIn: true }).slots.some((sl) => sl.copyKey === 'sour')).toBe(false);
+  });
+});
+
+describe('단계 승급 예고 슬롯 (stageOptIn, id 6)', () => {
+  it('사이클은 찼고 일수만 남았을 때: at = createdAt + 요구 일수(클램프)', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const createdAt = t0 - DAY;
+    const s: SimState = { ...initialState(t0), createdAt, maturity: STAGES[1].cycles };
+    expect(stageOf(s, t0)).toBe(0); // 일수(3일) 미달이라 아직 0단계
+    const plan = planNotifications(s, t0, { stageOptIn: true });
+    const up = plan.slots.find((sl) => sl.copyKey === 'stageUp');
+    expect(up).toBeDefined();
+    expect(up!.id).toBe(NOTIFY_SLOT_STAGE);
+    expect(up!.stage).toBe(1);
+    expect(up!.at).toBe(clampQuiet(createdAt + STAGES[1].days * DAY));
+  });
+
+  it('사이클 미달이면 없음 — 언제 채울지 모르는 시각을 예고하지 않는다', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const s: SimState = { ...initialState(t0), createdAt: t0 - DAY, maturity: STAGES[1].cycles - 1 };
+    expect(planNotifications(s, t0, { stageOptIn: true }).slots.some((sl) => sl.copyKey === 'stageUp')).toBe(false);
+  });
+
+  it('최종 5단계면 없음 — 다음 단계가 없다', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const top = STAGES.length - 1;
+    const s: SimState = {
+      ...initialState(t0),
+      createdAt: t0 - (STAGES[top].days + 1) * DAY,
+      maturity: STAGES[top].cycles,
+    };
+    expect(stageOf(s, t0)).toBe(top);
+    expect(planNotifications(s, t0, { stageOptIn: true }).slots.some((sl) => sl.copyKey === 'stageUp')).toBe(false);
+  });
+
+  it('승급 시각이 이미 지났으면 없음', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const s: SimState = {
+      ...initialState(t0),
+      createdAt: t0 - (STAGES[1].days + 1) * DAY,
+      maturity: STAGES[1].cycles,
+    };
+    expect(planNotifications(s, t0, { stageOptIn: true }).slots.some((sl) => sl.copyKey === 'stageUp')).toBe(false);
+  });
+});
+
+describe('첫 주 안내 슬롯 (firstWeekOptIn, id 7)', () => {
+  it('0단계 갓 태어남: at = createdAt + 24h(클램프)', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const plan = planNotifications(initialState(t0), t0, { firstWeekOptIn: true });
+    const fw = plan.slots.find((sl) => sl.copyKey === 'firstWeek');
+    expect(fw).toBeDefined();
+    expect(fw!.id).toBe(NOTIFY_SLOT_FIRSTWEEK);
+    expect(fw!.at).toBe(clampQuiet(t0 + DAY));
+  });
+
+  it('1단계 이상이면 없음 — 첫 주 튜토리얼은 끝났다', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const s: SimState = { ...initialState(t0), createdAt: t0 - 4 * DAY, maturity: STAGES[1].cycles };
+    expect(stageOf(s, t0)).toBeGreaterThanOrEqual(1);
+    expect(planNotifications(s, t0, { firstWeekOptIn: true }).slots.some((sl) => sl.copyKey === 'firstWeek')).toBe(false);
+  });
+
+  it('24h가 이미 지났으면 없음', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const s: SimState = { ...initialState(t0), createdAt: t0 - 2 * DAY };
+    expect(stageOf(s, t0)).toBe(0);
+    expect(planNotifications(s, t0, { firstWeekOptIn: true }).slots.some((sl) => sl.copyKey === 'firstWeek')).toBe(false);
+  });
+});
+
+describe('capPerDay — 하루 최대 2건 (GDD 7절)', () => {
+  const d = local(2024, 0, 15, 9, 0);
+
+  it('같은 날 4건이면 우선순위 상위 2건만 남는다', () => {
+    const kept = capPerDay([
+      slotOf('firstWeek', d),
+      slotOf('feedTime', d + HOUR),
+      slotOf('moldWarn', d + 2 * HOUR),
+      slotOf('peak', d + 3 * HOUR),
+    ]);
+    expect(kept.map((sl) => sl.copyKey)).toEqual(['feedTime', 'moldWarn']); // 입력 순서 보존
+  });
+
+  it('weekly 슬롯은 집계에서 빠진다 — 같은 날 3건이어도 전부 남는다', () => {
+    const kept = capPerDay([
+      slotOf('fridgeWeek', d, true),
+      slotOf('feedTime', d + HOUR),
+      slotOf('moldWarn', d + 2 * HOUR),
+    ]);
+    expect(kept.length).toBe(3);
+  });
+
+  it('날짜가 다르면 서로 영향 없음', () => {
+    const kept = capPerDay([
+      slotOf('firstWeek', d),
+      slotOf('peak', d + HOUR),
+      slotOf('stageUp', d + DAY),
+      slotOf('sour', d + DAY + HOUR),
+    ]);
+    expect(kept.length).toBe(4);
+  });
+
+  it('2건 이하는 그대로', () => {
+    const input = [slotOf('feedTime', d), slotOf('dormant', d + HOUR)];
+    expect(capPerDay(input)).toEqual(input);
+  });
+});
+
+describe('planNotificationsAll — 확장 슬롯 병합 (2026-09-03)', () => {
+  it('두 르방의 firstWeek가 병합되어 count 2, 하루 상한도 지킨다', () => {
+    const t0 = local(2024, 0, 15, 12, 0);
+    const a = initialState(t0);
+    const b: SimState = { ...initialState(t0), createdAt: t0 - 2 * HOUR };
+    const plan = planNotificationsAll([a, b], t0, { firstWeekOptIn: true });
+    const fw = plan.slots.find((sl) => sl.copyKey === 'firstWeek');
+    expect(fw).toBeDefined();
+    expect(fw!.count).toBe(2);
+    expect(fw!.at).toBe(clampQuiet(b.createdAt + DAY)); // 더 이른 쪽 채택
+
+    const perDay = new Map<string, number>();
+    for (const sl of plan.slots) {
+      if (sl.weekly) continue;
+      const dt = new Date(sl.at);
+      const key = `${dt.getFullYear()}-${dt.getMonth()}-${dt.getDate()}`;
+      perDay.set(key, (perDay.get(key) ?? 0) + 1);
+    }
+    for (const cnt of perDay.values()) expect(cnt).toBeLessThanOrEqual(2);
+  });
+});
+
+describe('planNotificationsAll — 슬롯 label = 알림 본문의 르방 이름 (2026-09-03)', () => {
+  it('labels를 넘기면 단독 슬롯엔 그 르방 이름이 실리고, 이름이 null이면 label이 없다', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const a = initialState(t0);
+    const named = planNotificationsAll([a], t0, undefined, ['하나']);
+    expect(named.slots.length).toBeGreaterThan(0);
+    expect(named.slots.every((s) => s.label === '하나')).toBe(true);
+    const unnamed = planNotificationsAll([a], t0, undefined, [null]);
+    expect(unnamed.slots.every((s) => s.label === undefined)).toBe(true);
+    // labels 자체를 생략하면 종전과 동일(label 키 없음)
+    expect(planNotificationsAll([a], t0).slots.every((s) => !('label' in s))).toBe(true);
+  });
+
+  it('병합(count ≥ 2) 슬롯은 한 마리를 지목할 수 없어 label을 떼고, 활성 르방 이름을 쓰지 않는다', () => {
+    const t0 = local(2024, 0, 15, 6, 0);
+    const a = initialState(t0);
+    const b = initialState(t0);
+    const plan = planNotificationsAll([a, b], t0, undefined, ['하나', '둘']);
+    expect(plan.slots.length).toBeGreaterThan(0);
+    for (const s of plan.slots) {
+      expect(s.count).toBe(2);
+      expect(s.label).toBeUndefined();
+    }
   });
 });

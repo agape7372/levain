@@ -21,8 +21,14 @@ export interface SaveSettings {
   muted: boolean;
   haptics: boolean;
   notifyEnabled: boolean;
-  /** "한창때" 옵트인 알림 — v2 무버전 추가 키(2026-08-30). 기본 off */
+  /** "한창때" 옵트인 알림 — v2 무버전 추가 키(2026-08-30). 2026-09-03부터 기본 on */
   notifyPeak: boolean;
+  /** "시큼해질 때" 옵트인 알림 — v2 무버전 추가 키(2026-09-03). 기본 on */
+  notifySour: boolean;
+  /** "단계가 오를 때" 옵트인 알림 — v2 무버전 추가 키(2026-09-03). 기본 on */
+  notifyStage: boolean;
+  /** "첫 주 안내" 옵트인 알림 — v2 무버전 추가 키(2026-09-03). 기본 on */
+  notifyFirstWeek: boolean;
   /** 조용시간(로컬 시각, 시 단위) — v2 무버전 추가 키. start===end면 조용시간 없음 */
   quietStartH: number;
   quietEndH: number;
@@ -93,7 +99,13 @@ export const defaultSettings = (): SaveSettings => ({
   muted: false,
   haptics: true,
   notifyEnabled: true,
-  notifyPeak: false,
+  // 2026-09-03 기본 on 승격 — 하루 상한 2건(notifyPlan.capPerDay)이 스팸을 막으므로
+  // 옵트인 슬롯을 꺼둘 이유가 없어졌다. 기존 저장본에 남은 false는 그대로 존중한다
+  // (settingsOf가 키가 있으면 그 값을 쓴다 — 기본값은 키 부재일 때만 적용된다).
+  notifyPeak: true,
+  notifySour: true,
+  notifyStage: true,
+  notifyFirstWeek: true,
   quietStartH: 22, // sim/constants QUIET_START_H와 같은 값 — 저장엔 값으로 굳는다
   quietEndH: 8,
 });
@@ -213,6 +225,9 @@ function settingsOf(v: unknown): SaveSettings {
     haptics: bool(v.haptics, d.haptics),
     notifyEnabled: bool(v.notifyEnabled, d.notifyEnabled),
     notifyPeak: bool(v.notifyPeak, d.notifyPeak),
+    notifySour: bool(v.notifySour, d.notifySour),
+    notifyStage: bool(v.notifyStage, d.notifyStage),
+    notifyFirstWeek: bool(v.notifyFirstWeek, d.notifyFirstWeek),
     quietStartH: Math.round(num(v.quietStartH, 0, 23, d.quietStartH)),
     quietEndH: Math.round(num(v.quietEndH, 0, 23, d.quietEndH)),
   };

@@ -207,6 +207,12 @@ SimState → deriveSnapshot(state, now) → Snapshot → toRenderParams(snap) �
 - 화면: home / recipes / bake(스택) / onboarding. 프레임워크 없음 —
   `gameStore.subscribe(snap => screen.update(snap))`로 각 화면이 자기 DOM만 갱신.
 - **모달 = 중앙 팝업 고정** (`components/modal.ts` 하나로 강제. 바닥 시트 금지 — 사용자 규칙, 되돌림 방지 주석 필수).
+  `footer` 옵션(2026-09-03)은 같은 중앙 팝업에 본문 스크롤 + 바닥 고정 footer를 더한 **시트형**이지 바닥 시트가 아니다.
+  **모달 위 모달은 열지 않는다** — 확인이 필요하면 닫은 뒤 `confirmModal`(관찰 카드·빵 시트 선례).
+- **획득 연출 = 비차단 레이어** (`components/celebrate.ts`, 2026-09-03): 모달이 아니라 z 45 오버레이(모달 위·토스트 아래).
+  호출 계약은 `celebrateIngredients(api, ids)`·`celebrateStageUp(api, stage)` 둘뿐, 열린 빵 계산·병합·퇴장은 내부.
+- **시각 원형은 `components/recipeVisuals.ts`**: 카드·상태 줄·시트 머리·칩·형태 행의 DOM 모양. 화면(`screens/recipes.ts`·
+  `components/breadSheet.ts`·`exchangeModal.ts`)은 데이터·핸들러만 붙인다 — 클래스 이름을 화면 코드에서 새로 조립하지 말 것.
 - **Android backButton 계약**: `@capacitor/app` backButton 리스너 —
   ① 열린 모달 있으면 닫기 ② router depth>0면 back() ③ 루트면 `App.minimizeApp()` (종료 아님 —
   다마고치는 백그라운드 생존이 자연). 연출 중엔 백 = 연출 스킵. 웹은 no-op.

@@ -3,7 +3,7 @@ export * from './types';
 export { advance, reanchor } from './advance';
 export { applyAction, initialState } from './actions';
 export { deriveSnapshot, effSinceFeedMs, activityAt, phaseAt, stageOf, boundariesH, moldStageAt, clamp, smoothstep, rateMult } from './derive';
-export { planNotifications, planNotificationsAll, clampQuiet } from './notifyPlan';
+export { planNotifications, planNotificationsAll, clampQuiet, capPerDay } from './notifyPlan';
 export { deriveBriefing } from './briefing';
 export { adCountsToday, adRemaining, canWatchAd, recordAdGrant, sameLocalDay } from './ads';
 export type { AdGrant, AdSlotId } from './ads';
@@ -20,4 +20,5 @@ export {
   STAGE_REWARD_FLOUR, RECIPE_REWARD_FLOUR,
   SPLIT_MIN_G, PANTRY_MAX,
   AD_SLOT_DAILY, AD_TOTAL_DAILY, AD_SESSION_CAP,
+  NOTIFY_MAX_PER_DAY,
 } from './constants';

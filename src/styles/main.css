@@ -572,7 +572,7 @@ html {
 
 /* ── 무료 경제 배너·교환소 (§9) ───────────────────────── */
 .econ-bar {
-  margin-top: 14px;
+  margin: 0 0 14px;   /* 세그먼트 아래·그리드 위 — 세그 리듬(14px)과 같은 간격 (2026-09-03 인라인 marginTop 제거) */
   padding: 10px 14px;
   background: var(--bg-soft);
   border-radius: 14px;
@@ -593,29 +593,56 @@ html {
 .exchange-texts { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .exchange-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
-/* ── 레시피 도감 ─────────────────────────────────────── */
+/* ── 레시피 (2026-09-03 개편: 세그먼트 [빵|재료] 한 줄, 빵 카드 = 시트, 도감-빵 170장 벽 폐지) ── */
 .recipes-wrap { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 24px; }
-.recipes-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-.recipes-title-group { display: flex; align-items: center; gap: 4px; }
-.recipes-back { font-size: 20px; padding: 4px 10px; line-height: 1; }
+.recipes-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .recipes-title { font-size: 19px; font-weight: 600; color: var(--ink); margin: 0; }
+/* 굽기 상태 줄 — 제목 아래 한 줄. 왼쪽 = 르방·적기(말), 오른쪽 = 보관 g(숫자). 탭 = 띄워보기 토스트.
+   굽기에 필요한 두 정보(적기·보관량)를 홈으로 돌아가지 않고 여기서 본다. 원가가 g으로 적혀 있으니 g 노출은 정합. */
+.status-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg-soft) 85%, transparent);
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  text-align: left;
+  cursor: pointer;
+}
+.status-line:active { opacity: 0.7; }
+.status-line .sl-left { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.status-line .sl-ready { color: var(--ink); font-weight: 600; }
+.status-line .sl-pantry { flex-shrink: 0; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.status-line .sl-pantry.is-empty { color: var(--ink-faint); font-weight: 400; }
+.recipes-seg { margin-bottom: 14px; }
+.recipes-seg button { flex: 1; }
 .recipe-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 .recipe-card {
+  position: relative;               /* 우상단 pill(변형 진행·수량)의 기준 */
   background: var(--bg-soft);
   border-radius: 16px;
   padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   border: 0;
   font-family: inherit;
   text-align: left;
   cursor: pointer;
+  transition: transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
 }
+.recipe-card:active { transform: scale(0.98); }
 .recipe-card .art {
   height: 64px;
   display: grid;
@@ -625,6 +652,24 @@ html {
 }
 .recipe-card .art img { width: 60px; height: 60px; object-fit: contain; }
 .recipe-card.locked .art { opacity: 0.25; filter: grayscale(1) brightness(1.35); }
+/* 원가 줄 — **항상** 보인다(개편 전엔 한 번 구우면 등급·횟수로 바뀌어 사라졌다 = "몇 그램 필요한지 모름").
+   보관이 모자라면 옆에 옅은 안내 — 경고색 아님(--hooch는 정보 톤). */
+.recipe-card .cost { font-size: 12.5px; color: var(--ink-faint); line-height: 1.45; font-variant-numeric: tabular-nums; }
+.recipe-card .cost .short { color: var(--hooch); }
+/* 우상단 pill — 빵 카드는 변형 진행(3/16), 재료 카드는 수량(9). 0이면 옅게 */
+.count-pill {
+  position: absolute;
+  top: 10px; right: 10px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-deep) 75%, transparent);
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.count-pill.is-zero { opacity: 0.55; font-weight: 400; }
 /* ?-실루엣 — 미발견 도감 항목: 단색 실루엣 + 중앙 ? (사용자 확정 2026-08-24) */
 .recipe-card.mystery { position: relative; }
 .recipe-card.mystery .art { opacity: 0.35; filter: grayscale(1) contrast(0.35) brightness(1.15) sepia(0.5); }
@@ -651,10 +696,338 @@ html {
   from { -webkit-mask-position: 100% 0; mask-position: 100% 0; }
   to { -webkit-mask-position: 0% 0; mask-position: 0% 0; }
 }
-.recipe-card .name { font-size: 15px; font-weight: 600; color: var(--ink); }
+.recipe-card .name { font-size: 15px; font-weight: 600; color: var(--ink); padding-right: 34px; /* pill 자리 */ }
 .recipe-card.locked .name { color: var(--ink-faint); font-weight: 400; }
 .recipe-card .meta { font-size: 12px; color: var(--ink-faint); line-height: 1.5; }
 .recipe-card .grade { color: var(--crust); font-weight: 600; }
+
+/* ── 시트형 모달 (footer 고정) — 빵 시트·교환소 (2026-09-03) ───────────────
+   modal.ts의 `footer` 옵션. 본문(.modal-scroll)만 스크롤하고 footer는 카드 바닥에 붙는다.
+   개편 전 굽기 모달은 옵션 31행 아래에 `굽기`가 있었다(실측 scrollH 1,799/702px). */
+.modal-card--sheet {
+  width: min(100%, 360px);
+  max-height: 84vh;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px 18px 14px;
+}
+.modal-scroll .modal-title { margin-bottom: 10px; }
+.modal-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid color-mix(in srgb, var(--ink-faint) 16%, transparent);
+  background: var(--bg-soft);
+}
+.modal-footer .btn { padding: 12px 18px; font-size: 15px; }
+.modal-footer .btn-primary { flex: 1; }
+/* 2단 footer — 텍스트 줄 위, 버튼 줄 아래(교환소: 라벨이 길어 한 줄에 셋이 안 들어간다 — 실측 101px 붕괴) */
+.modal-footer--stack { flex-direction: column; align-items: stretch; gap: 8px; }
+.modal-footer--stack .footer-text { flex: none; }
+.footer-actions { display: flex; gap: 8px; }
+.footer-actions .btn { flex: 1; padding: 11px 12px; font-size: 14px; white-space: nowrap; }
+.footer-actions .btn-ghost { flex: 0 0 auto; }
+/* 결과 카드 폴백 — 아트 가운데 크게 + 이름 + 한 줄 */
+.result-card { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 6px 0 2px; }
+.result-card .art { width: 96px; height: 96px; display: grid; place-items: center; }
+.result-card .art img { width: 88px; height: 88px; object-fit: contain; }
+.result-card .art svg { width: 88px; height: 66px; }
+.result-card .rc-name { margin-top: 8px; font-size: 18px; font-weight: 600; color: var(--ink); }
+.result-card .rc-line { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+.modal-footer .footer-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.modal-footer .footer-text b { color: var(--ink); font-weight: 600; }
+
+/* 시트 머리 — 큰 아트 + 이름·맛·원가/보관·등급. "르방 100g 필요 · 보관 320g"이 여기서 한 줄로 읽힌다 */
+.sheet-head { display: flex; gap: 14px; align-items: center; }
+.sheet-head .art {
+  width: 76px; height: 76px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+.sheet-head .art img { width: 64px; height: 64px; object-fit: contain; }
+.sheet-head .sh-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.sheet-head .sh-name { font-size: 18px; font-weight: 600; color: var(--ink); }
+.sheet-head .sh-flavor { font-size: 13px; color: var(--ink-faint); }
+.sheet-head .sh-cost { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.sheet-head .sh-cost .short { color: var(--hooch); }
+.sheet-head .sh-meta { font-size: 12.5px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+.sheet-head .sh-meta .grade { color: var(--crust); font-weight: 600; }
+.sheet-label {
+  margin: 16px 0 8px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-faint);
+}
+.sheet-label .hint { font-weight: 400; }
+.sheet-summary { margin-top: 12px; min-height: 18px; font-size: 13px; color: var(--ink-soft); }
+.sheet-summary b { color: var(--ink); font-weight: 600; }
+
+/* 재료 칩 그리드 — 4열. 이 빵에 넣을 수 있는 재료 **전부**를 보이고 보유/미보유/발견을 세 상태로 가른다:
+   보유 = 또렷 + 수량 / 미보유 = 옅게(이름은 보인다 — "무엇이 필요한지"가 여기서 읽힌다) / 발견 = ✓ */
+.chip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.chip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px 7px;
+  min-height: 76px;
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  background: var(--bg);
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.12s cubic-bezier(0.22, 1, 0.36, 1), background 0.15s, border-color 0.15s;
+}
+.chip:active { transform: scale(0.96); }
+.chip .art { width: 44px; height: 40px; display: grid; place-items: center; }
+.chip .art img { width: 40px; height: 40px; object-fit: contain; }
+.chip .art svg { width: 40px; height: 30px; }
+.chip .chip-name {
+  max-width: 100%;
+  font-size: 11.5px;
+  line-height: 1.2;
+  color: var(--ink-soft);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chip.selected { border-color: var(--accent); background: var(--cream); }
+.chip.selected .chip-name { color: var(--ink); font-weight: 600; }
+.chip--missing .art { opacity: 0.4; filter: grayscale(0.7); }
+.chip--missing .chip-name { color: var(--ink-faint); }
+.chip.is-locked { opacity: 0.45; }   /* disabled 금지 — 탭하면 이유 토스트 */
+.chip-count {
+  position: absolute;
+  top: 5px; right: 5px;
+  min-width: 16px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-deep) 90%, var(--ink-faint));
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+}
+.chip-count.is-zero { opacity: 0.55; font-weight: 400; }
+/* 발견한 변형이 있는 재료 — 좌상단 작은 체크(크러스트색 = 완료 뱃지 토큰) */
+.chip--done::after {
+  content: '✓';
+  position: absolute;
+  top: 5px; left: 6px;
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  background: var(--crust);
+  color: var(--cream);
+  font-size: 10px;
+  line-height: 15px;
+  text-align: center;
+}
+/* 형태 서브선택 행 — 그리드 한 줄 전체를 차지하며 고른 칩 아래로 펼쳐진다(폴더 열리듯) */
+.chip-forms {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 10px;
+  margin: -2px 0 2px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--cream) 60%, transparent);
+  animation: forms-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes forms-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+.form-pill {
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  padding: 6px 11px;
+  background: var(--bg-soft);
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.form-pill.selected { border-color: var(--accent); color: var(--ink); font-weight: 600; background: var(--cream); }
+.form-pill .fp-hint { color: var(--ink-faint); font-size: 11.5px; margin-left: 4px; }
+.form-pill.is-done::before { content: '✓ '; color: var(--crust); }
+
+/* 교환소 머리 — 잔액은 맨 위에(개편 전엔 30행 아래 있었다) */
+.exchange-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.exchange-head .econ-amount { font-size: 17px; }
+.exchange-ad { margin-bottom: 12px; }
+
+/* ── 획득 연출 — "새 재료·새 레시피가 열렸어요" (2026-09-03, celebrate.ts) ──────
+   모달이 아니라 비차단 레이어: 모달(40) 위·토스트(50) 아래. 탭 또는 시간 경과로 퇴장.
+   다이제틱 규칙(GDD 무캐릭터): 밀가루 모트·카드 와이프만. 하트·별·컨페티 금지. */
+.celebrate-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(74, 50, 32, 0.12);
+  opacity: 0;
+  transition: opacity 0.22s;
+  cursor: pointer;
+}
+.celebrate-layer.show { opacity: 1; }
+.celebrate-layer.leaving { opacity: 0; }
+.celebrate-card {
+  width: min(100%, 320px);
+  padding: 22px 20px 16px;
+  border-radius: 22px;
+  background: var(--bg-soft);
+  box-shadow: 0 10px 28px rgba(74, 50, 32, 0.2);
+  text-align: center;
+  animation: cele-pop 0.36s cubic-bezier(0.8, 0.25, 0.16, 1.17) both;   /* 탄성 오버슈트(css-animations 치트시트) */
+}
+.celebrate-layer.leaving .celebrate-card { animation: cele-out 0.22s ease-in both; }
+@keyframes cele-pop {
+  from { opacity: 0; transform: translateY(10px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cele-out { to { opacity: 0; transform: translateY(-6px) scale(0.98); } }
+/* 히어로 — 받은 재료(1개면 크게, 여럿이면 부채꼴) 또는 단계 원판. 모트는 이 중심에서 방사한다 */
+.celebrate-hero {
+  position: relative;
+  width: 132px; height: 104px;
+  margin: 0 auto 8px;
+  display: grid;
+  place-items: center;
+}
+.hero-slot { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.hero-art {
+  width: 88px; height: 88px;
+  display: grid;
+  place-items: center;
+  animation: hero-pop 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;   /* 0.55 → 1.1 → 0.97 → 1 오버슈트 */
+}
+.hero-art img { width: 84px; height: 84px; object-fit: contain; }
+.hero-art svg { width: 84px; height: 63px; }
+.celebrate-hero.multi .hero-slot:nth-child(1) { transform: translate(-50%, -50%) translateX(-30px) rotate(-8deg); }
+.celebrate-hero.multi .hero-slot:nth-child(2) { transform: translate(-50%, -50%) translateY(-4px); z-index: 1; }
+.celebrate-hero.multi .hero-slot:nth-child(3) { transform: translate(-50%, -50%) translateX(30px) rotate(8deg); }
+.celebrate-hero.multi .hero-art { width: 66px; height: 66px; }
+.celebrate-hero.multi .hero-art img { width: 62px; height: 62px; }
+.celebrate-hero.multi .hero-slot:nth-child(2) .hero-art { animation-delay: 0.16s; }
+.celebrate-hero.multi .hero-slot:nth-child(3) .hero-art { animation-delay: 0.24s; }
+.hero-more {
+  position: absolute;
+  right: 2px; bottom: 6px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--bg-deep);
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 2;
+}
+.hero-stage {
+  width: 74px; height: 74px;
+  border-radius: 50%;
+  background: var(--cream);
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--crust);
+  font-variant-numeric: tabular-nums;
+}
+@keyframes hero-pop {
+  from { opacity: 0; transform: scale(0.55); }
+  55% { opacity: 1; transform: scale(1.1); }
+  78% { transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+/* 밀가루 모트 — 중심에서 방사, 크림·반죽색·종이색 3톤(부풀 때 날리는 가루). rotate(--r)+translateY(--dist) */
+.mote {
+  --r: 0deg; --dist: -52px; --size: 5px; --d: 0.12s;
+  position: absolute;
+  top: calc(50% - var(--size) / 2);
+  left: calc(50% - var(--size) / 2);
+  width: var(--size); height: var(--size);
+  border-radius: 50%;
+  background: var(--cream);
+  opacity: 0;
+  pointer-events: none;
+  animation: mote-fly 0.72s cubic-bezier(0.63, -0.01, 0.29, 1) var(--d) both;
+}
+.mote:nth-child(3n) { background: #fff8ef; }
+.mote:nth-child(4n) { background: color-mix(in srgb, var(--cream) 70%, var(--crust)); }
+@keyframes mote-fly {
+  0% { opacity: 0; transform: rotate(var(--r)) translateY(0) scale(0.6); }
+  25% { opacity: 0.95; }
+  100% { opacity: 0; transform: rotate(var(--r)) translateY(var(--dist)) scale(1); }
+}
+.celebrate-title { margin: 0; font-size: 17px; font-weight: 600; color: var(--ink); }
+.celebrate-sub { margin: 4px 0 0; font-size: 13px; color: var(--ink-faint); }
+.celebrate-extra { margin: 8px 0 0; font-size: 12.5px; color: var(--ink-soft); }
+/* 열린 빵 스트립 — 카드마다 70ms 시차로 크림→컬러 와이프(레시피 그리드의 just-unlocked와 같은 문법) + 살짝 떠오름 */
+.celebrate-strip { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.celebrate-item {
+  --i: 0;
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  -webkit-mask-image: linear-gradient(90deg, #000 50%, transparent 50%);
+  mask-image: linear-gradient(90deg, #000 50%, transparent 50%);
+  -webkit-mask-size: 220% 100%;
+  mask-size: 220% 100%;
+  animation:
+    card-wipe 0.5s cubic-bezier(0.22, 1, 0.36, 1) calc(0.25s + var(--i) * 70ms) both,
+    item-rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) calc(0.25s + var(--i) * 70ms) both;
+}
+@keyframes item-rise { from { transform: translateY(8px); } to { transform: none; } }
+.celebrate-item .art { width: 48px; height: 44px; display: grid; place-items: center; }
+.celebrate-item .art img { width: 44px; height: 44px; object-fit: contain; }
+.celebrate-item .art svg { width: 44px; height: 33px; }
+.celebrate-item .name {
+  max-width: 64px;
+  font-size: 11px;
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.celebrate-item.more { justify-content: center; min-height: 44px; font-size: 12px; color: var(--ink-faint); }
+.celebrate-hint { margin: 12px 0 0; font-size: 11px; color: var(--ink-faint); opacity: 0.8; }
+@media (prefers-reduced-motion: reduce) {
+  .celebrate-card, .hero-art, .celebrate-item, .chip-forms { animation: none !important; }
+  .mote { display: none; }
+  .celebrate-item { -webkit-mask-image: none; mask-image: none; }
+}
 
 /* ── 관찰 카드·설정 행 ────────────────────────────────── */
 .observe-rows { display: flex; flex-direction: column; gap: 10px; font-size: 15px; }
@@ -678,6 +1051,10 @@ html {
   text-align: left;
 }
 .settings-row + .settings-row { border-top: 1px solid color-mix(in srgb, var(--ink-faint) 18%, transparent); }
+/* 알림 하위 모달(2026-09-03) — 마스터가 꺼지면 항목 행이 흐려진다. :disabled 아님(탭하면 이유 토스트) */
+.settings-row.is-locked { opacity: 0.45; }
+.settings-hint { padding: 10px 2px 0; font-size: 13px; color: var(--ink-faint); }
+.settings-hint[hidden] { display: none; }
 /* 방해 없는 시간 — 시 선택. 시스템 select를 앱 톤으로만 감싼다 */
 .quiet-select {
   font: 15px/1 inherit;

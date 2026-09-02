@@ -26,6 +26,11 @@ export interface ModalOptions {
   /** 백드롭 탭으로 닫기 허용 (기본 true) */
   dismissible?: boolean;
   onClose?: () => void;
+  /**
+   * 시트형(2026-09-03): 본문은 `.modal-scroll`에서 스크롤하고 footer는 카드 하단에 **고정**된다.
+   * 굽기·교환처럼 목록이 길어도 주 버튼이 항상 보여야 하는 모달용 — 이전엔 `굽기`가 31행 아래 있었다.
+   */
+  footer?: HTMLElement;
 }
 
 export function openModal(content: HTMLElement, opts: ModalOptions = {}): ModalHandle {
@@ -37,13 +42,24 @@ export function openModal(content: HTMLElement, opts: ModalOptions = {}): ModalH
   card.setAttribute('role', 'dialog');
   card.setAttribute('aria-modal', 'true');
 
+  // 시트형이면 제목·본문은 스크롤 영역에, footer는 카드에 직접 — 카드가 flex column이라 footer가 바닥에 붙는다
+  const body = opts.footer ? document.createElement('div') : card;
+  if (opts.footer) {
+    card.classList.add('modal-card--sheet');
+    body.className = 'modal-scroll';
+    card.appendChild(body);
+  }
   if (opts.title) {
     const h = document.createElement('h2');
     h.className = 'modal-title';
     h.textContent = opts.title;
-    card.appendChild(h);
+    body.appendChild(h);
   }
-  card.appendChild(content);
+  body.appendChild(content);
+  if (opts.footer) {
+    opts.footer.classList.add('modal-footer');
+    card.appendChild(opts.footer);
+  }
   backdrop.appendChild(card);
   document.getElementById('ui-root')?.appendChild(backdrop);
 

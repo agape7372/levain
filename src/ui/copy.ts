@@ -2,6 +2,13 @@
 // 담백한 한 문장. 시스템어·내부 용어·죄책감 유발·느낌표 남발 금지. 빨강 경고 시맨틱 없음.
 import { SEED_G } from '../sim';
 
+/** 목적격 조사 — 받침 있으면 '을', 없으면 '를' (recipes.bakeConfirm과 같은 판정) */
+const objParticle = (word: string): string => {
+  const last = word.charCodeAt(word.length - 1);
+  const hasBatchim = last >= 0xac00 && last <= 0xd7a3 && (last - 0xac00) % 28 !== 0;
+  return hasBatchim ? '을' : '를';
+};
+
 export const copy = {
   app: { name: '르방이' },
 
@@ -98,6 +105,11 @@ export const copy = {
   pantry: {
     label: (g: number) => `보관 ${g}g`,
     empty: '보관해둔 르방이 없어요',
+    /** 레시피 상태 줄 오른쪽 — 잔량 0 (label의 짧은 판) */
+    none: '보관 없음',
+    /** 빵 카드 원가 옆 옅은 안내 — 진입은 막지 않는다(시트에서 부족량을 정확히 말한다) */
+    short: '보관 부족',
+    shortBy: (g: number) => `${g}g 모자라요`,
     // 힌트 문구는 없앴다(2026-08-26) — 물건이 놓여 있으면 눌러본다. 라벨이 하던 일은
     // 탭 응답(split.blocked*)과 설명서(help)가 대신한다.
     lastWarn: '이걸 구우면 보관해둔 르방이 다 없어져요',
@@ -183,14 +195,12 @@ export const copy = {
     started: '한 술 먹였어요. 12시간쯤 뒤에 다시 밥을 주세요',
     tooSoon: '아직 소화 중이에요. 조금 더 기다려요',
     done: '다시 숨쉬기 시작했어요',
-    comfort: '괜찮아요. 르방은 잘 버텨요',
   },
 
   stage: {
     names: ['갓 반죽', '잠잠기', '첫 기포', '어린 르방', '성숙 르방', '노포'] as const,
     up: (name: string) => `${name} 단계가 되었어요`,
     fakeRise: '크게 부풀었어요. 곧 조용해질 거예요, 정상이에요',
-    quietWeek: '이 시기는 원래 조용해요',
     labelUnlocked: '병에 이름표를 붙일 수 있어요',
   },
 
@@ -224,11 +234,6 @@ export const copy = {
     discardDone: '따끈하게 구웠어요',
     madeCount: (n: number) => `${n}번 만들었어요`,
     costSuffix: (g: number) => `르방 ${g}g`,
-    bakeConfirm: (name: string, g: number) => {
-      const last = name.charCodeAt(name.length - 1);
-      const hasBatchim = last >= 0xac00 && last <= 0xd7a3 && (last - 0xac00) % 28 !== 0;
-      return `${name}${hasBatchim ? '을' : '를'} 구울까요? 르방 ${g}g을 써요`;
-    },
     grades: { best: '최고예요', good: '잘 구웠어요', flat: '조금 납작해요. 그래도 맛있어요' },
     names: {
       pancake: '팬케이크', cracker: '크래커', scone: '스콘',
@@ -247,13 +252,20 @@ export const copy = {
       rye: '시큼함이 오히려 맛이 되는 빵',
       wholewheat: '통밀의 구수함을 담은 깜빠뉴',
     } as Record<string, string>,
-    // ── Phase 6 — 세그먼트·도감·변형 (§8, 2026-08-24 개편: [레시피|도감]-[빵|재료]) ──
-    segments: { recipes: '레시피', gallery: '도감' },
-    galleryTabs: { bread: '빵', ingredient: '재료' },
-    retapHint: '레시피 탭을 한 번 더 누르면 도감이 열려요',
-    galleryMysteryBase: '아직 만나지 못한 빵이에요',
-    bakeTitle: (name: string) => name,
-    bakePlain: (name: string) => `기본 ${name}`,
+    // ── 세그먼트·상태 줄·빵 시트 (2026-09-03 개편: [빵|재료] 한 줄, 빵 카드 = 시트) ──
+    segments: { bread: '빵', ingredient: '재료' },
+    retapHint: '레시피 탭을 한 번 더 누르면 재료가 열려요',
+    // 상태 줄 — 띄워보기와 같은 판정(activity)을 한 줄로 줄인 말. 탭하면 floatTest 문구가 그대로 뜬다
+    readyNow: '지금 굽기 좋아요',
+    readyIn: (left: string) => `${left}쯤 뒤에 굽기 좋아요`,
+    // 시트 머리 — 원가와 재고를 한 줄에서 같이 읽는다 (카드의 costSuffix는 원가만 말한다)
+    needG: (g: number, have: number) => `르방 ${g}g 필요 · 보관 ${have}g`,
+    progress: (done: number, total: number) => `변형 ${done}/${total}`,
+    ingredientsLabel: '재료 넣기',
+    ingredientsHint: '없는 재료는 교환소에서',
+    plainLabel: '기본',
+    addOne: '1개를 넣어요',
+    view3d: '3D로 보기',
     bakeWithIngredient: (ing: string) => `${ing} 1개를 넣어요`,
     ingredientNames: {
       olive: '올리브', choco: '초콜릿', strawberry: '딸기', chestnut: '밤',
@@ -304,16 +316,12 @@ export const copy = {
         default: return `${ingredientName} ${baseName}`; // 과육·생과·구운 조각 = 대표 형태
       }
     },
-    ingredientCount: (n: number) => `${n}개`,
     /** 재료 쇼케이스 한 줄 — 호환성 데이터에서 파생한다(재료가 늘어도 문구는 안 는다) */
     ingredientHeadline: (n: number) => (n > 0 ? `빵 ${n}종에 넣을 수 있어요` : ''),
     /** 도감-재료 미발견 탭 — 도감-빵의 variantHint와 같은 자리 */
     // 교환소 안내를 붙인 이유: 이 카드가 뜨는 화면 상단에 교환소 버튼이 있다 — 힌트가 바로 실행된다
     galleryIngredientLocked: '아직 만나지 못한 재료예요 · 교환소에서 가루로 가져올 수 있어요',
     needIngredient: (name: string) => `${name}이(가) 있으면 만들 수 있어요`,
-    variantConfirm: (name: string, ingredientName: string, g: number) =>
-      `${name}, 처음 만들어 봐요. ${ingredientName} 1개와 르방 ${g}g을 써요`,
-    variantHint: '재료가 생기면 새로운 빵을 만들 수 있어요',
     bakeAgain: '다시 만들기',
   },
 
@@ -324,7 +332,8 @@ export const copy = {
     flourLabel: (n: number) => `가루 ${n}개`,
     earned: (n: number) => `가루 ${n}개가 생겼어요`,
     exchangeTitle: '재료 바꾸기',
-    exchangeIntro: '가루로 원하는 재료를 가져올 수 있어요',
+    /** 교환소 footer — 아직 아무 재료도 안 골랐을 때 (두 버튼은 잠겨 있다) */
+    pickOne: '재료를 골라요',
     have: (n: number) => `${n}개 있어요`,
     haveFull: (n: number) => `${n}개 있어요 · 가득 찼어요`,
     buy: (cost: number) => `가루 ${cost}개로 가져오기`,
@@ -357,6 +366,19 @@ export const copy = {
     giftDone: (name: string) => `${name} 1개를 받았어요`,
   },
 
+  // 획득 연출 (2026-09-03, ui/components/celebrate.ts) — 담백하게, 느낌표 0개.
+  celebrate: {
+    gotIngredient: (name: string) => `${name}${objParticle(name)} 얻었어요`,
+    gotIngredients: (n: number) => `재료 ${n}종을 얻었어요`,
+    stageUp: (stageName: string) => `${stageName} 단계가 되었어요`,
+    openedBreads: (n: number) => `새로 열린 빵 ${n}종`,
+    openedNone: '아직 넣을 수 있는 빵은 없어요',
+    moreBreads: (n: number) => `외 ${n}종`,
+    fridgeUnlocked: '이제 냉장고에 넣을 수 있어요',
+    ratioUnlocked: (ratio: string) => `${ratio} 밥을 줄 수 있어요`,
+    dismissHint: '눌러서 닫기',
+  },
+
   notify: {
     channel: '르방이 돌보기',
     feedTime: '밥 시간이에요',
@@ -364,7 +386,12 @@ export const copy = {
     dormant: '르방이 깊이 잠들었어요. 잊지 말고 깨워 주세요',
     reviveSecond: '다시 밥 줄 시간이에요',
     moldWarn: '르방이 표면에 반점이 보여요. 아직 늦지 않았어요',
-    peak: '르방이가 한창 부풀어 있어요. 지금이 굽기 좋은 때예요',
+    peak: '한창 부풀어 있어요. 지금 굽거나 떼어 두기 좋아요',
+    // 확장 슬롯 3종(2026-09-03). firstWeek은 stage.fakeRise와 같은 문장 — 같은 현상을
+    // 앱 안(카드)과 앱 밖(알림)에서 말할 뿐이라 문장을 둘로 갈라 두지 않는다.
+    sour: '조금 시큼해졌어요. 밥을 주면 금방 돌아와요',
+    stageUp: (name: string) => `${name} 단계가 되었어요`,
+    firstWeek: '크게 부풀었어요. 곧 조용해질 거예요, 정상이에요',
     channelWarn: '중요 알림', // Android 채널명 — 놓치면 잃는 신호(반점·깊은 잠) 전용
     permissionHint: '밥 시간을 알려드릴까요',
     permissionSettings: '알림은 시스템 설정에서 켤 수 있어요',
@@ -379,14 +406,24 @@ export const copy = {
     reviveSecond: (_n: number) => '다시 밥 줄 시간이에요',
     moldWarn: (_n: number) => '표면에 반점이 보이는 르방이가 있어요. 아직 늦지 않았어요',
     peak: (_n: number) => '한창 부풀어 있는 르방이가 있어요',
+    sour: (_n: number) => '조금 시큼해진 르방이가 있어요. 밥을 주면 돌아와요',
+    stageUp: (_n: number) => '단계가 오른 르방이가 있어요',
+    firstWeek: (_n: number) => '크게 부푼 르방이가 있어요. 곧 조용해져요, 정상이에요',
   } as Record<string, (n: number) => string>,
 
   settings: {
     title: '설정',
     sound: '소리',
     haptics: '진동',
-    notify: '밥 시간 알림',
-    notifyPeak: '한창때 알림',
+    // 알림 — 설정 본문엔 진입 행 하나(notifyTitle)만 두고, 항목은 하위 모달로 (2026-09-03)
+    notifyTitle: '알림',
+    notify: '알림 받기', // 하위 모달의 마스터 토글
+    notifyPeak: '한창때',
+    notifySour: '시큼해질 때',
+    notifyStage: '단계가 오를 때',
+    notifyFirstWeek: '첫 주 안내',
+    notifyPermissionOff: '알림이 꺼져 있어요. 시스템 설정에서 켤 수 있어요',
+    notifyMasterOff: '알림 받기를 먼저 켜 주세요',
     quiet: '방해 없는 시간',
     quietValue: (s: number, e: number) => (s === e ? '없음' : `${s}시부터 ${e}시까지`),
     quietBody: '이 시간에 걸린 알림은 끝나는 시각으로 미뤄서 보내드려요',
