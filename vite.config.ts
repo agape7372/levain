@@ -1,7 +1,13 @@
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
+
+const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
 export default defineConfig({
   base: './',
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   build: {
     target: 'es2020',
     // ⚠ 명시해 뒀지만 **이 환경에선 안 먹는다** — dist/ 디렉터리 제거 자체가 조용히 실패해서

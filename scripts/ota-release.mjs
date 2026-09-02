@@ -42,6 +42,15 @@ if (!/^\d+\.\d+\.\d+$/.test(version)) {
   process.exit(1);
 }
 
+// APP_VERSION 단일 출처(2026-09-03) — 수동 계좌 드리프트(1.3.7 vs 1.3.9 실사고) 방지
+if (!dryRun) {
+  const pkgPath = path.join(root, 'package.json');
+  const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+  pkg.version = version;
+  writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+  console.log(`package.json version → ${version}`);
+}
+
 // ★dist/를 먼저 비운다 — 빌드가 스스로 비우지 않는다.
 //
 // 산출물 파일명이 내용 해시라 빌드마다 새 이름이 생기고 옛 파일은 **그대로 남는다.**

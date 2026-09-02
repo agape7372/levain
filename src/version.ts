@@ -1,5 +1,6 @@
 /**
  * 앱(웹 번들) 버전 — 설정 하단 표시 + 개발자 모드 진입(7탭) 앵커.
- * ⚠ OTA 발행 시 수동 갱신: `npm run ota:release -- <version>` 버전과 맞출 것 (RELEASE §8 절차에 포함).
+ * package.json version이 유일 출처 — vite define으로 주입. 수동 갱신 금지,
+ * `npm run ota:release -- <ver>`가 package.json을 올린다.
  */
-export const APP_VERSION = '1.3.7';
+export const APP_VERSION = __APP_VERSION__;
