@@ -617,7 +617,8 @@ html {
   cursor: pointer;
 }
 .status-line:active { opacity: 0.7; }
-.status-line .sl-left { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 말줄임 금지 — 좁은 폭·큰 글자에선 두 줄로 접힌다. 적기 안내가 잘리면 이 줄의 존재 이유가 없다(실측 195px에서 통째로 소실) */
+.status-line .sl-left { flex: 1; min-width: 0; line-height: 1.4; }
 .status-line .sl-ready { color: var(--ink); font-weight: 600; }
 .status-line .sl-pantry { flex-shrink: 0; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .status-line .sl-pantry.is-empty { color: var(--ink-faint); font-weight: 400; }
@@ -625,7 +626,8 @@ html {
 .recipes-seg button { flex: 1; }
 .recipe-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* 폭에 따라 열 수가 정해진다(358px = 2열). 고정 2열은 좁은 폭·큰 글자에서 둘째 열이 잘려 나갔다(실측 195px) */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 12px;
 }
 .recipe-card {
@@ -765,7 +767,7 @@ html {
   background: color-mix(in srgb, var(--bg) 70%, transparent);
 }
 .sheet-head .art img { width: 64px; height: 64px; object-fit: contain; }
-.sheet-head .sh-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.sheet-head .sh-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; overflow-wrap: anywhere; }
 .sheet-head .sh-name { font-size: 18px; font-weight: 600; color: var(--ink); }
 .sheet-head .sh-flavor { font-size: 13px; color: var(--ink-faint); }
 .sheet-head .sh-cost { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
@@ -787,7 +789,8 @@ html {
 
 /* 재료 칩 그리드 — 4열. 이 빵에 넣을 수 있는 재료 **전부**를 보이고 보유/미보유/발견을 세 상태로 가른다:
    보유 = 또렷 + 수량 / 미보유 = 옅게(이름은 보인다 — "무엇이 필요한지"가 여기서 읽힌다) / 발견 = ✓ */
-.chip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+/* 324px(시트 안폭)에서 4열, 좁아지면 열이 준다 — 고정 4열은 좁은 폭에서 칩이 잘렸다(실측 195px) */
+.chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; }
 .chip {
   position: relative;
   display: flex;
@@ -895,7 +898,11 @@ html {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(74, 50, 32, 0.12);
+  /* 모달(교환소·설정) 위에 뜰 때 뒤 카드가 비치지 않게 — 실측(09)에서 0.12는 칩 그리드와 겹쳐 읽혔다.
+     딤은 모달 백드롭(0.25)보다 진하게 + 블러로 뒤를 물린다. 차단은 아니다(탭하면 닫힌다). */
+  background: rgba(74, 50, 32, 0.34);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
   opacity: 0;
   transition: opacity 0.22s;
   cursor: pointer;
@@ -903,7 +910,7 @@ html {
 .celebrate-layer.show { opacity: 1; }
 .celebrate-layer.leaving { opacity: 0; }
 .celebrate-card {
-  width: min(100%, 320px);
+  width: min(100%, 340px);   /* 모달 카드(340)와 같은 폭 — 뒤 카드 가장자리가 삐져나오지 않게 */
   padding: 22px 20px 16px;
   border-radius: 22px;
   background: var(--bg-soft);
