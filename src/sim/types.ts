@@ -63,13 +63,53 @@ export interface SimState {
   flake: { madeAt: number; maturity: number } | null;
 }
 
+/**
+ * 통에 든 반죽의 품질 — g 가중 평균 (GDD §6-2 개정 2026-09-05: 등급은 화면의 르방이 아니라
+ * 통에서 나가는 반죽이 정한다). store가 shared.pantryLots(아래 PantryLot)에서 파생해 bake
+ * 액션에 `dough`로 주입한다 — 이번 굽기로 실제 나갈 조각들의 평균이지 통 전체 평균이 아니다.
+ * sim은 통을 모르므로(순수) 값으로만 받는다.
+ */
+export interface DoughQuality {
+  /** 뗀 순간들의 activity g 가중 평균 0~1 */
+  activity: number;
+  /** 뗀 순간들의 acidity g 가중 평균 0~100 */
+  acidity: number;
+  /** 통에서 g이 가장 많은 밀가루 — flourAffinity 판정용 */
+  flour: Flour;
+}
+
+/**
+ * 보관 통의 로트 한 덩이 — "언제 뗀 반죽인지"를 뭉개지 않고 통째로 기억한다
+ * (GDD §6-2 개정 2026-09-05). 저장 위치는 shared.pantryLots, 타입만 도메인 어휘라 여기 산다
+ * (CollectionEntry 선례). sim은 통을 모른다 — 이 타입을 읽는 것은 store뿐이다.
+ *
+ * **타임스탬프가 없는 것이 핵심**이다: 의미를 갖는 건 순서(앞 = 오래된 것)뿐이라
+ * 시계 역행 재정박 목록(CLAUDE.md 규칙 4)에 들어가지 않는다. 순서는 "오래된 것 → 최근"이고
+ * 동점 타이브레이크·상한 병합 대상을 정하는 데 쓰인다. 굽기가 어느 로트를 쓸지는 순서가 아니라
+ * 레시피 적합도가 정한다 — sim/pantry.ts pickDough(그 파일 머리에 이유).
+ */
+export interface PantryLot {
+  /** 이 로트에 남은 그램 — 정수 */
+  g: number;
+  /** 뗀 순간의 발효 활성도 0~1 */
+  act: number;
+  /** 뗀 순간의 산미 0~100 */
+  acid: number;
+  /** 뗀 순간 르방이가 먹고 있던 밀가루 */
+  flour: Flour;
+}
+
 export type Action =
   | { type: 'feed'; ratio: FeedRatio; flour?: Flour } // flour 생략 = 이전 것 유지
   | { type: 'setLocation'; to: Location }
   // variantId(§8-2) = 도감 기록 키 패스스루 — sim은 해석하지 않는다(재료 sim 무영향).
   // 재료 검증·차감은 store 소관 (gameStore.bakeVariant)
-  | { type: 'bake'; recipeId: string; variantId?: string }
-  | { type: 'bakeDiscard'; recipeId: string; variantId?: string } // variantId 규약은 bake와 동일
+  // houseStage·dough(2026-09-05, GDD §6-2 개정) = **store가 doDispatch에서 주입**하는 집 기준 값.
+  // 해금은 집 최고 단계(economy.stageMax), 등급은 통 반죽 품질로 판정한다 — 어느 르방이 화면에
+  // 떠 있는지는 굽기와 무관. 부재 = 활성 르방 자기 상태로 판정(후방 호환·기존 테스트 무수정).
+  // UI가 직접 채우지 않는다 — store 한 곳(gameStore.doDispatch)만.
+  | { type: 'bake'; recipeId: string; variantId?: string; houseStage?: number; dough?: DoughQuality }
+  | { type: 'bakeDiscard'; recipeId: string; variantId?: string; houseStage?: number } // variantId 규약은 bake와 동일
   | { type: 'split' }           // 떼어내기 — 씨앗만 남기고 보관 통으로 (GDD §6-2, 적립은 store 소관)
   | { type: 'makeFlake' }       // 얇게 펴 말리기 — 죽음 보험 (3단계 해금, 활발, -20g)
   | { type: 'discardStarter' }  // 곰팡이 확정 후 폐기 — 새 개체 (도감은 전역이라 자동 보존)

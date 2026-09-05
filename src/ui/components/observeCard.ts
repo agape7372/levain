@@ -5,7 +5,7 @@
 import { copy } from '../copy';
 import { agoText, untilText } from '../format';
 import { confirmModal, openModal } from './modal';
-import { FLAKE_COST_G, FLAKE_STAGE, SEED_G } from '../../sim';
+import { FLAKE_COST_G, FLAKE_STAGE, FLOAT_OK_ACTIVITY, SEED_G } from '../../sim';
 import type { GameApi } from '../gameApi';
 
 export function openObserveCard(api: GameApi): void {
@@ -26,6 +26,13 @@ export function openObserveCard(api: GameApi): void {
     } else if (now < snap.peakEndAt) {
       rows.push(['부풀기', copy.observe.peakNow]);
     }
+    // 띄워보기 (2026-09-05) — 레시피 상태 줄에서 이리로 옮겨왔다. 물에 뜨는지는 **르방의** 상태라
+    // 르방을 말하는 카드에서 말한다(빵은 통에서 나간다 — GDD §6-2 개정).
+    // ★정보 행이지 버튼이 아니다: 이 카드의 조작은 말려두기 하나뿐이다(GDD §5 "조작 1개 상한").
+    rows.push([
+      copy.observe.floatTest,
+      snap.activity >= FLOAT_OK_ACTIVITY ? copy.observe.floatOk : copy.observe.floatNotYet,
+    ]);
     rows.push(['다음 밥', copy.observe.nextFeed(untilText(snap.nextFeedAt, now) + ' 뒤')]);
   }
 

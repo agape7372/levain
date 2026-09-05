@@ -3,11 +3,15 @@
 // NaN·범위 밖 숫자는 버리지 않고 clamp로 살린다 — 필드 하나 때문에 기록 전체를 잃지 않는다.
 // 파싱 순서: JSON.parse → migrate(raw) → validateAndClamp(현행 스키마) — 마이그레이션이
 // 검증보다 먼저다. 구버전 저장본이 신버전 가드에 걸려 null(새 게임)이 되는 사고 방지.
-import type { AdGrant, BakeGrade, CollectionEntry, FeedRatio, Flour, Location, SimState } from '../sim';
-import { RATIOS, TEMP_MULT } from '../sim';
+import type {
+  AdGrant, BakeGrade, CollectionEntry, FeedRatio, Flour, Location, PantryLot, SimState,
+} from '../sim';
+import { RATIOS, TEMP_MULT, capLots, lotsSum, trimOldest } from '../sim';
 // MASS_MAX·ACID_MAX는 sim/index.ts가 재수출하지 않는데 sim/**는 M2 범위 밖(수정 금지)이다.
 // 범위 수치를 여기에 하드코딩하지 않기 위해(CLAUDE.md 규칙 9) constants에서 직접 가져온다.
-import { ACID_MAX, MASS_MAX, PANTRY_MAX, SEED_G, STAGES } from '../sim/constants';
+import {
+  ACID_MAX, MASS_MAX, PANTRY_MAX, PANTRY_LEGACY_ACIDITY, PANTRY_LEGACY_ACTIVITY, SEED_G, STAGES,
+} from '../sim/constants';
 import { INGREDIENTS } from '../sim/ingredients';
 import type { IngredientId } from '../sim/ingredients';
 import type { StorageAdapter } from '../platform/storage';
@@ -75,7 +79,21 @@ export interface SharedState {
    * 키 부재 = 0 (inventory·economy와 같은 무버전 착륙).
    */
   pantry: number;
+  /**
+   * 보관 통 로트 원장 (GDD §6-2 개정 2026-09-05) — 등급이 화면의 르방이 아니라 통에서
+   * 나가는 반죽으로 결정되면서 생겼다. 스칼라 평균이 아니라 **덩이의 줄**로 든다:
+   * 떼면 뒤에 붙고, 구울 때는 그 빵에 가장 잘 맞는 로트부터 나간다(sim/pantry.ts pickDough).
+   * 평균으로 뭉개면 "어떤 반죽을 언제 떼어 두었나"가 통째로 사라진다.
+   * 순서 자체가 데이터다 — 앞이 오래된 것이고, 동점일 때의 우선순위이자 병합 대상이다.
+   *
+   * `pantry`(스칼라 g)는 이 원장의 **미러**다 — Σ lots.g와 항상 같게 유지한다.
+   * 미러를 남겨 두는 이유는 롤백: 1.4.0 번들은 `pantryLots`를 모르고 g만 읽는다.
+   * 키 부재 = 1.4.x 저장본 → PANTRY_LEGACY_* 품질의 로트 하나로 물질화(lotsOf 주석).
+   */
+  pantryLots: PantryLot[];
 }
+
+export const emptyLots = (): PantryLot[] => [];
 
 export interface SaveEnvelope {
   schemaVersion: number;
@@ -185,22 +203,75 @@ function economyOf(v: unknown): EconomyState {
   };
 }
 
+const FLOURS: readonly Flour[] = ['white', 'wholewheat', 'rye'];
+
+function lotOf(v: unknown): PantryLot | null {
+  if (!isObject(v)) return null;
+  const g = Math.round(num(v.g, 0, PANTRY_MAX, 0));
+  if (g <= 0) return null; // 0g 로트는 자리만 차지한다
+  return {
+    g,
+    act: num(v.act, 0, 1, 0),
+    acid: num(v.acid, 0, ACID_MAX, 0),
+    flour: FLOURS.includes(v.flour as Flour) ? (v.flour as Flour) : 'white',
+  };
+}
+
+/**
+ * 로트 원장 착륙 (GDD §6-2 개정 2026-09-05). pantry(미러 g)를 이미 clamp한 뒤에 부른다 —
+ * 1.4.0 번들이 읽고 쓰는 건 그 스칼라뿐이라 **미러가 기준**이고 원장을 거기에 맞춘다.
+ *
+ * 키 부재 = 1.4.x 저장본 → 레거시 품질 로트 하나로 **물질화**한다. 읽는 즉시 env에 실려
+ * 다음 persist에 저장되므로, 첫 떼기부터 가중 평균이 정상 누적된다
+ * (320g 구세이브 + 90g 새 반죽 = (320×0.8 + 90×act)/410). 매번 다시 씌우는 임시 처리가 아니다.
+ * 키가 있으면 로트별로 관대 파싱(불량 로트만 폐기) 후 미러에 정합시킨다:
+ *   Σg < pantry — 옛 번들이 g만 늘리고 롤백된 경로 → 부족분을 레거시 로트로 **맨 앞**에 넣는다
+ *                 (가장 오래된 반죽 자리 = 다음 빵에 먼저 나간다)
+ *   Σg > pantry — 손상·불일치 → 앞(오래된 것)부터 잘라 맞춘다
+ */
+function lotsOf(v: Record<string, unknown>, pantry: number): PantryLot[] {
+  if (pantry <= 0) return emptyLots(); // 빈 통에 로트는 없다
+  const legacyLot = (g: number): PantryLot => ({
+    g,
+    act: PANTRY_LEGACY_ACTIVITY,
+    acid: PANTRY_LEGACY_ACIDITY,
+    flour: 'white',
+  });
+  if (!has(v, 'pantryLots') || !Array.isArray(v.pantryLots)) return [legacyLot(pantry)];
+
+  const lots: PantryLot[] = [];
+  for (const raw of v.pantryLots) {
+    const lot = lotOf(raw);
+    if (lot !== null) lots.push(lot); // 불량 로트는 개별로 버린다 (ads 원장 선례)
+  }
+  const sum = lotsSum(lots);
+  if (sum < pantry) return capLots([legacyLot(pantry - sum), ...lots]);
+  if (sum > pantry) return capLots(trimOldest(lots, sum - pantry));
+  return capLots(lots);
+}
+
 /** 전역(집) 소유 상태 — 하위 키가 없으면 기본값 (inventory가 예고대로 무이행 착륙, flour 패턴) */
 function sharedOf(v: unknown): SharedState {
   if (!isObject(v)) {
-    return { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0, ads: [] };
+    return {
+      collection: {}, inventory: emptyInventory(), economy: emptyEconomy(),
+      pantry: 0, ads: [], pantryLots: emptyLots(),
+    };
   }
+  // 보관 통 — economy와 같은 등급의 무버전 추가 키. 부재 = 0으로 착륙시켜
+  // 옛 클라이언트가 이 저장본을 읽어도 미지 키만 버리고 살아남게 한다(위 economyOf 주석).
+  // 선물 적립을 안 하는 이유: mass가 "아직 안 뗀 예치금"이라 떼어내기 한 번이면 그대로 들어온다.
+  const pantry = Math.round(num(v.pantry, 0, PANTRY_MAX, 0));
   return {
     collection: collectionOf(v.collection),
     inventory: inventoryOf(v.inventory),
     economy: economyOf(v.economy),
-    // 보관 통 — economy와 같은 등급의 무버전 추가 키. 부재 = 0으로 착륙시켜
-    // 옛 클라이언트가 이 저장본을 읽어도 미지 키만 버리고 살아남게 한다(위 economyOf 주석).
-    // 선물 적립을 안 하는 이유: mass가 "아직 안 뗀 예치금"이라 떼어내기 한 번이면 그대로 들어온다.
-    pantry: Math.round(num(v.pantry, 0, PANTRY_MAX, 0)),
+    pantry,
     // 광고 지급 원장 — 같은 등급의 무버전 추가 키(2026-08-30, 확장기획 §10 멱등성).
     // 불량 줄은 개별로 버린다 — 원장이 깨져도 상한 산수가 0에서 다시 시작할 뿐이다.
     ads: adsOf(v.ads),
+    // 반죽 로트 원장 — pantry(미러) clamp 뒤에 (lotsOf 주석)
+    pantryLots: lotsOf(v, pantry),
   };
 }
 

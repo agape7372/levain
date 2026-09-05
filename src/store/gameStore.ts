@@ -6,20 +6,24 @@
 // 멀티는 전부 이 층에서 — 활성 르방만 advance/dispatch하고, 비활성은 닫힌 함수 모델
 // 덕분에 그냥 둔다(전환 시 advance 1회면 정산 끝). 백그라운드 시뮬 0.
 import type {
-  Action, AdGrant, BriefingKey, CollectionEntry, IngredientId, NotifyPlan, SimEvent, SimState, Snapshot,
+  Action, AdGrant, BriefingKey, CollectionEntry, DoughPick, DoughQuality, IngredientId, NotifyPlan,
+  PantryLot, SimEvent, SimState, Snapshot,
 } from '../sim';
 import {
   LABEL_STAGE, REWIND_TOLERANCE_MS, STARTER_SLOTS_FREE,
-  advance, applyAction, betterGrade, deriveBriefing, deriveSnapshot, initialState,
+  activityAt, advance, applyAction, betterGrade, deriveBriefing, deriveSnapshot, initialState,
   isPlayable, planNotificationsAll, playableRules, reanchor, ruleByVariantId, stageOf,
   RECIPES, variantIdOf, DAY, INGREDIENT_SOFT_CAP, INGREDIENT_FLOUR_COST,
-  canBakeBread, recipeById, PANTRY_MAX, INGREDIENTS,
+  canBakeBread, recipeById, PANTRY_MAX, PANTRY_LEGACY_ACIDITY, PANTRY_LEGACY_ACTIVITY, INGREDIENTS,
   canWatchAd, recordAdGrant,
+  consumeLots, lotsSum, pantryQualityOf, pickDough, pushLot, trimOldest,
 } from '../sim';
 import type { Clock } from '../platform/clock';
 import type { StorageAdapter } from '../platform/storage';
 import type { LoadSource, SaveEnvelope, SaveFlags, SaveSettings, StarterRecord } from './persistence';
-import { SCHEMA_VERSION, defaultFlags, defaultSettings, emptyInventory, load, save } from './persistence';
+import {
+  SCHEMA_VERSION, defaultFlags, defaultSettings, emptyInventory, emptyLots, load, save,
+} from './persistence';
 import type { EconomyState } from './economy';
 import { earnedFlour, emptyEconomy, flourBalance } from './economy';
 
@@ -61,6 +65,19 @@ export interface GameStore {
   /** 보관 통 잔량(g) — 빵 원가의 출처 (GDD §6-2) */
   getPantry(): number;
   /**
+   * 집 최고 성장 단계(economy.stageMax) — 해금의 단일 출처 (GDD §6-2 개정 2026-09-05).
+   * 활성 르방의 stage가 아니다: 통이 집 것이면 무엇을 구울 수 있는지도 집이 정한다.
+   */
+  getHouseStage(): number;
+  /** 통 **전체**의 g 가중 평균 품질 — 상태 줄 표시용. 통이 비었으면 null */
+  getPantryQuality(): DoughQuality | null;
+  /**
+   * 이 빵을 지금 구우면 실제로 나갈 반죽의 품질 — 굽기는 레시피에 가장 잘 맞는 로트부터
+   * 골라 쓴다(sim/pantry.ts pickDough). 등급 판정의 입력이고 빵 시트가 같은 값을 보여준다.
+   * 빵 레시피가 아니거나 통이 비었으면 null.
+   */
+  getDoughFor(recipeId: string): DoughQuality | null;
+  /**
    * 재료 지급 — 소프트캡(INGREDIENT_SOFT_CAP)까지만 쌓이고 초과분은 교환 가루로 자동
    * 전환된다 (§9). Levain Lab·개발자 모드·선물이 공용으로 쓴다.
    */
@@ -68,8 +85,9 @@ export interface GameStore {
   /**
    * 보관 통 직접 적립 — Levain Lab·개발자 모드·테스트 전용. 정상 경로는 떼어내기(split)다.
    * grantIngredient와 같은 등급의 주입구이고, 게임 규칙은 통과하지 않는다.
+   * quality 생략 시 레거시 품질(PANTRY_LEGACY_*)의 로트로 들어간다.
    */
-  grantPantry(g: number): void;
+  grantPantry(g: number, quality?: DoughQuality): void;
 
   // ── 무료 경제 (§9 Phase 7) — 잔액은 파생, store/economy.ts가 정의 ──
   /** 경제 카운터 원본 (읽기 전용) */
@@ -132,7 +150,10 @@ export function newEnvelope(now: number): SaveEnvelope {
     starters: [{ id: 's1', name: null, ordinal: 1, sim: initialState(now) }],
     activeStarterId: 's1',
     nextStarterOrdinal: 2,
-    shared: { collection: {}, inventory: emptyInventory(), economy: emptyEconomy(), pantry: 0, ads: [] },
+    shared: {
+      collection: {}, inventory: emptyInventory(), economy: emptyEconomy(),
+      pantry: 0, ads: [], pantryLots: emptyLots(),
+    },
     settings: defaultSettings(),
     flags: defaultFlags(),
   };
@@ -171,6 +192,12 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
   function setEconomy(patch: Partial<EconomyState>): void {
     env = { ...env, shared: { ...env.shared, economy: { ...economy(), ...patch } } };
   }
+
+  /**
+   * 집 최고 성장 단계 = 해금의 단일 출처 (GDD §6-2 개정 2026-09-05). stageMax는 이미
+   * 전 starter 관측으로 갱신되고 부트 백필도 있어(syncStageMax) 별도 max 계산이 필요 없다.
+   */
+  const houseStage = (): number => economy().stageMax;
 
   /** stageMax는 이벤트가 아니라 관측으로 올린다 — 구세이브(이미 성장한 르방)도 소급 인정 */
   let stageMaxDirty = false;
@@ -229,7 +256,13 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
       env = {
         ...env,
         starters: env.starters.map((r) => ({ ...r, sim: reanchor(r.sim, delta) })),
-        shared: { ...env.shared, collection },
+        shared: {
+          ...env.shared,
+          collection,
+          // 광고 원장도 타임스탬프다 — GDD §3-8은 "향후 필드 포함 모든 타임스탬프"라고 쓴다.
+          // 안 당기면 오늘 지급분이 "미래"가 돼 sameLocalDay 산수에서 빠지고 하루 상한이 리셋된다.
+          ads: env.shared.ads.map((g) => ({ ...g, at: g.at - delta })),
+        },
       };
     }
     setActiveSim(advance(activeSim(), now));
@@ -272,21 +305,69 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     }
   }
 
+  // ── 보관 통 로트 원장 (GDD §6-2, 개정 2026-09-05) ──────────────────────────
+  // 떼면 뒤에 붙고, 구울 때는 그 빵에 **가장 잘 맞는 로트**부터 나간다(sim/pantry.ts pickDough —
+  // 오래된 순이 아니다. 그 이유는 그 파일 머리 주석에). g은 정수만: 로트 g의 합이 곧
+  // shared.pantry(미러)이고 그게 화면에 뜨는 유일한 수치라 소수점이 생기면 안 된다.
+  // 규칙은 전부 sim의 순수 함수이고 여기는 그것을 env에 붙이는 배선뿐이다.
+
+  /** 원장을 갈아 끼운다 — 미러(pantry) 동기화는 여기 한 곳에서만 */
+  function setLots(lots: PantryLot[]): void {
+    env = { ...env, shared: { ...env.shared, pantryLots: lots, pantry: lotsSum(lots) } };
+  }
+
+  /** 로트 추가 — PANTRY_MAX는 밸런스 캡이 아니라 저장 가드라 넘칠 몫만 잘라 넣는다 */
+  function addLot(lot: PantryLot): void {
+    const room = PANTRY_MAX - env.shared.pantry;
+    const g = Math.min(Math.round(lot.g), room);
+    if (g <= 0) return;
+    setLots(pushLot(env.shared.pantryLots, { ...lot, g }));
+  }
+
+  /** 이 레시피를 지금 구우면 어느 조각이 나갈지 — 판정 주입과 소비가 공유하는 단 하나의 선택 */
+  function pickFor(recipeId: string): DoughPick | null {
+    const recipe = recipeById(recipeId);
+    if (!recipe || recipe.kind !== 'bread') return null;
+    return pickDough(env.shared.pantryLots, recipe, recipe.cost);
+  }
+
   /**
    * 보관 통 정산 — 떼어내면 쌓이고 빵을 구우면 나간다 (GDD §6-2).
    * sim은 전역 통을 모르므로(순수) 적립·차감이 전부 여기서 일어난다 — 도감·재료와 같은 층이고
    * doDispatch의 persist 1회 안에서 커밋되므로 원자성은 그 계약에 얹힌다.
+   * `pick`은 dough를 주입할 때 고른 조각 — 같은 것을 소비해야 예고와 결과가 갈리지 않는다.
    */
-  function applyPantryEvents(events: SimEvent[]): void {
-    let delta = 0;
+  function applyPantryEvents(
+    events: SimEvent[],
+    stateAfter: SimState,
+    now: number,
+    pick: DoughPick | null,
+  ): void {
     for (const e of events) {
-      if (e.type === 'split') delta += e.amount;
-      // bakedDiscard는 cost 0 — 통을 쓰지 않는다(급여당 1회 쿨다운이 그 제약, GDD §6-1)
-      else if (e.type === 'baked') delta -= recipeById(e.recipeId)?.cost ?? 0;
+      if (e.type === 'split') {
+        // 뗀 순간을 로트로 봉해 둔다 — "피크에 떼라"가 등급에 이빨을 갖는 지점(GDD §6-2).
+        // 액션 후 상태로 읽어도 되는 이유: split은 mass만 씨앗으로 줄이고 lastFedAt·locAnchorAt·
+        // effBaseMs·acidity·flour를 건드리지 않는다 → activityAt이 떼기 전과 같은 값이다.
+        addLot({
+          g: e.amount,
+          act: activityAt(stateAfter, now),
+          acid: stateAfter.acidity,
+          flour: stateAfter.flour,
+        });
+      } else if (e.type === 'baked') {
+        // bakedDiscard는 cost 0 — 통을 쓰지 않는다(급여당 1회 쿨다운이 그 제약, GDD §6-1)
+        const cost = recipeById(e.recipeId)?.cost ?? 0;
+        if (cost <= 0) continue;
+        // pantryGate가 통 부족을 사전 차단하므로 여기 도달했으면 Σg ≥ cost이고 pick도 있다.
+        // 미러(pantry)가 아니라 **원장 합**을 보는 이유: 게이트가 이미 미러로 판정했으니 미러를
+        // 다시 봐야 새로 알 게 없다. 둘이 갈라진 상태(불변식 붕괴)를 잡는 게 이 줄의 일이다.
+        // 클램프로 덮으면 무료 빵이 조용히 굽힌다 — 불변식 위반은 소리를 내게 둔다(FM1).
+        if (pick === null || lotsSum(env.shared.pantryLots) < cost) {
+          throw new Error('pantry underflow');
+        }
+        setLots(consumeLots(env.shared.pantryLots, pick.taken));
+      }
     }
-    if (delta === 0) return;
-    const pantry = Math.max(0, Math.min(PANTRY_MAX, env.shared.pantry + delta));
-    env = { ...env, shared: { ...env.shared, pantry } };
   }
 
   /**
@@ -299,8 +380,13 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     if (action.type !== 'bake') return null;
     const recipe = recipeById(action.recipeId);
     if (!recipe || recipe.kind !== 'bread') return null;
-    if (canBakeBread(activeSim(), recipe, now) !== 'ok') return null;
-    if (env.shared.pantry >= recipe.cost) return null;
+    // 단계 판정은 sim과 같은 기준(집 최고 단계)이어야 한다 — 어긋나면 sim이 통과시킬 굽기를
+    // 여기서 통 부족으로 막거나 그 반대가 된다.
+    if (canBakeBread(activeSim(), recipe, now, houseStage()) !== 'ok') return null;
+    // 잔량은 **원장 합**으로 본다(미러 pantry가 아니라) — 나가는 것도 원장이므로 게이트와 소비가 같은 수를
+    // 봐야 한다. 미러로 판정하면 둘이 갈라진 저장본(불변식 붕괴)에서 applyPantryEvents의 underflow throw가
+    // 도감 기록 뒤에 터져 메모리 상태가 반쯤 바뀐 채 남는다. 원장으로 판정하면 그 경로는 죽는다.
+    if (lotsSum(env.shared.pantryLots) >= recipe.cost) return null;
     return { state: activeSim(), events: [{ type: 'bakeBlocked', reason: 'pantry' }] };
   }
 
@@ -357,14 +443,35 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     return snap;
   }
 
+  /**
+   * 집 기준 굽기 컨텍스트 주입 (GDD §6-2 개정 2026-09-05) — 해금은 집 최고 단계로,
+   * 등급은 통 반죽 품질로 판정한다. **UI가 채워 보낸 값이 있어도 덮어쓴다**: 단일 출처가
+   * store 하나여야 화면이 본 것과 판정이 갈리지 않는다. advanceTo 뒤에만 부를 것 —
+   * stageMax는 그 안의 syncStageMax가 갱신한다.
+   */
+  function withHouseContext(action: Action, pick: DoughPick | null): Action {
+    if (action.type === 'bake') {
+      return { ...action, houseStage: houseStage(), dough: pick?.dough };
+    }
+    // discard는 통을 쓰지 않는다 — 나갈 반죽이 없으니 판정할 것도 없다(해금만 집 기준)
+    if (action.type === 'bakeDiscard') return { ...action, houseStage: houseStage() };
+    return action;
+  }
+
   function doDispatch(action: Action): SimEvent[] {
     const now = clock.now(); // 한 번만 캡처 — advance·applyAction·savedAt이 같은 시각을 본다
     const before = earnedNow();
     advanceTo(now);
-    const res = pantryGate(action, now) ?? applyAction(activeSim(), action, now);
+    // 나갈 조각을 **한 번만** 고른다 — 판정(dough)과 소비가 같은 선택이어야 시트가 예고한
+    // 반죽과 실제로 나간 반죽이 갈리지 않는다. advanceTo 뒤: 그 전엔 원장이 확정이 아니다.
+    const pick = action.type === 'bake' ? pickFor(action.recipeId) : null;
+    const act = withHouseContext(action, pick);
+    const res = pantryGate(act, now) ?? applyAction(activeSim(), act, now);
     setActiveSim(res.state);
     applyBakeEvents(res.events, now);
-    applyPantryEvents(res.events); // 도감과 같은 델타 — 통 차감·적립도 이 persist 1회에 든다
+    // 도감과 같은 델타 — 통 차감·적립도 이 persist 1회에 든다. 액션 후 상태를 넘기는 이유는
+    // applyPantryEvents 주석(split의 떼는 순간 품질).
+    applyPantryEvents(res.events, res.state, now, pick);
     applyEconomyEvents(res.events); // 도감 갱신 뒤 — 레시피 최초 완성분까지 같은 델타에 든다
     snap = deriveSnapshot(activeSim(), now);
     const events = [...res.events, ...earnEvents(before)];
@@ -399,6 +506,9 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     getCollection: () => env.shared.collection,
     getInventory: () => env.shared.inventory,
     getPantry: () => env.shared.pantry,
+    getHouseStage: () => houseStage(),
+    getPantryQuality: () => pantryQualityOf(env.shared.pantryLots),
+    getDoughFor: (recipeId: string) => pickFor(recipeId)?.dough ?? null,
     getAdLedger: () => env.shared.ads,
 
     // 광고 자체(SDK·시청)는 platform 소관 — 여기는 "보상 지급"만. 호출자(app.ts)가
@@ -428,9 +538,21 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
       emit(earnEvents(before));
     },
 
-    grantPantry(g: number): void {
-      const pantry = Math.max(0, Math.min(PANTRY_MAX, env.shared.pantry + Math.round(g)));
-      env = { ...env, shared: { ...env.shared, pantry } };
+    grantPantry(g: number, quality?: DoughQuality): void {
+      // quality 생략 = 1.4.x 저장본 착륙과 같은 레거시 품질(선호 범위 안 빵이 best로 나온다).
+      // 음수는 통을 줄이는 뜻이라 오래된 것부터 떠낸다(굽기 규칙과 무관한 주입구 편의).
+      const delta = Math.round(g);
+      if (delta > 0) {
+        addLot({
+          g: delta,
+          act: quality?.activity ?? PANTRY_LEGACY_ACTIVITY,
+          acid: quality?.acidity ?? PANTRY_LEGACY_ACIDITY,
+          flour: quality?.flour ?? 'white',
+        });
+      } else if (delta < 0) {
+        // 음수 = "그만큼 없애라". 버릴 대상을 고르는 일이라 굽기(pickDough)가 아니라 trimOldest다.
+        setLots(trimOldest(env.shared.pantryLots, -delta));
+      }
       persist(clock.now());
     },
 
@@ -502,8 +624,11 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
       const sim = activeSim();
       // createdAt만 과거로 — 재정박 목록과 무관(더 과거로 미는 건 안전), 일수 게이트 통과용
       setActiveSim({ ...sim, createdAt: now - 40 * DAY, maturity: 45, mass: 480 });
-      // 통도 같이 채운다 — 안 채우면 성숙 치트를 써도 빵을 한 개도 못 굽는다(원가가 통에서 나간다)
-      env = { ...env, shared: { ...env.shared, pantry: Math.max(env.shared.pantry, 1_000) } };
+      // 통도 같이 채운다 — 안 채우면 성숙 치트를 써도 빵을 한 개도 못 굽는다(원가가 통에서 나간다).
+      // 품질까지 실어 주는 이유: 등급이 통 반죽으로 결정되므로(GDD §6-2 개정) 빈 품질로 채우면
+      // 치트로 구운 빵이 죄다 납작하게 나온다. 활발(1.0)·순한(산미 10) 로트 = 어떤 레시피든 최고 가능.
+      const need = 1_000 - env.shared.pantry;
+      if (need > 0) addLot({ g: need, act: 1.0, acid: 10, flour: 'white' });
       snap = deriveSnapshot(activeSim(), now);
       persist(now);
       replan(now);

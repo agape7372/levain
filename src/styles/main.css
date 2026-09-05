@@ -11,6 +11,13 @@
   --crust:       #A9713F;  /* 구운 빵·완료 뱃지 */
   --hooch:       #9C927F;  /* 배고픔·휴면 정보 톤 (경고 아님) */
 
+  /* 타이포 토큰 (VISUAL §7-2, 2026-09-05 명문화) — 레시피 절이 10~12.5px를 8종 쓰고 있었다(실측).
+     --fs-num(12px)은 **숫자 pill 전용**. 글자는 --fs-cap(13px)이 하한이다. 새 크기를 지어내지 말 것. */
+  --fs-title: 20px;
+  --fs-body:  15px;
+  --fs-cap:   13px;
+  --fs-num:   12px;
+
   /* 우상단 오브젝트 컬럼 폭 = ? + ⚙ 가로 두 개(38 + 8 + 38). 항아리(56)보다 이쪽이 넓다.
      .hud-top이 이 값만큼 오른쪽을 비워 둔다 — 한 숫자가 두 곳을 지배해야 글자가
      아이콘 밑으로 파고드는 일이 다시 안 생긴다. 코너에 물건을 더하면 여기부터 고칠 것. */
@@ -515,7 +522,7 @@ html {
   cursor: pointer;
   text-align: left;
 }
-.option-item .hint { font-size: 12.5px; color: var(--ink-faint); }
+.option-item .hint { font-size: var(--fs-cap); color: var(--ink-faint); }
 .option-item.selected { border-color: var(--accent); background: var(--cream); }
 .option-item:disabled { opacity: 0.4; cursor: default; }
 
@@ -593,35 +600,34 @@ html {
 .exchange-texts { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .exchange-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
-/* ── 레시피 (2026-09-03 개편: 세그먼트 [빵|재료] 한 줄, 빵 카드 = 시트, 도감-빵 170장 벽 폐지) ── */
+/* ── 레시피 (2026-09-03 개편 · 2026-09-05 재검수: 세그먼트 3개 [빵|선반|재료], 타이포 토큰, 카드 고정 슬롯, 통 상태 줄) ── */
 .recipes-wrap { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 24px; }
 .recipes-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.recipes-title { font-size: 19px; font-weight: 600; color: var(--ink); margin: 0; }
-/* 굽기 상태 줄 — 제목 아래 한 줄. 왼쪽 = 르방·적기(말), 오른쪽 = 보관 g(숫자). 탭 = 띄워보기 토스트.
-   굽기에 필요한 두 정보(적기·보관량)를 홈으로 돌아가지 않고 여기서 본다. 원가가 g으로 적혀 있으니 g 노출은 정합. */
+.recipes-title { font-size: var(--fs-title); font-weight: 600; color: var(--ink); margin: 0; }
+/* 통 상태 줄 — 제목 아래 한 줄. 왼쪽 = 보관 g(강조), 오른쪽 = 통 반죽의 발효력·산미(캡션). 탭 = 통 설명 토스트.
+   2026-09-05: "{르방} · 지금 굽기 좋아요"(활성 르방 activity)는 폐지 — 빵은 통에서 나가므로 통의 상태만 말한다(GDD §6-2 개정).
+   어린 르방으로 넘겼을 때 "르방이 2 · 지금 굽기 좋아요"가 떠 있던 것이 실측 F7. */
 .status-line {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 10px;
+  align-items: baseline;
+  gap: 12px;
   width: 100%;
   margin: 0 0 12px;
-  padding: 10px 14px;
+  padding: 11px 14px;
   border: 0;
   border-radius: 14px;
   background: color-mix(in srgb, var(--bg-soft) 85%, transparent);
   font-family: inherit;
-  font-size: 13.5px;
   color: var(--ink-soft);
   text-align: left;
   cursor: pointer;
 }
 .status-line:active { opacity: 0.7; }
-/* 말줄임 금지 — 좁은 폭·큰 글자에선 두 줄로 접힌다. 적기 안내가 잘리면 이 줄의 존재 이유가 없다(실측 195px에서 통째로 소실) */
-.status-line .sl-left { flex: 1; min-width: 0; line-height: 1.4; }
-.status-line .sl-ready { color: var(--ink); font-weight: 600; }
-.status-line .sl-pantry { flex-shrink: 0; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.status-line .sl-pantry { flex-shrink: 0; font-size: var(--fs-body); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .status-line .sl-pantry.is-empty { color: var(--ink-faint); font-weight: 400; }
+/* 말줄임 금지 — 좁은 폭에선 두 줄로 접힌다(두 어절이라 접혀도 뜻이 산다) */
+.status-line .sl-quality { min-width: 0; font-size: var(--fs-cap); color: var(--ink-faint); text-align: right; line-height: 1.4; }
 .recipes-seg { margin-bottom: 14px; }
 .recipes-seg button { flex: 1; }
 .recipe-grid {
@@ -630,14 +636,17 @@ html {
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 12px;
 }
+/* 빵 카드 — 고정 슬롯 4단(아트 / 이름 1줄 / 1행 / 2행)이라 같은 행의 카드 바닥이 맞는다.
+   실측(2026-09-05 390-03): discard 카드는 맛 문구 2줄+횟수, 빵 카드는 원가 1줄+등급 문장 2줄로 높이가 제각각이었다.
+   맛 문구는 시트가 말한다 — 카드는 짧은 토큰만(`르방 30g` / `덜어낸 반죽` / `최고 · 3번`). */
 .recipe-card {
-  position: relative;               /* 우상단 pill(변형 진행·수량)의 기준 */
+  position: relative;               /* 우상단 pill(변형 진행)의 기준 */
   background: var(--bg-soft);
   border-radius: 16px;
   padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   border: 0;
   font-family: inherit;
   text-align: left;
@@ -649,16 +658,42 @@ html {
   height: 64px;
   display: grid;
   place-items: center;
-  font-size: 40px;
   filter: none;
 }
 .recipe-card .art img { width: 60px; height: 60px; object-fit: contain; }
 .recipe-card.locked .art { opacity: 0.25; filter: grayscale(1) brightness(1.35); }
-/* 원가 줄 — **항상** 보인다(개편 전엔 한 번 구우면 등급·횟수로 바뀌어 사라졌다 = "몇 그램 필요한지 모름").
-   보관이 모자라면 옆에 옅은 안내 — 경고색 아님(--hooch는 정보 톤). */
-.recipe-card .cost { font-size: 12.5px; color: var(--ink-faint); line-height: 1.45; font-variant-numeric: tabular-nums; }
-.recipe-card .cost .short { color: var(--hooch); }
-/* 우상단 pill — 빵 카드는 변형 진행(3/16), 재료 카드는 수량(9). 0이면 옅게 */
+/* 이름 1줄 고정 — 최장 '통밀 깜빠뉴'(6자·90px)가 130px에 든다. 넘치면 접지 말고 clamp(슬롯 높이 보존) */
+.recipe-card .name {
+  margin-top: 2px;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+  padding-right: 34px; /* pill 자리 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+.recipe-card.locked .name { color: var(--ink-faint); font-weight: 400; }
+/* 두 행 슬롯 — 1행 원가/표식, 2행 등급·횟수 또는 보관 부족. 비어도 높이는 남는다 */
+.recipe-card .line {
+  font-size: var(--fs-cap);
+  line-height: 1.45;
+  min-height: calc(var(--fs-cap) * 1.45);
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+.recipe-card .line .grade { color: var(--crust); font-weight: 600; }
+.recipe-card .line .short { color: var(--hooch); }   /* 보관 부족 — 정보 톤, 경고색 아님 */
+/* 잠긴 카드 — 해금 힌트가 두 행 슬롯을 다 쓴다(문장이라 2줄까지) */
+.recipe-card .locked-text {
+  font-size: var(--fs-cap);
+  line-height: 1.45;
+  min-height: calc(var(--fs-cap) * 1.45 * 2);
+  color: var(--ink-faint);
+}
+/* 우상단 pill — 변형 진행(3/16). **하나라도 만들었을 때만** 붙는다(0/26은 소음 — 실측 F5) */
 .count-pill {
   position: absolute;
   top: 10px; right: 10px;
@@ -666,26 +701,74 @@ html {
   border-radius: 999px;
   background: color-mix(in srgb, var(--bg-deep) 75%, transparent);
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: var(--fs-num);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 .count-pill.is-zero { opacity: 0.55; font-weight: 400; }
-/* ?-실루엣 — 미발견 도감 항목: 단색 실루엣 + 중앙 ? (사용자 확정 2026-08-24) */
-.recipe-card.mystery { position: relative; }
-.recipe-card.mystery .art { opacity: 0.35; filter: grayscale(1) contrast(0.35) brightness(1.15) sepia(0.5); }
-.mystery-mark {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30px;
-  font-weight: 700;
-  color: var(--ink-faint);
-  pointer-events: none;
+/* .recipe-card.mystery / .mystery-mark 는 폐지(2026-09-05) — 재료 탭이 2열 대형 카드에서 4열 칩(.chip--mystery)으로 갔다 */
+
+/* ── 선반 — 구운 빵만, 2D로 (2026-09-05). "만든 걸 3D 아니면 못 본다"(사용자 판정)의 답.
+   3D는 결과 카드 footer의 선택지로 내려갔다. 미발견 ?-벽은 두지 않는다 — 09-03이 걷어낸 170장을 되살리지 말 것. */
+.shelf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
 }
+.shelf-tile {
+  background: var(--bg-soft);
+  border-radius: 16px;
+  padding: 14px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border: 0;
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.shelf-tile:active { transform: scale(0.98); }
+.shelf-tile .art { width: 96px; height: 92px; display: grid; place-items: center; }
+.shelf-tile .art img { width: 88px; height: 88px; object-fit: contain; }
+.shelf-tile .art svg { width: 84px; height: 63px; }
+/* 이름은 2줄까지(변형 이름 '동결건조 블루베리 깜빠뉴'). ellipsis 금지 — 이름이 잘리면 무슨 빵인지 모른다 */
+.shelf-tile .name {
+  margin-top: 4px;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.shelf-tile .line { font-size: var(--fs-cap); line-height: 1.45; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+.shelf-tile .line .grade { color: var(--crust); font-weight: 600; }
+.shelf-empty { padding: 40px 16px; text-align: center; color: var(--ink-soft); font-size: var(--fs-body); line-height: 1.6; }
+.shelf-empty .hint { display: block; margin-top: 4px; font-size: var(--fs-cap); color: var(--ink-faint); }
+
+/* ── 정보 행 — 시트 머리·결과 카드 공용 k/v (관찰 카드 .observe-rows와 같은 문법, 캡션 크기).
+   ' · ' 체인 문장의 대체물. 라벨은 제자리, 값이 길면 오른쪽 열 안에서만 접힌다. */
+.info-rows { display: flex; flex-direction: column; gap: 6px; width: 100%; box-sizing: border-box; }
+.info-rows .ir { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.info-rows .ir-k { flex-shrink: 0; font-size: var(--fs-cap); color: var(--ink-faint); }
+.info-rows .ir-v {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.info-rows .ir-v .grade { color: var(--crust); font-weight: 600; }
+.info-rows .ir-note { font-size: var(--fs-cap); color: var(--hooch); }   /* '100g 모자라요' — 정보 톤 */
 /* 방금 해금 — 좌→우 wipe 등장 */
 .recipe-card.just-unlocked {
   -webkit-mask-image: linear-gradient(90deg, #000 50%, transparent 50%);
@@ -698,10 +781,6 @@ html {
   from { -webkit-mask-position: 100% 0; mask-position: 100% 0; }
   to { -webkit-mask-position: 0% 0; mask-position: 0% 0; }
 }
-.recipe-card .name { font-size: 15px; font-weight: 600; color: var(--ink); padding-right: 34px; /* pill 자리 */ }
-.recipe-card.locked .name { color: var(--ink-faint); font-weight: 400; }
-.recipe-card .meta { font-size: 12px; color: var(--ink-faint); line-height: 1.5; }
-.recipe-card .grade { color: var(--crust); font-weight: 600; }
 
 /* ── 시트형 모달 (footer 고정) — 빵 시트·교환소 (2026-09-03) ───────────────
    modal.ts의 `footer` 옵션. 본문(.modal-scroll)만 스크롤하고 footer는 카드 바닥에 붙는다.
@@ -738,13 +817,20 @@ html {
 .footer-actions { display: flex; gap: 8px; }
 .footer-actions .btn { flex: 1; padding: 11px 12px; font-size: 14px; white-space: nowrap; }
 .footer-actions .btn-ghost { flex: 0 0 auto; }
-/* 결과 카드 폴백 — 아트 가운데 크게 + 이름 + 한 줄 */
+/* 결과 카드 — 선반 타일 탭·굽기 결과 3D 폴백·재료 감상 공용. 아트 가운데 크게(2026-09-05: 96 → 160px — 2D로도 빵이 보여야 한다) */
 .result-card { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 6px 0 2px; }
-.result-card .art { width: 96px; height: 96px; display: grid; place-items: center; }
-.result-card .art img { width: 88px; height: 88px; object-fit: contain; }
-.result-card .art svg { width: 88px; height: 66px; }
-.result-card .rc-name { margin-top: 8px; font-size: 18px; font-weight: 600; color: var(--ink); }
-.result-card .rc-line { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+.result-card .art { width: 168px; height: 160px; display: grid; place-items: center; }
+.result-card .art img { width: 152px; height: 152px; object-fit: contain; }
+.result-card .art svg { width: 120px; height: 90px; }
+.result-card .rc-name { margin-top: 10px; font-size: 18px; font-weight: 600; color: var(--ink); line-height: 1.35; }
+.result-card .rc-line { margin: 6px 0 0; font-size: var(--fs-body); line-height: 1.5; color: var(--ink-soft); }
+.result-card .info-rows {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  text-align: left;
+}
 .modal-footer .footer-text {
   flex: 1;
   min-width: 0;
@@ -756,49 +842,57 @@ html {
 }
 .modal-footer .footer-text b { color: var(--ink); font-weight: 600; }
 
-/* 시트 머리 — 큰 아트 + 이름·맛·원가/보관·등급. "르방 100g 필요 · 보관 320g"이 여기서 한 줄로 읽힌다 */
-.sheet-head { display: flex; gap: 14px; align-items: center; }
+/* 시트 머리 — 아트 가운데 + 이름·맛 가운데 + 정보 행(k/v). 2026-09-05 개정.
+   이전 판(왼쪽 아트 76px + 오른쪽 텍스트 스택 + ' · ' 체인)은 216px 열에서
+   `조금 납작해요. 그래도 맛있어요 · 1번 / 만들었어요 · 변형 1/30`처럼 구 중간에서 접혔다(실측 390-04).
+   overflow-wrap: anywhere도 걷어냈다 — keep-all을 죽여 어절 중간 줄바꿈을 허용하던 규칙. */
+.sheet-head { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .sheet-head .art {
-  width: 76px; height: 76px;
+  width: 112px; height: 108px;
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  border-radius: 18px;
+  border-radius: 24px;
   background: color-mix(in srgb, var(--bg) 70%, transparent);
+  margin-bottom: 6px;
 }
-.sheet-head .art img { width: 64px; height: 64px; object-fit: contain; }
-.sheet-head .sh-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; overflow-wrap: anywhere; }
-.sheet-head .sh-name { font-size: 18px; font-weight: 600; color: var(--ink); }
-.sheet-head .sh-flavor { font-size: 13px; color: var(--ink-faint); }
-.sheet-head .sh-cost { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-.sheet-head .sh-cost .short { color: var(--hooch); }
-.sheet-head .sh-meta { font-size: 12.5px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
-.sheet-head .sh-meta .grade { color: var(--crust); font-weight: 600; }
+.sheet-head .art img { width: 92px; height: 92px; object-fit: contain; }
+.sheet-head .art svg { width: 80px; height: 60px; }
+.sheet-head .sh-name { font-size: 18px; font-weight: 600; color: var(--ink); text-align: center; line-height: 1.35; }
+.sheet-head .sh-flavor { font-size: var(--fs-cap); color: var(--ink-faint); text-align: center; line-height: 1.45; margin-bottom: 8px; }
+.sheet-head .info-rows {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+}
 .sheet-label {
   margin: 16px 0 8px;
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
+  gap: 10px;
+  font-size: var(--fs-cap);
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--ink-faint);
 }
-.sheet-label .hint { font-weight: 400; }
-.sheet-summary { margin-top: 12px; min-height: 18px; font-size: 13px; color: var(--ink-soft); }
+.sheet-label .hint { font-weight: 400; text-align: right; }
+.sheet-summary { margin-top: 12px; min-height: 18px; font-size: 14px; line-height: 1.45; color: var(--ink-soft); }
 .sheet-summary b { color: var(--ink); font-weight: 600; }
 
 /* 재료 칩 그리드 — 4열. 이 빵에 넣을 수 있는 재료 **전부**를 보이고 보유/미보유/발견을 세 상태로 가른다:
    보유 = 또렷 + 수량 / 미보유 = 옅게(이름은 보인다 — "무엇이 필요한지"가 여기서 읽힌다) / 발견 = ✓ */
-/* 324px(시트 안폭)에서 4열, 좁아지면 열이 준다 — 고정 4열은 좁은 폭에서 칩이 잘렸다(실측 195px) */
-.chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; }
+/* 시트 안폭은 **306px**(390 뷰포트: 카드 360 − 스크롤 패딩 36 − 스크롤바 여유. W2 실측)에서 4열, 좁아지면 열이 준다 —
+   고정 4열은 좁은 폭에서 칩이 잘렸다(실측 195px). minmax 70(2026-09-05): 4×70+3×8 = 304 ≤ 306. 72면 312가 필요해 3열로 떨어졌다(W2 실측).
+   360px 뷰포트(안폭 ≈276)는 3열 — 칩을 줄이지 않고 3열을 허용한다. */
+.chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; }
 .chip {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 8px 4px 7px;
-  min-height: 76px;
+  padding: 8px 2px 8px;   /* 좌우 2px — 70px 칩에서 안폭 66px: '해바라기씨'(5음절·13px·자간 -0.02em ≈ 64px)가 든다 */
+  min-height: 88px;
   border: 1.5px solid transparent;
   border-radius: 14px;
   background: var(--bg);
@@ -810,21 +904,51 @@ html {
 .chip .art { width: 44px; height: 40px; display: grid; place-items: center; }
 .chip .art img { width: 40px; height: 40px; object-fit: contain; }
 .chip .art svg { width: 40px; height: 30px; }
+/* 이름 — 13px 2줄까지. ellipsis 금지(2026-09-05): '해바라기씨'·'피스타치오'가 11.5px에서 잘리거나 빠듯했다 */
 .chip .chip-name {
   max-width: 100%;
-  font-size: 11.5px;
-  line-height: 1.2;
+  font-size: var(--fs-cap);
+  letter-spacing: -0.02em;   /* 끊을 자리가 없는 5음절 단어(해바라기씨·피스타치오)가 4열 칩 안폭에 들게 — keep-all은 한 단어를 못 접는다 */
+  line-height: 1.25;
   color: var(--ink-soft);
   text-align: center;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 .chip.selected { border-color: var(--accent); background: var(--cream); }
 .chip.selected .chip-name { color: var(--ink); font-weight: 600; }
+/* 미보유 — 옅게, 이름은 보인다(무엇이 필요한지). 수량 pill은 붙지 않는다(recipeVisuals — 0은 정보가 아니다, 실측 F4) */
 .chip--missing .art { opacity: 0.4; filter: grayscale(0.7); }
 .chip--missing .chip-name { color: var(--ink-faint); }
 .chip.is-locked { opacity: 0.45; }   /* disabled 금지 — 탭하면 이유 토스트 */
+/* 미발견(재료 탭 도감) — ?-실루엣 칩. 이름은 숨긴다(만나 본 기록이 없다). 2026-08-24 확정 문법을 카드에서 칩으로 옮긴 것 */
+.chip--mystery { justify-content: center; }
+.chip--mystery .art { opacity: 0.35; filter: grayscale(1) contrast(0.35) brightness(1.15) sepia(0.5); }
+.chip-mark {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+/* 구분선 행 — 보유 칩과 미보유 칩 사이('아직 없는 재료'). 그리드 한 줄 전체 */
+.chip-divider {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 -2px;
+  font-size: var(--fs-cap);
+  color: var(--ink-faint);
+}
+.chip-divider::before,
+.chip-divider::after { content: ''; flex: 1; height: 1px; background: color-mix(in srgb, var(--ink-faint) 22%, transparent); }
 .chip-count {
   position: absolute;
   top: 5px; right: 5px;
@@ -833,7 +957,7 @@ html {
   border-radius: 999px;
   background: color-mix(in srgb, var(--bg-deep) 90%, var(--ink-faint));
   color: var(--ink);
-  font-size: 10px;
+  font-size: var(--fs-num);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -872,15 +996,15 @@ html {
 .form-pill {
   border: 1.5px solid transparent;
   border-radius: 999px;
-  padding: 6px 11px;
+  padding: 7px 12px;
   background: var(--bg-soft);
   color: var(--ink-soft);
   font-family: inherit;
-  font-size: 12.5px;
+  font-size: var(--fs-cap);
   cursor: pointer;
 }
 .form-pill.selected { border-color: var(--accent); color: var(--ink); font-weight: 600; background: var(--cream); }
-.form-pill .fp-hint { color: var(--ink-faint); font-size: 11.5px; margin-left: 4px; }
+.form-pill .fp-hint { color: var(--ink-faint); font-size: var(--fs-cap); margin-left: 4px; }
 .form-pill.is-done::before { content: '✓ '; color: var(--crust); }
 
 /* 교환소 머리 — 잔액은 맨 위에(개편 전엔 30행 아래 있었다) */
@@ -955,7 +1079,7 @@ html {
   border-radius: 999px;
   background: var(--bg-deep);
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: var(--fs-num);   /* '+N' — 숫자 pill */
   font-weight: 600;
   z-index: 2;
 }
@@ -997,13 +1121,13 @@ html {
   100% { opacity: 0; transform: rotate(var(--r)) translateY(var(--dist)) scale(1); }
 }
 .celebrate-title { margin: 0; font-size: 17px; font-weight: 600; color: var(--ink); }
-.celebrate-sub { margin: 4px 0 0; font-size: 13px; color: var(--ink-faint); }
-.celebrate-extra { margin: 8px 0 0; font-size: 12.5px; color: var(--ink-soft); }
+.celebrate-sub { margin: 4px 0 0; font-size: var(--fs-cap); color: var(--ink-faint); }
+.celebrate-extra { margin: 8px 0 0; font-size: var(--fs-cap); color: var(--ink-soft); }
 /* 열린 빵 스트립 — 카드마다 70ms 시차로 크림→컬러 와이프(레시피 그리드의 just-unlocked와 같은 문법) + 살짝 떠오름 */
 .celebrate-strip { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .celebrate-item {
   --i: 0;
-  width: 64px;
+  width: 72px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1020,16 +1144,21 @@ html {
 .celebrate-item .art { width: 48px; height: 44px; display: grid; place-items: center; }
 .celebrate-item .art img { width: 44px; height: 44px; object-fit: contain; }
 .celebrate-item .art svg { width: 44px; height: 33px; }
+/* 이름 2줄 clamp — '초코칩 팬케이크'가 64px nowrap에서 잘렸다(2026-09-05) */
 .celebrate-item .name {
-  max-width: 64px;
-  font-size: 11px;
+  max-width: 72px;
+  font-size: var(--fs-cap);
+  line-height: 1.25;
   color: var(--ink-soft);
+  text-align: center;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
-.celebrate-item.more { justify-content: center; min-height: 44px; font-size: 12px; color: var(--ink-faint); }
-.celebrate-hint { margin: 12px 0 0; font-size: 11px; color: var(--ink-faint); opacity: 0.8; }
+.celebrate-item.more { justify-content: center; min-height: 44px; font-size: var(--fs-cap); color: var(--ink-faint); }
+.celebrate-hint { margin: 12px 0 0; font-size: var(--fs-cap); color: var(--ink-faint); opacity: 0.8; }
 @media (prefers-reduced-motion: reduce) {
   .celebrate-card, .hero-art, .celebrate-item, .chip-forms { animation: none !important; }
   .mote { display: none; }
@@ -1128,3 +1257,25 @@ html {
   transform: scaleX(0);
   transform-origin: left center;
 }
+
+/* ── 합성 썸네일 — 재료 아트를 빵 곁에 놓는다 (2026-09-05, recipeVisuals.breadThumb) ──────
+   전용 PNG가 없는 변형(156종)은 베이스 PNG + 재료 썸네일(우하단에 **놓인 것처럼** 겹침 — 정물 구도).
+   원형 크림 바탕·테두리는 쓰지 않는다: 그건 알림 뱃지 문법이라 같은 카드 우상단 count-pill과 부딪히고
+   "스티커 붙인 같은 빵"으로 읽힌다(Opus 반론 e). 전용 PNG가 로드되면 붙지 않는다.
+   이 블록은 **파일 끝**에 있어야 한다: `.recipe-card .art img`·`.chip .art img` 등과 명시도가 같아(0,2,1) 순서로만 이긴다. */
+.art { position: relative; }
+.art > .art-badge {
+  position: absolute;
+  right: -2%;
+  bottom: -2%;
+  width: 46%;
+  height: 46%;
+  min-width: 24px;
+  min-height: 24px;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px rgba(74, 50, 32, 0.22));   /* 빵 위에 놓인 그림자 한 겹 — 크롬 없이 앞뒤를 가른다 */
+}
+.art > .art-badge img,
+.art > .art-badge svg { width: 100%; height: 100%; object-fit: contain; }

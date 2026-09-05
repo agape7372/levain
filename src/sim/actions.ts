@@ -1,6 +1,6 @@
 // applyAction(state, action, now) — 순수. 호출자는 반드시 advance(tick)를 선행한다
 // (액션 순서 불변식 — docs/ARCHITECTURE.md §2). 정본: docs/GDD.md §5·§6·§3-7.
-import type { Action, FeedRatio, Flour, SimEvent, SimState } from './types';
+import type { Action, DoughQuality, FeedRatio, Flour, SimEvent, SimState } from './types';
 import {
   FLAKE_COST_G,
   FLAKE_MATURITY_KEEP,
@@ -103,18 +103,29 @@ function setLocation(state: SimState, to: SimState['location'], now: number): Ac
   return { state: next, events: [{ type: 'moved', to }] };
 }
 
-function bake(state: SimState, recipeId: string, now: number, variantId?: string): ActionResult {
+function bake(
+  state: SimState,
+  recipeId: string,
+  now: number,
+  variantId?: string,
+  houseStage = 0,
+  dough?: DoughQuality,
+): ActionResult {
   const recipe = recipeById(recipeId);
   if (!recipe || recipe.kind !== 'bread') {
     return { state, events: [{ type: 'bakeBlocked', reason: 'unknownRecipe' }] };
   }
-  const gate = canBakeBread(state, recipe, now);
+  const gate = canBakeBread(state, recipe, now, houseStage);
   if (gate !== 'ok') return { state, events: [{ type: 'bakeBlocked', reason: gate }] };
 
   // 도감 기록은 전역(집의 기록) — store가 baked 이벤트로 갱신한다 (확장기획 §5-4)
   // 그램 원가도 마찬가지로 store 소관: 빵은 보관 통에서 나가고 르방이의 mass는 변하지 않는다.
-  // 판정만 여기서 — 통은 양(재고)이고 등급은 오늘 이 르방이의 발효력이다 (GDD §6-2)
-  const grade = gradeOf(bakeScore(recipe, activityAt(state, now), state.acidity, state.flour));
+  // 판정만 여기서 — **GDD §6-2 개정(2026-09-05)**: 등급은 화면에 떠 있는 르방이 아니라
+  // 통에서 나가는 반죽(dough)이 정한다. 08-25 "품질 세탁 수용"의 번복이다. dough 부재면
+  // 옛 규칙(활성 르방 자기 상태)으로 판정한다 — 후방 호환·순수성 유지(통은 store 소관).
+  const grade = dough
+    ? gradeOf(bakeScore(recipe, dough.activity, dough.acidity, dough.flour))
+    : gradeOf(bakeScore(recipe, activityAt(state, now), state.acidity, state.flour));
   return { state, events: [{ type: 'baked', recipeId, grade, ...(variantId ? { variantId } : {}) }] };
 }
 
@@ -134,12 +145,19 @@ function split(state: SimState, now: number): ActionResult {
   return { state: next, events: [{ type: 'split', amount }] };
 }
 
-function bakeDiscard(state: SimState, recipeId: string, now: number, variantId?: string): ActionResult {
+function bakeDiscard(
+  state: SimState,
+  recipeId: string,
+  now: number,
+  variantId?: string,
+  houseStage = 0,
+): ActionResult {
   const recipe = recipeById(recipeId);
   if (!recipe || recipe.kind !== 'discard') {
     return { state, events: [{ type: 'bakeBlocked', reason: 'unknownRecipe' }] };
   }
-  const gate = canBakeDiscard(state, recipe, now);
+  // 해금은 집 기준, 쿨다운은 이 르방 것 — discard는 "이 르방의 덜어낸 반죽"이라 쿨다운만 개체 소유다
+  const gate = canBakeDiscard(state, recipe, now, houseStage);
   if (gate !== 'ok') return { state, events: [{ type: 'bakeBlocked', reason: gate }] };
 
   const next: SimState = { ...state, lastDiscardBakeAt: now };
@@ -203,8 +221,9 @@ export function applyAction(state: SimState, action: Action, now: number): Actio
   switch (action.type) {
     case 'feed': return feed(state, action.ratio, action.flour ?? state.flour, now);
     case 'setLocation': return setLocation(state, action.to, now);
-    case 'bake': return bake(state, action.recipeId, now, action.variantId);
-    case 'bakeDiscard': return bakeDiscard(state, action.recipeId, now, action.variantId);
+    // houseStage·dough는 store가 doDispatch에서 주입한다 (types.ts Action 주석) — 부재 = 옛 규칙
+    case 'bake': return bake(state, action.recipeId, now, action.variantId, action.houseStage ?? 0, action.dough);
+    case 'bakeDiscard': return bakeDiscard(state, action.recipeId, now, action.variantId, action.houseStage ?? 0);
     case 'split': return split(state, now);
     case 'makeFlake': return makeFlake(state, now);
     case 'discardStarter': return discardStarter(state, now);

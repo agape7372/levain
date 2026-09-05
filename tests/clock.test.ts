@@ -2,6 +2,9 @@
 import { describe, it, expect } from 'vitest';
 import { initialState, advance, deriveSnapshot, stageOf, HOUR, DAY } from '../src/sim';
 import type { SimState } from '../src/sim';
+import { createGameStore, newEnvelope } from '../src/store/gameStore';
+import type { Clock } from '../src/platform/clock';
+import type { StorageAdapter } from '../src/platform/storage';
 
 const t0 = 1_700_000_000_000;
 
@@ -71,5 +74,63 @@ describe('clock — 시계 방어 (GDD §3-8)', () => {
     expect(now - rewound.createdAt).toBeGreaterThanOrEqual(0);
     expect(snap.stage).toBeGreaterThanOrEqual(0);
     expect(stageOf(rewound, now)).toBe(stageOf(s, t0)); // 상대 나이 보존 → 단계 퇴행 없음
+  });
+});
+
+// 재정박은 sim 밖 타임스탬프에도 걸린다 — GDD §3-8은 "향후 필드 포함 모든 타임스탬프"라고 쓴다.
+// 광고 원장(shared.ads[].at)이 그 목록에서 빠져 있었다: 안 당기면 오늘 지급분이 "미래"로
+// 밀려 sameLocalDay 산수에서 빠지고 하루 상한이 리셋된다 (D3).
+describe('clock — 시계 역행 시 광고 원장 재정박 (GDD §3-8)', () => {
+  it('shared.ads[].at이 delta만큼 당겨진다', () => {
+    let t = t0;
+    let raw: string | null = null;
+    const clock: Clock = { now: () => t };
+    const storage: StorageAdapter = {
+      loadRaw: () => raw,
+      saveRaw: (json: string) => { raw = json; return true; },
+      mirror: () => {},
+      loadMirror: async () => raw,
+    };
+    const base = newEnvelope(t0);
+    const env = {
+      ...base,
+      shared: {
+        ...base.shared,
+        ads: [{ slot: 'delivery', at: t0 - HOUR }, { slot: 'delivery', at: t0 - 2 * HOUR }],
+      },
+    };
+    const store = createGameStore({ clock, storage }, env);
+
+    const delta = 10 * HOUR;
+    t = t0 - delta;
+    store.tick();
+
+    expect(store.getAdLedger().map((g) => g.at)).toEqual([
+      t0 - HOUR - delta,
+      t0 - 2 * HOUR - delta,
+    ]);
+    // 원장 항목의 상대 간격도 보존된다 — 상한 산수가 흔들리지 않는다
+    const [a, b] = store.getAdLedger();
+    expect(a.at - b.at).toBe(HOUR);
+  });
+
+  it('5분 이내 역행이면 원장도 그대로', () => {
+    let t = t0;
+    let raw: string | null = null;
+    const clock: Clock = { now: () => t };
+    const storage: StorageAdapter = {
+      loadRaw: () => raw,
+      saveRaw: (json: string) => { raw = json; return true; },
+      mirror: () => {},
+      loadMirror: async () => raw,
+    };
+    const base = newEnvelope(t0);
+    const store = createGameStore(
+      { clock, storage },
+      { ...base, shared: { ...base.shared, ads: [{ slot: 'delivery', at: t0 - HOUR }] } },
+    );
+    t = t0 - 4 * 60_000;
+    store.tick();
+    expect(store.getAdLedger()[0].at).toBe(t0 - HOUR);
   });
 });

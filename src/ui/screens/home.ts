@@ -1,6 +1,6 @@
 // 홈 — 캔버스 위 HUD 오버레이. 상태 문구 탭 = 관찰 카드, 반죽 탭 = poke(게임필).
 import { copy } from '../copy';
-import { agoText, untilText } from '../format';
+import { activityBand, agoText, untilText } from '../format';
 import { confirmModal, hasOpenModal, openModal } from '../components/modal';
 import { openHelp } from '../components/helpModal';
 import { openMoldModal } from '../components/moldModal';
@@ -152,8 +152,11 @@ export function createHomeScreen(
       return;
     }
     const g = snap.mass - SEED_G;
+    // 지금 떼면 어떤 반죽이 통에 들어가는지 먼저 말하고, 그다음에 묻는다 (2026-09-05 통 품질 모델).
+    // 순서가 중요하다: 품질이 질문 앞에 서야 "왜 지금인가"가 판단 재료가 된다.
+    const quality = { high: copy.split.quality.good, mid: copy.split.quality.ok, low: copy.split.quality.weak };
     confirmModal({
-      body: copy.split.confirm(g),
+      body: `${quality[activityBand(snap.activity)]} ${copy.split.confirm(g)}`,
       confirmLabel: copy.split.action,
       cancelLabel: '다음에요',
       onConfirm: () => {

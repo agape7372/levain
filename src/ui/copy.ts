@@ -35,7 +35,7 @@ export const copy = {
       },
       {
         q: '오른쪽 항아리는 뭐예요',
-        a: `씨앗 ${SEED_G}g만 남기고 떼어낸 반죽을 여기 모아 둬요. 빵은 이 항아리에서 나가요. 밥 준 직후에는 아직 못 떼는데, 눌러 보면 얼마나 기다려야 하는지 알려줘요.`,
+        a: `씨앗 ${SEED_G}g만 남기고 떼어낸 반죽을 여기 모아 둬요. 빵은 이 항아리에서 나가요. 떼어 둔 반죽은 뗀 그때의 상태로 잠들어 있어서, 잘 부풀어 있을 때 떼어 두면 빵도 잘 부풀어요. 밥 준 직후에는 아직 못 떼는데, 눌러 보면 얼마나 기다려야 하는지 알려줘요.`,
       },
       {
         q: '단계는 왜 올라가요',
@@ -101,6 +101,13 @@ export const copy = {
     blockedTooSoon: (left: string) => `밥 준 지 얼마 안 됐어요. ${left} 뒤에 떼어낼 수 있어요`,
     blockedMass: '아직 양이 적어요. 밥을 주면 금방 늘어나요',
     blockedDormant: '자는 동안에는 떼어낼 수 없어요',
+    // 떼어내기 확인 모달 둘째 줄 — 지금 떼면 어떤 반죽이 통에 들어가는지(2026-09-05, 통 품질 모델).
+    // activity ≥ 0.7 / ≥ 0.4 / 그 아래. 죄책감 없이 사실 + 위로.
+    quality: {
+      good: '한창 부풀어 있어요. 좋은 반죽이에요',
+      ok: '조금 지쳤어요. 그래도 괜찮아요',
+      weak: '많이 지쳤어요. 빵이 조금 납작할 수 있어요',
+    },
   },
   pantry: {
     label: (g: number) => `보관 ${g}g`,
@@ -114,6 +121,16 @@ export const copy = {
     // 탭 응답(split.blocked*)과 설명서(help)가 대신한다.
     lastWarn: '이걸 구우면 보관해둔 르방이 다 없어져요',
     notEnough: (need: number) => `보관해둔 르방이 ${need}g 필요해요`,
+    // 통 반죽 품질 (2026-09-05, GDD §6-2 개정 — 등급은 화면의 르방이 아니라 통에서 나가는 반죽이 정한다).
+    // 레시피 상태 줄 오른쪽 캡션 = 발효력 밴드 + 산미 밴드. 두 어절만 ' · '로 잇는다(문장 아님).
+    quality: {
+      activity: { high: '발효력 좋음', mid: '발효력 보통', low: '발효력 약함' },
+      acidity: { mild: '순함', tangy: '새콤', sour: '시큼' },
+    },
+    /** 빈 통일 때 상태 줄 캡션 */
+    emptyHint: '떼어낸 반죽이 여기 모여요',
+    /** 상태 줄 탭 — 통이 무엇인지 한 줄 */
+    hint: '활발할 때 떼어 둔 반죽일수록 잘 부풀어요',
   },
 
   // 건조 플레이크 — 죽음 보험 (실제 관행: 얇게 펴 말려 보관)
@@ -144,7 +161,6 @@ export const copy = {
     feed: '밥 주기',
     wake: '깨우기',
     observe: '살펴보기',
-    floatTest: '물에 띄워보기',
     bake: '굽기',
     move: { room: '실온', window: '창가', fridge: '냉장고' },
   },
@@ -183,12 +199,15 @@ export const copy = {
     peak: (from: string, to: string) => `${from}~${to} 뒤쯤 가장 부풀어요`,
     peakNow: '지금이 한창때예요',
     massG: (g: number) => `지금 ${g}g이에요`,
+    // 띄워보기 — 레시피 상태 줄에서 관찰 카드 정보 행으로 이동(2026-09-05). 르방의 상태라 르방 카드에서 말한다
+    floatTest: '띄워보기',
+    floatOk: '동동 떠요. 떼어 두기 좋아요',
+    floatNotYet: '아직 가라앉아요',
   },
 
-  floatTest: {
-    ok: '동동 떠요. 지금 굽기 좋아요',
-    notYet: (left: string) => `아직 가라앉아요. ${left}쯤 더 기다려 보세요`,
-  },
+  // 2026-09-05: 최상위 `floatTest`(레시피 상태 줄이 부르던 '지금 굽기 좋아요' / '더 기다려 보세요')는
+  // 폐지. 띄워보기는 관찰 카드의 정보 행 하나로 줄었고 문구는 observe.float*가 갖는다 —
+  // 상태 줄이 활성 르방의 컨디션을 말하던 자리가 통의 상태로 바뀌었기 때문이다(GDD §6-2 개정).
 
   revive: {
     needRoom: '실온에 두고 밥을 주세요',
@@ -234,7 +253,35 @@ export const copy = {
     discardDone: '따끈하게 구웠어요',
     madeCount: (n: number) => `${n}번 만들었어요`,
     costSuffix: (g: number) => `르방 ${g}g`,
+    /** 카드 1행 — discard 레시피(원가 없음). 맛 문구는 카드가 아니라 시트가 말한다(2026-09-05 고정 슬롯) */
+    discardCost: '덜어낸 반죽',
     grades: { best: '최고예요', good: '잘 구웠어요', flat: '조금 납작해요. 그래도 맛있어요' },
+    /** 카드·선반 타일용 짧은 판 — 145px 열에 문장을 넣지 않는다. 시트 정보 행·결과 카드는 전문(grades) */
+    gradesShort: { best: '최고', good: '잘 구움', flat: '조금 납작' },
+    /** 횟수 짧은 판 — 카드·타일·정보 행 값 */
+    times: (n: number) => `${n}번`,
+    // 정보 행(k/v) 라벨 — 시트 머리·결과 카드 (2026-09-05, ' · ' 체인 문장 대체)
+    rows: {
+      need: '필요',
+      pantry: '보관',
+      best: '최고',
+      count: '횟수',
+      variants: '변형',
+      first: '처음',
+      starter: '르방',
+      /** 이 빵에 실제로 들어갈 반죽의 상태(통은 이 빵에 가장 잘 맞는 로트를 골라 쓴다) — 값은 pantry.quality 두 어절 */
+      dough: '반죽',
+      /** 들어갈 반죽의 우세 가루 — 다목적이면 행 자체를 생략(호밀·통밀 가산점이 숨은 절벽이 되지 않게) */
+      flour: '가루',
+    },
+    needOnly: (g: number) => `르방 ${g}g`,
+    grams: (g: number) => `${g}g`,
+    variantsOf: (done: number, total: number) => `${done}/${total}`,
+    // 선반 (2026-09-05) — 구운 빵만, 3D 없이 본다
+    shelfEmpty: '아직 구운 빵이 없어요',
+    shelfEmptyHint: '첫 빵은 플랫브레드부터',
+    /** 미보유 재료 묶음 구분선 */
+    missingLabel: '아직 없는 재료',
     names: {
       pancake: '팬케이크', cracker: '크래커', scone: '스콘',
       flatbread: '플랫브레드', focaccia: '포카치아', loaf: '식빵',
@@ -253,14 +300,10 @@ export const copy = {
       wholewheat: '통밀의 구수함을 담은 깜빠뉴',
     } as Record<string, string>,
     // ── 세그먼트·상태 줄·빵 시트 (2026-09-03 개편: [빵|재료] 한 줄, 빵 카드 = 시트) ──
-    segments: { bread: '빵', ingredient: '재료' },
-    retapHint: '레시피 탭을 한 번 더 누르면 재료가 열려요',
-    // 상태 줄 — 띄워보기와 같은 판정(activity)을 한 줄로 줄인 말. 탭하면 floatTest 문구가 그대로 뜬다
-    readyNow: '지금 굽기 좋아요',
-    readyIn: (left: string) => `${left}쯤 뒤에 굽기 좋아요`,
-    // 시트 머리 — 원가와 재고를 한 줄에서 같이 읽는다 (카드의 costSuffix는 원가만 말한다)
-    needG: (g: number, have: number) => `르방 ${g}g 필요 · 보관 ${have}g`,
-    progress: (done: number, total: number) => `변형 ${done}/${total}`,
+    segments: { bread: '빵', shelf: '선반', ingredient: '재료' },
+    retapHint: '레시피 탭을 한 번 더 누르면 선반과 재료로 넘어가요',
+    // 2026-09-05: readyNow/readyIn(활성 르방 activity 상태 줄)·needG·progress(' · ' 체인)는 폐지 —
+    // 상태 줄은 pantry.quality, 시트 머리는 rows(k/v)로 말한다.
     ingredientsLabel: '재료 넣기',
     ingredientsHint: '없는 재료는 교환소에서',
     plainLabel: '기본',
@@ -464,6 +507,8 @@ export const copy = {
     minutes: (n: number) => `${n}분`,
     hours: (n: number) => `${n}시간`,
     days: (n: number) => `${n}일`,
+    /** 절대 날짜 — 선반·결과 카드의 "처음 구운 날". 연도는 붙이지 않는다(한 해를 넘겨도 날짜만 말한다) */
+    monthDay: (month: number, day: number) => `${month}월 ${day}일`,
   },
 } as const;
 

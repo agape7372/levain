@@ -143,6 +143,9 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     subscribe: (fn) => store.subscribe(fn),
     inventory: () => store.getInventory(),
     pantry: () => store.getPantry(),
+    houseStage: () => store.getHouseStage(),
+    pantryQuality: () => store.getPantryQuality(),
+    doughFor: (recipeId) => store.getDoughFor(recipeId),
     collection: () => store.getCollection(),
     feedRatio: () => store.getActiveStarter().sim.feedRatio,
     bakeVariant: (variantId) => store.bakeVariant(variantId),
@@ -320,7 +323,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   };
   tabLevain.addEventListener('click', () => showTab('levain'));
   tabRecipes.addEventListener('click', () => {
-    // 재탭 상태 전이 (§8-1 표): 루트에서 재탭 = 레시피 ↔ 재료함 토글, 하위 상세에선 루트 복귀
+    // 재탭 상태 전이 (§8-1 표): 루트에서 재탭 = 빵 → 선반 → 재료 순환, 하위 상세에선 루트 복귀
     if (currentTab === 'recipes') {
       if (router.current()?.id !== 'recipes') {
         showTab('recipes'); // setRoot가 스택을 루트 하나로 되돌린다
@@ -330,7 +333,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       return;
     }
     showTab('recipes');
-    // 첫 2~3회 힌트 — "한 번 더 누르면 재료함" (발견 가능성 보조)
+    // 첫 2~3회 힌트 — "한 번 더 누르면 선반·재료" (발견 가능성 보조)
     const hints = store.getEnvelope().flags.retapHints;
     if (hints < 3) {
       toast(copy.recipes.retapHint);

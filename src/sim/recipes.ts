@@ -54,17 +54,21 @@ export const betterGrade = (a: BakeGrade | null, b: BakeGrade): BakeGrade =>
  * 굽기 게이트: 단계만. 그램 원가는 보관 통(집 소유·전역)에서 나가므로 sim이 모른다 —
  * 통 잔량 게이트는 store(gameStore.doDispatch) 소관이다. 이 분리 덕에 굽기는 르방이의
  * mass를 아예 건드리지 않고, "어떤 액션도 르방이를 죽일 수 없다"가 더 단단해진다 (GDD §6-2).
+ *
+ * houseStage (GDD §6-2 개정 2026-09-05) = 집 최고 성장 단계(economy.stageMax). 통이 집 것이면
+ * 해금도 집 것이다 — 어린 르방으로 넘겼다고 성숙 르방이 채운 통으로 굽던 빵이 잠기지 않는다.
+ * sim은 집을 모르므로(순수) 숫자로만 받는다. 기본값 0 = 활성 르방 단독 판정(기존 동작).
  */
-export function canBakeBread(state: SimState, recipe: RecipeDef, now: number):
+export function canBakeBread(state: SimState, recipe: RecipeDef, now: number, houseStage = 0):
   'ok' | 'stage' {
-  if (stageOf(state, now) < recipe.stage) return 'stage';
+  if (Math.max(stageOf(state, now), houseStage) < recipe.stage) return 'stage';
   return 'ok';
 }
 
-/** discard 게이트: 단계 + 마지막 급여 후 1회 쿨다운 */
-export function canBakeDiscard(state: SimState, recipe: RecipeDef, now: number):
+/** discard 게이트: 단계(집 기준 — canBakeBread 주석) + 마지막 급여 후 1회 쿨다운 */
+export function canBakeDiscard(state: SimState, recipe: RecipeDef, now: number, houseStage = 0):
   'ok' | 'stage' | 'cooldown' {
-  if (stageOf(state, now) < recipe.stage) return 'stage';
+  if (Math.max(stageOf(state, now), houseStage) < recipe.stage) return 'stage';
   if (state.lastDiscardBakeAt !== null && state.lastDiscardBakeAt >= state.lastFedAt) return 'cooldown';
   return 'ok';
 }

@@ -104,6 +104,26 @@ export const INITIAL_MASS = 180;
 export const SPLIT_MIN_G = 30;
 export const PANTRY_MAX = 1_000_000;
 
+/**
+ * 통 반죽 품질 레거시 씌움 (GDD §6-2 개정 2026-09-05) — 1.4.x 저장본에는 g만 있고
+ * 로트 원장(shared.pantryLots)이 없다. 그 g을 이 품질의 로트 하나로 물질화해 착륙시킨다.
+ *
+ * 0.8은 "경계에 정확히 세운다"를 포기하고 **경계 위로 올린 값**이다: 0.75면 점수가
+ * 0.6×0.75 + 0.4 = 0.85로 GRADE_BEST와 같은데, 0.6이 이진수로 안 떨어져 곱이
+ * 0.4499999…로 내려앉아 good으로 떨어진다. 부동소수 한 칸에 구세이브 등급이 걸리게 두지 않는다.
+ * 0.8 → 0.48 + 0.4 = 0.88로 안전하게 best. 호밀빵은 산미 25가 선호 범위(40~75) 밖이라
+ * 여전히 good — 구세이브가 공짜 최고 등급을 받지도, 억울하게 납작해지지도 않는다.
+ */
+export const PANTRY_LEGACY_ACTIVITY = 0.8;
+export const PANTRY_LEGACY_ACIDITY = 25;
+
+/**
+ * 보관 통 로트 상한 (GDD §6-2). 넘으면 가장 오래된 둘을 g 가중으로 병합한다 —
+ * 떼기를 막지 않으면서 저장 크기를 묶는 유일한 방법. 가장 흐릿해진 기억부터 뭉갠다.
+ * 12 = 하루 2회 떼기 기준 엿새치. 그 이상 거슬러 올라가는 로트는 이미 평균과 구분되지 않는다.
+ */
+export const PANTRY_LOT_MAX = 12;
+
 /** 성장 단계 게이트: [요구 사이클, 요구 일수] — max(둘 다 충족) */
 export const STAGES: Array<{ cycles: number; days: number }> = [
   { cycles: 0, days: 0 },   // 0 갓 반죽

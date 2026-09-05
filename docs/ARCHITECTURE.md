@@ -91,9 +91,11 @@ export function deriveBriefing(state: SimState, from: number, to: number): Brief
 export type Action =
   | { type: 'feed'; ratio: FeedRatio }
   | { type: 'setLocation'; to: Location }
-  | { type: 'bake'; recipeId: string }          // 빵: 판정만(GDD §6-2, 2026-08-25). 원가는 mass가
-                                                 // 아니라 store가 쥔 보관 통에서 나간다 — sim은 모른다
-  | { type: 'bakeDiscard'; recipeId: string }   // discard: 쿨다운 갱신만
+  | { type: 'bake'; recipeId: string; variantId?: string; houseStage?: number; dough?: DoughQuality }
+                                                 // 빵: 판정만(GDD §6-2). 원가는 mass가 아니라 store가 쥔 보관 통에서 나간다 —
+                                                 // sim은 모른다. houseStage(집 최고 단계)·dough(이 빵에 골라 쓸 로트의 품질)는
+                                                 // store가 doDispatch에서 주입(2026-09-05). 부재 = 활성 르방 자기 상태로 판정
+  | { type: 'bakeDiscard'; recipeId: string; variantId?: string; houseStage?: number }   // discard: 쿨다운 갱신만(통 미사용)
   | { type: 'split' }                            // 떼어내기: mass를 씨앗 60g까지 줄인다. 통 적립은
                                                  // store가 'split' 이벤트로 한다 (GDD §5·§6-2)
   | { type: 'makeFlake' }                       // 플레이크 말리기: mass −20g, flake 기록 (GDD §5)
@@ -146,7 +148,10 @@ interface SaveEnvelope {
     collection: Record<recipeId, CollectionEntry>;
     inventory: Record<IngredientId, number>;   // 재료함(§8-2) — 무버전 추가 키, 부재→{}
     economy: EconomyState;                     // 무료 경제 카운터(§9) — 무버전 추가 키, 부재→전부 0
-    pantry: number;                            // 보관 통 총 g(GDD §6-2) — 무버전 추가 키, 부재→0
+    pantry: number;                            // 보관 통 총 g(GDD §6-2) — 무버전 추가 키, 부재→0. 2026-09-05부터 Σ pantryLots.g의 **미러**
+    pantryLots: PantryLot[];                   // 통 로트 원장 {g, act, acid, flour}[] — 뗀 순서, 상한 12. 굽기는 레시피 best-fit으로 골라 쓴다 (GDD §6-2 개정 2026-09-05).
+                                               // 무버전 추가 키. 부재→pantry>0이면 레거시 로트 1개(act 0.8·acid 25·white)로 물질화.
+                                               // 적재 시 Σg를 pantry에 맞춘다(부족분 = 레거시 로트를 맨 앞에, 초과분 = 앞에서 잘라냄).
   };
   settings: { muted: boolean; haptics: boolean; notifyEnabled: boolean };
   flags: { onboarded: boolean; pendingBake: { recipeId: string; grade: string } | null };
@@ -159,7 +164,11 @@ interface SaveEnvelope {
   (개별 sim에만 맡기면 비활성 르방이 delta만큼 공짜 휴식을 얻는다).
 - 이름은 `StarterRecord.name`(sim 밖) — 폐기(discardStarter)에도 보존된다(§11-2 승인 변경).
   null이면 표시 시점에 "르방이 {ordinal}" 파생 — 저장하지 않는다.
-- **무버전 추가 키**: `inventory`·`economy`·`pantry` 셋 다 `schemaVersion`을 올리지 않고 `shared`에
+- **집 기준 굽기 주입**(2026-09-05, GDD §6-2): 해금은 `economy.stageMax`, 등급은 통 로트 품질 — 둘 다 **store가 `doDispatch`에서
+  bake/bakeDiscard 액션에 `houseStage`·`dough`로 주입**한다(UI는 넣지 않는다, 넣어도 store가 덮는다). sim은 값 인자로만 받아 순수를
+  지키고, 필드 부재 = 자기 상태 판정(후방 호환). `pantryGate`도 같은 houseStage를 받는다 — 어긋나면 활성 르방 기준 'stage' 차단이라고
+  믿고 통 검사를 건너뛰어 원가 0 빵이 나온다(회귀 테스트). `gameApi`: `houseStage()`·`pantryQuality()`(통 전체 평균)·`doughFor(recipeId)`(그 빵에 골라 쓸 로트의 품질 — `sim/pantry.ts pickDough`, 순수).
+- **무버전 추가 키**: `inventory`·`economy`·`pantry`·`pantryLots`(2026-09-05) 전부 `schemaVersion`을 올리지 않고 `shared`에
   얹혔다. `migrate()`는 `raw.schemaVersion > SCHEMA_VERSION`이면 무조건 `null`(=새 게임)로 처리한다
   (`persistence.ts` — 미래 모양 저장본은 다운그레이드해서 읽지 않는다) — 그래서 스키마 버전을 올리는
   릴리스마다 "그 버전을 모르는 과거 번들로는 OTA 롤백 금지"가 하나씩 늘어난다(§3 v1→v2가 그 예).
@@ -211,8 +220,11 @@ SimState → deriveSnapshot(state, now) → Snapshot → toRenderParams(snap) �
   **모달 위 모달은 열지 않는다** — 확인이 필요하면 닫은 뒤 `confirmModal`(관찰 카드·빵 시트 선례).
 - **획득 연출 = 비차단 레이어** (`components/celebrate.ts`, 2026-09-03): 모달이 아니라 z 45 오버레이(모달 위·토스트 아래).
   호출 계약은 `celebrateIngredients(api, ids)`·`celebrateStageUp(api, stage)` 둘뿐, 열린 빵 계산·병합·퇴장은 내부.
-- **시각 원형은 `components/recipeVisuals.ts`**: 카드·상태 줄·시트 머리·칩·형태 행의 DOM 모양. 화면(`screens/recipes.ts`·
-  `components/breadSheet.ts`·`exchangeModal.ts`)은 데이터·핸들러만 붙인다 — 클래스 이름을 화면 코드에서 새로 조립하지 말 것.
+- **시각 원형은 `components/recipeVisuals.ts`**: 카드·상태 줄·시트 머리·정보 행(`infoRows`)·선반 타일·칩·구분선·형태 행·결과 카드의
+  DOM 모양. 화면(`screens/recipes.ts`·`components/breadSheet.ts`·`exchangeModal.ts`)은 데이터·핸들러만 붙인다 — 클래스 이름을 화면
+  코드에서 새로 조립하지 말 것. 아트는 `breadThumb(artId, fallbackId)` 폴백 사다리(변형 PNG → 베이스 PNG+재료 → SVG) 하나만.
+- **레시피 탭 = 세그먼트 3개 `[빵 | 선반 | 재료]`**(2026-09-05, GDD §6-3): 재탭 순환 3단. 선반 = 도감 항목 2D 타일 → 결과 카드(중앙 팝업,
+  footer `[3D로 보기] [다시 만들기]`). 3D 쇼케이스는 여전히 Screen push이되 결과 카드의 선택지다.
 - **Android backButton 계약**: `@capacitor/app` backButton 리스너 —
   ① 열린 모달 있으면 닫기 ② router depth>0면 back() ③ 루트면 `App.minimizeApp()` (종료 아님 —
   다마고치는 백그라운드 생존이 자연). 연출 중엔 백 = 연출 스킵. 웹은 no-op.

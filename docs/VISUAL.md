@@ -392,25 +392,54 @@ down ─ 이동<8px & <250ms 내 up → poke
 
 - **Pretendard Variable 번들**(`public/fonts/` — CDN 불가). fallback `system-ui, sans-serif`.
 - 제목 20px/600 · 본문 15px/400 lh1.6 · 캡션 13px/400. 수치·타이머 `font-variant-numeric: tabular-nums`.
+- **타이포 토큰**(2026-09-05 명문화, `main.css :root`): `--fs-title 20` · `--fs-body 15` · `--fs-cap 13` · `--fs-num 12`.
+  **`--fs-num`은 숫자 pill 전용**(변형 진행 `3/16`·수량 `9`·`+N`). 글자는 `--fs-cap` 13px이 하한 — 실측(2026-09-05)에서 레시피 절이
+  10·11·11.5·12·12.5px를 8종 쓰고 있었다(칩 이름 11.5 ×24, 수량 pill 10 ×23 …). 새 크기를 지어내지 말고 토큰만 쓴다.
+- **줄바꿈 규율**(2026-09-05): ① 폭 240px 미만 컨테이너에서 ` · `로 문장을 이어 붙이지 않는다 — 정보는 **k/v 정보 행**(`.info-rows`)
+  으로(실측: 시트 머리 `조금 납작해요. 그래도 맛있어요 · 1번 / 만들었어요 · 변형 1/30`이 216px 열에서 구 중간에 접혔다. 홈 HUD가 08-25에
+  같은 이유로 `hud-sub`를 세로로 갈랐다). 두 어절짜리 짧은 토큰(`최고 · 3번`, `발효력 좋음 · 순함`)은 예외. ② `text-overflow: ellipsis`는
+  **고정 폭 이름표**(`.hud-stage-chip`·`.footer-text`)에만 — 칩·타일·연출 스트립 이름은 13px **2줄 clamp**(`-webkit-line-clamp: 2`).
+  ③ `overflow-wrap: anywhere` 금지 — `html { word-break: keep-all }`을 죽여 어절 중간 줄바꿈을 허용한다. 끊을 자리가 없는 5음절 단어
+  (해바라기씨·피스타치오)는 자간 `-0.02em`으로 든다(칩 72px·안폭 66px). ④ 그리드 카드는 **고정 슬롯**(아트/이름 1줄/1행/2행)으로
+  같은 행의 바닥을 맞춘다 — 문장은 카드가 아니라 시트가 말한다(카드용 등급 짧은 판 `최고`·`잘 구움`·`조금 납작`).
+  ⑤ 정렬: 그리드 카드 = 왼쪽, 아이콘 주도 칩·타일 = 가운데, 모달 머리 = 아트가 가운데일 때만 가운데(정보는 k/v).
 - **탭바**: 52px + `padding-bottom: env(safe-area-inset-bottom)` 필수(현 프로토의 시각오류 수정).
   텍스트 탭 + 활성 상단 2px 테라코타 인디케이터(0.25s 슬라이드).
 - **모달: 중앙 팝업 고정** — radius 20, `--bg-soft`, 그림자 `0 8px 24px rgba(74,50,32,0.18)` 한 겹,
   백드롭 `rgba(74,50,32,0.25)`, 등장 scale 0.96→1 + opacity 0.22s.
   <!-- 되돌림 방지: 사용자 확정 규칙 — 모달은 중앙 팝업. 바닥 시트로 바꾸지 말 것 -->
-- **레시피 카드**: 2열 그리드, `--bg-soft` radius 16. 상단 빵 실루엣 — 해금 시 GLB 베이크 PNG 썸네일(크러스트 팔레트),
-  미해금 `--ink-faint` 20% 실루엣 + "성숙도 3이 되면 열려요"(자물쇠 아이콘 금지). 해금 순간 크림→컬러 wipe 0.5s.
-  (개정 2026-09-03) 이름 아래 **원가 줄 상시**(12.5px `--ink-faint`, 부족은 `--hooch` — 경고색 아님) + 우상단 **`.count-pill`**
-  (11px/600 tabular, `--bg-deep` 75%: 빵은 변형 진행 `3/16`, 재료는 수량 `9`, 0이면 opacity .55). 시각 원형은 전부
-  `ui/components/recipeVisuals.ts` — 화면 코드가 이 클래스를 직접 조립하지 않는다.
-- **굽기 상태 줄 `.status-line`**(2026-09-03): 제목 아래 한 줄, `--bg-soft` 85% radius 14, 13.5px. 왼쪽 = 말(`{르방} · 지금 굽기 좋아요`,
-  적기면 `--ink`/600), 오른쪽 = 숫자(`보관 320g` tabular/600, 없으면 `--ink-faint`/400). 원가가 g으로 적혀 있으니 g 노출은 정합.
+- **레시피 카드**(개정 2026-09-05 — 고정 슬롯): 2열 그리드(`auto-fill minmax(150px)`), `--bg-soft` radius 16. 아트 64px(GLB 베이크 PNG
+  썸네일, 미해금은 opacity .25 grayscale) / 이름 `--fs-body` 600 **1줄 clamp** / `.line` 1행 = 원가 `르방 100g`(discard는 `덜어낸 반죽`) /
+  `.line` 2행 = `최고 · 3번`(`.grade` = `--crust` 600) 또는 `보관 부족`(`.short` = `--hooch`, 경고색 아님) — 두 행은 비어도 높이를
+  남긴다(`min-height`). 미해금은 `.locked-text` 2행 슬롯에 "어린 르방 단계가 되면 열려요"(자물쇠 아이콘 금지). 해금 순간 크림→컬러 wipe 0.5s.
+  우상단 **`.count-pill`**(`--fs-num`/600 tabular, `--bg-deep` 75%)은 변형 진행 `3/16` — **하나라도 만들었을 때만**(0/26은 소음).
+  시각 원형은 전부 `ui/components/recipeVisuals.ts` — 화면 코드가 이 클래스를 직접 조립하지 않는다.
+- **통 상태 줄 `.status-line`**(개정 2026-09-05 — 이전 판 "굽기 상태 줄"): 제목 아래 한 줄, `--bg-soft` 85% radius 14. 왼콝 `.sl-pantry` =
+  `보관 320g`(`--fs-body`/600 tabular, 없으면 `--ink-faint`/400), 오른쪽 `.sl-quality` = 통 반죽의 `발효력 좋음 · 순함`(`--fs-cap` `--ink-faint`,
+  두 어절이라 접혀도 뜻이 산다). **활성 르방의 적기(`지금 굽기 좋아요`)는 폐지** — 빵은 통에서 나간다(GDD §6-2). `align-items: baseline`.
+- **선반 `.shelf-grid`/`.shelf-tile`**(2026-09-05 신설): 2열, 타일 = 아트 88px 가운데 / 이름 `--fs-body` 600 **2줄 clamp** / `.line` `최고 · 3번` /
+  `.line` `8월 26일`. 빈 선반 `.shelf-empty`(본문 + 캡션 힌트). `?` 벽 없음.
+- **정보 행 `.info-rows`**(2026-09-05 신설 — 관찰 카드 `.observe-rows`와 같은 문법, 캡션 크기): `.ir` = `.ir-k`(`--fs-cap` `--ink-faint`, 고정) +
+  `.ir-v`(14px `--ink` 오른쪽 정렬, 세로 스택 — 보조 `.ir-note`는 값 아래 `--hooch`). ` · ` 체인 문장의 대체물. 시트 머리·결과 카드는
+  `--bg` 55% radius 14 바닥 위에 얹는다.
+- **시트 머리 `.sheet-head`**(개정 2026-09-05): 세로 가운데 — 아트 112px 상자(`--bg` 70%, radius 24, PNG 92px) → `.sh-name` 18/600 →
+  `.sh-flavor` `--fs-cap` → `.info-rows`. 이전 판(왼쪽 아트 76 + 오른쪽 텍스트 스택 + ` · ` 체인 + `overflow-wrap: anywhere`)은 폐기.
+- **결과 카드 `.result-card`**(개정 2026-09-05): 아트 168px 상자(PNG 152px — 2D로도 빵이 보여야 한다) → `.rc-name` 18/600 → `.rc-line`
+  `--fs-body` → `.info-rows`. footer(`[3D로 보기] [다시 만들기]`)는 `modal.ts footer`. 선반 타일 탭·굽기 결과 3D 폴백·재료 감상 공용.
+- **합성 썸네일 `.art > .art-badge`**(2026-09-05, `recipeVisuals.breadThumb` 폴백 사다리 `변형 PNG → 베이스 PNG(+재료) → SVG`): 전용 PNG가
+  없는 변형은 베이스 PNG 우하단(46%, `right/bottom -2%`)에 재료 썸네일을 **놓인 것처럼** 겹친다 — 원형 바탕·테두리 없음(알림 뱃지 문법과
+  부딪히고 "스티커"로 읽힌다 — Opus 반론 e), `drop-shadow` 한 겹만. 이 블록은 `main.css` **파일 끝**(명시도 동률 (0,2,1)을 순서로 이김).
+  이전 판은 변형 PNG 404면 곧장 SVG로 떨어져 깜빠뉴 변형이 "＋ 원"(SVG) 플레이스홀더로 보였다(실측 390-05).
 - **시트형 모달 `.modal-card--sheet`**(2026-09-03, `modal.ts` `footer` 옵션): 중앙 팝업 그대로(바닥 시트 아님 — 되돌림 금지)이되
   폭 `min(100%, 360px)`·최대 84vh·패딩 0, 본문 `.modal-scroll`(padding 20/18/14)만 스크롤, `.modal-footer`(헤어라인 위, 주 버튼
   flex 1)는 카드 바닥에 **고정**. 개편 전 굽기 모달은 `굽기`가 옵션 31행 아래 있었다(실측 scrollH 1,799/702px).
-- **재료 칩 `.chip`**(4열 `.chip-grid`, gap 8): 76px 이상·radius 14·`--bg`, 아트 40px + 이름 11.5px 1줄 말줄임 + 우상단 수량 `.chip-count`.
-  상태 3종 — 보유(또렷) / `.chip--missing`(아트 opacity .4 grayscale .7, **이름은 남긴다** — 무엇이 필요한지 읽히는 게 목적) /
-  `.chip--done`(좌상단 ✓ 15px `--crust` 원). 선택 `.selected` = `--accent` 테두리 1.5 + `--cream`. 형태 서브선택 `.chip-forms`는
-  그리드 한 줄 전체(`grid-column: 1/-1`), `--cream` 60% 바닥에 `.form-pill`(12.5px 알약) — 고른 칩 **바로 뒤에** 끼워 폴더 열리듯 펼친다.
+- **재료 칩 `.chip`**(4열 `.chip-grid` `minmax(72px)`, gap 8 — 360px 뷰포트는 3열을 허용, 칩을 줄이지 않는다): 88px 이상·radius 14·`--bg`,
+  좌우 padding 3, 아트 40px + 이름 **`--fs-cap` 2줄 clamp, 자간 -0.02em**(개정 2026-09-05 — 이전 11.5px 1줄 말줄임) + 우상단 수량
+  `.chip-count`(`--fs-num`). 상태 4종 — 보유(또렷+수량) / `.chip--missing`(아트 opacity .4 grayscale .7, **이름은 남긴다** — 무엇이 필요한지
+  읽히는 게 목적, **수량 pill 없음** — 0은 정보가 아니다) / `.chip--mystery`(도감 미발견: 실루엣 + `.chip-mark` `?`, 이름 숨김) /
+  `.chip--done`(좌상단 ✓ 15px `--crust` 원). 보유와 미보유 사이 `.chip-divider`(한 줄 전체, 헤어라인 + `아직 없는 재료`). 선택 `.selected` =
+  `--accent` 테두리 1.5 + `--cream`. 형태 서브선택 `.chip-forms`는 그리드 한 줄 전체(`grid-column: 1/-1`), `--cream` 60% 바닥에
+  `.form-pill`(`--fs-cap` 알약) — 고른 칩 **바로 뒤에** 끼워 폴더 열리듯 펼친다. 재료 탭(도감 30종)도 같은 칩 원형을 쓴다(교환소와 한 문법).
 - **획득 연출 `.celebrate-layer`**(2026-09-03, `celebrate.ts`): 모달(40) 위·토스트(50) 아래 z 45, 백드롭 `rgba(74,50,32,.12)`(모달 .25보다 옅게 —
   차단이 아니다). 카드 320px `--bg-soft` radius 22, `cele-pop` 0.36s `cubic-bezier(.8,.25,.16,1.17)`(탄성). 히어로 88px 아트 `hero-pop`
   0.6s(0.55 → 1.1 → 0.97 → 1 오버슈트), 여럿이면 66px 부채꼴 3장(±30px, ±8°) + `+N` 알약, 승급만이면 `--cream` 원판에 단계 숫자.
