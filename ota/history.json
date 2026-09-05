@@ -150,5 +150,13 @@
     "size": 5497431,
     "releasedAt": "2026-09-02T23:52:25.802Z",
     "minNative": "1.0"
+  },
+  {
+    "version": "1.5.0",
+    "url": "https://levain-ota.vercel.app/bundles/1.5.0.zip",
+    "checksum": "6007c514d448c0e259fa4b2bd8f3f4ee5323e35c934b1c40d4cfc9577e3aacd3",
+    "size": 5500456,
+    "releasedAt": "2026-09-05T03:41:50.002Z",
+    "minNative": "1.0"
   }
 ]
