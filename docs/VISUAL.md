@@ -419,6 +419,7 @@ down ─ 이동<8px & <250ms 내 up → poke
   두 어절이라 접혀도 뜻이 산다). **활성 르방의 적기(`지금 굽기 좋아요`)는 폐지** — 빵은 통에서 나간다(GDD §6-2). `align-items: baseline`.
 - **선반 `.shelf-grid`/`.shelf-tile`**(2026-09-05 신설): 2열, 타일 = 아트 88px 가운데 / 이름 `--fs-body` 600 **2줄 clamp** / `.line` `최고 · 3번` /
   `.line` `8월 26일`. 빈 선반 `.shelf-empty`(본문 + 캡션 힌트). `?` 벽 없음.
+  **빵 종류별 묶음**(GDD §6-3): 묶음마다 `.grid-divider` 머리(빵 이름, 선반에선 `--ink-soft`/600으로 한 단 세게). 순서 규칙은 `ui/shelfOrder.ts`.
 - **정보 행 `.info-rows`**(2026-09-05 신설 — 관찰 카드 `.observe-rows`와 같은 문법, 캡션 크기): `.ir` = `.ir-k`(`--fs-cap` `--ink-faint`, 고정) +
   `.ir-v`(14px `--ink` 오른쪽 정렬, 세로 스택 — 보조 `.ir-note`는 값 아래 `--hooch`). ` · ` 체인 문장의 대체물. 시트 머리·결과 카드는
   `--bg` 55% radius 14 바닥 위에 얹는다.
@@ -437,7 +438,7 @@ down ─ 이동<8px & <250ms 내 up → poke
   좌우 padding 3, 아트 40px + 이름 **`--fs-cap` 2줄 clamp, 자간 -0.02em**(개정 2026-09-05 — 이전 11.5px 1줄 말줄임) + 우상단 수량
   `.chip-count`(`--fs-num`). 상태 4종 — 보유(또렷+수량) / `.chip--missing`(아트 opacity .4 grayscale .7, **이름은 남긴다** — 무엇이 필요한지
   읽히는 게 목적, **수량 pill 없음** — 0은 정보가 아니다) / `.chip--mystery`(도감 미발견: 실루엣 + `.chip-mark` `?`, 이름 숨김) /
-  `.chip--done`(좌상단 ✓ 15px `--crust` 원). 보유와 미보유 사이 `.chip-divider`(한 줄 전체, 헤어라인 + `아직 없는 재료`). 선택 `.selected` =
+  `.chip--done`(좌상단 ✓ 15px `--crust` 원). 보유와 미보유 사이 `.grid-divider`(한 줄 전체, 헤어라인 + `아직 없는 재료` — 선반의 빵 종류 머리와 같은 원형, 2026-09-05 개명). 선택 `.selected` =
   `--accent` 테두리 1.5 + `--cream`. 형태 서브선택 `.chip-forms`는 그리드 한 줄 전체(`grid-column: 1/-1`), `--cream` 60% 바닥에
   `.form-pill`(`--fs-cap` 알약) — 고른 칩 **바로 뒤에** 끼워 폴더 열리듯 펼친다. 재료 탭(도감 30종)도 같은 칩 원형을 쓴다(교환소와 한 문법).
 - **획득 연출 `.celebrate-layer`**(2026-09-03, `celebrate.ts`): 모달(40) 위·토스트(50) 아래 z 45, 백드롭 `rgba(74,50,32,.12)`(모달 .25보다 옅게 —

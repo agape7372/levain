@@ -21,16 +21,17 @@ import { openBreadSheet, openShelfCard, variantName } from '../components/breadS
 import type { OpenShowcase, ShowcaseOpts } from '../components/breadSheet';
 import { openExchangeModal, openMissionsModal } from '../components/exchangeModal';
 import {
-  breadCard, chipGrid, ingredientChip, resultCard, shelfEmpty, shelfGrid, shelfTile,
+  breadCard, chipGrid, gridDivider, ingredientChip, resultCard, shelfEmpty, shelfGrid, shelfTile,
   statusLine, updateStatusLine,
 } from '../components/recipeVisuals';
 import type { StatusLineView } from '../components/recipeVisuals';
 import { ingredientArtNode } from './ingredientArt';
 import { dateText, pantryQualityText } from '../format';
+import { shelfGroups } from '../shelfOrder';
 import type { GameApi } from '../gameApi';
 import type { CollectionEntry, IngredientId } from '../../sim';
 import {
-  INGREDIENTS, RECIPES, playableRules, recipeById, ruleByVariantId, rulesForBase, variantIdOf,
+  INGREDIENTS, RECIPES, playableRules, ruleByVariantId, rulesForBase, variantIdOf,
 } from '../../sim';
 import type { Screen } from '../router';
 
@@ -184,41 +185,33 @@ export function createRecipesScreen(
     content.appendChild(grid);
   }
 
-  // ── 선반 (발견한 것만) ──
-  // `?` 벽이 없다: 아직 안 구운 빵은 빵 탭이 말하고, 여기는 구운 것만 최근 순으로 놓인다.
-  // 카탈로그에서 사라진 키(옛 저장본의 잔존 변형)는 그릴 이름이 없으니 조용히 건너뛴다.
+  // ── 선반 (발견한 것만, 종류별) ──
+  // `?` 벽이 없다: 아직 안 구운 빵은 빵 탭이 말하고, 여기는 구운 것만 놓인다.
+  // 순서는 **빵 종류별 묶음**(shelfOrder.shelfGroups) — 최근 구운 순이면 같은 빵의 변형이
+  // 굽는 순서대로 흩어져 "깜빠뉴가 어디까지 있더라"를 훑을 수 없다(사용자 판정 2026-09-05).
+  // 묶음 머리는 베이스 빵 이름, 카탈로그에서 사라진 키는 그 함수가 걸러낸다.
   function renderShelf(): void {
     const collection = getCollection();
-    const keys = Object.keys(collection)
-      .sort((a, b) => collection[b].firstAt - collection[a].firstAt);
+    const groups = shelfGroups(collection);
     const grid = shelfGrid();
-    let drawn = 0;
-    for (const key of keys) {
-      const entry = collection[key];
-      let name: string;
-      let fallbackId: string;
-      if (recipeById(key)) {
-        name = copy.recipes.names[key];
-        fallbackId = key;
-      } else {
-        const rule = ruleByVariantId(key);
-        if (!rule) continue; // 카탈로그에서 사라진 변형 — 그릴 이름이 없다
-        name = variantName(rule);
-        fallbackId = rule.baseRecipeId;
+    for (const group of groups) {
+      grid.appendChild(gridDivider(copy.recipes.names[group.baseId]));
+      for (const item of group.items) {
+        const entry = collection[item.key];
+        const rule = item.isBase ? undefined : ruleByVariantId(item.key);
+        const tile = shelfTile({
+          artId: item.key,
+          fallbackId: item.baseId,
+          name: rule ? variantName(rule) : copy.recipes.names[item.baseId],
+          gradeShort: entry.bestGrade ? copy.recipes.gradesShort[entry.bestGrade] : undefined,
+          countText: copy.recipes.times(entry.count),
+          whenText: dateText(entry.firstAt),
+        });
+        tile.addEventListener('click', () => openShelfCard(api, item.key, deps));
+        grid.appendChild(tile);
       }
-      const tile = shelfTile({
-        artId: key,
-        fallbackId,
-        name,
-        gradeShort: entry.bestGrade ? copy.recipes.gradesShort[entry.bestGrade] : undefined,
-        countText: copy.recipes.times(entry.count),
-        whenText: dateText(entry.firstAt),
-      });
-      tile.addEventListener('click', () => openShelfCard(api, key, deps));
-      grid.appendChild(tile);
-      drawn += 1;
     }
-    content.appendChild(drawn > 0
+    content.appendChild(groups.length > 0
       ? grid
       : shelfEmpty(copy.recipes.shelfEmpty, copy.recipes.shelfEmptyHint));
   }

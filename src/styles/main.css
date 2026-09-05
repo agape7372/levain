@@ -748,6 +748,9 @@ html {
 }
 .shelf-tile .line { font-size: var(--fs-cap); line-height: 1.45; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
 .shelf-tile .line .grade { color: var(--crust); font-weight: 600; }
+/* 선반의 종류 머리 — 칩 구분선보다 조금 세게(빵 이름이라 읽히는 무게가 다르다) */
+.shelf-grid .grid-divider { margin: 10px 0 0; color: var(--ink-soft); font-weight: 600; }
+.shelf-grid .grid-divider:first-child { margin-top: 0; }
 .shelf-empty { padding: 40px 16px; text-align: center; color: var(--ink-soft); font-size: var(--fs-body); line-height: 1.6; }
 .shelf-empty .hint { display: block; margin-top: 4px; font-size: var(--fs-cap); color: var(--ink-faint); }
 
@@ -937,8 +940,8 @@ html {
   color: var(--ink-faint);
   pointer-events: none;
 }
-/* 구분선 행 — 보유 칩과 미보유 칩 사이('아직 없는 재료'). 그리드 한 줄 전체 */
-.chip-divider {
+/* 구분선 행 — 그리드 한 줄 전체를 가로지르는 머리. 시트 '아직 없는 재료' · 선반 빵 종류 머리 공용 */
+.grid-divider {
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
@@ -947,8 +950,8 @@ html {
   font-size: var(--fs-cap);
   color: var(--ink-faint);
 }
-.chip-divider::before,
-.chip-divider::after { content: ''; flex: 1; height: 1px; background: color-mix(in srgb, var(--ink-faint) 22%, transparent); }
+.grid-divider::before,
+.grid-divider::after { content: ''; flex: 1; height: 1px; background: color-mix(in srgb, var(--ink-faint) 22%, transparent); }
 .chip-count {
   position: absolute;
   top: 5px; right: 5px;

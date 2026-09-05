@@ -314,9 +314,12 @@ export function chipGrid(): HTMLElement {
   return el('div', 'chip-grid');
 }
 
-/** 구분선 행 — 보유 칩과 미보유 칩 사이('아직 없는 재료'). 그리드 한 줄 전체 */
-export function chipDivider(label: string): HTMLElement {
-  return el('div', 'chip-divider', label);
+/**
+ * 구분선 행 — 그리드 한 줄 전체를 가로지르는 머리.
+ * 시트 칩 그리드의 '아직 없는 재료', 선반의 빵 종류 머리가 같은 원형을 쓴다.
+ */
+export function gridDivider(label: string): HTMLElement {
+  return el('div', 'grid-divider', label);
 }
 
 export interface FormPillView {

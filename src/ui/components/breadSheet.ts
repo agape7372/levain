@@ -13,7 +13,7 @@ import { dateText, pantryQualityText } from '../format';
 import { toast } from './toast';
 import { confirmModal, openModal } from './modal';
 import {
-  breadThumb, chipDivider, chipGrid, formsRow, ingredientChip, resultCard, setChipSelected,
+  breadThumb, chipGrid, gridDivider, formsRow, ingredientChip, resultCard, setChipSelected,
   setFormSelected, setSummary, sheetHead, sheetLabel, sheetSummary,
 } from './recipeVisuals';
 import type { InfoRow } from './recipeVisuals';
@@ -269,7 +269,7 @@ export function openBreadSheet(
   }
 
   if (missing.length > 0) {
-    grid.appendChild(chipDivider(copy.recipes.missingLabel));
+    grid.appendChild(gridDivider(copy.recipes.missingLabel));
     for (const group of missing) {
       const chip = ingredientChip({
         id: group.id,
