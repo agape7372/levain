@@ -13,6 +13,7 @@ import {
   NOTIFY_SLOT_DORMANT,
   NOTIFY_SLOT_FEED,
   NOTIFY_SLOT_FIRSTWEEK,
+  NOTIFY_SLOT_FRIDGE,
   NOTIFY_SLOT_MOLD,
   NOTIFY_SLOT_PEAK,
   NOTIFY_SLOT_SOUR,
@@ -136,7 +137,7 @@ export function planNotifications(state: SimState, now: number, opts?: NotifyOpt
   // 피크도 제외 — 냉장은 주 1회 케어 모드라 "한창" 창 자체가 관심사가 아니다.
   if (state.location === 'fridge') {
     const at = cq(wallFor(b.hungry));
-    if (at > now) slots.push({ id: NOTIFY_SLOT_FEED, at, copyKey: 'fridgeWeek', weekly: true });
+    if (at > now) slots.push({ id: NOTIFY_SLOT_FRIDGE, at, copyKey: 'fridgeWeek', weekly: true });
     return { slots };
   }
 
@@ -191,8 +192,8 @@ export function planNotifications(state: SimState, now: number, opts?: NotifyOpt
 
 /**
  * 멀티 르방 병합 플랜 (확장기획 §5-6) — 알림 총량은 N배가 아니라 슬롯 수 그대로.
- * 같은 슬롯을 여러 르방이 원하면 **가장 이른 시각 1건**(그 르방의 copyKey·weekly 채택),
- * 병합 수는 count로 실어 문구를 집계형으로(ui/copy.ts notifyMany).
+ * 같은 copyKey를 여러 르방이 원하면 **가장 이른 시각 1건**(그 르방의 weekly 채택),
+ * 병합 수는 count로 실어 문구를 집계형으로(ui/copy.ts notifyMany). 다른 copyKey는 세지 않는다.
  * 사망 침묵·휴면 1건·조용시간 처리는 개별 planNotifications가 이미 보장한다.
  */
 export function planNotificationsAll(
@@ -211,15 +212,23 @@ export function planNotificationsAll(
     const plan = planNotifications(sims[0], now, opts);
     return labels?.[0] ? { slots: plan.slots.map((s) => withLabel(s, 0)) } : plan;
   }
-  const bySlot = new Map<number, NotifySlot & { count: number }>();
+  // 병합은 같은 copyKey끼리만 — 다른 종류를 한 count로 묶으면 「2개가 배고파요」가 거짓이 된다(감사 T2-11)
+  const byKey = new Map<NotifySlot['copyKey'], NotifySlot & { count: number }>();
   sims.forEach((sim, i) => {
     for (const slot of planNotifications(sim, now, opts).slots) {
-      const cur = bySlot.get(slot.id);
-      if (!cur) bySlot.set(slot.id, { ...withLabel(slot, i), count: 1 });
-      else if (slot.at < cur.at) bySlot.set(slot.id, { ...withLabel(slot, i), count: cur.count + 1 });
+      const cur = byKey.get(slot.copyKey);
+      if (!cur) byKey.set(slot.copyKey, { ...withLabel(slot, i), count: 1 });
+      else if (slot.at < cur.at) byKey.set(slot.copyKey, { ...withLabel(slot, i), count: cur.count + 1 });
       else cur.count += 1;
     }
   });
+  // 슬롯 1은 feedTime·reviveSecond가 같이 쓴다 — 예약 id가 겹치면 하나가 덮이므로 이른 쪽만 둔다.
+  // 늦은 쪽은 앱 복귀 때 재계획으로 다시 잡힌다(종전 병합과 같은 결과, count만 정직해짐)
+  const bySlot = new Map<number, NotifySlot & { count: number }>();
+  for (const s of byKey.values()) {
+    const cur = bySlot.get(s.id);
+    if (!cur || s.at < cur.at) bySlot.set(s.id, s);
+  }
   const slots: NotifySlot[] = [...bySlot.values()]
     // 병합(count ≥ 2)이면 한 마리를 지목할 수 없다 — label을 뗀다
     .map(({ count, label, ...rest }) => (count > 1 ? { ...rest, count } : label ? { ...rest, label } : rest))

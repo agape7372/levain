@@ -21,6 +21,10 @@ export default [
               ],
               message: 'sim은 순수 — now는 인자로 받는다',
             },
+            {
+              group: ['@capacitor/*'],
+              message: 'sim은 순수 — 플랫폼 API는 platform/ 소관',
+            },
           ],
         },
       ],
@@ -36,6 +40,11 @@ export default [
         },
         {
           selector: "CallExpression[callee.object.name='performance'][callee.property.name='now']",
+          message: 'sim은 순수 — now는 인자로 받는다',
+        },
+        {
+          // 인자 없는 new Date()는 곧 현재 시각이다 — 인자 있는 new Date(ts)는 허용(ads·notifyPlan)
+          selector: "NewExpression[callee.name='Date'][arguments.length=0]",
           message: 'sim은 순수 — now는 인자로 받는다',
         },
       ],

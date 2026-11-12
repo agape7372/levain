@@ -5,6 +5,10 @@ import type { Snapshot } from '../src/sim';
 
 const base: Snapshot = {
   canSplit: false,
+  splitReadyAt: 0,
+  discardReady: true,
+  nextStage: null,
+  fakeRise: false,
   phase: 'active',
   activity: 0,
   hunger: 0,

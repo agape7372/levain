@@ -10,15 +10,15 @@
 import { RECIPES } from '../sim';
 import type { CollectionEntry } from '../sim';
 import {
-  FLOUR_PER_INGREDIENT, INGREDIENT_FLOUR_COST, MISSION_BAKE_STEP, MISSION_FEED_STEP,
+  FLOUR_PER_INGREDIENT, MISSION_BAKE_STEP, MISSION_FEED_STEP,
   MISSION_REWARD_FLOUR, RECIPE_REWARD_FLOUR, STAGE_REWARD_FLOUR,
 } from '../sim/constants';
 
 /** 집(계정) 경제 상태 — 전부 단조 증가 카운터. shared 하위 무버전 추가 키 */
 export interface EconomyState {
-  /** 누적 급여 횟수 (fed 이벤트) — 급여 미션의 축 */
+  /** 누적 급여 횟수 (fed 이벤트 중 counted — 유효 6h 간격) — 급여 미션의 축 */
   feeds: number;
-  /** 누적 굽기 횟수 (baked·bakedDiscard) — 굽기 미션의 축 */
+  /** 누적 굽기 횟수 (baked 전부 + bakedDiscard 중 counted — 벽시계 6h 간격) — 굽기 미션의 축 */
   bakes: number;
   /** 집 최고 도달 성장 단계 — 르방이 죽거나 삭제돼도 내려가지 않는다 */
   stageMax: number;
@@ -65,11 +65,6 @@ export const flourBalance = (
   eco: EconomyState,
   collection: Record<string, CollectionEntry>,
 ): number => Math.max(0, earnedFlour(eco, collection) - eco.spent);
-
-export const canBuyIngredient = (
-  eco: EconomyState,
-  collection: Record<string, CollectionEntry>,
-): boolean => flourBalance(eco, collection) >= INGREDIENT_FLOUR_COST;
 
 export interface MissionView {
   /** 누적 횟수 */

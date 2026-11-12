@@ -1,4 +1,4 @@
-// WebAudio 전량 합성 — 에셋 0, v1 3종 (VISUAL §6). 첫 제스처에서 resume, hidden 시 suspend.
+// WebAudio 전량 합성 — 에셋 0 (VISUAL §6). 첫 제스처에서 생성·resume, hidden 시 suspend.
 // 마스터: Gain 0.25 → LPF 3kHz. 리버브 금지. 휴면 진입 = 무음(침묵이 표현).
 
 let ctx: AudioContext | null = null;
@@ -9,9 +9,18 @@ export function setMuted(m: boolean): void {
   muted = m;
 }
 
+/** 이미 만들어진 컨텍스트만 돌려준다. 생성은 unlockAudio(첫 제스처)만 한다 —
+ *  유휴 기포 팝이 제스처 전에 컨텍스트를 만들면 자동재생 경고가 나고 생성 비용(수십 ms)이
+ *  유휴 프레임에 걸린다 (2026-11-12 감사 T4-5). 제스처 전의 소리는 그냥 나지 않는다. */
 function ensureCtx(): AudioContext | null {
-  if (typeof AudioContext === 'undefined') return null;
-  if (!ctx) {
+  if (!ctx) return null;
+  if (ctx.state === 'suspended') void ctx.resume();
+  return ctx;
+}
+
+/** 첫 사용자 제스처에서 호출 — 컨텍스트 생성 + 모바일 자동재생 정책 해제 */
+export function unlockAudio(): void {
+  if (!ctx && typeof AudioContext !== 'undefined') {
     ctx = new AudioContext();
     master = ctx.createGain();
     master.gain.value = 0.25;
@@ -20,12 +29,6 @@ function ensureCtx(): AudioContext | null {
     lpf.frequency.value = 3000;
     master.connect(lpf).connect(ctx.destination);
   }
-  if (ctx.state === 'suspended') void ctx.resume();
-  return ctx;
-}
-
-/** 첫 사용자 제스처에서 호출 — 모바일 자동재생 정책 해제 */
-export function unlockAudio(): void {
   ensureCtx();
 }
 
@@ -79,6 +82,20 @@ export function sfxUnlock(): void {
   tone(523.25, t + 0.09, 0.34, 'triangle', 0.5);
   tone(659.25, t + 0.18, 0.5, 'triangle', 0.48);
   tone(987.77, t + 0.2, 0.4, 'triangle', 0.12); // 끝음 5도 배음 살짝
+}
+
+/** 굽기 결과 — 보상 소리는 하나(G4–C5–E5)이고, 결과는 「어디까지 올라가느냐」로만 다르다.
+ *  2 = 둘째 음에서 멈춤(납작·덜어낸 반죽 굽기), 3 = 세 음(잘 구움), 4 = 끝음 배음까지(최고 = sfxUnlock) */
+export function sfxBaked(rungs: 2 | 3 | 4): void {
+  if (rungs === 4) {
+    sfxUnlock();
+    return;
+  }
+  if (muted || !ensureCtx() || !ctx) return;
+  const t = ctx.currentTime;
+  tone(392.0, t, 0.32, 'triangle', 0.45);
+  tone(523.25, t + 0.09, rungs === 2 ? 0.45 : 0.34, 'triangle', 0.45);
+  if (rungs === 3) tone(659.25, t + 0.18, 0.5, 'triangle', 0.44);
 }
 
 /** 부활 성공 — 재사용 조합 */
@@ -152,23 +169,58 @@ export function sfxStirEnd(): void {
   stirFilter = null;
 }
 
-/** 천 덮개 사락 — 하이패스 노이즈 버스트 0.25s (마스터 LPF 3kHz와 만나 1.2~3k 대역) */
-export function sfxCloth(): void {
+/** 노이즈 한 숨 — 필터를 지나 사라지는 짧은 소리. 사락·탁·쩍이 전부 이 하나에서 나온다 */
+function noiseBurst(o: {
+  type: BiquadFilterType;
+  freq: number;
+  /** 주면 freq에서 여기로 미끄러진다 */
+  to?: number;
+  q?: number;
+  peak: number;
+  attack: number;
+  dur: number;
+  rate?: number;
+}): void {
   if (muted || !ensureCtx() || !ctx || !master) return;
   const buf = ensureNoise();
   if (!buf) return;
   const src = ctx.createBufferSource();
   src.buffer = buf;
-  src.playbackRate.value = 0.9 + Math.random() * 0.2;
-  const hpf = ctx.createBiquadFilter();
-  hpf.type = 'highpass';
-  hpf.frequency.value = 1200;
-  const g = ctx.createGain();
+  src.playbackRate.value = o.rate ?? 1;
+  const f = ctx.createBiquadFilter();
+  f.type = o.type;
   const t = ctx.currentTime;
+  f.frequency.setValueAtTime(o.freq, t);
+  if (o.to) f.frequency.exponentialRampToValueAtTime(o.to, t + o.dur);
+  if (o.q) f.Q.value = o.q;
+  const g = ctx.createGain();
   g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(0.22, t + 0.02);
-  g.gain.exponentialRampToValueAtTime(0.0004, t + 0.25);
-  src.connect(hpf).connect(g).connect(master);
-  src.start(t);
-  src.stop(t + 0.3);
+  g.gain.linearRampToValueAtTime(o.peak, t + o.attack);
+  g.gain.exponentialRampToValueAtTime(0.0004, t + o.dur);
+  src.connect(f).connect(g).connect(master);
+  // 버퍼(1초)의 아무 데서나 시작 — 같은 소리가 매번 똑같이 들리지 않게
+  src.start(t, Math.random() * 0.4);
+  src.stop(t + o.dur + 0.05);
+}
+
+/** 천 덮개 사락 — 하이패스 노이즈 버스트 0.25s (마스터 LPF 3kHz와 만나 1.2~3k 대역) */
+export function sfxCloth(): void {
+  noiseBurst({ type: 'highpass', freq: 1200, peak: 0.22, attack: 0.02, dur: 0.25, rate: 0.9 + Math.random() * 0.2 });
+}
+
+/** 가루 붓는 사락 — 천보다 길고 여리게. 밥·부활 시작·말린 조각 되살리기(전부 병에 무언가 들어가는 순간) */
+export function sfxPour(): void {
+  noiseBurst({ type: 'highpass', freq: 1500, peak: 0.13, attack: 0.09, dur: 0.6, rate: 0.9 + Math.random() * 0.2 });
+}
+
+/** 병을 내려놓는 탁 — 자리 옮기기·르방 바꾸기·새 병. 낮은 한 점 + 유리 닿는 짧은 틱 */
+export function sfxSetDown(): void {
+  if (muted || !ensureCtx() || !ctx) return;
+  tone(150, ctx.currentTime, 0.1, 'sine', 0.55, 85);
+  noiseBurst({ type: 'highpass', freq: 1600, peak: 0.09, attack: 0.002, dur: 0.035 });
+}
+
+/** 반죽 떼는 쩍 — 끈적한 것이 끊어지는 짧은 내림. 젓기와 같은 대역(밴드패스)이라 한 재료로 들린다 */
+export function sfxPinch(): void {
+  noiseBurst({ type: 'bandpass', freq: 560, to: 240, q: 2.2, peak: 0.3, attack: 0.012, dur: 0.17 });
 }

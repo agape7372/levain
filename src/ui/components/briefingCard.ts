@@ -9,7 +9,7 @@ export function openBriefingCard(keys: BriefingKey[], onClose?: () => void): voi
     return;
   }
   const wrap = document.createElement('div');
-  wrap.className = 'observe-rows';
+  wrap.className = 'observe-rows briefing-rows'; // 행 문법은 관찰 카드, 정렬은 목록(점 옆에 문장)
   for (const k of keys) {
     const row = document.createElement('div');
     row.className = 'row';

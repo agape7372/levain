@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12(API 31) 이상 클라우드 백업·기기 간 이전. 규칙은 backup_rules.xml과 같다(제외만). -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="versions/" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="versions/" />
+    </device-transfer>
+</data-extraction-rules>

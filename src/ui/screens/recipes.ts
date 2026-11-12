@@ -125,7 +125,7 @@ export function createRecipesScreen(
         art: ingredientArtNode(id),
         name: copy.recipes.ingredientNames[id],
         headline,
-      }));
+      }), { ariaLabel: copy.recipes.ingredientNames[id] });
     };
     const open = deps.openShowcase;
     if (!open) {

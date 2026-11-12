@@ -10,15 +10,17 @@ import { toast } from '../components/toast';
 import type { GameApi } from '../gameApi';
 import type { FeedRatio, Flour, Location, SimEvent, Snapshot } from '../../sim';
 import {
-  RATIOS, FRIDGE_STAGE, SEED_G, SPLIT_MIN_G,
+  RATIOS, RECIPES, FRIDGE_STAGE, SEED_G, SPLIT_MIN_G,
   FLOUR_STAGE, HOUR, rateMult,
 } from '../../sim';
-// MASS_MAX·MATURITY_MIN_GAP_H는 sim/index가 재수출하지 않는다 — persistence.ts:10과 같은 직접 임포트
+// MASS_MAX는 sim/index가 재수출하지 않는다 — persistence.ts:10과 같은 직접 임포트
 // (ESLint no-restricted-imports는 src/sim/** 안쪽에만 걸린다)
-import { MASS_MAX, MATURITY_MIN_GAP_H } from '../../sim/constants';
+import { MASS_MAX } from '../../sim/constants';
 import type { Screen } from '../router';
 
 const LOCATIONS: Location[] = ['room', 'window', 'fridge'];
+/** 통의 반죽을 쓰는 첫 빵이 열리는 단계 — 그 전엔 떼어 둬도 쓸 곳이 없어 떼기를 권하지 않는다 */
+const FIRST_BREAD_STAGE = Math.min(...RECIPES.filter((r) => r.kind === 'bread').map((r) => r.stage));
 
 export function createHomeScreen(
   api: GameApi,
@@ -65,7 +67,7 @@ export function createHomeScreen(
     confirmModal({
       body: copy.starter.addConfirm,
       confirmLabel: copy.starter.add,
-      cancelLabel: '다음에요',
+      cancelLabel: copy.common.later,
       onConfirm: () => toast(api.addStarter() ? copy.starter.added : copy.starter.slotsFull),
     });
   });
@@ -99,7 +101,7 @@ export function createHomeScreen(
 
   // ── 우상단: 설명서 · 설정 + 보관 통 ──
   // 하단 = 세션마다 반복되는 조작의 자리(위 chipRow 주석), 여기 = 저빈도·읽기 위주 오브젝트의 자리.
-  // 떼어내기는 canSplit이 유효 6h를 요구해 구조상 하루 1~2회가 상한이고, 잔량은 보기만 해도
+  // 떼어내기는 canSplit이 유효 4.5~6h(derive.splitGateH)를 요구해 구조상 하루 1~2회가 상한이고, 잔량은 보기만 해도
   // 읽히므로 엄지 비용이 0이다 — 두 주석은 충돌이 아니라 같은 규칙의 양면이다.
   const corner = document.createElement('div');
   corner.className = 'hud-corner';
@@ -144,11 +146,8 @@ export function createHomeScreen(
     }
     if (!snap.canSplit) {
       // 남은 시간은 실제 시계로 환산해 말한다 — 유효시간을 그대로 말하면 냉장고에선 거짓말이 된다.
-      // 이 식은 derive.ts의 wallFor와 대수적으로 같다:
-      //   now + (T − effMs)/mult ≡ locAnchorAt + (T − effBaseMs)/mult
-      const mult = rateMult({ location: api.location(), flour: snap.flour });
-      const readyAt = now + Math.max(0, MATURITY_MIN_GAP_H * HOUR - snap.effSinceFeedMs) / mult;
-      toast(copy.split.blockedTooSoon(untilText(readyAt, now)));
+      // 게이트와 환산은 sim 한 곳(derive.splitGateH · splitReadyAt)이 갖는다
+      toast(copy.split.blockedTooSoon(untilText(snap.splitReadyAt, now)));
       return;
     }
     const g = snap.mass - SEED_G;
@@ -156,9 +155,9 @@ export function createHomeScreen(
     // 순서가 중요하다: 품질이 질문 앞에 서야 "왜 지금인가"가 판단 재료가 된다.
     const quality = { high: copy.split.quality.good, mid: copy.split.quality.ok, low: copy.split.quality.weak };
     confirmModal({
-      body: `${quality[activityBand(snap.activity)]} ${copy.split.confirm(g)}`,
+      body: copy.split.confirmAfter(quality[activityBand(snap.activity)], g),
       confirmLabel: copy.split.action,
-      cancelLabel: '다음에요',
+      cancelLabel: copy.common.later,
       onConfirm: () => {
         const events = api.dispatch({ type: 'split' });
         const done = events.find((e): e is Extract<SimEvent, { type: 'split' }> => e.type === 'split');
@@ -220,13 +219,13 @@ export function createHomeScreen(
     openRatioModal(snap);
   }
 
-  let lastRatio: FeedRatio = '1:1:1';
-
   function openRatioModal(snap: Snapshot): void {
     const wrap = document.createElement('div');
     wrap.className = 'option-list';
     const ratios = (Object.keys(RATIOS) as FeedRatio[]).filter((r) => snap.stage >= RATIOS[r].stage);
     type Choice = FeedRatio | 'fridgePrep';
+    // 기본값 = 최근 사용(GDD §5) — 세션 변수가 아니라 저장된 비율이라 재시작해도 이어진다 (T7-13)
+    const lastRatio = api.feedRatio();
     let selected: Choice = ratios.includes(lastRatio) ? lastRatio : '1:1:1';
 
     const items = new Map<Choice, HTMLButtonElement>();
@@ -278,13 +277,14 @@ export function createHomeScreen(
       const updateForecast = (): void => {
         // 피크 예보 — 선택한 비율·가루 + 현재 위치 기준. 범위로 말한다 (§19-1)
         const r = RATIOS[selected === 'fridgePrep' ? '1:1:1' : selected];
-        const mult = rateMult({ location: api.location(), flour: selectedFlour });
+        const loc: Location = selected === 'fridgePrep' ? 'fridge' : api.location(); // 냉장 갈 준비 = 냉장 배율 (T7-12)
+        const mult = rateMult({ location: loc, flour: selectedFlour });
         const now = api.now();
         const from = untilText(now + (r.peakStartH * HOUR) / mult, now);
         const to = untilText(now + (r.peakEndH * HOUR) / mult, now);
         forecast.textContent =
           copy.feed.peakForecast(from, to) +
-          (api.location() === 'window' ? '' : ` · ${copy.feed.peakForecastWindow}`);
+          (loc === 'window' ? '' : ` · ${copy.feed.peakForecastWindow}`);
       };
 
       for (const f of FLOURS) {
@@ -332,7 +332,6 @@ export function createHomeScreen(
         api.dispatch({ type: 'setLocation', to: 'fridge' });
         return;
       }
-      lastRatio = selected;
       api.dispatch({ type: 'feed', ratio: selected, flour: selectedFlour });
     });
     actions.appendChild(ok);
@@ -368,7 +367,20 @@ export function createHomeScreen(
 
     subFed.textContent = copy.observe.lastFed(agoText(api.lastFedAt(), now));
     const twoPart = snap.phase === 'active';
-    subNext.textContent = twoPart ? copy.observe.nextFeed(untilText(snap.nextFeedAt, now) + ' 뒤') : '';
+    // 둘째 줄 = 「다음 일」(감사 T8-04). 한창때 전엔 한창때 예보를 말한다 — 이 예보가 살펴보기 창 안에만
+    // 있어서, 알림을 끈 사람은 이 게임의 핵심(한창때 맞추기)을 배울 길이 없었다.
+    // 한창때엔 떼기를 권하되 통의 반죽을 쓸 빵이 열린 집에서만. 그 뒤엔 종전대로 배고픔 예보.
+    let nextLine = '';
+    if (twoPart) {
+      if (now < snap.peakAt) {
+        nextLine = copy.observe.peak(untilText(snap.peakAt, now), untilText(snap.peakEndAt, now));
+      } else if (now < snap.peakEndAt && snap.canSplit && api.houseStage() >= FIRST_BREAD_STAGE) {
+        nextLine = copy.observe.peakNowSplit;
+      } else {
+        nextLine = copy.observe.nextFeed(copy.observe.after(untilText(snap.nextFeedAt, now)));
+      }
+    }
+    subNext.textContent = nextLine;
     subNext.style.display = twoPart ? '' : 'none';
 
     // 타임라인은 sub가 두 마디일 때만 산다 — 같은 문장의 그림이라 조건도 같다.
@@ -416,7 +428,7 @@ export function createHomeScreen(
     const splittable = snap.phase !== 'moldy' && snap.phase !== 'dormant';
     const showJar = snap.phase !== 'moldy' && (splittable || pantry > 0);
     pantryJar.style.display = showJar ? '' : 'none';
-    // 뚜껑 = 조작 어포던스, 몸통 = 재고 readout. canSplit이 급여 후 6h 게이트라 자주 false인데
+    // 뚜껑 = 조작 어포던스, 몸통 = 재고 readout. canSplit이 급여 후 시간 게이트라 자주 false인데
     // 그때마다 재고 표시까지 죽으면 안 된다 — 잠금 표시는 뚜껑에만 준다(CSS가 분리 처리).
     // ★disabled를 쓰지 않는다: 그러면 클릭 이벤트가 안 떠서 "왜 안 되는지"를 말할 기회가 없다.
     pantryJar.classList.toggle('is-locked', !snap.canSplit || !splittable);
@@ -441,7 +453,7 @@ export function createHomeScreen(
     });
   }
 
-  const unsub = api.subscribe((snap) => update(snap));
+  api.subscribe((snap) => update(snap)); // 홈은 루트 — 해제는 앱 종료 시
 
   return {
     id: 'home',
@@ -449,9 +461,6 @@ export function createHomeScreen(
     update,
     onShow() {
       update(api.getSnapshot());
-    },
-    onHide() {
-      void unsub; // 홈은 루트 — 실제 해제는 앱 종료 시
     },
     // 알림 탭 딥링크(2026-09-03) — 밥 계열 알림을 누르면 비율 모달까지 열어 준다.
     // 모달 위 모달 금지: 브리핑·곰팡이 모달이 떠 있으면 조용히 접는다(호출자가 재시도).

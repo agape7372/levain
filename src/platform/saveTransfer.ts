@@ -7,7 +7,8 @@ import { isNative } from './native';
 
 const FILE_NAME = 'levain-save.json';
 
-export async function exportEnvelope(env: SaveEnvelope): Promise<void> {
+/** 성공 여부 — 공유 시트 취소·쓰기 실패는 false */
+export async function exportEnvelope(env: SaveEnvelope): Promise<boolean> {
   const json = JSON.stringify(env, null, 2);
 
   if (isNative()) {
@@ -19,10 +20,10 @@ export async function exportEnvelope(env: SaveEnvelope): Promise<void> {
         encoding: Encoding.UTF8,
       });
       await Share.share({ url: uri });
-      return;
+      return true;
     } catch {
       // 공유 시트 취소 포함 — 웹 다운로드 폴백으로 진행하지 않고 조용히 끝낸다
-      return;
+      return false;
     }
   }
 
@@ -33,6 +34,7 @@ export async function exportEnvelope(env: SaveEnvelope): Promise<void> {
   a.download = FILE_NAME;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 5000);
+  return true;
 }
 
 /** 파일 선택 → 텍스트 반환 (취소 시 미해결로 남을 수 있음 — 호출부는 모달 없이 대기). 검증은 persistence 몫 */

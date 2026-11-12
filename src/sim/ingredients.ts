@@ -11,8 +11,6 @@
 //              이 계약은 tests/variants.test.ts가 강제한다.
 // 합계 200행 = verified 81 / conditional 79 / experimental 39 / blocked 1.
 // 노출(verified+conditional) = 160종 변형. 재료 30종.
-import type { RecipeDef } from './types';
-import { RECIPES } from './recipes';
 
 export type IngredientId =
   | 'olive' | 'choco' | 'strawberry' | 'chestnut'
@@ -409,9 +407,3 @@ export const rulesForBase = (baseRecipeId: string): readonly CompatibilityRule[]
 const byVariantId = new Map(COMPATIBILITY.map((r) => [variantIdOf(r), r]));
 export const ruleByVariantId = (variantId: string): CompatibilityRule | undefined =>
   byVariantId.get(variantId);
-
-/** 변형의 베이스 레시피 정의 — 굽기 게이트·비용·판정은 전부 베이스 그대로 (재료 sim 무영향) */
-export const baseOfVariant = (variantId: string): RecipeDef | undefined => {
-  const rule = byVariantId.get(variantId);
-  return rule ? RECIPES.find((r) => r.id === rule.baseRecipeId) : undefined;
-};

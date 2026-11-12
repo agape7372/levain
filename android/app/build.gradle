@@ -6,6 +6,9 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+// versionName = package.json version (웹 버전 단일 출처 — 손으로 쓰다 어긋난 실사고, 감사 T3-05)
+def webVersion = new groovy.json.JsonSlurper().parse(rootProject.file('../package.json')).version
+
 android {
     namespace = "com.zaballgam.levain"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -13,8 +16,8 @@ android {
         applicationId "com.zaballgam.levain"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 4
-        versionName "1.5.0"
+        versionCode 5
+        versionName webVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

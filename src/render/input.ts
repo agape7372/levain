@@ -36,7 +36,7 @@ export interface InputHooks {
   onStirMove?(speed01: number): void;
   onStirEnd?(): void;
   onGrabStart?(): void;
-  /** 신장 정도 0~1 — 사운드·햅틱 훅용 (현재 미배선 — Phase 1 튜닝 후) */
+  /** 신장 정도 0~1 — 사운드·햅틱 훅용. DoughMesh.grabStretch01() 값 그대로(grabTarget 길이 ÷ grabMax, 상한 1). 배선은 SceneHost.onGrab* → app.ts */
   onGrabMove?(stretch01: number): void;
   onGrabEnd?(): void;
   /** 지금 르방 전환 스와이프를 받아도 되는가 (르방 2마리 이상·모달/연출/쇼케이스 아님) */

@@ -59,7 +59,7 @@ function openResultCard(recipe: RecipeDef, assetId: string, name: string, headli
     art: breadThumb(assetId, recipe.id),
     name,
     headline: headline || copy.recipes.flavor[recipe.id],
-  }));
+  }), { ariaLabel: name });
 }
 
 /** 결과 표시 — 3D 쇼케이스 우선, GLB 미비 시 카드 폴백 */
@@ -170,6 +170,11 @@ export function openBreadSheet(
   bakeBtn.type = 'button';
   bakeBtn.className = 'btn btn-primary';
   bakeBtn.textContent = copy.actions.bake;
+  // 덜어낸 반죽 굽기는 밥 한 번에 한 번 — 이미 구웠으면 단추를 미리 잠긴 모양으로(감사 T8-12).
+  // ★disabled는 쓰지 않는다(항아리·냉장과 같은 규약): 눌러야 이유를 말할 수 있다
+  const cooling = !isBread && !api.getSnapshot().discardReady;
+  bakeBtn.classList.toggle('is-locked', cooling);
+  bakeBtn.setAttribute('aria-disabled', String(cooling));
   footer.appendChild(bakeBtn);
 
   const syncFooter = (): void => {
@@ -327,16 +332,19 @@ export function openBreadSheet(
     const baked = events.find((e): e is Extract<SimEvent, { type: 'baked' }> => e.type === 'baked');
     if (baked) {
       const grade = copy.recipes.grades[baked.grade];
-      showResult(deps, recipe, assetId, name, label ? `${label} — ${grade}` : grade, true);
+      showResult(deps, recipe, assetId, name, grade, true);
       return;
     }
     if (events.some((e) => e.type === 'bakedDiscard')) {
-      const done = copy.recipes.discardDone;
-      showResult(deps, recipe, assetId, name, label ? `${label} — ${done}` : done, false);
+      showResult(deps, recipe, assetId, name, copy.recipes.discardDone, false);
     }
   };
 
   bakeBtn.addEventListener('click', () => {
+    if (cooling) {
+      toast(copy.recipes.discardCooldown); // 시트는 열어 둔다
+      return;
+    }
     // 통 부족은 **진입 차단이 아니라 탭 응답**이다(2026-09-03 개편) — 원가·부족량이 시트 머리에
     // 이미 적혀 있으니 문을 잠그는 것보다 이유를 말하는 쪽이 정보가 많다.
     if (isBread && api.pantry() < recipe.cost) {
@@ -349,7 +357,7 @@ export function openBreadSheet(
       confirmModal({
         body: copy.pantry.lastWarn,
         confirmLabel: copy.actions.bake,
-        cancelLabel: '다음에요',
+        cancelLabel: copy.common.later,
         onConfirm: runBake,
       });
       return;
@@ -376,7 +384,7 @@ export function openBreadSheet(
   });
 
   // 제목 없음 — 시트 머리가 이름을 말한다(제목을 또 두면 같은 이름이 두 줄이 된다)
-  const handle = openModal(body, { footer });
+  const handle = openModal(body, { footer, ariaLabel: baseName });
 }
 
 /**
@@ -439,6 +447,6 @@ export function openShelfCard(api: GameApi, key: string, deps: BreadSheetDeps): 
 
   const handle = openModal(
     resultCard({ art: breadThumb(key, recipe.id), name, rows }),
-    { footer },
+    { footer, ariaLabel: name },
   );
 }

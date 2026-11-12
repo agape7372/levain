@@ -109,8 +109,9 @@ export const PANTRY_MAX = 1_000_000;
  * 로트 원장(shared.pantryLots)이 없다. 그 g을 이 품질의 로트 하나로 물질화해 착륙시킨다.
  *
  * 0.8은 "경계에 정확히 세운다"를 포기하고 **경계 위로 올린 값**이다: 0.75면 점수가
- * 0.6×0.75 + 0.4 = 0.85로 GRADE_BEST와 같은데, 0.6이 이진수로 안 떨어져 곱이
- * 0.4499999…로 내려앉아 good으로 떨어진다. 부동소수 한 칸에 구세이브 등급이 걸리게 두지 않는다.
+ * 0.6×0.75 + 0.4 = 0.85로 GRADE_BEST와 딱 같다. 이 조합은 마침 0.85로 맞아떨어지지만 같은 꼴의
+ * 경계 점수가 늘 그렇지는 않다(activity 0.95 · 적합도 0.7은 0.8499999…로 내려앉는다).
+ * 부동소수 한 칸에 구세이브 등급이 걸리게 두지 않는다(gradeOf의 1e-9 여유와 별개로).
  * 0.8 → 0.48 + 0.4 = 0.88로 안전하게 best. 호밀빵은 산미 25가 선호 범위(40~75) 밖이라
  * 여전히 good — 구세이브가 공짜 최고 등급을 받지도, 억울하게 납작해지지도 않는다.
  */
@@ -146,8 +147,17 @@ export const STARTER_SLOTS_FREE = 3;
 /** 굽기 판정 */
 export const BAKE_ACTIVITY_W = 0.6;
 export const BAKE_SOUR_W = 0.4;
+/**
+ * 레시피별 판정 가중 [activity, 산미 적합도] — 없으면 위 기본(0.6/0.4).
+ * 호밀빵 = 시큼의 구원: 시어진 반죽(하루 1회 24h·호밀 시큼)이 good에 닿게 산미 쪽을 무겁게.
+ * 다른 빵 등급은 한 칸도 안 바뀐다(감사 2026-11-12 T1 O5 실측).
+ */
+export const BAKE_WEIGHTS_BY_RECIPE: Readonly<Record<string, readonly [number, number]>> = {
+  rye: [0.3, 0.7],
+};
 export const GRADE_BEST = 0.85;
-export const GRADE_GOOD = 0.6;
+/** 0.55 = 하루 2회(12h 간격) 떼기가 good, 배고픔 이후 떼기(≈0.52)는 flat (GDD §6-2 검산) */
+export const GRADE_GOOD = 0.55;
 
 /** 띄워보기(float test) 통과 활성도 */
 export const FLOAT_OK_ACTIVITY = 0.7;
@@ -171,6 +181,9 @@ export const NOTIFY_SLOT_PEAK = 4; // 한창때 — 옵트인. 2026-09-03부터 
 export const NOTIFY_SLOT_SOUR = 5;       // 시큼 진입 — 되돌릴 수 있는 상태라 알린다
 export const NOTIFY_SLOT_STAGE = 6;      // 사이클은 찼고 일수만 남은 단계 승급 예정 시각
 export const NOTIFY_SLOT_FIRSTWEEK = 7;  // 0단계 D2 가짜 부풀기 안내 — 첫 주 튜토리얼(GDD §4)
+// 냉장 주간 — 원래 슬롯 1 재사용이었지만 멀티 르방 병합에서 실온 르방의 feedTime에 묻혀 사라졌다(감사 T2-11).
+// 한 르방의 플랜에는 여전히 냉장 분기 1건뿐이라 르방당 슬롯 수는 7을 넘지 않는다.
+export const NOTIFY_SLOT_FRIDGE = 8;
 /** 하루 알림 상한 — GDD §7 "스팸 금지, 하루 최대 2건". weekly 슬롯은 집계 제외 */
 export const NOTIFY_MAX_PER_DAY = 2;
 

@@ -116,7 +116,8 @@ export type Action =
   | { type: 'restoreFlake' };   // 곰팡이 확정 후 플레이크 복원 — 같은 계보 (부활 의식 경유)
 
 export type SimEvent =
-  | { type: 'fed'; ratio: FeedRatio; maturityGained: boolean }
+  // counted = 급여 미션 계수 대상(직전 급여에서 유효 6h↑). maturityGained와 달리 시큼·부활 급여도 센다
+  | { type: 'fed'; ratio: FeedRatio; maturityGained: boolean; counted: boolean }
   | { type: 'stageUp'; stage: number }
   | { type: 'reviveStarted' }
   | { type: 'reviveTooSoon' }
@@ -126,7 +127,8 @@ export type SimEvent =
   | { type: 'moved'; to: Location }
   | { type: 'locationLocked' }  // 냉장 미해금
   | { type: 'baked'; recipeId: string; grade: BakeGrade; variantId?: string }
-  | { type: 'bakedDiscard'; recipeId: string; variantId?: string }
+  // counted = 굽기 미션 계수 대상(직전 discard 굽기에서 벽시계 6h↑, 처음이면 참)
+  | { type: 'bakedDiscard'; recipeId: string; variantId?: string; counted: boolean }
   // reason 'pantry' = 보관 통 부족. sim은 통을 모르므로 이 사유만 store가 낸다 (gameStore.doDispatch)
   | { type: 'bakeBlocked'; reason: 'pantry' | 'stage' | 'cooldown' | 'unknownRecipe' | 'ingredient' }
   | { type: 'split'; amount: number }
@@ -179,8 +181,16 @@ export interface Snapshot {
   /** kahm 효모 막(무해 — 오판 유발) — 창가×시큼 구간 파생 */
   kahm: boolean;
   hasFlake: boolean;
-  /** 떼어내기 가능 — 유효 6h 경과 + 씨앗 위로 최소량 이상 남음 (GDD §6-2) */
+  /** 떼어내기 가능 — 떼기 게이트(derive.splitGateH: 유효 6h, 1:1:1은 한창때 4.5h) 경과 + 씨앗 위로 최소량 이상 남음 (GDD §6-2) */
   canSplit: boolean;
+  /** 떼기 게이트가 열리는 예측 wall-clock — 잠긴 항아리가 남은 시간을 말할 때 쓴다 */
+  splitReadyAt: number;
+  /** discard 굽기 가능(마지막 급여 뒤 아직 안 구움) — 빵 시트가 굽기 단추를 미리 잠근다 */
+  discardReady: boolean;
+  /** 다음 단계까지 남은 급여 사이클·날 수 — 마지막 단계면 null. 둘 다 0이어야 오른다 */
+  nextStage: { feeds: number; days: number } | null;
+  /** D2 가짜 부풀기 구간(갓 반죽의 둘째 날) — 관찰 카드가 「곧 가라앉는다」를 미리 말한다 */
+  fakeRise: boolean;
 }
 
 export interface NotifySlot {

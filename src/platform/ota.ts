@@ -1,17 +1,22 @@
 // OTA(웹 번들 무선 갱신) — platform 층에 격리. sim·store는 이 파일의 존재를 모른다.
 // 계약 3줄:
-//   ① 부팅 즉시 notifyAppReady() — 안 부르면 플러그인이 "깨진 번들"로 보고 이전 번들로 롤백한다.
+//   ① 부팅 끝에 markOtaReady()(= notifyAppReady) — 안 부르면 플러그인이 30초 뒤 "깨진 번들"로 보고 이전 번들로 롤백한다.
+//      app.ts의 initOta({ deferReady: true })와 한 쌍이다. 화면이 실제로 뜬 번들만 「성공」으로 남는다(감사 T2-05).
 //   ② 세션 중에는 절대 화면을 갈아끼우지 않는다 — 받아만 두고 next()로 예약한다.
 //      ⚠ 실측(에뮬 2026-08-23): 예약분이 적용되는 시점은 "앱 종료 후 재시작"이 아니라
 //      **백그라운드로 나갔다 돌아올 때**다. force-stop→재시작만으로는 builtin이 계속 뜬다.
 //   ③ 네트워크는 있으면 좋은 것 — 실패는 조용히 삼킨다. 오프라인에서도 앱은 완전히 동작한다.
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
+import { Preferences } from '@capacitor/preferences';
+import { APP_VERSION } from '../version';
 import { isNative } from './native';
 
 /** 정적 배포처 — 서버 로직 없음(manifest.json + bundles/*.zip 두 종류뿐) */
 const OTA_BASE = 'https://levain-ota.vercel.app';
 const MANIFEST_URL = `${OTA_BASE}/manifest.json`;
 const FETCH_TIMEOUT_MS = 6000;
+/** 부팅 실패로 롤백된 번들 버전 — 플러그인 getFailedUpdate()는 한 번 읽으면 비워지므로 옮겨 적어 둔다 */
+const BAD_KEY = 'levain:ota:bad';
 
 interface OtaManifest {
   version: string;
@@ -44,6 +49,8 @@ async function fetchManifest(): Promise<OtaManifest | null> {
     if (typeof json !== 'object' || json === null) return null;
     const m = json as Record<string, unknown>;
     if (typeof m.version !== 'string' || typeof m.url !== 'string' || typeof m.checksum !== 'string') return null;
+    // 출처·체크섬 가드 — 빈 checksum이면 플러그인이 검증을 건너뛴다(감사 T2-20)
+    if (!m.url.startsWith(`${OTA_BASE}/bundles/`) || !/^[0-9a-f]{64}$/.test(m.checksum)) return null;
     return {
       version: m.version,
       url: m.url,
@@ -60,14 +67,24 @@ async function fetchManifest(): Promise<OtaManifest | null> {
 }
 
 /**
+ * 롤백 방지 신호 — 지금 실행 중인 번들이 정상 부팅했음을 알린다. 실패해도 앱은 계속 간다.
+ * 첫 화면까지 뜬 뒤에 불러야 "JS는 뜨고 그 뒤에 죽는" 번들도 롤백된다(감사 T2-05).
+ */
+export function markOtaReady(): void {
+  if (!isNative()) return;
+  void CapacitorUpdater.notifyAppReady().catch(() => undefined);
+}
+
+/**
  * 부팅 시 1회 호출. 롤백 방지 신호를 먼저 보내고, 그다음 조용히 새 번들을 확인한다.
+ * deferReady면 신호는 보내지 않는다 — 호출자가 부팅 끝에서 markOtaReady()를 반드시 부른다.
  * 반환값 없음 — UI는 OTA를 기다리지 않는다.
  */
-export function initOta(): void {
+export function initOta(opts: { deferReady?: boolean } = {}): void {
   if (!isNative()) return; // 웹(dev·브라우저)에선 OTA 개념 자체가 없다
 
-  // ① 롤백 방지: 지금 실행 중인 번들이 정상 부팅했음을 알린다. 실패해도 앱은 계속 간다.
-  void CapacitorUpdater.notifyAppReady().catch(() => undefined);
+  // ① 롤백 방지
+  if (!opts.deferReady) markOtaReady();
 
   // ② 확인·다운로드는 부팅 경로를 막지 않게 뒤로 미룬다
   setTimeout(() => void checkAndStage(), 3000);
@@ -75,6 +92,10 @@ export function initOta(): void {
 
 async function checkAndStage(): Promise<void> {
   try {
+    // 부팅 실패로 롤백된 번들 — 같은 버전을 세션마다 다시 받아 30초 빈 화면을 되풀이하지 않게(감사 T2-07)
+    const failed = await CapacitorUpdater.getFailedUpdate().catch(() => null);
+    if (failed?.bundle.version) await Preferences.set({ key: BAD_KEY, value: failed.bundle.version });
+
     const manifest = await fetchManifest();
     if (!manifest) return;
 
@@ -85,9 +106,11 @@ async function checkAndStage(): Promise<void> {
     // 네이티브가 요구 버전보다 낮으면 이 번들은 못 쓴다 (플러그인 추가 등 — APK 재배포 몫)
     if (manifest.minNative && compareVersions(nativeVersion, manifest.minNative) < 0) return;
 
-    // builtin은 버전 비교 대상이 아니다 — 매니페스트가 네이티브보다 새로우면 받는다
-    const base = currentVersion === 'builtin' ? nativeVersion : currentVersion;
+    // builtin은 플러그인이 버전을 모른다 — 번들에 박힌 웹 버전과 비교한다.
+    // 손으로 쓰는 versionName을 기준으로 삼으면 새 웹을 담은 AAB가 옛 OTA로 덮인다(감사 T3-05)
+    const base = currentVersion === 'builtin' ? APP_VERSION : currentVersion;
     if (compareVersions(manifest.version, base) <= 0) return;
+    if ((await Preferences.get({ key: BAD_KEY })).value === manifest.version) return;
 
     // 이미 받아 둔 같은 버전이 있으면 다시 받지 않는다
     const list = await CapacitorUpdater.list();

@@ -48,7 +48,7 @@ export function createShowcaseScreen(
   }
   const close = document.createElement('button');
   close.className = 'btn btn-primary';
-  close.textContent = '좋아요';
+  close.textContent = copy.common.ok;
   close.addEventListener('click', () => deps.onClose());
   bottom.appendChild(close);
 

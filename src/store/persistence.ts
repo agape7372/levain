@@ -41,14 +41,18 @@ export interface SaveSettings {
 export interface PendingBake {
   recipeId: string;
   grade: string;
+  /** 변형을 구웠을 때만 — 키 부재 = 베이스 (무버전 선택 키) */
+  variantId?: string;
 }
 
 export interface SaveFlags {
   onboarded: boolean;
   /** 굽기 연출 도중 앱이 죽어도 결과를 다시 보여주기 위한 자리 */
   pendingBake: PendingBake | null;
-  /** 레시피 탭 재탭 힌트 노출 횟수 (§8-1 — 3회까지만). 키 부재 = 0 (v2 무버전 추가 키) */
+  /** 더는 쓰지 않는다(2026-11-12 재탭 힌트 삭제) — 옛 저장과 모양을 맞추려고 자리만 남긴다. 키 부재 = 0 */
   retapHints: number;
+  /** 개발자 도구 허용 — 기록 불러오기로만 켜진다(화면에 켜는 길 없음). 키 부재 = false (무버전 선택 키) */
+  dev?: boolean;
 }
 
 /**
@@ -157,7 +161,7 @@ function collectionOf(v: unknown): Record<string, CollectionEntry> {
   if (!isObject(v)) return {};
   const out: Record<string, CollectionEntry> = {};
   for (const [id, raw] of Object.entries(v)) {
-    if (!isObject(raw)) continue;
+    if (id === '__proto__' || !isObject(raw)) continue; // __proto__ 대입은 기록이 아니라 프로토타입을 바꾼다
     const firstAt = finite(raw.firstAt);
     if (firstAt === null) continue; // 시각을 모르는 기록은 살릴 방법이 없다
     const grade = raw.bestGrade;
@@ -304,17 +308,23 @@ function settingsOf(v: unknown): SaveSettings {
   };
 }
 
+/**
+ * flags 복원. 여기 오는 저장본은 르방이 1마리 이상 살아 있다(validateAndClamp가 0이면 null) —
+ * flags가 없거나 onboarded가 깨졌으면 onboarded=true로 착륙한다. false로 두면 온보딩 완료가
+ * 기존 르방·도감을 지웠다(T2-02). 진짜 온보딩 전 저장본은 boolean false라 그대로 남는다.
+ */
 function flagsOf(v: unknown): SaveFlags {
   const d = defaultFlags();
-  if (!isObject(v)) return d;
+  if (!isObject(v)) return { ...d, onboarded: true };
   const pb = v.pendingBake;
   return {
-    onboarded: bool(v.onboarded, d.onboarded),
+    onboarded: bool(v.onboarded, true),
     pendingBake:
-      isObject(pb) && typeof pb.recipeId === 'string' && typeof pb.grade === 'string'
-        ? { recipeId: pb.recipeId, grade: pb.grade }
+      isObject(pb) && typeof pb.recipeId === 'string' && pb.recipeId.length <= 64 && typeof pb.grade === 'string'
+        ? { recipeId: pb.recipeId, grade: pb.grade, ...(typeof pb.variantId === 'string' ? { variantId: pb.variantId } : {}) }
         : null,
     retapHints: Math.round(num(v.retapHints, 0, 9, 0)),
+    ...(v.dev === true ? { dev: true } : {}),
   };
 }
 
@@ -517,6 +527,17 @@ function parseEnvelope(raw: string | null): SaveEnvelope | null {
 }
 
 export async function load(storage: StorageAdapter): Promise<LoadResult | null> {
+  return (await loadDetailed(storage)).result;
+}
+
+/**
+ * load + 「읽을 수 없는 저장본이 있었나」. 주·미러 둘 다 못 읽었는데 원문이 있었으면 broken=true이고,
+ * 그 원문은 새 게임 저장이 덮기 전에 storage.keepBroken으로 따로 남긴다(감사 T2-03 — 잘린 파일·
+ * 더 새 버전의 저장본이 안내 없이 사라졌다).
+ */
+export async function loadDetailed(
+  storage: StorageAdapter,
+): Promise<{ result: LoadResult | null; broken: boolean }> {
   let primaryRaw: string | null = null;
   try {
     primaryRaw = storage.loadRaw();
@@ -524,7 +545,7 @@ export async function load(storage: StorageAdapter): Promise<LoadResult | null> 
     primaryRaw = null;
   }
   const primary = parseEnvelope(primaryRaw);
-  if (primary) return { envelope: primary, source: 'primary' };
+  if (primary) return { result: { envelope: primary, source: 'primary' }, broken: false };
 
   let mirrorRaw: string | null = null;
   try {
@@ -533,7 +554,14 @@ export async function load(storage: StorageAdapter): Promise<LoadResult | null> 
     mirrorRaw = null;
   }
   const mirror = parseEnvelope(mirrorRaw);
-  if (mirror) return { envelope: mirror, source: 'mirror' };
+  if (mirror) return { result: { envelope: mirror, source: 'mirror' }, broken: false };
 
-  return null;
+  const raw = primaryRaw ?? mirrorRaw;
+  if (!raw) return { result: null, broken: false };
+  try {
+    storage.keepBroken?.(raw);
+  } catch {
+    /* 보관 실패가 부팅을 막지 않는다 */
+  }
+  return { result: null, broken: true };
 }

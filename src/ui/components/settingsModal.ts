@@ -7,6 +7,9 @@ import { toast } from './toast';
 import type { GameApi } from '../gameApi';
 import { APP_VERSION } from '../../version';
 
+/** 문의 받는 곳 — 처리방침(docs/PRIVACY.md)에 적힌 주소와 같아야 한다 */
+const CONTACT_MAIL = 'zaballgam@gmail.com';
+
 function toggleRow(label: string, on: boolean, onChange: (v: boolean) => void): HTMLElement {
   const row = document.createElement('div');
   row.className = 'settings-row';
@@ -15,6 +18,7 @@ function toggleRow(label: string, on: boolean, onChange: (v: boolean) => void): 
   const sw = document.createElement('button');
   sw.className = 'switch' + (on ? ' on' : '');
   sw.setAttribute('role', 'switch');
+  sw.setAttribute('aria-label', label);
   sw.setAttribute('aria-checked', String(on));
   sw.addEventListener('click', () => {
     const next = !sw.classList.contains('on');
@@ -52,6 +56,7 @@ function lockableToggleRow(
   const sw = document.createElement('button');
   sw.className = 'switch' + (on ? ' on' : '');
   sw.setAttribute('role', 'switch');
+  sw.setAttribute('aria-label', label);
   sw.setAttribute('aria-checked', String(on));
   let locked = false;
   sw.addEventListener('click', () => {
@@ -86,11 +91,17 @@ export function openSettings(api: GameApi): void {
   wrap.appendChild(toggleRow(copy.settings.haptics, s.haptics, (v) => api.setSettings({ haptics: v })));
   // 알림 — 항목이 6개(마스터+옵트인 4+방해 없는 시간)로 늘어 설정 본문을 잡아먹었다.
   // 진입 행 하나로 접고 하위 모달로 내린다 (2026-09-03).
-  wrap.appendChild(actionRow(copy.settings.notifyTitle, () => openNotifyModal(api)));
+  // 하위 모달은 설정을 닫고 연다 — 모달 위 모달 금지 (ARCHITECTURE §5, T7-09). 하위(알림·라이선스)를 닫으면 설정으로 돌아온다
+  wrap.appendChild(actionRow(copy.settings.notifyTitle, () => {
+    handle.close();
+    openNotifyModal(api);
+  }));
 
   wrap.appendChild(
     actionRow(copy.settings.exportSave, () => {
-      void api.exportSave().then(() => toast(copy.settings.exported));
+      void api.exportSave().then((ok) => {
+        if (ok) toast(copy.settings.exported);
+      });
     }),
   );
   wrap.appendChild(
@@ -101,27 +112,28 @@ export function openSettings(api: GameApi): void {
   // 병 이름표 — 5단계(노포) 해금 보상 (GDD §4)
   if (api.getSnapshot().stage >= LABEL_STAGE) {
     wrap.appendChild(
-      actionRow(api.labelText() ? `이름표: ${api.labelText()}` : '이름표 붙이기', () => {
+      actionRow(api.labelText() ? copy.settings.label(api.labelText() ?? '') : copy.settings.labelAdd, () => {
+        handle.close();
         const box = document.createElement('div');
         const input = document.createElement('input');
         input.type = 'text';
         input.maxLength = 12;
         input.value = api.labelText() ?? '';
-        input.placeholder = '이름표';
+        input.placeholder = copy.settings.labelPlaceholder;
         input.style.cssText =
-          'width:100%;box-sizing:border-box;border:1.5px solid var(--bg-deep);border-radius:12px;padding:12px 14px;font:15px/1 inherit;font-family:inherit;color:var(--ink);background:var(--bg);outline:none';
+          'width:100%;box-sizing:border-box;border:1.5px solid var(--bg-deep);border-radius:12px;padding:12px 14px;font-size:15px;line-height:1;font-family:inherit;color:var(--ink);background:var(--bg);outline:none';
         const actions = document.createElement('div');
         actions.className = 'modal-actions';
         const ok = document.createElement('button');
         ok.className = 'btn btn-primary';
-        ok.textContent = '붙이기';
+        ok.textContent = copy.settings.labelApply;
         ok.addEventListener('click', () => {
           api.rename(input.value);
           h.close();
         });
         actions.appendChild(ok);
         box.append(input, actions);
-        const h = openModal(box, { title: '병 이름표' });
+        const h = openModal(box, { title: copy.settings.labelTitle });
         input.focus();
       }),
     );
@@ -129,23 +141,40 @@ export function openSettings(api: GameApi): void {
 
   // 처리방침 링크 — §13 요건(광고 SDK 도입 시 앱 내 링크 필수). window.open('_system')은
   // Capacitor WebView에서 외부 네비게이션을 시스템 브라우저로 위임하는 관례적 트리거.
+  const privacyRow = actionRow(copy.settings.privacy, () => {
+    window.open('https://levain-ota.vercel.app/privacy.html', '_system');
+  });
+  wrap.appendChild(privacyRow);
+  // 광고 동의 다시 고르기 — 동의가 필요한 지역(EEA·UK 등)에서만 행이 생긴다 (Google UMP 요건, 감사 T2-08)
+  void api.ads.privacyOptionsRequired().then((required) => {
+    if (required) privacyRow.after(actionRow(copy.settings.adPrivacy, () => void api.ads.showPrivacyOptions()));
+  });
+  // 오픈소스 고지 · 문의 — 출시작에 있어야 할 두 줄 (감사 T8-07)
   wrap.appendChild(
-    actionRow(copy.settings.privacy, () => {
-      window.open('https://levain-ota.vercel.app/privacy.html', '_system');
+    actionRow(copy.settings.licenses, () => {
+      handle.close();
+      openLicenses(api);
+    }),
+  );
+  wrap.appendChild(
+    actionRow(copy.settings.contact, () => {
+      const subject = encodeURIComponent(copy.settings.version(APP_VERSION));
+      window.open(`mailto:${CONTACT_MAIL}?subject=${subject}`, '_system');
     }),
   );
 
   wrap.appendChild(
     actionRow(copy.settings.reset, () => {
+      handle.close();
       confirmModal({
         body: copy.settings.resetConfirm,
         confirmLabel: copy.settings.reset,
-        cancelLabel: '그만두기',
+        cancelLabel: copy.common.stop,
         onConfirm: () =>
           confirmModal({
             body: copy.settings.resetConfirm2,
             confirmLabel: copy.settings.reset,
-            cancelLabel: '그만두기',
+            cancelLabel: copy.common.stop,
             onConfirm: () => api.resetGame(),
           }),
       });
@@ -155,19 +184,35 @@ export function openSettings(api: GameApi): void {
   // ── 버전 표시 + 개발자 모드 진입 (7탭 — 사용자 본인 치트, 배포 UI에선 그냥 버전 텍스트) ──
   const version = document.createElement('div');
   version.className = 'hint';
-  version.style.cssText = 'text-align:center;padding:10px 0 2px;color:var(--ink-soft,#8a6a4a);user-select:none';
-  version.textContent = `르방이 v${APP_VERSION}`;
+  version.style.cssText = 'text-align:center;padding:10px 0 2px;color:var(--ink-soft);user-select:none';
+  version.textContent = copy.settings.version(APP_VERSION);
   let taps = 0;
-  version.addEventListener('click', () => {
-    taps += 1;
-    if (taps === 7 && !wrap.querySelector('.dev-rows')) {
-      toast(copy.devMode.on);
-      wrap.insertBefore(buildDevRows(api), version);
-    }
-  });
+  // 출시 빌드는 누구에게나 열리던 치트였다 (T7-07) — 판정은 api.devToolsEnabled() 한 곳
+  if (api.devToolsEnabled()) {
+    version.addEventListener('click', () => {
+      taps += 1;
+      if (taps === 7 && !wrap.querySelector('.dev-rows')) {
+        toast(copy.devMode.on);
+        wrap.insertBefore(buildDevRows(api), version);
+      }
+    });
+  }
   wrap.appendChild(version);
 
-  openModal(wrap, { title: copy.settings.title });
+  const handle = openModal(wrap, { title: copy.settings.title });
+}
+
+/** 오픈소스 고지 — 번들에 든 전문(public/licenses.txt, scripts/gen-licenses.mjs가 만든다)을 그대로 보여준다 */
+function openLicenses(api: GameApi): void {
+  const text = document.createElement('p');
+  text.className = 'modal-body license-text';
+  openModal(text, { title: copy.settings.licenses, onClose: () => openSettings(api) });
+  void fetch('/licenses.txt')
+    .then((r) => (r.ok ? r.text() : ''))
+    .then((t) => {
+      text.textContent = t;
+    })
+    .catch(() => undefined);
 }
 
 /**
@@ -199,7 +244,9 @@ function openNotifyModal(api: GameApi): void {
       void api.requestNotifyPermission().then((r) => {
         if (r === 'denied') {
           toast(copy.notify.permissionSettings);
-          api.openNotifySettings();
+          // 안내 줄은 열 때만 계산됐다 — 거부 결과를 그 자리에서 반영 (T7-16)
+          permHint.textContent = copy.settings.notifyPermissionOff;
+          permHint.hidden = false;
         }
       });
     },
@@ -221,12 +268,13 @@ function openNotifyModal(api: GameApi): void {
   syncLocked();
 
   // 방해 없는 시간 — 시 단위 2선택. 시작=끝이면 조용시간 없음 (copy.quietValue가 '없음'으로 말한다)
-  const quietRow = actionRow('', () => openQuietModal(api, syncQuietLabel));
-  const syncQuietLabel = (): void => {
-    const cur = api.getSettings();
-    quietRow.textContent = `${copy.settings.quiet}: ${copy.settings.quietValue(cur.quietStartH, cur.quietEndH)}`;
-  };
-  syncQuietLabel();
+  let toQuiet = false;
+  const quietRow = actionRow('', () => {
+    toQuiet = true; // 아래 onClose가 설정으로 돌아가지 않게
+    handle.close(); // 모달 위 모달 금지 — 알림 모달을 닫고 연다
+    openQuietModal(api);
+  });
+  quietRow.textContent = `${copy.settings.quiet}: ${copy.settings.quietValue(s.quietStartH, s.quietEndH)}`;
   rows.appendChild(quietRow);
 
   // 시스템 권한 안내 — 조회 전용이라 여기서 권한 팝업이 뜨지 않는다.
@@ -241,11 +289,17 @@ function openNotifyModal(api: GameApi): void {
     permHint.hidden = false;
   });
 
-  openModal(wrap, { title: copy.settings.notifyTitle });
+  // 닫으면 한 단계 위(설정)로 — 하드웨어 백도 같은 길을 탄다
+  const handle = openModal(wrap, {
+    title: copy.settings.notifyTitle,
+    onClose: () => {
+      if (!toQuiet) openSettings(api);
+    },
+  });
 }
 
 /** 방해 없는 시간 편집 — 변경 즉시 저장·재예약(setSettings가 replan까지 태운다) */
-function openQuietModal(api: GameApi, onChanged?: () => void): void {
+function openQuietModal(api: GameApi): void {
   const s = api.getSettings();
   const wrap = document.createElement('div');
 
@@ -279,17 +333,12 @@ function openQuietModal(api: GameApi, onChanged?: () => void): void {
     row.append(span, sel);
     rows.appendChild(row);
   };
-  addRow(copy.settings.quietFrom, hourSelect(s.quietStartH, (h) => {
-    api.setSettings({ quietStartH: h });
-    onChanged?.();
-  }));
-  addRow(copy.settings.quietTo, hourSelect(s.quietEndH, (h) => {
-    api.setSettings({ quietEndH: h });
-    onChanged?.();
-  }));
+  addRow(copy.settings.quietFrom, hourSelect(s.quietStartH, (h) => api.setSettings({ quietStartH: h })));
+  addRow(copy.settings.quietTo, hourSelect(s.quietEndH, (h) => api.setSettings({ quietEndH: h })));
   wrap.appendChild(rows);
 
-  openModal(wrap, { title: copy.settings.quiet });
+  // 닫으면 알림 창으로 돌아간다 — 바꾼 시간이 그 창의 행에 바로 보인다
+  openModal(wrap, { title: copy.settings.quiet, onClose: () => openNotifyModal(api) });
 }
 
 /** 개발자 섹션 — 성장·재료·멀티·도감 치트. 게이트(슬롯 상한 등)는 store 규칙 그대로 */

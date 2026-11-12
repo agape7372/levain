@@ -35,7 +35,8 @@ describe('flour 발효 가속', () => {
   });
 
   it('flour는 급여에서만 바뀌고, 생략하면 유지된다', () => {
-    let s = fed('white');
+    // 밀가루 선택은 4단계 해금 — sim도 막는다(감사 T1-11)
+    let s: SimState = { ...fed('white'), createdAt: T0 - 20 * 24 * HOUR, maturity: 21 };
     s = applyAction(s, { type: 'feed', ratio: '1:1:1', flour: 'rye' }, T0 + 10 * HOUR).state;
     expect(s.flour).toBe('rye');
     s = applyAction(s, { type: 'feed', ratio: '1:1:1' }, T0 + 20 * HOUR).state;

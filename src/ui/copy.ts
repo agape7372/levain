@@ -2,15 +2,25 @@
 // 담백한 한 문장. 시스템어·내부 용어·죄책감 유발·느낌표 남발 금지. 빨강 경고 시맨틱 없음.
 import { SEED_G } from '../sim';
 
-/** 목적격 조사 — 받침 있으면 '을', 없으면 '를' (recipes.bakeConfirm과 같은 판정) */
-const objParticle = (word: string): string => {
+/** 끝 글자에 받침이 있는가 (한글 음절만 — 그 밖은 없는 것으로) */
+const hasBatchim = (word: string): boolean => {
   const last = word.charCodeAt(word.length - 1);
-  const hasBatchim = last >= 0xac00 && last <= 0xd7a3 && (last - 0xac00) % 28 !== 0;
-  return hasBatchim ? '을' : '를';
+  return last >= 0xac00 && last <= 0xd7a3 && (last - 0xac00) % 28 !== 0;
 };
+/** 목적격 조사 — 받침 있으면 '을', 없으면 '를' (recipes.bakeConfirm과 같은 판정) */
+const objParticle = (word: string): string => (hasBatchim(word) ? '을' : '를');
+/** 주격 조사 — 받침 있으면 '이', 없으면 '가' */
+const subjParticle = (word: string): string => (hasBatchim(word) ? '이' : '가');
 
 export const copy = {
-  app: { name: '르방이' },
+  app: {
+    name: '르방이',
+    /** 부트 실패(그래픽을 못 여는 기기 등) — 빈 화면 대신 이 한 줄 (main.ts) */
+    bootFailed: '르방이를 불러오지 못했어요. 앱을 다시 열어 주세요',
+  },
+
+  /** 여러 화면이 같이 쓰는 단추 말 */
+  common: { ok: '좋아요', later: '다음에요', stop: '그만두기' },
 
   tabs: { levain: '르방', recipes: '레시피' },
 
@@ -66,12 +76,12 @@ export const copy = {
     yogurt: '요거트처럼 새콤한 냄새예요',
     vinegar: '식초 기운이 살짝 돌아요',
     sharp: '코가 찡한 시큼함이에요',
-    acetone: '아세톤 비슷한 냄새가 나요. 배가 많이 고프다는 신호예요 — 넉넉한 밥이면 돌아와요',
+    acetone: '아세톤 비슷한 냄새가 나요. 배가 많이 고프다는 신호예요. 넉넉한 밥이면 돌아와요',
   },
 
   // 진단 — 곰팡이로 오판하기 쉬운 무해 상태들 (실제 르방의 오판 1순위들)
   diagnosis: {
-    kahm: '주름진 흰 막이 덮였어요. 곰팡이는 아니에요 — 밥을 주면 사라져요',
+    kahm: '주름진 흰 막이 덮였어요. 곰팡이는 아니에요. 밥을 주면 사라져요',
     greySurface: '표면이 잿빛이에요. 겉모습만 그래요, 속은 자고 있어요',
     moldSpot: '표면에 작은 반점이 생겼어요. 밥을 주면 아직 괜찮아요',
     moldSpread: '반점이 번지고 있어요. 지금 밥을 주면 살릴 수 있어요',
@@ -96,7 +106,9 @@ export const copy = {
   // 지금은 병이 항상 눌리고, 잠겼으면 이유와 남은 시간을 말한다.
   split: {
     action: '떼어내기',
-    confirm: (g: number) => `씨앗 ${SEED_G}g만 남기고 ${g}g을 떼어 보관할까요?`,
+    /** 확인 창 본문 = 지금 반죽 상태 한 문장 + 질문 (quality 문구엔 마침표가 없다) */
+    confirmAfter: (quality: string, g: number) =>
+      `${quality}. 씨앗 ${SEED_G}g만 남기고 ${g}g을 떼어 보관할까요?`,
     done: (g: number) => `${g}g을 떼어 보관해두었어요`,
     blockedTooSoon: (left: string) => `밥 준 지 얼마 안 됐어요. ${left} 뒤에 떼어낼 수 있어요`,
     blockedMass: '아직 양이 적어요. 밥을 주면 금방 늘어나요',
@@ -105,8 +117,8 @@ export const copy = {
     // activity ≥ 0.7 / ≥ 0.4 / 그 아래. 죄책감 없이 사실 + 위로.
     quality: {
       good: '한창 부풀어 있어요. 좋은 반죽이에요',
-      ok: '조금 지쳤어요. 그래도 괜찮아요',
-      weak: '많이 지쳤어요. 빵이 조금 납작할 수 있어요',
+      ok: '부푼 힘이 조금 모자라요. 그래도 괜찮아요',
+      weak: '부푼 힘이 많이 모자라요. 빵이 조금 납작할 수 있어요',
     },
   },
   pantry: {
@@ -172,8 +184,6 @@ export const copy = {
       '1:2:2': '하루짜리 든든한 밥이에요',
       '1:5:5': '밤새 천천히 자라요',
     },
-    done: '맛있게 먹었어요',
-    tooSoon: '아직 배부른가 봐요',
     // 묶음 프리셋 — 밥 + 냉장 이동을 1탭으로 (§7-1 "냉장 갈 준비". 3단계 해금과 동행)
     fridgePrep: '냉장 갈 준비',
     fridgePrepHint: '밥 주고 바로 냉장고로',
@@ -198,10 +208,37 @@ export const copy = {
     // 범위로 말한다 — 실제 르방도 "정답 시간"이 없다 (§19-1, 상태·온도로 변동)
     peak: (from: string, to: string) => `${from}~${to} 뒤쯤 가장 부풀어요`,
     peakNow: '지금이 한창때예요',
+    /** 홈 머리 줄 둘째 줄 — 한창때이고 뗄 수 있을 때(빵이 열린 집만) */
+    peakNowSplit: '지금 떼어 두기 좋아요',
+    /** 남은 시간 뒤에 붙는 말 — '3시간' → '3시간 뒤' */
+    after: (t: string) => `${t} 뒤`,
     massG: (g: number) => `지금 ${g}g이에요`,
+    /** 살펴보기 창 행 이름표 */
+    rows: {
+      smell: '냄새',
+      lastFed: '마지막 밥',
+      rise: '부풀기',
+      nextFeed: '다음 밥',
+      surface: '표면',
+      caution: '조심',
+      flake: '보관',
+      mass: '양',
+      season: '이 시기',
+      nextStage: '다음 단계',
+    },
+    /** 다음 단계까지 남은 것 — 밥은 6시간 넘게 띄워 준 밥만 센다(급여 사이클) */
+    nextStage: (name: string, feeds: number, days: number) =>
+      feeds > 0 && days > 0 ? `${name}까지 밥 ${feeds}번, ${days}일`
+      : feeds > 0 ? `${name}까지 밥 ${feeds}번`
+      : days > 0 ? `${name}까지 ${days}일`
+      : `곧 ${name} 단계예요`,
     // 띄워보기 — 레시피 상태 줄에서 관찰 카드 정보 행으로 이동(2026-09-05). 르방의 상태라 르방 카드에서 말한다
     floatTest: '띄워보기',
     floatOk: '동동 떠요. 떼어 두기 좋아요',
+    /** 뜨긴 하는데 아직 떼기 전(밥 준 지 얼마 안 됨) */
+    floatSoon: '동동 떠요. 곧 떼어 둘 수 있어요',
+    /** 뜨지만 이미 떼어서 남은 게 씨앗뿐 */
+    floatPlain: '동동 떠요',
     floatNotYet: '아직 가라앉아요',
   },
 
@@ -218,8 +255,9 @@ export const copy = {
 
   stage: {
     names: ['갓 반죽', '잠잠기', '첫 기포', '어린 르방', '성숙 르방', '노포'] as const,
-    up: (name: string) => `${name} 단계가 되었어요`,
-    fakeRise: '크게 부풀었어요. 곧 조용해질 거예요, 정상이에요',
+    // 첫 주의 두 고비 — 살펴보기 창 「이 시기」 행. 둘째 날 가짜 부풀기 · 잠잠기(GDD §4 「가르친다」)
+    fakeRise: '크게 부풀었다가 곧 조용해져요. 정상이에요',
+    quiet: '며칠은 조용해요. 속에서 자라는 중이에요',
     labelUnlocked: '병에 이름표를 붙일 수 있어요',
   },
 
@@ -279,7 +317,7 @@ export const copy = {
     variantsOf: (done: number, total: number) => `${done}/${total}`,
     // 선반 (2026-09-05) — 구운 빵만, 3D 없이 본다
     shelfEmpty: '아직 구운 빵이 없어요',
-    shelfEmptyHint: '첫 빵은 플랫브레드부터',
+    shelfEmptyHint: '첫 빵은 팬케이크부터',
     /** 미보유 재료 묶음 구분선 */
     missingLabel: '아직 없는 재료',
     names: {
@@ -295,17 +333,16 @@ export const copy = {
       focaccia: '올리브 향의 폭신한 이탈리아 빵',
       loaf: '보들보들한 매일의 식빵',
       baguette: '겉은 바삭, 속은 쫄깃한 막대빵',
-      campagne: '시골빵 — 사워도우의 정석',
+      campagne: '사워도우의 정석, 시골빵',
       rye: '시큼함이 오히려 맛이 되는 빵',
       wholewheat: '통밀의 구수함을 담은 깜빠뉴',
     } as Record<string, string>,
     // ── 세그먼트·상태 줄·빵 시트 (2026-09-03 개편: [빵|재료] 한 줄, 빵 카드 = 시트) ──
     segments: { bread: '빵', shelf: '선반', ingredient: '재료' },
-    retapHint: '레시피 탭을 한 번 더 누르면 선반과 재료로 넘어가요',
     // 2026-09-05: readyNow/readyIn(활성 르방 activity 상태 줄)·needG·progress(' · ' 체인)는 폐지 —
     // 상태 줄은 pantry.quality, 시트 머리는 rows(k/v)로 말한다.
     ingredientsLabel: '재료 넣기',
-    ingredientsHint: '없는 재료는 교환소에서',
+    ingredientsHint: '없는 재료는 재료 탭에서 바꿔 올 수 있어요',
     plainLabel: '기본',
     addOne: '1개를 넣어요',
     view3d: '3D로 보기',
@@ -363,8 +400,8 @@ export const copy = {
     ingredientHeadline: (n: number) => (n > 0 ? `빵 ${n}종에 넣을 수 있어요` : ''),
     /** 도감-재료 미발견 탭 — 도감-빵의 variantHint와 같은 자리 */
     // 교환소 안내를 붙인 이유: 이 카드가 뜨는 화면 상단에 교환소 버튼이 있다 — 힌트가 바로 실행된다
-    galleryIngredientLocked: '아직 만나지 못한 재료예요 · 교환소에서 가루로 가져올 수 있어요',
-    needIngredient: (name: string) => `${name}이(가) 있으면 만들 수 있어요`,
+    galleryIngredientLocked: '아직 만나지 못한 재료예요 · 재료 바꾸기에서 가루로 가져올 수 있어요',
+    needIngredient: (name: string) => `${name}${subjParticle(name)} 있으면 만들 수 있어요`,
     bakeAgain: '다시 만들기',
   },
 
@@ -387,26 +424,29 @@ export const copy = {
     sold: (n: number) => `가루 ${n}개로 바꿨어요`,
     // 재료 배송(확장기획 §10) — 전부 사용자 선택형. "무료"라고 안 하는 이유: 광고를 대가로
     // 말하는 게 정직하다(죄책감 유발 없이, 담백하게 "영상 보고" 정도로).
-    adDeliveryTitle: '영상 보고 재료 받기',
+    adDeliveryTitle: '영상 보고 재료 1개 받기',
+    /** 무엇이 오는지 — 지급 규칙(gameStore.adDeliveryReward)과 같은 말이어야 한다 */
+    adDeliveryRule: '아직 없는 재료부터 하나가 와요',
+    adDeliveryCta: '영상 보기',
     adDeliveryRemaining: (n: number) => `오늘 ${n}번 더 받을 수 있어요`,
     adDeliveryDone: '오늘은 다 받았어요. 내일 다시 와 주세요',
     adDeliveryWatching: '재생 중…',
     adDeliveryFailed: '영상을 불러오지 못했어요',
-    adDeliveryGot: (name: string) => `${name}을(를) 선물로 받았어요`,
+    adDeliveryGot: (name: string) => `${name}${objParticle(name)} 선물로 받았어요`,
     noStock: '바꿀 재료가 없어요',
     missionsTitle: '가루 모으기',
     missionsIntro: '지금까지의 횟수는 그대로 쌓여요',
-    missionFeed: (remaining: number, reward: number) =>
-      `밥 주기 — ${remaining}번 더 주면 가루 ${reward}개`,
-    missionBake: (remaining: number, reward: number) =>
-      `빵 굽기 — ${remaining}번 더 구우면 가루 ${reward}개`,
-    missionStage: (reward: number) => `르방이가 한 단계 자랄 때마다 가루 ${reward}개`,
-    missionRecipe: (done: number, total: number, reward: number) =>
-      `처음 만든 빵 ${done}/${total} — 한 종류마다 가루 ${reward}개`,
-    missionCount: (n: number) => `지금까지 ${n}번`,
+    // 행 = 이름표(왼쪽) + 내용(오른쪽). 이름표 옆 숫자는 지금까지 쌓인 횟수
+    missionFeedLabel: (count: number) => `밥 주기 ${count}번`,
+    missionFeed: (remaining: number, reward: number) => `${remaining}번 더 주면 가루 ${reward}개`,
+    missionBakeLabel: (count: number) => `빵 굽기 ${count}번`,
+    missionBake: (remaining: number, reward: number) => `${remaining}번 더 구우면 가루 ${reward}개`,
+    missionStageLabel: '단계',
+    missionStage: (reward: number) => `한 단계 자랄 때마다 가루 ${reward}개`,
+    missionRecipeLabel: (done: number, total: number) => `처음 만든 빵 ${done}/${total}`,
+    missionRecipe: (reward: number) => `한 종류마다 가루 ${reward}개`,
     giftTitle: '첫 재료를 하나 골라요',
-    giftBody: '고른 재료로 새로운 빵 하나를 열 수 있어요',
-    giftDone: (name: string) => `${name} 1개를 받았어요`,
+    giftBody: '르방이가 자라면 빵에 넣을 수 있어요',
   },
 
   // 획득 연출 (2026-09-03, ui/components/celebrate.ts) — 담백하게, 느낌표 0개.
@@ -429,7 +469,7 @@ export const copy = {
     dormant: '르방이 깊이 잠들었어요. 잊지 말고 깨워 주세요',
     reviveSecond: '다시 밥 줄 시간이에요',
     moldWarn: '르방이 표면에 반점이 보여요. 아직 늦지 않았어요',
-    peak: '한창 부풀어 있어요. 지금 굽거나 떼어 두기 좋아요',
+    peak: '한창 부풀어 있어요. 지금 떼어 두기 좋아요',
     // 확장 슬롯 3종(2026-09-03). firstWeek은 stage.fakeRise와 같은 문장 — 같은 현상을
     // 앱 안(카드)과 앱 밖(알림)에서 말할 뿐이라 문장을 둘로 갈라 두지 않는다.
     sour: '조금 시큼해졌어요. 밥을 주면 금방 돌아와요',
@@ -474,7 +514,17 @@ export const copy = {
     quietTo: '끝',
     exportSave: '기록 내보내기',
     importSave: '기록 불러오기',
+    label: (text: string) => `이름표: ${text}`,
+    labelAdd: '이름표 붙이기',
+    labelTitle: '병 이름표',
+    labelPlaceholder: '이름표',
+    labelApply: '붙이기',
     privacy: '개인정보처리방침',
+    /** 광고 동의를 다시 고르는 창(Google UMP) — 동의가 필요한 지역에서만 보인다 */
+    adPrivacy: '광고 개인정보 설정',
+    licenses: '오픈소스 라이선스',
+    contact: '문의하기',
+    version: (v: string) => `르방이 v${v}`,
     reset: '처음부터 다시 시작',
     resetConfirm: '지금까지의 기록이 모두 사라져요. 정말 다시 시작할까요?',
     resetConfirm2: '구운 빵 기록도 함께 사라져요. 마지막으로 한 번 더 확인해요',
@@ -489,7 +539,10 @@ export const copy = {
   },
 
   onboarding: {
+    /** 첫 화면 이름 아래 한 줄 — 스토어 한 줄 소개와 같은 문장(르방이-업데이트-계획 마케팅 잠금) */
+    tagline: '살아있는 반죽과의 느린 동거',
     welcome: '밀가루와 물로 새 생명을 깨워 볼까요',
+    start: '시작하기',
     stir: '천천히 저어 주세요',
     stirDone: '이대로 깨우기',
     born: '르방이가 태어났어요',

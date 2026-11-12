@@ -3,6 +3,8 @@
 import * as THREE from 'three';
 
 const POOL = 256;
+/** 김 수명 마지막 이 시간(초) 동안 scale을 0으로 줄여 사라진다 — 공용 재질이라 알파 대신 scale (T4-14) */
+export const STEAM_FADE_S = 0.3;
 
 interface P {
   active: boolean;
@@ -96,7 +98,7 @@ export class ParticlePool {
         }
       }
       this.dummy.position.copy(p.pos);
-      this.dummy.scale.setScalar(p.scale);
+      this.dummy.scale.setScalar(p.mode === 'steam' ? p.scale * Math.min(1, p.life / STEAM_FADE_S) : p.scale);
       this.dummy.updateMatrix();
       this.mesh.setMatrixAt(count, this.dummy.matrix);
       count++;

@@ -5,7 +5,7 @@
 import { copy } from '../copy';
 import { agoText, untilText } from '../format';
 import { confirmModal, openModal } from './modal';
-import { FLAKE_COST_G, FLAKE_STAGE, FLOAT_OK_ACTIVITY, SEED_G } from '../../sim';
+import { FLAKE_COST_G, FLAKE_STAGE, FLOAT_OK_ACTIVITY, SEED_G, SPLIT_MIN_G } from '../../sim';
 import type { GameApi } from '../gameApi';
 
 export function openObserveCard(api: GameApi): void {
@@ -15,41 +15,57 @@ export function openObserveCard(api: GameApi): void {
   const wrap = document.createElement('div');
   wrap.className = 'observe-rows';
 
+  const label = copy.observe.rows;
   const rows: Array<[string, string]> = [
-    ['냄새', copy.smell[snap.smell]],
-    ['마지막 밥', copy.observe.lastFed(agoText(api.lastFedAt(), now))],
+    [label.smell, copy.smell[snap.smell]],
+    [label.lastFed, copy.observe.lastFed(agoText(api.lastFedAt(), now))],
   ];
   if (snap.phase === 'active') {
     // 피크는 구간 — 단정 대신 범위 (§19-1). 구간 안이면 "한창때"
     if (now < snap.peakAt) {
-      rows.push(['부풀기', copy.observe.peak(untilText(snap.peakAt, now), untilText(snap.peakEndAt, now))]);
+      rows.push([label.rise, copy.observe.peak(untilText(snap.peakAt, now), untilText(snap.peakEndAt, now))]);
     } else if (now < snap.peakEndAt) {
-      rows.push(['부풀기', copy.observe.peakNow]);
+      rows.push([label.rise, copy.observe.peakNow]);
     }
     // 띄워보기 (2026-09-05) — 레시피 상태 줄에서 이리로 옮겨왔다. 물에 뜨는지는 **르방의** 상태라
     // 르방을 말하는 카드에서 말한다(빵은 통에서 나간다 — GDD §6-2 개정).
     // ★정보 행이지 버튼이 아니다: 이 카드의 조작은 말려두기 하나뿐이다(GDD §5 "조작 1개 상한").
-    rows.push([
-      copy.observe.floatTest,
-      snap.activity >= FLOAT_OK_ACTIVITY ? copy.observe.floatOk : copy.observe.floatNotYet,
-    ]);
-    rows.push(['다음 밥', copy.observe.nextFeed(untilText(snap.nextFeedAt, now) + ' 뒤')]);
+    // 「떼어 두기 좋아요」는 실제로 뗄 수 있을 때만 — 항아리가 「아직」이라는데 이 줄이 떼라고 하던 모순(감사 T8-03)
+    let floatText: string;
+    if (snap.activity < FLOAT_OK_ACTIVITY) floatText = copy.observe.floatNotYet;
+    else if (snap.canSplit) floatText = copy.observe.floatOk;
+    else if (snap.mass - SEED_G < SPLIT_MIN_G) floatText = copy.observe.floatPlain; // 씨앗뿐 — 뗄 몫이 없다
+    else floatText = copy.observe.floatSoon;
+    rows.push([copy.observe.floatTest, floatText]);
+    rows.push([label.nextFeed, copy.observe.nextFeed(copy.observe.after(untilText(snap.nextFeedAt, now)))]);
   }
 
   // 진단 행 — 곰팡이로 오판하기 쉬운 상태들을 구분해 준다 (실사육의 오판 1순위)
   if (snap.phase !== 'moldy') {
-    if (snap.moldStage === 'spot') rows.push(['표면', copy.diagnosis.moldSpot]);
-    else if (snap.moldStage === 'spread') rows.push(['표면', copy.diagnosis.moldSpread]);
-    else if (snap.kahm) rows.push(['표면', copy.diagnosis.kahm]);
-    else if (snap.phase === 'dormant' && snap.dormancy >= 1) rows.push(['표면', copy.diagnosis.greySurface]);
+    if (snap.moldStage === 'spot') rows.push([label.surface, copy.diagnosis.moldSpot]);
+    else if (snap.moldStage === 'spread') rows.push([label.surface, copy.diagnosis.moldSpread]);
+    else if (snap.kahm) rows.push([label.surface, copy.diagnosis.kahm]);
+    else if (snap.phase === 'dormant' && snap.dormancy >= 1) rows.push([label.surface, copy.diagnosis.greySurface]);
     if (snap.moldStage === 'spot' || snap.moldStage === 'spread') {
-      rows.push(['조심', copy.diagnosis.moldDeadline(untilText(snap.moldDeadAt, now) + ' 뒤')]);
+      rows.push([label.caution, copy.diagnosis.moldDeadline(copy.observe.after(untilText(snap.moldDeadAt, now)))]);
     }
   }
 
   const flakeAt = api.flakeMadeAt();
-  if (flakeAt !== null) rows.push(['보관', copy.flake.hasOne(agoText(flakeAt, now))]);
-  rows.push(['양', copy.observe.massG(snap.mass)]);
+  if (flakeAt !== null) rows.push([label.flake, copy.flake.hasOne(agoText(flakeAt, now))]);
+  rows.push([label.mass, copy.observe.massG(snap.mass)]);
+
+  // 첫 주의 두 고비를 그 자리에서 말한다 — 둘째 날 크게 부풀었다 꺼지는 것, 잠잠기에 부피가 주는 것은
+  // 설명이 없으면 퇴보로 읽힌다(감사 T8-06). STAGE_FILL_FACTOR가 부피를 줄이는 단계가 1(잠잠기)이다
+  if (snap.phase !== 'moldy') {
+    if (snap.fakeRise) rows.push([label.season, copy.stage.fakeRise]);
+    else if (snap.stage === 1) rows.push([label.season, copy.stage.quiet]);
+    // 다음 단계까지 — 며칠 뒤의 목표가 화면 어디에도 없었다
+    const next = snap.nextStage;
+    if (next) {
+      rows.push([label.nextStage, copy.observe.nextStage(copy.stage.names[snap.stage + 1], next.feeds, next.days)]);
+    }
+  }
 
   for (const [k, v] of rows) {
     const row = document.createElement('div');
@@ -89,7 +105,7 @@ export function openObserveCard(api: GameApi): void {
       confirmModal({
         body: copy.flake.confirm,
         confirmLabel: copy.flake.action,
-        cancelLabel: '다음에요',
+        cancelLabel: copy.common.later,
         onConfirm: () => void api.dispatch({ type: 'makeFlake' }),
       });
     });

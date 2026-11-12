@@ -8,11 +8,11 @@ const t0 = 1_700_000_000_000;
 describe('maturity — 급여 사이클 적립 게이트 (GDD §3-6)', () => {
   it('유효 6h 미만 재급여는 미적립, 6h 이상이면 적립', () => {
     const under = applyAction(initialState(t0), { type: 'feed', ratio: '1:1:1' }, t0 + 5 * HOUR);
-    expect(under.events).toContainEqual({ type: 'fed', ratio: '1:1:1', maturityGained: false });
+    expect(under.events).toContainEqual({ type: 'fed', ratio: '1:1:1', maturityGained: false, counted: false });
     expect(under.state.maturity).toBe(0);
 
     const over = applyAction(initialState(t0), { type: 'feed', ratio: '1:1:1' }, t0 + 6 * HOUR);
-    expect(over.events).toContainEqual({ type: 'fed', ratio: '1:1:1', maturityGained: true });
+    expect(over.events).toContainEqual({ type: 'fed', ratio: '1:1:1', maturityGained: true, counted: true });
     expect(over.state.maturity).toBe(1);
   });
 
@@ -25,7 +25,8 @@ describe('maturity — 급여 사이클 적립 게이트 (GDD §3-6)', () => {
     expect(phaseAt(sour, t0)).toBe('sour');
 
     const result = applyAction(sour, { type: 'feed', ratio: '1:1:1' }, t0);
-    expect(result.events).toContainEqual({ type: 'fed', ratio: '1:1:1', maturityGained: false });
+    // 미션 계수는 phase를 안 본다 — 시큼 급여도 간격만 맞으면 센다(감사 T1-01)
+    expect(result.events).toContainEqual({ type: 'fed', ratio: '1:1:1', maturityGained: false, counted: true });
     expect(result.state.maturity).toBe(0);
     expect(phaseAt(result.state, t0)).toBe('active'); // 회복은 됨
   });

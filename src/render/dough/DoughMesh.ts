@@ -280,7 +280,8 @@ export class DoughMesh {
     return BASE_Y - h + 2 * h * levelled;
   }
 
-  tick(t: number): void {
+  /** t = 렌더 시계(초, CPU 로직 전부). shaderT = 셰이더 uTime — 생략하면 t. 호출자가 원점을 옮긴 작은 값을 넘겨 float32 해상도를 지킨다 */
+  tick(t: number, shaderT = t): void {
     const p = this.params;
     const level = p?.levelness ?? 0.5;
     const fluid = p?.fluidity ?? 0.3;
@@ -409,7 +410,7 @@ export class DoughMesh {
     // 젖은 광 — 상태 기본값 + 젓기 부스트
     u.uWet.value = Math.min(1, (p?.wet ?? 0) + 0.3 * this.agitation);
 
-    u.uTime.value = t;
+    u.uTime.value = shaderT;
     // ── 슬로싱 — 감쇠 진동자(1.5Hz). 액체일수록 오래 출렁(ζ 0.55→0.10).
     //    셰이더는 이 값을 "수면 기울기"(액체)와 잔여 강체 시프트(고체)로 나눠 그린다 ──
     if (stirring && this.stirDrivesWobble) {

@@ -12,5 +12,13 @@ if (q.has('demo')) {
   void (async () => {
     const { startApp } = await import('./app');
     await startApp();
-  })();
+  })().catch(async (e: unknown) => {
+    // 부트 예외(WebGL 컨텍스트 생성 실패 등)면 빈 화면 대신 안내 한 줄 (T7-06)
+    console.error(e);
+    const { copy } = await import('./ui/copy');
+    const p = document.createElement('p');
+    p.textContent = copy.app.bootFailed;
+    p.style.cssText = 'padding:40vh 24px 0;text-align:center;color:var(--ink)';
+    document.getElementById('ui-root')?.appendChild(p);
+  });
 }

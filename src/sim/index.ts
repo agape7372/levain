@@ -2,7 +2,7 @@
 export * from './types';
 export { advance, reanchor } from './advance';
 export { applyAction, initialState } from './actions';
-export { deriveSnapshot, effSinceFeedMs, activityAt, phaseAt, stageOf, boundariesH, moldStageAt, clamp, smoothstep, rateMult } from './derive';
+export { deriveSnapshot, effSinceFeedMs, activityAt, phaseAt, stageOf, boundariesH, moldStageAt, clamp, smoothstep, rateMult, splitGateH } from './derive';
 export { planNotifications, planNotificationsAll, clampQuiet, capPerDay } from './notifyPlan';
 export { deriveBriefing } from './briefing';
 export { adCountsToday, adRemaining, canWatchAd, recordAdGrant, sameLocalDay } from './ads';

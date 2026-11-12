@@ -110,6 +110,9 @@ export interface GameApi {
      * 시청과 지급 사이에 시간이 걸리므로 Promise — UI는 로딩 상태를 스스로 관리한다.
      */
     watchForDelivery(): Promise<IngredientId | null>;
+    /** 광고 동의를 다시 고를 진입점이 필요한 지역인가(Google UMP — EEA·UK 등). 설정이 이 값으로 행을 보인다 */
+    privacyOptionsRequired(): Promise<boolean>;
+    showPrivacyOptions(): Promise<void>;
   };
 
   /** 개발자 모드 (설정 버전 7탭 — 사용자 본인 치트. 배선은 app.ts) */
@@ -122,16 +125,18 @@ export interface GameApi {
   getSettings(): GameSettings;
   setSettings(patch: Partial<GameSettings>): void;
 
-  exportSave(): Promise<void>;
+  /** 내보내기 성공 여부 — 공유 취소·쓰기 실패는 false(「내보냈어요」를 말하지 않는다) */
+  exportSave(): Promise<boolean>;
   importSave(): Promise<boolean>;
   resetGame(): void;
 
   requestNotifyPermission(): Promise<'granted' | 'denied' | 'unavailable'>;
   /** 조회 전용 — 권한 요청 팝업을 띄우지 않는다(설정 화면의 "꺼져 있어요" 안내 판정용) */
   checkNotifyPermission(): Promise<'granted' | 'denied' | 'unavailable'>;
-  openNotifySettings(): void;
+  /** 개발자 도구(설정 버전 7탭) 허용 — dev 빌드이거나 저장본 flags.dev === true */
+  devToolsEnabled(): boolean;
 
-  /** 미표시 굽기 결과 (강제종료 복구) — 표시 후 clear */
-  pendingBake(): { recipeId: string; grade: string } | null;
+  /** 미표시 굽기 결과 (강제종료 복구) — 표시 후 clear. variantId = 변형을 구웠을 때 */
+  pendingBake(): { recipeId: string; grade: string; variantId?: string } | null;
   clearPendingBake(): void;
 }

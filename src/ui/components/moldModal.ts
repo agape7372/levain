@@ -5,9 +5,13 @@ import { openModal } from './modal';
 import { toast } from './toast';
 import type { GameApi } from '../gameApi';
 
-export function openMoldModal(api: GameApi): void {
+/** onClose — 모달이 닫힌 뒤(곰팡이가 아니라 안 열렸으면 바로) 다음 모달을 잇는 자리 */
+export function openMoldModal(api: GameApi, onClose?: () => void): void {
   const snap = api.getSnapshot();
-  if (snap.phase !== 'moldy') return;
+  if (snap.phase !== 'moldy') {
+    onClose?.();
+    return;
+  }
 
   const wrap = document.createElement('div');
   const body = document.createElement('p');
@@ -44,5 +48,5 @@ export function openMoldModal(api: GameApi): void {
   }
 
   wrap.appendChild(actions);
-  const handle = openModal(wrap, { title: copy.mold.deadTitle });
+  const handle = openModal(wrap, { title: copy.mold.deadTitle, onClose });
 }

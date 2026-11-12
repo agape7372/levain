@@ -3,11 +3,13 @@
 // 버전 스큐 방어가 이 한 줄이다: OTA가 광고 UI를 실어도 죽은 버튼이 생기지 않는다.
 //
 // SSV(서버 검증)는 백엔드 0이라 미사용 — 클라이언트 보상(§10-1, 정책 위반 아님·리스크 수용).
-// 초기화는 지연(lazy): 첫 슬롯 사용 때만 SDK를 깨운다 — 앱 시작 비용 0, §10 금지(시작 광고)와도 결.
+// 우리 쪽 초기화(동의 확인 · initialize)는 지연(lazy): 첫 슬롯 사용 때만 한다 — 시작 광고는 없다(§10 금지).
+// 단 SDK 자체는 매니페스트의 MobileAdsInitProvider가 앱 시작 때 올린다. 「시작 비용 0」은 아니다(감사 T3).
 import { Capacitor } from '@capacitor/core';
 import {
   AdMob,
   AdmobConsentStatus,
+  MaxAdContentRating,
   RewardAdPluginEvents,
 } from '@capacitor-community/admob';
 import { AD_SESSION_CAP } from '../sim';
@@ -37,17 +39,35 @@ export function adsSessionBlocked(): boolean {
 
 async function ensureInit(): Promise<void> {
   if (initDone) return;
-  initDone = true;
-  await AdMob.initialize();
   try {
-    // UMP 동의 — EEA 등 필요 지역에서만 폼이 뜬다. 실패해도 광고 요청은 SDK가 알아서 제한.
+    // UMP 동의를 SDK 초기화·광고 요청보다 먼저(Google 권장 순서). EEA 등 필요 지역에서만 폼이 뜬다.
     const consent = await AdMob.requestConsentInfo();
     if (consent.isConsentFormAvailable && consent.status === AdmobConsentStatus.REQUIRED) {
       await AdMob.showConsentForm();
     }
   } catch {
-    /* 동의 흐름 실패 = 광고가 안 나올 뿐, 앱은 정상 (알림 권한과 같은 결) */
+    /* 동의 흐름 실패 = 기기에 남은 동의 상태로 요청이 나갈 뿐, 앱은 정상 (알림 권한과 같은 결) */
   }
+  // 앱은 전체이용가 — 광고 등급 상한을 G로 묶는다(감사 T3-03)
+  await AdMob.initialize({ maxAdContentRating: MaxAdContentRating.General });
+  initDone = true; // 성공한 뒤에만 — 실패하면 다음 탭에서 동의 확인부터 다시
+}
+
+/** 광고 개인정보 선택 진입점이 필요한 지역인가(UMP REQUIRED, EEA·UK 등) — 설정 화면이 이 값으로 행을 보인다 */
+export async function adPrivacyOptionsRequired(): Promise<boolean> {
+  if (!adsAvailable()) return false;
+  try {
+    const info = await AdMob.requestConsentInfo();
+    return String(info.privacyOptionsRequirementStatus) === 'REQUIRED'; // 플러그인이 이 enum을 내보내지 않는다
+  } catch {
+    return false;
+  }
+}
+
+/** 광고 개인정보 선택 폼 열기(Google UMP) */
+export async function showAdPrivacyOptions(): Promise<void> {
+  if (!adsAvailable()) return;
+  await AdMob.showPrivacyOptionsForm().catch(() => undefined);
 }
 
 /**

@@ -109,6 +109,16 @@ export function activityAt(state: SimState, now: number): number {
   return a;
 }
 
+/**
+ * 떼기 게이트(유효시간 h). 기본은 급여 간격 게이트와 같은 6h인데, 한창때가 그보다 먼저 오는
+ * 비율(1:1:1 — 4.5h)은 한창때부터 연다. 「한창 부풀어 있어요」라고 말하는 한 시간 반 동안
+ * 떼기가 막혀 있던 모순을 없앤다(감사 T8-03). 연타 방지 목적은 그대로다 — 급여가 유효시간을
+ * 0으로 되돌리므로 한 번 떼려면 여전히 4.5h를 기다려야 한다.
+ * actions.split · canSplit · splitReadyAt 셋이 이 함수 하나를 쓴다.
+ */
+export const splitGateH = (state: Pick<SimState, 'feedRatio'>): number =>
+  Math.min(MATURITY_MIN_GAP_H, RATIOS[state.feedRatio].peakStartH);
+
 export function stageOf(state: SimState, now: number): number {
   const ageDays = (now - state.createdAt) / DAY;
   let stage = 0;
@@ -118,13 +128,26 @@ export function stageOf(state: SimState, now: number): number {
   return stage;
 }
 
+/** D2 가짜 부풀기 구간 — 갓 반죽(0단계)의 둘째 날 (GDD §4) */
+const inFakeRise = (state: SimState, now: number, stage: number): boolean => {
+  const age = now - state.createdAt;
+  return stage === 0 && age >= DAY && age < 2 * DAY;
+};
+
 /** 부피 표현 계수 — 잠잠기 억제 + D2 가짜 부풀기(실제 현상) */
 function stageFillFactor(state: SimState, now: number, stage: number): number {
-  if (stage === 0) {
-    const age = now - state.createdAt;
-    if (age >= DAY && age < 2 * DAY) return FAKE_RISE_FACTOR;
-  }
+  if (inFakeRise(state, now, stage)) return FAKE_RISE_FACTOR;
   return STAGE_FILL_FACTOR[stage] ?? 1.0;
+}
+
+/** 다음 단계까지 남은 것 — 마지막 단계면 null (stageOf와 같은 두 조건을 뒤집어 읽는다) */
+function nextStageOf(state: SimState, now: number, stage: number): Snapshot['nextStage'] {
+  const next = STAGES[stage + 1];
+  if (!next) return null;
+  return {
+    feeds: Math.max(0, next.cycles - state.maturity),
+    days: Math.max(0, Math.ceil(next.days - (now - state.createdAt) / DAY)),
+  };
 }
 
 function smellOf(acidity: number): SmellBand {
@@ -189,6 +212,11 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
     kahm,
     hasFlake: state.flake !== null,
     // actions.split의 게이트와 같은 식 — 두 곳이 어긋나면 눌리는데 막히는 버튼이 된다
-    canSplit: state.mass - SEED_G >= SPLIT_MIN_G && effMs >= MATURITY_MIN_GAP_H * HOUR,
+    canSplit: state.mass - SEED_G >= SPLIT_MIN_G && effMs >= splitGateH(state) * HOUR,
+    splitReadyAt: wallFor(splitGateH(state)),
+    // recipes.canBakeDiscard의 쿨다운 항과 같은 식
+    discardReady: state.lastDiscardBakeAt === null || state.lastDiscardBakeAt < state.lastFedAt,
+    nextStage: nextStageOf(state, now, stage),
+    fakeRise: inFakeRise(state, now, stage),
   };
 }

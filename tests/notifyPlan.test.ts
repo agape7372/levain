@@ -76,7 +76,7 @@ describe('planNotifications — 상태별 슬롯 (GDD §7)', () => {
     expect(moldSlot!.at).toBe(clampQuiet(t0 + 168 * HOUR)); // moldSpot
   });
 
-  it('냉장: fridgeWeek 슬롯 1개, weekly true (슬롯 1 재사용), moldWarn 없음(≈175일이라 제외)', () => {
+  it('냉장: fridgeWeek 슬롯 1개, weekly true (슬롯 8 전용 — 멀티 병합에서 묻히지 않게), moldWarn 없음(≈175일이라 제외)', () => {
     const t0 = local(2024, 0, 15, 6, 0);
     const stage3: SimState = { ...initialState(t0), maturity: 12, createdAt: t0 - 9 * DAY };
     const fridge = applyAction(stage3, { type: 'setLocation', to: 'fridge' }, t0).state;
@@ -85,7 +85,7 @@ describe('planNotifications — 상태별 슬롯 (GDD §7)', () => {
     expect(plan.slots.length).toBe(1);
     expect(plan.slots[0].copyKey).toBe('fridgeWeek');
     expect(plan.slots[0].weekly).toBe(true);
-    expect(plan.slots[0].id).toBe(1);
+    expect(plan.slots[0].id).toBe(8); // NOTIFY_SLOT_FRIDGE (감사 T2-11)
     expect(plan.slots.some((sl) => sl.copyKey === 'moldWarn')).toBe(false);
   });
 
@@ -176,14 +176,19 @@ describe('planNotificationsAll — 멀티 르방 병합 (확장기획 §5-6)', (
     expect(plan.slots.length).toBeLessThanOrEqual(3); // 알림 스팸 없음 — 슬롯 의미 유지
   });
 
-  it('실온+냉장 혼합: 슬롯 1은 더 이른 실온 one-shot(feedTime, weekly:false) + count 2', () => {
+  // 2026-11-12 감사 T2-11: 종전 계약(슬롯 1에 합쳐 count 2)은 냉장 르방까지 「배고파요」로 세고
+  // 냉장 주간 알림을 없앴다. 이제 다른 copyKey는 합치지 않고 냉장 주간은 슬롯 8에 따로 남는다.
+  it('실온+냉장 혼합: 실온 feedTime 단독(count 없음) + 냉장 fridgeWeek 주간 반복이 따로 남는다', () => {
     const room = initialState(t0);
     const fridge: SimState = { ...initialState(t0), location: 'fridge', maturity: 12, createdAt: t0 - 9 * DAY };
     const plan = planNotificationsAll([room, fridge], t0);
     const feed = plan.slots.find((s) => s.id === NOTIFY_SLOT_FEED)!;
-    expect(feed.copyKey).toBe('feedTime');         // 가장 이른(실온) 항목의 문구·반복 채택
+    expect(feed.copyKey).toBe('feedTime');
     expect(feed.weekly).toBe(false);
-    expect(feed.count).toBe(2);
+    expect(feed.count).toBeUndefined();
+    const week = plan.slots.find((s) => s.copyKey === 'fridgeWeek')!;
+    expect(week.weekly).toBe(true);
+    expect(week.count).toBeUndefined();
   });
 
   it('moldy 르방은 병합에 기여 0 (죽음을 푸시로 통지하지 않는다)', () => {

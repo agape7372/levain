@@ -19,6 +19,7 @@ import { breadThumb } from './recipeVisuals';
 const COLLECT_MS = 300;      // 트리거 수집 창 — 선물·구매·치트가 연달아 와도 한 장
 const MIN_SHOW_MS = 1200;    // 이미 떠 있는 장을 교체하기 전 최소 노출
 const AUTO_DISMISS_MS = 2600;
+const AUTO_DISMISS_STAGE_MS = 5200; // 승급 장은 읽을 줄이 많다(단계·해금·새 빵) — 한 달에 다섯 번뿐인 장면
 const LEAVE_MS = 240;
 const MAX_HERO = 3;
 const MAX_STRIP = 6;
@@ -27,6 +28,8 @@ const MOTES = 14;
 interface Pending {
   ingredients: Set<IngredientId>;
   stages: number[];
+  /** 그 단계의 빵이 집에 새로 열린 승급만 — 집이 이미 그 단계를 넘었으면 빠진다 */
+  breadStages: number[];
 }
 
 let pending: Pending | null = null;
@@ -37,15 +40,19 @@ let queued: (() => void) | null = null;
 /** 재료 수량이 0→1이 된 직후(선물·구매·광고 배송·치트) 호출. 열린 빵 계산은 내부에서 한다. */
 export function celebrateIngredients(api: GameApi, ids: IngredientId[]): void {
   if (ids.length === 0) return;
-  pending ??= { ingredients: new Set(), stages: [] };
+  pending ??= { ingredients: new Set(), stages: [], breadStages: [] };
   for (const id of ids) pending.ingredients.add(id);
   scheduleFlush(api);
 }
 
-/** 성장 단계 승급 직후(stageUp 이벤트) 호출. 새로 열린 베이스 레시피를 스트립으로 보여준다. */
-export function celebrateStageUp(api: GameApi, stage: number): void {
-  pending ??= { ingredients: new Set(), stages: [] };
+/**
+ * 성장 단계 승급 직후(stageUp 이벤트) 호출. 새로 열린 베이스 레시피를 스트립으로 보여준다.
+ * 해금은 집 최고 단계 기준(GDD §6-2 개정) — `prevHouseStage`(승급 전 집 최고)보다 높은 단계의 빵만 새로 열림이다.
+ */
+export function celebrateStageUp(api: GameApi, stage: number, prevHouseStage: number): void {
+  pending ??= { ingredients: new Set(), stages: [], breadStages: [] };
   if (!pending.stages.includes(stage)) pending.stages.push(stage);
+  if (stage > prevHouseStage && !pending.breadStages.includes(stage)) pending.breadStages.push(stage);
   scheduleFlush(api);
 }
 
@@ -61,7 +68,7 @@ function scheduleFlush(api: GameApi): void {
 
 /** 이 재료들로 지금 새로 열리는 베이스 빵 — 해금된 단계 + 미발견 변형이 하나라도 있는 것(RECIPES 순서) */
 function openedBases(api: GameApi, ids: Set<IngredientId>): string[] {
-  const stage = api.getSnapshot().stage;
+  const stage = api.houseStage(); // 활성 르방이 아니라 집 최고 단계 (T7-08)
   const collection = api.collection();
   const bases = new Set<string>();
   for (const rule of playableRules()) {
@@ -84,7 +91,8 @@ function present(api: GameApi, p: Pending): void {
       haptic('light');
       sfxUnlock();
     }
-    current = { layer, shownAt: Date.now(), dismissTimer: setTimeout(() => dismiss(), AUTO_DISMISS_MS) };
+    const stay = p.stages.length > 0 ? AUTO_DISMISS_STAGE_MS : AUTO_DISMISS_MS;
+    current = { layer, shownAt: Date.now(), dismissTimer: setTimeout(() => dismiss(), stay) };
     layer.addEventListener('pointerdown', () => dismiss());
   };
 
@@ -101,6 +109,14 @@ function present(api: GameApi, p: Pending): void {
     dismiss();
     setTimeout(show, LEAVE_MS);
   }, wait);
+}
+
+/** 하드웨어 백 = 연출 스킵 (ARCHITECTURE §5) — 떠 있던 장이 있으면 닫고 true. 대기 중인 교체도 버린다 */
+export function dismissCelebrate(): boolean {
+  if (!current) return false;
+  queued = null;
+  dismiss();
+  return true;
 }
 
 function dismiss(): void {
@@ -174,7 +190,7 @@ function build(api: GameApi, p: Pending): HTMLElement {
 
   // 열린 빵 = 재료로 열린 베이스 ∪ 승급으로 해금된 베이스
   const opened = new Set<string>(openedBases(api, p.ingredients));
-  for (const s of stages) for (const r of RECIPES) if (r.stage === s) opened.add(r.id);
+  for (const s of p.breadStages) for (const r of RECIPES) if (r.stage === s) opened.add(r.id);
   const openedIds = RECIPES.filter((r) => opened.has(r.id)).map((r) => r.id);
 
   const sub = document.createElement('p');
@@ -186,6 +202,7 @@ function build(api: GameApi, p: Pending): HTMLElement {
   const extras: string[] = [];
   for (const s of stages) {
     if (ings.length > 0) extras.push(copy.celebrate.stageUp(copy.stage.names[s]));
+    if (s === 1) extras.push(copy.stage.quiet); // 잠잠기 — 부피가 줄어드는 단계라 미리 말해 둔다(감사 T8-06)
     if (s === FRIDGE_STAGE) extras.push(copy.celebrate.fridgeUnlocked);
     for (const [ratio, def] of Object.entries(RATIOS)) if (def.stage === s && s > 0) extras.push(copy.celebrate.ratioUnlocked(ratio));
     if (s === LABEL_STAGE) extras.push(copy.stage.labelUnlocked);

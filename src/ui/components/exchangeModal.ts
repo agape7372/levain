@@ -29,28 +29,32 @@ export function openMissionsModal(api: GameApi): void {
 
   const rows = document.createElement('div');
   rows.className = 'observe-rows';
-  const addRow = (text: string, sub: string): void => {
+  // 관찰 카드와 같은 k/v 행 — 이름표(왼쪽) + 무엇을 하면 얼마(오른쪽)
+  const addRow = (label: string, text: string): void => {
     const row = document.createElement('div');
     row.className = 'row';
     const k = document.createElement('span');
     k.className = 'k';
-    k.textContent = '·';
+    k.textContent = label;
     const v = document.createElement('span');
     v.className = 'v';
-    v.textContent = sub ? `${text} · ${sub}` : text;
+    v.textContent = text;
     row.append(k, v);
     rows.appendChild(row);
   };
   addRow(
+    copy.economy.missionFeedLabel(eco.feed.count),
     copy.economy.missionFeed(eco.feed.remaining, MISSION_REWARD_FLOUR),
-    copy.economy.missionCount(eco.feed.count),
   );
   addRow(
+    copy.economy.missionBakeLabel(eco.bake.count),
     copy.economy.missionBake(eco.bake.remaining, MISSION_REWARD_FLOUR),
-    copy.economy.missionCount(eco.bake.count),
   );
-  addRow(copy.economy.missionStage(STAGE_REWARD_FLOUR), '');
-  addRow(copy.economy.missionRecipe(eco.basesDone, eco.basesTotal, RECIPE_REWARD_FLOUR), '');
+  addRow(copy.economy.missionStageLabel, copy.economy.missionStage(STAGE_REWARD_FLOUR));
+  addRow(
+    copy.economy.missionRecipeLabel(eco.basesDone, eco.basesTotal),
+    copy.economy.missionRecipe(RECIPE_REWARD_FLOUR),
+  );
   wrap.appendChild(rows);
 
   openModal(wrap, { title: copy.economy.missionsTitle });
@@ -88,9 +92,12 @@ export function openExchangeModal(api: GameApi, onChanged: () => void): void {
     adTexts.className = 'exchange-texts';
     const adLabel = document.createElement('span');
     adLabel.textContent = copy.economy.adDeliveryTitle;
+    const adRule = document.createElement('span');
+    adRule.className = 'hint';
+    adRule.textContent = copy.economy.adDeliveryRule;
     const adHint = document.createElement('span');
     adHint.className = 'hint';
-    adTexts.append(adLabel, adHint);
+    adTexts.append(adLabel, adRule, adHint);
     const adBtn = document.createElement('button');
     adBtn.type = 'button';
     adBtn.className = 'btn btn-primary btn-slim';
@@ -105,7 +112,7 @@ export function openExchangeModal(api: GameApi, onChanged: () => void): void {
       const locked = remaining <= 0;
       adBtn.classList.toggle('is-locked', locked);
       adBtn.setAttribute('aria-disabled', String(locked));
-      adBtn.textContent = copy.economy.adDeliveryTitle;
+      adBtn.textContent = copy.economy.adDeliveryCta;
     };
     adBtn.addEventListener('click', () => {
       if (api.ads.deliveryRemaining() <= 0) {
@@ -123,11 +130,11 @@ export function openExchangeModal(api: GameApi, onChanged: () => void): void {
           toast(copy.economy.adDeliveryFailed);
           return;
         }
-        toast(copy.economy.adDeliveryGot(copy.recipes.ingredientNames[id]));
         refresh();
         onChanged();
-        // 0→1일 때만 연출 — 이미 있던 재료를 더 받는 건 토스트로 충분하다
+        // 0→1일 때만 연출 — 이미 있던 재료를 더 받는 건 토스트로 충분하다(연출이 뜨면 토스트는 같은 말이라 뺀다)
         if ((before[id] ?? 0) === 0) celebrateIngredients(api, [id]);
+        else toast(copy.economy.adDeliveryGot(copy.recipes.ingredientNames[id]));
       });
     });
     paintAdRow();
@@ -213,10 +220,10 @@ export function openExchangeModal(api: GameApi, onChanged: () => void): void {
       toast(copy.economy.notEnough);
       return;
     }
-    toast(copy.economy.bought(copy.recipes.ingredientNames[id]));
     refresh();
     onChanged();
     if (before === 0) celebrateIngredients(api, [id]);
+    else toast(copy.economy.bought(copy.recipes.ingredientNames[id]));
   });
 
   sellBtn.addEventListener('click', () => {

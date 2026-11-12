@@ -5,6 +5,7 @@ import {
   FLAKE_COST_G,
   FLAKE_MATURITY_KEEP,
   FLAKE_STAGE,
+  FLOUR_STAGE,
   FRIDGE_STAGE,
   HOUR,
   INITIAL_MASS,
@@ -14,7 +15,7 @@ import {
   SEED_G,
   SPLIT_MIN_G,
 } from './constants';
-import { activityAt, clamp, effSinceFeedMs, phaseAt, rateMult, stageOf } from './derive';
+import { activityAt, clamp, effSinceFeedMs, phaseAt, rateMult, splitGateH, stageOf } from './derive';
 import { canBakeBread, canBakeDiscard, bakeScore, gradeOf, recipeById } from './recipes';
 
 export interface ActionResult {
@@ -56,14 +57,18 @@ function withFeed(state: SimState, ratio: FeedRatio, flour: Flour, now: number):
   };
 }
 
-function feed(state: SimState, ratio: FeedRatio, flour: Flour, now: number): ActionResult {
+function feed(state: SimState, ratio: FeedRatio, requested: Flour, now: number): ActionResult {
   const events: SimEvent[] = [];
   const r = RATIOS[ratio];
   const stageBefore = stageOf(state, now);
   if (stageBefore < r.stage) return { state, events: [{ type: 'ratioLocked', ratio }] };
+  // 밀가루 선택은 4단계 해금(§7-1) — UI만 막으면 API 경로가 샌다. 이벤트 없이 지금 것을 유지
+  const flour = stageBefore < FLOUR_STAGE ? state.flour : requested;
 
   const phase = phaseAt(state, now);
   const effH = effSinceFeedMs(state, now) / HOUR;
+  // 미션 계수 게이트 — maturity 게이트와 같은 간격이되 phase는 안 본다(시큼·부활 급여도 센다)
+  const counted = effH >= MATURITY_MIN_GAP_H;
 
   // 휴면 — 부활 의식 (2세션, GDD §3-7)
   if (phase === 'dormant') {
@@ -73,19 +78,20 @@ function feed(state: SimState, ratio: FeedRatio, flour: Flour, now: number): Act
       return { state: next, events: [{ type: 'reviveStarted' }] };
     }
     if (effH < REVIVE_GAP_H) {
-      // 너무 이른 2회차 — 무해: 산미 희석·mass 보충만, 의식 타이머(lastFedAt)는 보존
-      const next = { ...state, mass: r.mass, acidity: clamp(state.acidity * r.dilute, 0, 100) };
+      // 너무 이른 2회차 — 무해: 산미 희석만, 의식 타이머(lastFedAt)는 보존.
+      // mass는 채우지 않는다 — 채우면 떼기 → 이른 급여 반복으로 통이 무한히 찬다(감사 T1-03)
+      const next = { ...state, acidity: clamp(state.acidity * r.dilute, 0, 100) };
       return { state: next, events: [{ type: 'reviveTooSoon' }] };
     }
     const next = { ...withFeed(state, ratio, flour, now), reviveProgress: 0 as const };
-    return { state: next, events: [{ type: 'revived' }, { type: 'fed', ratio, maturityGained: false }] };
+    return { state: next, events: [{ type: 'revived' }, { type: 'fed', ratio, maturityGained: false, counted }] };
   }
 
   // 일반 급여 — maturity는 유효 6h↑ + 활발·배고픔에서만 적립 (연타 무효, GDD §3-6)
   const gained = effH >= MATURITY_MIN_GAP_H && (phase === 'active' || phase === 'hungry');
   let next = withFeed(state, ratio, flour, now);
   if (gained) next = { ...next, maturity: next.maturity + 1 };
-  events.push({ type: 'fed', ratio, maturityGained: gained });
+  events.push({ type: 'fed', ratio, maturityGained: gained, counted });
 
   const stageAfter = stageOf(next, now);
   if (stageAfter > stageBefore) events.push({ type: 'stageUp', stage: stageAfter });
@@ -138,7 +144,7 @@ function bake(
 function split(state: SimState, now: number): ActionResult {
   const amount = state.mass - SEED_G;
   if (amount < SPLIT_MIN_G) return { state, events: [{ type: 'splitBlocked', reason: 'mass' }] };
-  if (effSinceFeedMs(state, now) < MATURITY_MIN_GAP_H * HOUR) {
+  if (effSinceFeedMs(state, now) < splitGateH(state) * HOUR) {
     return { state, events: [{ type: 'splitBlocked', reason: 'tooSoon' }] };
   }
   const next: SimState = { ...state, mass: SEED_G };
@@ -160,8 +166,13 @@ function bakeDiscard(
   const gate = canBakeDiscard(state, recipe, now, houseStage);
   if (gate !== 'ok') return { state, events: [{ type: 'bakeBlocked', reason: gate }] };
 
+  // 굽기 미션 계수만 벽시계 6h 간격으로 막는다 — 쿨다운은 급여가 풀어서 밥↔팬케이크 반복이 미션을 무한히 올렸다(T1-02)
+  const counted = state.lastDiscardBakeAt === null || now - state.lastDiscardBakeAt >= MATURITY_MIN_GAP_H * HOUR;
   const next: SimState = { ...state, lastDiscardBakeAt: now };
-  return { state: next, events: [{ type: 'bakedDiscard', recipeId, ...(variantId ? { variantId } : {}) }] };
+  return {
+    state: next,
+    events: [{ type: 'bakedDiscard', recipeId, ...(variantId ? { variantId } : {}), counted }],
+  };
 }
 
 /** 얇게 펴 말리기 — 죽음 보험. 덮어쓰기 허용(최신 스냅이 더 낫다) */

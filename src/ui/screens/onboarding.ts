@@ -1,5 +1,8 @@
 // 온보딩 — 창조 의식: 환영 → 젓기(캔버스 드래그 실측) → 탄생 → 알림 권한 (GDD §9).
 // 저장이 없을 때 1회만. 완료 시 onComplete(now)가 initialState 생성·flags.onboarded 기록.
+//
+// 화면 구성(2026-11-12 감사): 오버레이는 처음부터 투명하다 — 첫 화면이 곧 병이다(얼굴 없는 유리병이
+// 이 게임의 첫 샷). 글자는 병을 가리지 않게 위(이름·안내)와 아래(버튼)로 나눠 놓는다.
 import { copy } from '../copy';
 import { toast } from '../components/toast';
 
@@ -10,28 +13,55 @@ export function mountOnboarding(opts: {
   onComplete: () => void;
 }): void {
   const el = document.createElement('div');
-  el.className = 'onboard';
+  el.className = 'onboard onboard--welcome';
 
+  const top = document.createElement('div');
+  top.className = 'onboard-top';
   const h = document.createElement('h1');
   const p = document.createElement('p');
+  top.append(h, p);
+
+  const bottom = document.createElement('div');
+  bottom.className = 'onboard-bottom';
+  const hint = document.createElement('p');
   const btn = document.createElement('button');
   btn.className = 'btn btn-primary btn-wide';
-  el.append(h, p, btn);
+  bottom.append(hint, btn);
+
+  el.append(top, bottom);
   opts.root.appendChild(el);
 
-  // 1) 환영
-  h.textContent = copy.onboarding.welcome;
-  p.textContent = copy.onboarding.firstWeek;
-  btn.textContent = '시작하기';
+  // 단계가 바뀔 때 글자가 뚝 바뀌지 않게 — 떠오르듯 한 번. 모션 줄이기 설정이면 건너뛴다.
+  const reduce =
+    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const enter = (node: HTMLElement, delay = 0): void => {
+    if (reduce || typeof node.animate !== 'function') return;
+    node.animate(
+      [
+        { opacity: 0, transform: 'translateY(6px)' },
+        { opacity: 1, transform: 'none' },
+      ],
+      { duration: 520, delay, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'backwards' },
+    );
+  };
+
+  // 1) 환영 — 이름과 한 줄, 그리고 병
+  h.textContent = copy.app.name;
+  p.textContent = copy.onboarding.tagline;
+  hint.textContent = copy.onboarding.welcome;
+  btn.textContent = copy.onboarding.start;
   btn.addEventListener('click', step2, { once: true });
+  enter(top, 120);
+  enter(bottom, 420);
 
   // 2) 젓기 — 오버레이를 뚫어 캔버스 드래그를 실측
   function step2(): void {
+    el.classList.remove('onboard--welcome');
     h.textContent = copy.onboarding.stir;
     p.textContent = '';
+    hint.textContent = '';
     btn.style.display = 'none';
     el.style.pointerEvents = 'none';
-    el.style.background = 'transparent';
 
     // 진행 헤어라인 — 700px 요건이 무피드백이면 "얼마나 더?"를 알 길이 없다(2026-08-30 a11y).
     // 반죽 자체가 손을 따라오는 게 1차 피드백이고, 이 선은 '얼마나 남았나'만 담백하게 말한다.
@@ -40,7 +70,8 @@ export function mountOnboarding(opts: {
     const fillEl = document.createElement('div');
     fillEl.className = 'onboard-stir-fill';
     track.appendChild(fillEl);
-    el.appendChild(track);
+    top.appendChild(track);
+    enter(top);
 
     let done = false;
     const finish = (): void => {
@@ -61,6 +92,7 @@ export function mountOnboarding(opts: {
       btn.style.display = '';
       btn.style.pointerEvents = 'auto';
       btn.addEventListener('click', finish, { once: true });
+      enter(bottom);
     }, 10_000);
 
     let stirred = 0;
@@ -83,7 +115,10 @@ export function mountOnboarding(opts: {
     h.textContent = copy.onboarding.born;
     p.textContent = copy.onboarding.firstWeek;
     btn.style.display = '';
-    btn.textContent = '좋아요';
+    btn.style.pointerEvents = '';
+    btn.textContent = copy.common.ok;
+    enter(top);
+    enter(bottom, 240);
     btn.addEventListener(
       'click',
       () => {

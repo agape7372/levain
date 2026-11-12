@@ -158,7 +158,8 @@ describe('validateAndClamp — 있는데 불량이면 살린다', () => {
       notifyPeak: true, notifySour: true, notifyStage: true, notifyFirstWeek: true,
       quietStartH: 22, quietEndH: 8,
     });
-    expect(env?.flags).toEqual({ onboarded: false, pendingBake: null, retapHints: 0 });
+    // flags 부재 + 르방 있음 = 온보딩을 마친 기록으로 본다 (T2-02, 2026-11-12)
+    expect(env?.flags).toEqual({ onboarded: true, pendingBake: null, retapHints: 0 });
     expect(env?.shared).toEqual({
       collection: {}, inventory: emptyInventory(), economy: emptyEconomy(),
       pantry: 0, ads: [], pantryLots: emptyLots(),

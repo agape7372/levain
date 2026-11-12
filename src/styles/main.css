@@ -4,7 +4,7 @@
   --bg-deep:     #DCCAB0;  /* 탭바·구분면 */
   --ink:         #4A3220;  /* 제목·활성 (현행) */
   --ink-soft:    #6B5340;  /* 본문 (현행) */
-  --ink-faint:   #8A6A4A;  /* 캡션·비활성 (현행) */
+  --ink-faint:   #77593C;  /* 캡션·비활성 — AA 4.5:1(--bg 위 4.6 · --bg-soft 위 5.2). 이전 #8A6A4A는 3.6~4.0이었다 (2026-11-13) */
   --accent:      #C4784A;  /* 테라코타 — 버튼·고무줄·탭 인디케이터 (현행 병색) */
   --accent-deep: #A95F38;  /* pressed */
   --cream:       #F4EAD4;  /* 반죽색 — 게이지·강조면 */
@@ -17,6 +17,7 @@
   --fs-body:  15px;
   --fs-cap:   13px;
   --fs-num:   12px;
+  --fs-display: 36px;  /* 온보딩 첫 화면의 이름 전용 */
 
   /* 우상단 오브젝트 컬럼 폭 = ? + ⚙ 가로 두 개(38 + 8 + 38). 항아리(56)보다 이쪽이 넓다.
      .hud-top이 이 값만큼 오른쪽을 비워 둔다 — 한 숫자가 두 곳을 지배해야 글자가
@@ -94,8 +95,10 @@ html {
   flex: 1;
   border: 0;
   background: transparent;
-  color: var(--ink-faint);
-  font: 15px/1 inherit;
+  color: var(--ink-soft);   /* --ink-faint는 --bg-deep 위 4.0:1 — 비활성 탭도 읽혀야 한다 */
+  /* ⚠ `font: 15px/1 inherit`는 무효 선언이었다(가족명 자리에 inherit 불가) — UA 13.33px로 렌더됐다(T5-08) */
+  font-size: 15px;
+  line-height: 1;
   font-family: inherit;
   letter-spacing: 0.02em;
   cursor: pointer;
@@ -250,7 +253,8 @@ html {
   border: 0;
   background: transparent;
   color: var(--ink-faint);
-  font: 18px/1 inherit;
+  font-size: 18px;
+  line-height: 1;
   font-family: inherit;
   padding: 2px 10px;
   cursor: pointer;
@@ -394,7 +398,8 @@ html {
   border: 0;
   background: transparent;
   color: var(--ink-faint);
-  font: 13px/1 inherit;
+  font-size: 13px;
+  line-height: 1;
   font-family: inherit;
   padding: 7px 14px;
   border-radius: 999px;
@@ -402,11 +407,29 @@ html {
 }
 .seg button.active { background: var(--cream); color: var(--ink); font-weight: 600; }
 .seg button:disabled { opacity: 0.35; cursor: default; }
-/* 잠금은 disabled 대신 .is-locked — 클릭이 살아야 이유 토스트가 뜬다(항아리 선례 2026-08-26) */
-.seg button.is-locked { opacity: 0.35; }
-/* 도감 이중 세그 — 두 줄을 경계 없이 한 덩어리로 (사용자 확정 2026-08-24) */
-.seg--joined-top { border-radius: 18px 18px 0 0; }
-.seg--joined-bottom { border-radius: 0 0 18px 18px; padding-top: 0; }
+/* 잠금은 disabled 대신 .is-locked — 클릭이 살아야 이유 토스트가 뜬다(항아리 선례 2026-08-26).
+   0.35는 글자가 1.5:1로 안 읽혔다 — 누르면 이유를 말하는 설계라 이름은 읽혀야 한다(0.6 ≈ 2.4:1, T5-05) */
+.seg button.is-locked { opacity: 0.6; }
+
+/* ── 탭 대상 44px (T5-09) — 보이는 크기는 그대로, 닿는 넓이만 투명 의사 요소로 넓힌다.
+   ⚠ 넓힌 영역이 옆 단추와 겹치면 엉뚱한 단추가 눌린다. 값은 각 자리의 실제 간격 안에서만 잡았다:
+   세그 위아래 9px(버튼 27 → 45 · 세그 패딩 3 + 밥 행과 간격 10 → 4px 남음) · ?⚙ 3px(둘 사이 8) · `+` 위로 길게 아래로 짧게(아래는 상태 문장 단추) ·
+   통 상태 줄 2px(아래 세그와 12) · 경제 배너 버튼 8px(배너 안쪽 여백 10). 가로로는 세그·배너 버튼을 넓히지 않는다(이웃 2~8px). */
+.seg button,
+.hud-chip-row .chip-nav,
+.icon-btn,
+.status-line,
+.econ-actions .btn { position: relative; }
+.seg button::after,
+.hud-chip-row .chip-nav::after,
+.icon-btn::after,
+.status-line::after,
+.econ-actions .btn::after { content: ''; position: absolute; }
+.seg button::after { inset: -9px 0; }
+.hud-chip-row .chip-nav::after { inset: -20px -7px -2px; }   /* 22 → 44. 아래 2px = 칩 줄(38) 바닥, 상태 문장 단추(margin -6)와 안 겹친다 */
+.icon-btn::after { inset: -3px; }
+.status-line::after { inset: -2px 0; }
+.econ-actions .btn::after { inset: -8px 0; }
 
 /* ── 버튼 ────────────────────────────────────────────── */
 .btn {
@@ -420,12 +443,14 @@ html {
   transition: transform 0.12s cubic-bezier(0.22, 1, 0.36, 1), background 0.15s;
 }
 .btn:active { transform: scale(0.97); }
-.btn-primary { background: var(--accent); color: #fff8ef; }
-.btn-primary:active { background: var(--accent-deep); }
+/* 바탕 = --accent-deep(2026-11-13, T5-05): --accent 위 흰 글씨는 3.25:1로 AA 미달이었다(#A95F38 위 4.55:1).
+   --accent 토큰 자체는 그대로 — 탭 표시 줄·스위치·선택 테두리가 같이 쓴다. 눌림은 새 토큰 없이 한 단계 어둡게 */
+.btn-primary { background: var(--accent-deep); color: #fff8ef; }
+.btn-primary:active { filter: brightness(0.92); }
 .btn-ghost { background: transparent; color: var(--ink-faint); font-weight: 400; }
 .btn-wide { min-width: 200px; }
 .btn:disabled { opacity: 0.4; cursor: default; }
-.btn.is-locked { opacity: 0.4; } /* :disabled 대체 — 위 .seg 주석과 같은 이유 */
+.btn.is-locked { opacity: 0.6; } /* :disabled 대체 — 위 .seg 주석과 같은 이유(0.4는 1.6:1로 안 읽혔다) */
 
 /* 밥 버튼 옆 보조 액션(말려두기) — 옅은 캡슐, 비활성은 opacity 규칙 공유 */
 .hud-actions { display: flex; gap: 10px; align-items: center; justify-content: center; }
@@ -454,6 +479,7 @@ html {
 }
 .modal-backdrop.open { opacity: 1; }
 .modal-card {
+  box-sizing: border-box;   /* content-box면 패딩 40px가 폭에 더해져 352~380px가 됐다 — 화면 여백 24 → 4px (T5-07) */
   width: min(100%, 340px);
   max-height: 78vh;
   overflow-y: auto;
@@ -465,6 +491,8 @@ html {
   transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .modal-backdrop.open .modal-card { transform: scale(1); }
+/* 카드는 포커스를 받는 그릇일 뿐 누르는 대상이 아니다 — 부트 모달(브리핑)에서 카드 테두리에 포커스 링이 그려졌다 */
+.modal-card:focus { outline: none; }
 .modal-title {
   margin: 0 0 12px;
   font-size: 18px;
@@ -474,11 +502,13 @@ html {
 .modal-body { margin: 0 0 16px; font-size: 15px; line-height: 1.6; }
 .modal-actions {
   display: flex;
+  flex-wrap: wrap;          /* 큰 글자 배율에서 버튼이 카드 밖으로 나가지 않게 줄을 넘긴다 */
   justify-content: flex-end;
   gap: 8px;
   margin-top: 8px;
 }
 .modal-actions .btn { padding: 11px 20px; font-size: 15px; }
+.modal-card .btn { min-height: 44px; }   /* 탭 대상 하한(T5-09) — 패딩만으로는 38~42px였다 */
 /* 관찰 카드의 말려두기 — 기본 modal-actions는 높이 43px라 터치 타깃 하한(44px)에 못 미친다 */
 .observe-actions .btn { padding: 13px 22px; }
 
@@ -545,6 +575,24 @@ html {
   z-index: 50;
   pointer-events: none;
 }
+/* ⚠ 위 none은 `#ui-root > *`(1,0,0)에 져서 죽어 있었다 — 토스트 2.6초 동안 그 아래 버튼 탭을 삼켰다(T5-06).
+   토스트는 읽는 것이지 누르는 것이 아니다 */
+#ui-root > .toast-container,
+.toast-container > * { pointer-events: none; }
+/* 레시피 탭엔 홈 HUD가 없다 — 위 top 계산은 홈 높이 기준이라 세그먼트·첫 카드 줄을 덮었다(T5-12).
+   탭바 바로 위로 내린다. data-tab은 app.ts showTab이 단다.
+   3D 쇼케이스는 예외 — 아래에 「좋아요」 단추가 있고 위(제목 아래)가 비어 있어 원래 자리가 맞다 */
+body[data-tab="recipes"] #ui-root:not(:has(.showcase-top)) > .toast-container {
+  top: auto;
+  bottom: calc(52px + env(safe-area-inset-bottom, 0px) + 12px);
+}
+/* 모달이 떠 있으면 탭바 띠 위로 — 모달 카드는 가운데라 제목(위)·footer(아래)를 피하는 자리는 딤 된 탭바뿐이다 */
+body #ui-root:has(> .modal-backdrop.open) > .toast-container {   /* body = 위 레시피 규칙과 명시도를 맞춰 순서로 이긴다 */
+  top: auto;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 7px);
+}
+/* 그 띠엔 한 장만 — 두 장이 쌓이면 위 장이 시트 footer(굽기)를 덮었다(실측 F4-p360-sheet-base) */
+#ui-root:has(> .modal-backdrop.open) > .toast-container > .toast:not(:last-child) { display: none; }
 .toast {
   background: color-mix(in srgb, var(--ink) 88%, transparent);
   color: var(--cream);
@@ -598,7 +646,6 @@ html {
 .btn-slim { padding: 7px 12px; font-size: 13px; border-radius: 12px; }
 .exchange-row { align-items: center; gap: 10px; }
 .exchange-texts { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.exchange-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
 /* ── 레시피 (2026-09-03 개편 · 2026-09-05 재검수: 세그먼트 3개 [빵|선반|재료], 타이포 토큰, 카드 고정 슬롯, 통 상태 줄) ── */
 .recipes-wrap { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 24px; }
@@ -806,6 +853,7 @@ html {
 .modal-footer {
   flex-shrink: 0;
   display: flex;
+  flex-wrap: wrap;          /* 글자 1.3×에서 버튼 행이 카드 밖(358>312)으로 나갔다 — 줄을 넘긴다(T5-07) */
   align-items: center;
   gap: 8px;
   padding: 10px 18px calc(12px + env(safe-area-inset-bottom, 0px));
@@ -817,7 +865,7 @@ html {
 /* 2단 footer — 텍스트 줄 위, 버튼 줄 아래(교환소: 라벨이 길어 한 줄에 셋이 안 들어간다 — 실측 101px 붕괴) */
 .modal-footer--stack { flex-direction: column; align-items: stretch; gap: 8px; }
 .modal-footer--stack .footer-text { flex: none; }
-.footer-actions { display: flex; gap: 8px; }
+.footer-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .footer-actions .btn { flex: 1; padding: 11px 12px; font-size: 14px; white-space: nowrap; }
 .footer-actions .btn-ghost { flex: 0 0 auto; }
 /* 결과 카드 — 선반 타일 탭·굽기 결과 3D 폴백·재료 감상 공용. 아트 가운데 크게(2026-09-05: 96 → 160px — 2D로도 빵이 보여야 한다) */
@@ -1037,6 +1085,7 @@ html {
 .celebrate-layer.show { opacity: 1; }
 .celebrate-layer.leaving { opacity: 0; }
 .celebrate-card {
+  box-sizing: border-box;    /* 모달 카드와 같은 이유(T5-07) — content-box면 380px였다 */
   width: min(100%, 340px);   /* 모달 카드(340)와 같은 폭 — 뒤 카드 가장자리가 삐져나오지 않게 */
   padding: 22px 20px 16px;
   border-radius: 22px;
@@ -1161,11 +1210,14 @@ html {
   white-space: normal;
 }
 .celebrate-item.more { justify-content: center; min-height: 44px; font-size: var(--fs-cap); color: var(--ink-faint); }
-.celebrate-hint { margin: 12px 0 0; font-size: var(--fs-cap); color: var(--ink-faint); opacity: 0.8; }
+/* opacity 0.8을 걷었다 — 2.89:1로 안 읽혔다(T5-05). 위계는 크기(캡션)와 색이 이미 말한다 */
+.celebrate-hint { margin: 12px 0 0; font-size: var(--fs-cap); color: var(--ink-faint); }
 @media (prefers-reduced-motion: reduce) {
   .celebrate-card, .hero-art, .celebrate-item, .chip-forms { animation: none !important; }
   .mote { display: none; }
   .celebrate-item { -webkit-mask-image: none; mask-image: none; }
+  /* 모달 열림(scale·opacity)과 토스트 전환도 끈다(T5-17) — 값은 그대로 바뀌고 움직임만 없다. 3D 씬은 별개 */
+  .modal-backdrop, .modal-card, .toast { transition: none; }
 }
 
 /* ── 관찰 카드·설정 행 ────────────────────────────────── */
@@ -1173,6 +1225,9 @@ html {
 .observe-rows .row { display: flex; justify-content: space-between; gap: 12px; }
 .observe-rows .k { color: var(--ink-faint); flex-shrink: 0; }
 .observe-rows .v { color: var(--ink); text-align: right; }
+/* 복귀 브리핑 — 같은 행 문법이지만 k/v가 아니라 목록이다. 점 바로 옆에서 문장이 시작해야 읽힌다(T5-11) */
+.briefing-rows .row { justify-content: flex-start; gap: 8px; }
+.briefing-rows .v { text-align: left; }
 
 .settings-rows { display: flex; flex-direction: column; }
 .settings-row {
@@ -1187,17 +1242,31 @@ html {
   font-family: inherit;
   cursor: pointer;
   width: 100%;
+  box-sizing: border-box;   /* width 100% + 좌우 패딩 2px라 2~4px 넘쳤다(T5-16) */
   text-align: left;
 }
 .settings-row + .settings-row { border-top: 1px solid color-mix(in srgb, var(--ink-faint) 18%, transparent); }
 /* 알림 하위 모달(2026-09-03) — 마스터가 꺼지면 항목 행이 흐려진다. :disabled 아님(탭하면 이유 토스트) */
-.settings-row.is-locked { opacity: 0.45; }
+.settings-row.is-locked { opacity: 0.6; }   /* 0.45는 2.35:1 — 누르면 이유를 말하니 읽혀야 한다(T5-05) */
 .settings-hint { padding: 10px 2px 0; font-size: 13px; color: var(--ink-faint); }
 .settings-hint[hidden] { display: none; }
+/* 오픈소스 고지 전문(30KB) — 카드(.modal-card max-height 78vh · overflow-y auto)가 세로로 스크롤한다.
+   원문 줄바꿈을 지키고, 긴 URL·해시는 어디서든 접어 가로 넘침을 막는다. 고지문은 복사할 수 있어야 한다 */
+.license-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  text-align: left;
+  font-size: var(--fs-cap);
+  line-height: 1.5;
+  user-select: text;
+  -webkit-user-select: text;
+}
 /* 방해 없는 시간 — 시 선택. 시스템 select를 앱 톤으로만 감싼다 */
 .quiet-select {
-  font: 15px/1 inherit;
+  font-size: 15px;
+  line-height: 1;
   font-family: inherit;
+  min-height: 44px;   /* 탭 대상 하한 — select는 의사 요소를 못 달아 상자 자체를 키운다(36 → 44) */
   color: var(--ink);
   background: var(--bg);
   border: 1.5px solid var(--bg-deep);
@@ -1228,23 +1297,48 @@ html {
 }
 .switch.on { background: var(--accent); }
 .switch.on::after { transform: translateX(18px); }
+/* 탭 대상 — ::after는 손잡이라 ::before로 위아래만 넓힌다(26 → 44, 행 패딩 13px 안) */
+.switch::before { content: ''; position: absolute; inset: -9px 0; }
 
 /* ── 온보딩 ──────────────────────────────────────────── */
+/* 오버레이는 투명하다 — 첫 화면이 곧 병이다. 글자는 병을 가리지 않게 위(이름·안내)와 아래(버튼)로 나눈다.
+   아래 그라디언트는 버튼 자리만 바탕색으로 덮는다(병 밑동 그림자·#stage 아랫단 경계가 글자 뒤로 비치지 않게). */
 .onboard {
   position: absolute;
   inset: 0;
-  background: var(--bg);
   z-index: 30;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  padding: 0 24px calc(60px + env(safe-area-inset-bottom));
+  justify-content: space-between;
+  padding: calc(64px + env(safe-area-inset-top)) 24px calc(60px + env(safe-area-inset-bottom));
   text-align: center;
-  gap: 16px;
+  background: linear-gradient(to top, var(--bg) 0%, var(--bg) 9%, rgba(232, 217, 196, 0) 24%);
 }
-.onboard h1 { font-size: 21px; font-weight: 600; color: var(--ink); margin: 0; line-height: 1.5; }
-.onboard p { font-size: 15px; color: var(--ink-soft); margin: 0; line-height: 1.6; }
+.onboard-top,
+.onboard-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.onboard-bottom { gap: 16px; }
+.onboard h1 { font-size: var(--fs-title); font-weight: 600; color: var(--ink); margin: 0; line-height: 1.5; }
+.onboard p { font-size: var(--fs-body); color: var(--ink-soft); margin: 0; line-height: 1.6; }
+.onboard p:empty { display: none; }
+/* 환영 화면의 이름 — 앱 안에서 이름이 크게 서는 유일한 자리 */
+.onboard--welcome h1 {
+  font-size: var(--fs-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+.onboard--welcome .onboard-top { gap: 6px; }
+/* 환영 화면만 아래 묶음에 안내 문장이 있다(문장 24 + 간격 16 + 단추 47 + 여백 60 = 147px) — 그 뒤를 px로 덮는다.
+   비율 띠(9%)로는 키 773px 미만 폰에서 문장이 병 밑동 그림자와 겹쳤다(360×640 실측 2026-11-13) */
+.onboard--welcome {
+  background: linear-gradient(to top, var(--bg) 0, var(--bg) calc(152px + env(safe-area-inset-bottom)), rgba(232, 217, 196, 0) calc(212px + env(safe-area-inset-bottom)));
+}
 /* 젓기 진행 헤어라인 — 타임라인과 같은 어휘(가는 선), 숫자 없이 '얼마나 남았나'만 */
 .onboard-stir-track {
   width: 140px;

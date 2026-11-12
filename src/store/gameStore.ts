@@ -15,14 +15,14 @@ import {
   isPlayable, planNotificationsAll, playableRules, reanchor, ruleByVariantId, stageOf,
   RECIPES, variantIdOf, DAY, INGREDIENT_SOFT_CAP, INGREDIENT_FLOUR_COST,
   canBakeBread, recipeById, PANTRY_MAX, PANTRY_LEGACY_ACIDITY, PANTRY_LEGACY_ACTIVITY, INGREDIENTS,
-  canWatchAd, recordAdGrant,
+  adRemaining, canWatchAd, recordAdGrant,
   consumeLots, lotsSum, pantryQualityOf, pickDough, pushLot, trimOldest,
 } from '../sim';
 import type { Clock } from '../platform/clock';
 import type { StorageAdapter } from '../platform/storage';
-import type { LoadSource, SaveEnvelope, SaveFlags, SaveSettings, StarterRecord } from './persistence';
+import type { SaveEnvelope, SaveFlags, SaveSettings, StarterRecord } from './persistence';
 import {
-  SCHEMA_VERSION, defaultFlags, defaultSettings, emptyInventory, emptyLots, load, save,
+  SCHEMA_VERSION, defaultFlags, defaultSettings, emptyInventory, emptyLots, loadDetailed, save,
 } from './persistence';
 import type { EconomyState } from './economy';
 import { earnedFlour, emptyEconomy, flourBalance } from './economy';
@@ -108,6 +108,11 @@ export interface GameStore {
    * 미보유(0개) 우선 랜덤 — "신규 보장(가능한 경우)"의 최소 구현. 지급 불가면 null·무기록.
    */
   adDeliveryReward(): IngredientId | null;
+  /**
+   * 재료 배송 광고의 오늘 남은 횟수 — 원장 상한에 더해 **지금 줄 수 있는 재료가 없으면 0**.
+   * 30종이 전부 소프트캡이면 광고를 끝까지 봐도 보상이 null이라, 광고 행부터 닫는다(T3-04).
+   */
+  adDeliveryRemaining(): number;
 
   /**
    * 변형 굽기 (§8-2 해금 공식) — 원자적: 첫 굽기 = 재료 1 차감 + 도감 발견이 같은
@@ -233,6 +238,19 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
   // 생성 시점이라 구독자가 없어 통지 대상이 없다: 이후의 상승만 flourEarned로 나간다.
   syncStageMax(clock.now());
   stageMaxDirty = false;
+
+  /**
+   * 집 최고 단계가 from보다 올랐으면 그 사이 단계마다 stageUp을 만든다. sim은 급여가 넘긴 승급만
+   * 알리는데, 실제 승급은 대부분 날짜 조건이 뒤늦게 차서(급여 없이) 온다 — 그 승급이 조용히
+   * 지나가 31일 동안 연출이 한 번도 안 뜨던 것(감사 T8-01). 이미 있는 stageUp은 겹쳐 내지 않는다.
+   */
+  const houseStageUps = (from: number, existing: SimEvent[] = []): SimEvent[] => {
+    const out: SimEvent[] = [];
+    for (let s = from + 1; s <= houseStage(); s++) {
+      if (!existing.some((e) => e.type === 'stageUp' && e.stage === s)) out.push({ type: 'stageUp', stage: s });
+    }
+    return out;
+  };
 
   /** 획득 델타를 이벤트로 — 미션·성장·도감 보상이 조용히 들어오지 않게 (토스트는 UI) */
   const earnEvents = (before: number): SimEvent[] => {
@@ -390,13 +408,16 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     return { state: activeSim(), events: [{ type: 'bakeBlocked', reason: 'pantry' }] };
   }
 
-  /** 누적 미션 카운터 — 급여·굽기 이벤트만 센다 (차단·잠금은 세지 않는다) */
+  /**
+   * 누적 미션 카운터 — 급여·굽기 이벤트만 센다 (차단·잠금은 세지 않는다).
+   * 급여와 discard 굽기는 sim이 실어 준 counted만 센다 — 연타가 미션을 올리지 않게(감사 T1-01·02)
+   */
   function applyEconomyEvents(events: SimEvent[]): void {
     let feeds = 0;
     let bakes = 0;
     for (const e of events) {
-      if (e.type === 'fed') feeds += 1;
-      else if (e.type === 'baked' || e.type === 'bakedDiscard') bakes += 1;
+      if (e.type === 'fed' && e.counted) feeds += 1;
+      else if (e.type === 'baked' || (e.type === 'bakedDiscard' && e.counted)) bakes += 1;
     }
     if (feeds === 0 && bakes === 0) return;
     setEconomy({ feeds: economy().feeds + feeds, bakes: economy().bakes + bakes });
@@ -435,11 +456,13 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
   function doTick(): Snapshot {
     const before = earnedNow();
     const now = clock.now();
+    if (!Number.isFinite(now)) return snap; // advance와 같은 가드 — 비유한 시각은 상태를 못 바꾼다
     stageMaxDirty = false;
+    const stageBefore = houseStage();
     advanceTo(now);
     // 성장 단계 보상은 급여 없이도(경과만으로) 오를 수 있다 — 오른 순간 저장까지 마친다
     if (stageMaxDirty) persist(now);
-    emit(earnEvents(before));
+    emit([...houseStageUps(stageBefore), ...earnEvents(before)]);
     return snap;
   }
 
@@ -460,21 +483,35 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
 
   function doDispatch(action: Action): SimEvent[] {
     const now = clock.now(); // 한 번만 캡처 — advance·applyAction·savedAt이 같은 시각을 본다
+    if (!Number.isFinite(now)) return []; // advance와 같은 가드 — 비유한 시각은 상태를 못 바꾼다
     const before = earnedNow();
-    advanceTo(now);
-    // 나갈 조각을 **한 번만** 고른다 — 판정(dough)과 소비가 같은 선택이어야 시트가 예고한
-    // 반죽과 실제로 나간 반죽이 갈리지 않는다. advanceTo 뒤: 그 전엔 원장이 확정이 아니다.
-    const pick = action.type === 'bake' ? pickFor(action.recipeId) : null;
-    const act = withHouseContext(action, pick);
-    const res = pantryGate(act, now) ?? applyAction(activeSim(), act, now);
-    setActiveSim(res.state);
-    applyBakeEvents(res.events, now);
-    // 도감과 같은 델타 — 통 차감·적립도 이 persist 1회에 든다. 액션 후 상태를 넘기는 이유는
-    // applyPantryEvents 주석(split의 떼는 순간 품질).
-    applyPantryEvents(res.events, res.state, now, pick);
-    applyEconomyEvents(res.events); // 도감 갱신 뒤 — 레시피 최초 완성분까지 같은 델타에 든다
-    snap = deriveSnapshot(activeSim(), now);
-    const events = [...res.events, ...earnEvents(before)];
+    const stageBefore = houseStage();
+    // 도중 throw면 반쯤 바뀐 env가 60초 주기 저장으로 나가지 않게 dispatch 전으로 되돌린다(T7-23)
+    const prevEnv = env;
+    const prevSnap = snap;
+    let res: { state: SimState; events: SimEvent[] };
+    try {
+      advanceTo(now);
+      // 나갈 조각을 **한 번만** 고른다 — 판정(dough)과 소비가 같은 선택이어야 시트가 예고한
+      // 반죽과 실제로 나간 반죽이 갈리지 않는다. advanceTo 뒤: 그 전엔 원장이 확정이 아니다.
+      const pick = action.type === 'bake' ? pickFor(action.recipeId) : null;
+      const act = withHouseContext(action, pick);
+      res = pantryGate(act, now) ?? applyAction(activeSim(), act, now);
+      setActiveSim(res.state);
+      // 급여로 승급하면 단계 보상·stageMax가 이 dispatch의 델타·persist에 같이 든다(T1-06)
+      syncStageMax(now);
+      applyBakeEvents(res.events, now);
+      // 도감과 같은 델타 — 통 차감·적립도 이 persist 1회에 든다. 액션 후 상태를 넘기는 이유는
+      // applyPantryEvents 주석(split의 떼는 순간 품질).
+      applyPantryEvents(res.events, res.state, now, pick);
+      applyEconomyEvents(res.events); // 도감 갱신 뒤 — 레시피 최초 완성분까지 같은 델타에 든다
+      snap = deriveSnapshot(activeSim(), now);
+    } catch (err) {
+      env = prevEnv;
+      snap = prevSnap;
+      throw err;
+    }
+    const events = [...res.events, ...houseStageUps(stageBefore, res.events), ...earnEvents(before)];
     persist(now);
     replan(now);
     emit(events);
@@ -529,6 +566,11 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
       persist(now);
       emit(earnEvents(before));
       return pick;
+    },
+
+    adDeliveryRemaining(): number {
+      const deliverable = INGREDIENTS.some((i) => (env.shared.inventory[i.id] ?? 0) < INGREDIENT_SOFT_CAP);
+      return deliverable ? adRemaining(env.shared.ads, clock.now(), 'delivery') : 0;
     },
 
     grantIngredient(id: IngredientId, count: number): void {
@@ -772,10 +814,12 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
 export interface InitResult {
   store: GameStore;
   isNew: boolean;
-  /** 새 게임이면 null */
-  loadSource: LoadSource | null;
   /** 부재 중 있었던 일 — 새 게임·짧은 부재면 [] */
   briefing: BriefingKey[];
+  /** 앱이 꺼져 있는 동안 넘은 단계들(저장된 집 최고 단계 다음부터) — 부트 연출용. 없으면 [] */
+  stageUps: number[];
+  /** 읽을 수 없는 저장본이 있어 새로 시작했다 — 원문은 따로 보관됐다(storage.keepBroken) */
+  brokenSave: boolean;
 }
 
 /**
@@ -784,11 +828,16 @@ export interface InitResult {
  * 주기 tick은 자동 시작하지 않는다 — app.ts가 화면·가시성과 함께 배선한다.
  */
 export async function initGameStore(deps: GameStoreDeps): Promise<InitResult> {
-  const loaded = await load(deps.storage);
+  const { result: loaded, broken } = await loadDetailed(deps.storage);
   const store = createGameStore(deps, loaded?.envelope);
   const briefing = loaded === null ? [] : store.resumeWithBriefing();
   if (loaded === null) store.tick();
+  // 부트 백필(createGameStore)이 조용히 올린 집 최고 단계 — 저장본에 적혀 있던 값 다음부터가 새 승급이다
+  const stageUps: number[] = [];
+  if (loaded) {
+    for (let s = loaded.envelope.shared.economy.stageMax + 1; s <= store.getHouseStage(); s++) stageUps.push(s);
+  }
   store.saveNow();
   store.replanNotifications();
-  return { store, isNew: loaded === null, loadSource: loaded?.source ?? null, briefing };
+  return { store, isNew: loaded === null, briefing, stageUps, brokenSave: broken };
 }

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <!-- appCategory=game: Android 16 대화면(sw≥600dp)에서도 세로 고정 유지(게임 예외).
+         백업 규칙 2종: OTA 번들(files/versions/)만 빼고 세이브는 그대로 백업 (감사 T3-02 · T3-08) -->
     <application
         android:allowBackup="true"
+        android:appCategory="game"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"

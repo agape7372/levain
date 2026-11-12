@@ -1,6 +1,8 @@
 // 레시피 데이터·해금·판정 — 정본: docs/GDD.md §6
 import type { BakeGrade, Flour, RecipeDef, SimState } from './types';
-import { BAKE_ACTIVITY_W, BAKE_SOUR_W, FLOUR_AFFINITY_BONUS, GRADE_BEST, GRADE_GOOD } from './constants';
+import {
+  BAKE_ACTIVITY_W, BAKE_SOUR_W, BAKE_WEIGHTS_BY_RECIPE, FLOUR_AFFINITY_BONUS, GRADE_BEST, GRADE_GOOD,
+} from './constants';
 import { clamp, stageOf } from './derive';
 
 /** 감점 기울기: 관대 0.015 / 보통 0.025 / 엄격 0.04 (선호 범위 밖 산미 1당) */
@@ -35,14 +37,16 @@ export function sourFit(recipe: RecipeDef, acidity: number, flour?: Flour): numb
   return clamp(1 - recipe.slope * dist + bonus, 0, 1);
 }
 
-/** 판정 점수 = 0.6×activity + 0.4×산미적합도 (GDD §6-2) */
+/** 판정 점수 = 0.6×activity + 0.4×산미적합도 (GDD §6-2). 호밀빵만 0.3/0.7 (BAKE_WEIGHTS_BY_RECIPE) */
 export function bakeScore(recipe: RecipeDef, activity: number, acidity: number, flour?: Flour): number {
-  return BAKE_ACTIVITY_W * activity + BAKE_SOUR_W * sourFit(recipe, acidity, flour);
+  const [wa, ws] = BAKE_WEIGHTS_BY_RECIPE[recipe.id] ?? [BAKE_ACTIVITY_W, BAKE_SOUR_W];
+  return wa * activity + ws * sourFit(recipe, acidity, flour);
 }
 
 export function gradeOf(score: number): BakeGrade {
-  if (score >= GRADE_BEST) return 'best';
-  if (score >= GRADE_GOOD) return 'good';
+  // 1e-9 여유 — 0.6×0.95 + 0.4×0.7 같은 경계 점수가 0.8499999…로 내려앉아 한 등급 떨어지지 않게
+  if (score + 1e-9 >= GRADE_BEST) return 'best';
+  if (score + 1e-9 >= GRADE_GOOD) return 'good';
   return 'flat'; // "조금 납작해요. 그래도 맛있어요" — 실패 없음
 }
 

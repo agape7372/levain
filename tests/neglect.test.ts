@@ -76,7 +76,7 @@ describe('neglect — 장기 방치·휴면·부활 (GDD §3-4·§3-7)', () => {
     // 유효 8h 이후 재급여 — 부활 완료
     const r3 = applyAction(r2.state, { type: 'feed', ratio: '1:1:1' }, t0 + 8 * HOUR);
     expect(r3.events).toContainEqual({ type: 'revived' });
-    expect(r3.events).toContainEqual({ type: 'fed', ratio: '1:1:1', maturityGained: false });
+    expect(r3.events).toContainEqual({ type: 'fed', ratio: '1:1:1', maturityGained: false, counted: true });
     expect(r3.state.reviveProgress).toBe(0);
     expect(phaseAt(r3.state, t0 + 8 * HOUR)).toBe('active');
     expect(r3.state.maturity).toBe(5); // 부활 급여는 maturity 미적립, 기존 값 보존

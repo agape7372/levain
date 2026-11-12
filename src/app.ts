@@ -12,11 +12,11 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { onLifecycle } from './platform/lifecycle';
 import { haptic, setHapticsEnabled } from './platform/haptics';
 import { isNative } from './platform/native';
-import { initOta } from './platform/ota';
+import { initOta, markOtaReady } from './platform/ota';
 import { exportEnvelope, pickImportFile } from './platform/saveTransfer';
 import {
   setMuted, sfxBubble, sfxFed, sfxRevived, sfxUnlock, suspendAudio, resumeAudio, unlockAudio,
-  sfxStirStart, sfxStirUpdate, sfxStirEnd, sfxCloth,
+  sfxStirStart, sfxStirUpdate, sfxStirEnd, sfxCloth, sfxBaked, sfxPour, sfxSetDown, sfxPinch,
 } from './audio/sounds';
 import type { Clock } from './platform/clock';
 import type { StorageAdapter } from './platform/storage';
@@ -32,12 +32,17 @@ import { createRecipesScreen } from './ui/screens/recipes';
 import { createShowcaseScreen } from './ui/screens/showcase';
 import { mountOnboarding } from './ui/screens/onboarding';
 import { openStarterGift } from './ui/components/ingredientPicker';
-import { celebrateIngredients, celebrateStageUp } from './ui/components/celebrate';
+import { celebrateIngredients, celebrateStageUp, dismissCelebrate } from './ui/components/celebrate';
+import { variantName } from './ui/components/breadSheet';
 import type { GameApi } from './ui/gameApi';
-import { RECIPES, INGREDIENTS, adRemaining } from './sim';
-import { adsAvailable, showRewarded } from './platform/ads';
+import { RECIPES, INGREDIENTS } from './sim';
+import { adPrivacyOptionsRequired, adsAvailable, showAdPrivacyOptions, showRewarded } from './platform/ads';
 import { basesCompleted, missionViews } from './store/economy';
 import type { BakeGrade, NotifySlot, SimEvent } from './sim';
+import { ruleByVariantId } from './sim';
+
+/** 굽기 결과 소리가 올라가는 음 수 — 등급이 높을수록 끝까지 (sounds.sfxBaked) */
+const BAKE_NOTES: Record<BakeGrade, 2 | 3 | 4> = { best: 4, good: 3, flat: 2 };
 
 export interface StartAppDeps {
   /** Levain Lab 전용 주입점 — 프로덕션은 생략(systemClock·정식 저장 키) */
@@ -46,9 +51,11 @@ export interface StartAppDeps {
 }
 
 export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameStore }> {
-  // OTA는 가장 먼저 — 롤백 방지 신호(notifyAppReady)가 늦으면 정상 번들도 되돌려진다.
-  // 확인·다운로드는 내부에서 뒤로 미루므로 부팅을 막지 않는다 (platform/ota.ts 계약).
-  initOta();
+  // OTA 확인·다운로드는 내부에서 뒤로 미루므로 부팅을 막지 않는다 (platform/ota.ts 계약).
+  // 롤백 방지 신호는 여기서 보내지 않는다 — 이 함수 맨 끝의 markOtaReady()가 보낸다. 첫 화면까지 뜬
+  // 뒤여야 「JS는 뜨는데 그 뒤에 죽는」 번들도 되돌려진다(감사 T2-05). ★두 줄은 한 쌍이다: 끝의
+  // markOtaReady()가 빠지면 모든 OTA 번들이 30초 뒤 롤백된다.
+  initOta({ deferReady: true });
 
   const canvas = document.getElementById('c') as HTMLCanvasElement;
   // 보조기술 라벨 — 캔버스는 그림이자 상호작용면인데 접근성 트리에선 빈 노드였다 (2026-08-30 a11y)
@@ -63,7 +70,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   // 저장 실패 토스트 — 주기 tick(60초) 저장도 이 경로를 타므로 30분에 1회만 말한다.
   // 지속 실패(용량 초과·프라이빗 모드)에서 매 분 토스트는 스팸이고, 1회는 놓치면 끝이라 중간값.
   let saveFailToldAt = -Infinity;
-  const { store, isNew, loadSource, briefing } = await initGameStore({
+  const { store, isNew, briefing, stageUps: bootStageUps, brokenSave } = await initGameStore({
     clock,
     storage,
     onNotifyPlan: (plan) => void notifier.applyPlan(plan), // 본문 르방 이름은 슬롯 label(store가 싣는다)
@@ -96,10 +103,38 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       stirHapticUsed = false;
     }
   };
-  scene.onClothOpen = () => sfxCloth();
+  // 승급 연출 — 천이 덮여 있으면(콜드 부트·긴 부재 뒤 복귀) 걷을 때까지 미룬다. 병이 안 보이는 채로
+  // 터뜨리면 장면이 반쪽이고, 천 걷기가 첫 손짓이라 소리도 그때부터 난다.
+  type StageUp = { stage: number; from: number }; // from = 그 승급 전의 집 최고 단계(새로 열린 빵을 세는 기준)
+  let stageQueue: StageUp[] = [];
+  const cheerStages = (ups: StageUp[]): void => {
+    if (ups.length === 0) return;
+    // 두 단계를 한 번에 넘어도 소리·진동·기포는 한 번
+    sfxUnlock();
+    haptic('success');
+    scene.celebrate(); // 기포 3연속 팝 — 다이제틱 축하
+    // 토스트 2줄(단계·이름표)을 획득 연출 레이어가 대신한다 — 새로 열린 빵까지 같이 보여준다.
+    // 냉장·비율·이름표 해금 문구는 celebrate.ts가 단계에서 파생한다(GDD §5 획득 연출 행).
+    for (const u of ups) celebrateStageUp(api, u.stage, u.from);
+  };
+  const onStageUps = (ups: StageUp[]): void => {
+    if (scene.isClothCovering()) stageQueue.push(...ups);
+    else cheerStages(ups);
+  };
+  scene.onClothOpen = () => {
+    sfxCloth();
+    if (stageQueue.length === 0) return;
+    const queued = stageQueue;
+    stageQueue = [];
+    setTimeout(() => cheerStages(queued), 700); // 천이 걷힌 뒤에
+  };
   scene.onStirStart = () => sfxStirStart();
   scene.onStirMove = (s) => sfxStirUpdate(s);
   scene.onStirEnd = () => sfxStirEnd();
+  // 당기기도 같은 반죽 소리 — 늘어난 만큼만 작게, 놓을 때 톡 (감사 T4-6)
+  scene.onGrabStart = () => sfxStirStart();
+  scene.onGrabMove = (s) => sfxStirUpdate(s * 0.6);
+  scene.onGrabEnd = () => { sfxStirEnd(); haptic('light'); };
 
   // ── 설정 반영 ──
   const applySettings = (): void => {
@@ -108,6 +143,9 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     setHapticsEnabled(s.haptics);
   };
   applySettings();
+
+  // 불러오기·초기화가 저장을 마치고 reload하는 중 — 언로드의 hidden 분기가 saveNow를 건너뛴다 (T2-01)
+  let reloading = false;
 
   // ── GameApi 어댑터 ──
   const api: GameApi = {
@@ -132,6 +170,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       // 피드백의 절반은 전환이 무예고 컷이라서다(§5-5가 처방했으나 실장 안 됨). 나머지 절반은 개체 지문.
       scene.slideSwap(dir, () => {
         if (!store.switchStarter(next.id)) return;
+        sfxSetDown(); // 다른 병이 자리에 놓인다
         // 컷 계약은 그대로 — 경과 시간을 재생하지 않는다: 즉시 스냅 + 개체 시드 재설정
         scene.snapParams(toRenderParams(store.getSnapshot()));
         scene.setSeed(store.getActiveStarter().sim.createdAt);
@@ -156,6 +195,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     addStarter: () => {
       const rec = store.addStarter();
       if (rec === null) return false;
+      sfxSetDown(); // 새 병
       // addStarter는 새 르방을 활성으로 전환한다 — 씬 컷 계약 동일 적용
       scene.snapParams(toRenderParams(store.getSnapshot()));
       scene.setSeed(store.getActiveStarter().sim.createdAt);
@@ -179,12 +219,14 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
 
     ads: {
       available: () => adsAvailable(),
-      deliveryRemaining: () => adRemaining(store.getAdLedger(), clock.now(), 'delivery'),
+      deliveryRemaining: () => store.adDeliveryRemaining(),
       watchForDelivery: async () => {
         const result = await showRewarded();
         if (result !== 'rewarded') return null;
         return store.adDeliveryReward();
       },
+      privacyOptionsRequired: () => adPrivacyOptionsRequired(),
+      showPrivacyOptions: () => showAdPrivacyOptions(),
     },
 
     dev: {
@@ -214,7 +256,15 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
         if (!migrated) return false;
         const env = validateAndClamp(migrated);
         if (!env) return false;
-        save(env, storage);
+        // 언로드의 hidden 저장이 옛 메모리 env로 새 기록을 덮지 않게 먼저 막는다 (T2-01)
+        reloading = true;
+        store.stopTicking();
+        if (!save(env, storage)) {
+          // 실패하고 reload하면 옛 기록으로 조용히 돌아온다 — 그대로 이어간다
+          reloading = false;
+          store.startTicking();
+          return false;
+        }
         location.reload(); // 가장 안전한 재부트 — 전 상태 재구축
         return true;
       } catch {
@@ -223,11 +273,14 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     },
     resetGame: () => {
       store.startNewGame();
+      reloading = true; // 불러오기와 같은 순서 — 언로드 저장을 건너뛴다
+      store.stopTicking();
       location.reload();
     },
     requestNotifyPermission: () => notifier.requestPermission(),
     checkNotifyPermission: () => notifier.checkPermission(),
-    openNotifySettings: () => void notifier.openSettings(),
+    // 개발자 도구 판정은 여기 한 곳 — 출시 빌드는 기록 불러오기로 flags.dev를 심은 기기만
+    devToolsEnabled: () => import.meta.env.DEV || store.getEnvelope().flags.dev === true,
     pendingBake: () => store.getEnvelope().flags.pendingBake,
     clearPendingBake: () => store.setFlags({ pendingBake: null }),
   };
@@ -251,7 +304,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       }
       if (isNative()) void CapApp.minimizeApp().catch(() => undefined);
     },
-    trySkipSequence: () => scene.skipSequence(),
+    trySkipSequence: () => dismissCelebrate() || scene.skipSequence(), // 획득 연출 레이어가 먼저
   });
   let currentTab: 'levain' | 'recipes' = 'levain';
 
@@ -264,15 +317,35 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     if (onLevain && !document.hidden) scene.start();
     else scene.stop();
   };
+  let showcaseLoading = false;
   const openShowcase = async (
     id: string, headline: string, large: boolean,
     opts?: { onRebake?: () => void; kind?: 'bread' | 'ingredient'; name?: string },
   ): Promise<boolean> => {
+    // 로딩 중·표시 중 재진입은 먼저 온 요청이 화면을 띄운다 — true라 호출부가 2D 카드 폴백을 겹쳐 띄우지 않는다 (T7-02)
+    if (showcaseLoading || showcaseActive) return true;
+    showcaseLoading = true;
     const kind = opts?.kind ?? 'bread';
     const dir = kind === 'ingredient' ? 'ingredients' : 'breads';
+    const tabAtRequest = currentTab;
     try {
-      await scene.enterShowcase(`/${dir}/${id}.glb`);
+      try {
+        await scene.enterShowcase(`/${dir}/${id}.glb`);
+      } catch {
+        // 변형 GLB는 대부분 없다 — 베이스 GLB로 한 번 더 (썸네일의 베이스 PNG 폴백과 같은 규칙, T4-2)
+        const base = id.split('--')[0];
+        if (base === id) return false;
+        await scene.enterShowcase(`/${dir}/${base}.glb`);
+      }
     } catch {
+      return false;
+    } finally {
+      showcaseLoading = false;
+    }
+    // 로드 중 탭을 옮겼으면 띄우지 않는다 (T7-10)
+    if (currentTab !== tabAtRequest) {
+      scene.exitShowcase();
+      restoreStage();
       return false;
     }
     // 변형(id가 copy.recipes(.ingredientNames)에 없다)은 호출부가 name을 직접 넘긴다
@@ -313,6 +386,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
 
   const showTab = (which: 'levain' | 'recipes'): void => {
     currentTab = which;
+    document.body.dataset.tab = which; // 토스트 자리 등 탭별 CSS의 기준 (main.css body[data-tab])
     tabLevain.classList.toggle('active', which === 'levain');
     tabRecipes.classList.toggle('active', which === 'recipes');
     router.setRoot(which === 'levain' ? home : recipes);
@@ -333,12 +407,6 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       return;
     }
     showTab('recipes');
-    // 첫 2~3회 힌트 — "한 번 더 누르면 선반·재료" (발견 가능성 보조)
-    const hints = store.getEnvelope().flags.retapHints;
-    if (hints < 3) {
-      toast(copy.recipes.retapHint);
-      store.setFlags({ retapHints: hints + 1 });
-    }
   });
   showTab('levain');
 
@@ -347,10 +415,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   // 400ms 간격으로 기다렸다가 연다(최대 10회 = 4초). 여전히 열려 있으면 탭만 옮긴다:
   // home.openFeed가 스스로 hasOpenModal을 확인하므로 모달이 겹치는 일은 없다.
   const openForNotify = (copyKey: NotifySlot['copyKey']): void => {
-    if (copyKey === 'peak') {
-      showTab('recipes'); // 한창때 = 지금 굽기 좋은 때
-      return;
-    }
+    // 한창때(peak)도 르방 탭 — 09-05 개정 뒤 한창때는 떼기 적기이고 떼는 자리는 홈의 통이다 (T7-18)
     showTab('levain');
     if (copyKey === 'feedTime' || copyKey === 'fridgeWeek' || copyKey === 'reviveSecond' || copyKey === 'sour') {
       home.openFeed();
@@ -372,22 +437,20 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
 
   // ── 이벤트 → 사운드·햅틱·토스트 ──
   const onEvents = (events: SimEvent[]): void => {
+    const ups: StageUp[] = [];
     for (const e of events) {
       switch (e.type) {
         case 'fed':
+          sfxPour(); // 가루가 들어가는 소리 위로 2음
           sfxFed();
           haptic('light');
           scene.playFeed(false);
           break;
         case 'stageUp':
-          sfxUnlock();
-          haptic('success');
-          scene.celebrate(); // 기포 3연속 팝 — 다이제틱 축하
-          // 토스트 2줄(단계·이름표)을 획득 연출 레이어가 대신한다 — 새로 열린 빵까지 같이 보여준다.
-          // 냉장·비율·이름표 해금 문구는 celebrate.ts가 단계에서 파생한다(GDD §5 획득 연출 행).
-          celebrateStageUp(api, e.stage);
+          ups.push({ stage: e.stage, from: houseSeen });
           break;
         case 'reviveStarted':
+          sfxPour();
           toast(copy.revive.started);
           haptic('light');
           scene.playFeed(true); // 따라내기 선행
@@ -403,11 +466,27 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
           setTimeout(() => scene.playWatch(), 2800); // 지켜보기 — 급여 연출 뒤
           break;
         case 'baked':
-          sfxUnlock();
+          // 보상 소리는 하나이고 결과는 「어디까지 올라가느냐」로만 다르다 (sounds.sfxBaked)
+          sfxBaked(BAKE_NOTES[e.grade]);
           haptic('success');
           // 강제종료 안전: 결과를 flags에 심고, 3초 살아있으면(= 결과 모달을 봤으면) 걷는다
-          store.setFlags({ pendingBake: { recipeId: e.recipeId, grade: e.grade } });
-          setTimeout(() => store.setFlags({ pendingBake: null }), 3000);
+          const planted = { recipeId: e.recipeId, grade: e.grade, ...(e.variantId ? { variantId: e.variantId } : {}) };
+          store.setFlags({ pendingBake: planted });
+          // 자기가 심은 값일 때만 걷는다 — 3초 안에 또 구우면 두 번째 기록이 1초 만에 지워졌다 (T2-12)
+          setTimeout(() => {
+            if (store.getEnvelope().flags.pendingBake === planted) store.setFlags({ pendingBake: null });
+          }, 3000);
+          break;
+        case 'bakedDiscard':
+          sfxBaked(2);
+          haptic('light');
+          break;
+        case 'moved':
+          sfxSetDown();
+          break;
+        case 'split':
+          sfxPinch();
+          haptic('light');
           break;
         case 'flourEarned':
           toast(copy.economy.earned(e.amount));
@@ -420,10 +499,12 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
           toast(e.reason === 'mass' ? copy.flake.blockedMass : copy.flake.blockedPhase);
           break;
         case 'flakeRestored':
+          sfxPour();
           haptic('medium');
           scene.playFeed(true); // 물을 주는 손길 — 따라내기 연출 재사용
           break;
         case 'starterDiscarded':
+          sfxSetDown(); // 새 병
           scene.snapParams(toRenderParams(store.getSnapshot())); // 새 반죽 — 즉시 스냅
           scene.setSeed(store.getActiveStarter().sim.createdAt); // 새 개체 = 새 반점 자리
           break;
@@ -434,11 +515,15 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
           break;
       }
     }
+    onStageUps(ups);
   };
 
+  // 승급 연출이 「새로 열린 빵」을 셀 기준 — 이 통지 직전의 집 최고 단계 (T7-08)
+  let houseSeen = store.getHouseStage();
   store.subscribe((snap, events) => {
     scene.setTargetParams(toRenderParams(snap));
     onEvents(events);
+    houseSeen = store.getHouseStage();
   });
 
   // ── 수명주기 ──
@@ -448,17 +533,17 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     if (visible) {
       const resumeBriefing = store.resumeWithBriefing(); // catch-up + 부재 브리핑
       scene.snapParams(toRenderParams(store.getSnapshot())); // 복귀 = 즉시 스냅
-      if (tabLevain.classList.contains('active')) scene.start();
+      if (tabLevain.classList.contains('active') || showcaseActive) scene.start(); // 쇼케이스는 레시피 탭에서 열린다 (T4-1)
       store.startTicking();
       store.replanNotifications();
       resumeAudio();
       if (store.getEnvelope().flags.onboarded) {
-        if (hiddenAt > 0 && Date.now() - hiddenAt > CLOTH_ABSENCE_MS) scene.coverCloth();
-        openBriefingCard(resumeBriefing, () => openMoldModal(api));
+        if (hiddenAt > 0 && clock.now() - hiddenAt > CLOTH_ABSENCE_MS) scene.coverCloth();
+        if (!hasOpenModal()) openBriefingCard(resumeBriefing, () => openMoldModal(api)); // 모달 위 모달 금지
       }
     } else {
-      hiddenAt = Date.now();
-      store.saveNow();
+      hiddenAt = clock.now();
+      if (!reloading) store.saveNow();
       store.stopTicking();
       scene.stop();
       suspendAudio();
@@ -479,22 +564,41 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   // ── 온보딩 게이트 ──
   if (isNew || !store.getEnvelope().flags.onboarded) {
     tabs.style.display = 'none';
+    // 젓기 단계에서 온보딩 레이어가 투명해지면 밑의 홈 HUD(밥·설정·+)가 눌렸다 (T7-05). 캔버스 젓기는 그대로
+    home.el.style.visibility = 'hidden';
     mountOnboarding({
       root: uiRoot,
       canvas,
       requestNotifyPermission: () => notifier.requestPermission(),
       onComplete: () => {
-        store.startNewGame(); // 창조 의식 완료 시각이 진짜 탄생 시각
+        // 창조 의식 완료 시각이 진짜 탄생 시각 — 온보딩 도중 닫았다 며칠 뒤 마쳐도 그날 태어난다.
+        // flags만 깨진 저장본(기록이 있는 집)은 persistence.flagsOf가 onboarded=true로 착륙시켜
+        // 여기 오지 않는다(T2-02). 여기 온 저장본은 온보딩 전 것뿐이라 새로 써도 잃는 게 없다.
+        store.startNewGame();
         store.setFlags({ onboarded: true });
         scene.snapParams(toRenderParams(store.getSnapshot()));
         tabs.style.display = '';
-        toast(copy.onboarding.born);
-        openStarterGift(api); // 첫 재료 선물 (§9) — 창조 의식 직후가 유일한 자연 자리
+        home.el.style.visibility = '';
+        // 첫 재료 선물 (§9) — 창조 의식 직후가 유일한 자연 자리. 이미 받은 기록이면 열지 않는다
+        if (api.economy().giftPending) openStarterGift(api);
       },
     });
-  } else if (loadSource === 'mirror') {
-    // 주 저장 손상 → 미러 복구 — 조용히 (사용자에게 시스템 사정 노출 금지)
   }
+
+  // ── 미표시 굽기 결과 재노출 (강제종료 안전) — 브리핑·곰팡이 체인이 끝난 뒤에 연다 (모달 위 모달 금지) ──
+  const showPendingBake = (): void => {
+    const pending = api.pendingBake();
+    if (!pending) return;
+    const wrap = document.createElement('div');
+    const p = document.createElement('p');
+    p.className = 'modal-body';
+    const rule = pending.variantId ? ruleByVariantId(pending.variantId) : undefined;
+    const name = rule ? variantName(rule) : copy.recipes.names[pending.recipeId] ?? pending.recipeId;
+    // 제목 = 빵 이름, 본문 = 등급 한 줄
+    p.textContent = copy.recipes.grades[pending.grade as BakeGrade] ?? '';
+    wrap.appendChild(p);
+    openModal(wrap, { title: name, onClose: () => api.clearPendingBake() });
+  };
 
   // ── 부트 브리핑 → (필요시) 곰팡이 종결 모달 — 중앙 팝업 순차, 겹치지 않게 ──
   if (!isNew && store.getEnvelope().flags.onboarded) {
@@ -503,21 +607,19 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     // 백드롭으로 닫으면 claimStarterGift가 안 불려 gifted가 false로 남고 → 매 콜드부팅마다
     // 다시 떴다. "한 번 권한다"가 아니라 매번이었다. 선물 진입로는 온보딩 직후 1회와
     // 재료 탭 배너 버튼(screens/recipes.ts) 둘뿐이다 — 되돌리지 말 것.
-    openBriefingCard(briefing, () => openMoldModal(api));
+    openBriefingCard(briefing, () => openMoldModal(api, showPendingBake));
+    // 앱이 꺼져 있는 동안 넘은 단계 — 천이 덮여 있으니 걷을 때 연출이 뜬다(onStageUps). 승급은 대부분
+    // 날짜 조건이 차서 오므로 이 길이 가장 흔하다(감사 T8-01)
+    if (bootStageUps.length > 0) {
+      const from = bootStageUps[0] - 1;
+      onStageUps(bootStageUps.map((stage) => ({ stage, from })));
+    }
+  } else {
+    showPendingBake();
   }
+  // 읽을 수 없는 저장본이 있어 새로 시작한 경우 — 원문은 따로 보관돼 있다(storage.keepBroken, 감사 T2-03)
+  if (brokenSave) toast(copy.save.corrupted, 7000); // 기록을 잃었다는 말 — 읽을 시간을 준다
 
-  // ── 미표시 굽기 결과 재노출 (강제종료 안전) ──
-  const pending = api.pendingBake();
-  if (pending) {
-    const wrap = document.createElement('div');
-    const p = document.createElement('p');
-    p.className = 'modal-body';
-    const name = copy.recipes.names[pending.recipeId] ?? pending.recipeId;
-    const grade = copy.recipes.grades[pending.grade as BakeGrade] ?? '';
-    p.textContent = `${name} — ${grade}`;
-    wrap.appendChild(p);
-    openModal(wrap, { title: '구운 빵', onClose: () => api.clearPendingBake() });
-  }
-
+  markOtaReady(); // 첫 화면까지 떴다 — 맨 위 initOta({ deferReady: true })와 한 쌍
   return { store }; // Levain Lab 계기판용 — 프로덕션(main.ts)은 무시
 }

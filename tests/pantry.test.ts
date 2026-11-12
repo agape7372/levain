@@ -87,6 +87,21 @@ describe('떼어내기 — 씨앗만 남기고 통으로 (GDD §6-2)', () => {
     expect(res.state.mass).toBe(thin.mass);
   });
 
+  it('1:1:1은 한창때(유효 4.5h)부터 뗄 수 있다 — 「한창」이라 말하면서 막지 않는다 (감사 T8-03)', () => {
+    const fed = initialState(t0); // 1:1:1 방금 급여
+    const at = (h: number) => t0 + h * HOUR;
+    expect(applyAction(fed, { type: 'split' }, at(4.4)).events[0].type).toBe('splitBlocked');
+    expect(applyAction(fed, { type: 'split' }, at(4.5)).events[0].type).toBe('split');
+    // 스냅샷도 같은 답 + 열리는 시각
+    expect(deriveSnapshot(fed, at(4.4)).canSplit).toBe(false);
+    expect(deriveSnapshot(fed, at(4.5)).canSplit).toBe(true);
+    expect(deriveSnapshot(fed, t0).splitReadyAt).toBe(at(4.5));
+    // 한창때가 6h보다 늦은 비율은 종전대로 6h
+    const slow = { ...fed, feedRatio: '1:2:2' as const, mass: RATIOS['1:2:2'].mass };
+    expect(applyAction(slow, { type: 'split' }, at(5.9)).events[0].type).toBe('splitBlocked');
+    expect(applyAction(slow, { type: 'split' }, at(6)).events[0].type).toBe('split');
+  });
+
   it('canSplit 스냅샷이 실제 게이트와 같은 답을 낸다 — 눌리는데 막히는 버튼 방지', () => {
     for (const s of [ripe(), initialState(t0), { ...ripe(), mass: SEED_G }]) {
       const allowed = applyAction(s, { type: 'split' }, t0).events[0].type === 'split';

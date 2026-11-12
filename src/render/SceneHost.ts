@@ -13,6 +13,15 @@ import { smoothParams, type RenderParams } from './renderParams';
 // 세로폰(aspect ~0.46)에서 병 폭 ≈ 화면 70%, 병+헤드룸 55~65% 점유 (VISUAL §1-1 목표값 실측 보정)
 const VIEW_H = 5.4;
 const LOOK_Y = 0.8; // 병 몸통 중심보다 살짝 위 — 상단 HUD 헤드룸 확보
+/** 픽셀 비율 상한(고정) · 버퍼 총 픽셀 상한 — 큰 태블릿(800×1280@2 = 3.9M px)에서 반죽 프래그 비용을 묶는다 (T4-11).
+ *  360×728 폰은 비율 2 그대로(1.05M px) — 총량 상한은 큰 화면에서만 물린다 */
+const MAX_DPR = 2;
+const MAX_BUFFER_PIXELS = 2.2e6;
+
+/** CSS 크기 w×h 스테이지의 픽셀 비율 — DPR 상한과 버퍼 총량 상한 중 작은 쪽. 테스트용 export */
+export function fitPixelRatio(dpr: number, w: number, h: number): number {
+  return Math.min(dpr, MAX_DPR, Math.sqrt(MAX_BUFFER_PIXELS / (w * h)));
+}
 
 type LightRig = {
   key: { color: number; intensity: number };
@@ -46,6 +55,13 @@ export class SceneHost {
   private camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 30);
   private raf = 0;
   private running = false;
+  /** 호출자가 원하는 구동 상태 — start()/stop() 공개 호출만 바꾼다. 컨텍스트 유실의 내부 정지는 건드리지 않는다 (T4-3) */
+  private wantRunning = false;
+  /** 마지막으로 받은 개체 시드·쇼케이스 url — 컨텍스트 복구 뒤 재적용 (T4-3) */
+  private seed: number | null = null;
+  private showcaseUrl: string | null = null;
+  /** 셰이더 시계 원점 — start()마다 새로 잡는다. uTime을 작게 유지해 float32 해상도를 지킨다 (T4-9) */
+  private shaderT0 = 0;
   private resizeObserver: ResizeObserver | null = null;
   private detachInput: (() => void) | null = null;
 
@@ -58,6 +74,10 @@ export class SceneHost {
   onStirStart: (() => void) | null = null;
   onStirMove: ((speed01: number) => void) | null = null;
   onStirEnd: (() => void) | null = null;
+  /** 당기기(grab) 훅 — 배선은 app.ts. onGrabMove 인자 = 신장 정도 0~1 (DoughMesh.grabStretch01, 여기서 한 번 더 자른다) */
+  onGrabStart: (() => void) | null = null;
+  onGrabMove: ((stretch01: number) => void) | null = null;
+  onGrabEnd: (() => void) | null = null;
   /** 배경 좌우 스와이프 = 르방 전환 (§5-5). 허용 여부·처리 모두 배선은 app.ts.
    *  필드 위임인 이유: 컨텍스트 유실 복구가 dispose→mount로 attachInput을 다시 부른다 */
   canSwipe: (() => boolean) | null = null;
@@ -77,6 +97,7 @@ export class SceneHost {
   /** 홈 씬 오브젝트 — 쇼케이스 진입 시 통째로 숨긴다 */
   private homeGroup: THREE.Object3D[] = [];
   private showcaseDrag: { detach: () => void } | null = null;
+  private showcaseSeq = 0;
   private current: RenderParams | null = null;
   private target: RenderParams | null = null;
   private lastT = 0;
@@ -93,7 +114,7 @@ export class SceneHost {
 
   mount(): void {
     const renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); // 고정 상한 — 어댑티브 없음
+    renderer.setPixelRatio(Math.min(devicePixelRatio, MAX_DPR)); // 고정 상한 — 어댑티브 없음. 총량 상한은 fit()
     this.renderer = renderer;
 
     this.scene = new THREE.Scene();
@@ -147,6 +168,9 @@ export class SceneHost {
       onStirStart: () => this.onStirStart?.(),
       onStirMove: (s) => this.onStirMove?.(s),
       onStirEnd: () => this.onStirEnd?.(),
+      onGrabStart: () => this.onGrabStart?.(),
+      onGrabMove: (s) => this.onGrabMove?.(Math.min(1, Math.max(0, s))),
+      onGrabEnd: () => this.onGrabEnd?.(),
       canSwipe: () => (this.canSwipe?.() ?? false) && !this.isSequenceActive(),
       onSwipe: (dir) => this.onSwipe?.(dir),
     });
@@ -167,14 +191,19 @@ export class SceneHost {
 
   private onContextLost = (e: Event): void => {
     e.preventDefault();
-    this.stop();
+    this.halt(); // wantRunning은 그대로 — 복구 뒤 재개 여부의 근거
   };
 
   private onContextRestored = (): void => {
-    const wasRunning = true; // 유실은 표시 중에만 감지됨 — 복구 후 재개
+    const showcaseUrl = this.showcaseUrl; // dispose가 비우기 전에 챙긴다
     this.dispose();
     this.mount();
-    if (wasRunning) this.start();
+    // 새 반죽은 기본값(시드 0.37·기본 파라미터)으로 태어난다 — 유실 전 상태를 다시 입힌다
+    if (this.seed !== null) this.dough?.setSeed(this.seed);
+    if (this.current) this.dough?.applyParams(this.current);
+    if (this.wantRunning) this.start(); // 레시피 탭처럼 멈춰 있던 씬은 멈춘 채로
+    // 쇼케이스 중이었으면 빵을 다시 올린다 — enterShowcase가 showcaseSeq를 올려 늦은 이전 로드는 버려진다
+    if (showcaseUrl) this.enterShowcase(showcaseUrl).catch(() => {});
   };
 
   /** 라이브 목표 파라미터 — 프레임마다 지수 lerp로 따라간다 (τ≈1.2s) */
@@ -265,6 +294,7 @@ export class SceneHost {
 
   /** 곰팡이 반점 시드 — 개체 정체성. 배선은 app.ts (createdAt) */
   setSeed(seed: number): void {
+    this.seed = seed;
     this.dough?.setSeed(seed);
   }
 
@@ -304,7 +334,12 @@ export class SceneHost {
   /** 쇼케이스 진입 — 홈 씬 숨기고 GLB 턴테이블. 로드 실패는 reject (호출자 폴백) */
   async enterShowcase(url: string): Promise<void> {
     if (!this.showcase) throw new Error('scene not mounted');
+    const seq = ++this.showcaseSeq;
     await this.showcase.load(url);
+    // 늦게 도착해 버려진 로드면 진행하지 않는다 — show·리스너 부착이 두 번 되던 경로 (T7-02)
+    if (seq !== this.showcaseSeq) throw new Error('showcase load superseded');
+    this.showcaseUrl = url;
+    this.showcaseDrag?.detach();
     for (const o of this.homeGroup) o.visible = false;
     this.showcase.show();
     // 빵 GLB는 정본 hex 파리티 조명(SHOWCASE_LIGHT)으로 — 홈 씬 진입 전까지만 유효(exitShowcase가 원복)
@@ -338,6 +373,7 @@ export class SceneHost {
   }
 
   exitShowcase(): void {
+    this.showcaseUrl = null;
     this.showcaseDrag?.detach();
     this.showcaseDrag = null;
     this.showcase?.hide();
@@ -465,6 +501,7 @@ export class SceneHost {
     const w = this.stage.clientWidth;
     const h = this.stage.clientHeight;
     if (w === 0 || h === 0) return;
+    this.renderer.setPixelRatio(fitPixelRatio(devicePixelRatio, w, h));
     this.renderer.setSize(w, h, false);
     const aspect = w / h;
     const viewW = VIEW_H * aspect;
@@ -476,8 +513,13 @@ export class SceneHost {
   }
 
   start(): void {
+    this.wantRunning = true;
     if (this.running) return;
     this.running = true;
+    // 단조 시계(performance.now) 자체는 JS double이라 안전하지만, 셰이더 uTime은 float32 — 며칠 켜 둔 앱에서
+    // 해상도가 떨어지지 않게 원점을 새로 잡는다. CPU 쪽(기포·트레일·숨쉬기 위상·시퀀스)은 절대 t 그대로라
+    // 원점 이동에 영향받지 않는다. 시계는 정지→재개 때만 옮기므로 화면이 멈춰 있던 동안의 점프는 안 보인다 (T4-9)
+    this.shaderT0 = performance.now() / 1000;
     const loop = (): void => {
       if (!this.running || !this.renderer) return;
       const t = performance.now() / 1000; // rAF 델타 누적 금지 — 단조 시계
@@ -488,16 +530,18 @@ export class SceneHost {
         this.current = smoothParams(this.current, this.target, dt);
         this.dough?.applyParams(this.current);
       }
-      this.dough?.tick(t);
+      const ts = t - this.shaderT0;
+      this.dough?.tick(t, ts);
       this.driveSequences(t);
       this.cloth?.tick(t);
       this.showcase?.tick(dt);
       this.particles?.update(dt);
-      if (this.dough && this.dough.bubbles.popsThisFrame > 0) this.onBubblePop?.();
+      // 쇼케이스 중엔 반죽이 숨어 있다 — 안 보이는 기포 소리를 내지 않는다 (T4-4)
+      if (this.dough && this.dough.bubbles.popsThisFrame > 0 && !this.isShowcasing()) this.onBubblePop?.();
       if (this.dough && this.jar && this.current) {
         // topY를 한 번만 뽑아 둘에 공급 — hooch 층과 유리 자국이 같은 수면 좌표계를 쓴다
         const top = this.dough.topY();
-        this.jar.setHooch(this.current.hoochAmt, top + 0.02, t);
+        this.jar.setHooch(this.current.hoochAmt, top + 0.02, ts);
         this.jar.setLevel(
           top,
           this.dough.fillWorldY(this.dough.levelY(this.current.markFill)),
@@ -512,12 +556,18 @@ export class SceneHost {
   }
 
   stop(): void {
+    this.wantRunning = false;
+    this.halt();
+  }
+
+  /** rAF만 끊는다 — wantRunning은 건드리지 않는다 (컨텍스트 유실·dispose 내부용) */
+  private halt(): void {
     this.running = false;
     cancelAnimationFrame(this.raf);
   }
 
   dispose(): void {
-    this.stop();
+    this.halt();
     this.detachInput?.();
     this.detachInput = null;
     this.resizeObserver?.disconnect();
@@ -542,6 +592,7 @@ export class SceneHost {
     this.showcaseDrag = null;
     this.showcase?.dispose();
     this.showcase = null;
+    this.showcaseUrl = null;
     this.homeGroup = [];
     this.keyLight = null;
     this.ambientLight = null;

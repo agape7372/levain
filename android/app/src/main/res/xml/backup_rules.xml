@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11(API 30) 이하 Auto Backup. 제외만 적는다 — include가 하나라도 있으면 나머지가 전부 빠진다.
+     files/versions/ = capgo OTA 번들 압축 해제본(개당 약 9MB). 다시 받을 수 있고, 없으면 플러그인이 내장 번들로 돌아간다.
+     세이브(WebView localStorage = app_webview/, Preferences 미러 = shared_prefs/CapacitorStorage.xml)는 그대로 백업된다. -->
+<full-backup-content>
+    <exclude domain="file" path="versions/" />
+</full-backup-content>

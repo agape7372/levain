@@ -42,15 +42,16 @@ export type AcidityBand = 'mild' | 'tangy' | 'sour';
 
 /** 발효력 밴드 — 0.7 이상 좋음 / 0.4 이상 보통 / 그 아래 약함 */
 export function activityBand(activity: number): ActivityBand {
-  if (activity >= FLOAT_OK_ACTIVITY) return 'high';
-  if (activity >= 0.4) return 'mid';
+  // 1e-9 여유 — 로트 g 가중 평균이 0.7을 0.6999…로 내려 밴드가 바뀌지 않게(sim gradeOf와 같은 방식)
+  if (activity + 1e-9 >= FLOAT_OK_ACTIVITY) return 'high';
+  if (activity + 1e-9 >= 0.4) return 'mid';
   return 'low';
 }
 
 /** 산미 밴드 — GDD §3-5 냄새 구간과 같은 경계(35 밀가루·요거트 / 60 식초) */
 export function acidityBand(acidity: number): AcidityBand {
-  if (acidity < 35) return 'mild';
-  if (acidity < 60) return 'tangy';
+  if (acidity + 1e-9 < 35) return 'mild';
+  if (acidity + 1e-9 < 60) return 'tangy';
   return 'sour';
 }
 

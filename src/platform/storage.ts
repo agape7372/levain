@@ -14,6 +14,8 @@ export interface StorageAdapter {
   mirror(json: string): void;
   /** 미러 원문 — 복구 사다리 2단 */
   loadMirror(): Promise<string | null>;
+  /** 읽을 수 없는 저장본 원문을 따로 남긴다(한 칸, 덮어씀) — 새 게임 저장이 덮기 전의 마지막 보험 */
+  keepBroken?(raw: string): void;
 }
 
 /** 모듈 최상위에서 localStorage를 만지지 않는다 — node(vitest)·스토리지 차단 WebView 모두에서 죽는다 */
@@ -60,6 +62,16 @@ export function createStorage(key: string = SAVE_KEY): StorageAdapter {
       } catch {
         return null;
       }
+    },
+
+    keepBroken(raw: string): void {
+      // 주·미러 양쪽에 — 곧 새 게임 저장이 두 곳을 다 덮는다. 실패는 삼킨다(보험일 뿐)
+      try {
+        primary()?.setItem(`${key}:broken`, raw);
+      } catch {
+        /* 용량 초과 */
+      }
+      if (isNative()) void Preferences.set({ key: `${key}:broken`, value: raw }).catch(() => undefined);
     },
   };
 }

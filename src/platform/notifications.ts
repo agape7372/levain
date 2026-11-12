@@ -17,7 +17,6 @@ export interface NotifierPort {
   requestPermission(): Promise<PermissionState>;
   /** 조회 전용 — 설정 화면이 "꺼져 있어요" 안내를 띄울지 판단한다(권한 요청을 유발하지 않음) */
   checkPermission(): Promise<PermissionState>;
-  openSettings(): Promise<void>;
   /** 알림 탭 → 해당 화면으로 (딥링크, 2026-09-03). 웹은 no-op */
   onTapped(cb: (copyKey: NotifySlot['copyKey']) => void): void;
 }
@@ -61,9 +60,9 @@ function toScheduled(slot: NotifySlot): LocalNotificationSchema {
     // schedule마다 시스템 "Alarms & reminders" 설정 화면을 강제로 연다 (에뮬 실측).
     // 밥 리마인더에 분 단위 정밀도는 불필요 — 명시적 inexact (GDD §7).
     isExactNotification: false,
-    schedule: slot.weekly
-      ? { at: new Date(slot.at), every: 'week', repeats: true }
-      : { at: new Date(slot.at) },
+    // weekly도 원샷 — 플러그인은 at이 있으면 every를 무시하고 간격을 (at − 지금)으로 잡아
+    // 몇 시간마다, 재부팅 뒤엔 분 단위로 반복했다(T2-04). 재예약은 복귀·액션마다 어차피 한다.
+    schedule: { at: new Date(slot.at) },
   };
 }
 
@@ -92,26 +91,34 @@ export function createNotifier(): NotifierPort {
     }
   }
 
+  async function applyNow(plan: NotifyPlan): Promise<void> {
+    if (!isNative()) return;
+
+    // 이 앱은 자기 로컬 알림 전부를 소유한다 — 대기 중인 것을 전부 걷고 플랜만 다시 심는다.
+    try {
+      const pending = await LocalNotifications.getPending();
+      const ids = pending?.notifications ?? [];
+      if (ids.length > 0) await LocalNotifications.cancel({ notifications: ids.map((n) => ({ id: n.id })) });
+    } catch {
+      /* 취소 실패는 같은 고정 id 재예약으로 덮인다 */
+    }
+
+    if (plan.slots.length === 0) return;
+    await ensureChannel();
+    try {
+      await LocalNotifications.schedule({ notifications: plan.slots.map(toScheduled) });
+    } catch {
+      /* 권한 거부 등 — 알림 없이도 전 기능 정상 (GDD §7) */
+    }
+  }
+
+  // 직렬화 — 동기 dispatch 2회(냉장 갈 준비)면 두 실행이 await 사이로 엇갈려 앞 플랜 슬롯이 남았다(T7-03)
+  let chain: Promise<void> = Promise.resolve();
+
   return {
-    async applyPlan(plan: NotifyPlan): Promise<void> {
-      if (!isNative()) return;
-
-      // 이 앱은 자기 로컬 알림 전부를 소유한다 — 대기 중인 것을 전부 걷고 플랜만 다시 심는다.
-      try {
-        const pending = await LocalNotifications.getPending();
-        const ids = pending?.notifications ?? [];
-        if (ids.length > 0) await LocalNotifications.cancel({ notifications: ids.map((n) => ({ id: n.id })) });
-      } catch {
-        /* 취소 실패는 같은 고정 id 재예약으로 덮인다 */
-      }
-
-      if (plan.slots.length === 0) return;
-      await ensureChannel();
-      try {
-        await LocalNotifications.schedule({ notifications: plan.slots.map(toScheduled) });
-      } catch {
-        /* 권한 거부 등 — 알림 없이도 전 기능 정상 (GDD §7) */
-      }
+    applyPlan(plan: NotifyPlan): Promise<void> {
+      chain = chain.catch(() => undefined).then(() => applyNow(plan));
+      return chain;
     },
 
     async requestPermission(): Promise<PermissionState> {
@@ -136,10 +143,6 @@ export function createNotifier(): NotifierPort {
       }
     },
 
-    async openSettings(): Promise<void> {
-      // 코어 플러그인에 앱 설정 딥링크가 없다 — 안내 문구(copy.notify.permissionSettings)로 산다.
-    },
-
     onTapped(cb: (copyKey: NotifySlot['copyKey']) => void): void {
       if (!isNative()) return;
       void LocalNotifications.addListener('localNotificationActionPerformed', (e) => {
@@ -149,12 +152,3 @@ export function createNotifier(): NotifierPort {
     },
   };
 }
-
-/** 알림을 쓰지 않는 경로(테스트)용 */
-export const noopNotifier: NotifierPort = {
-  applyPlan: async () => undefined,
-  requestPermission: async () => 'unavailable',
-  checkPermission: async () => 'unavailable',
-  openSettings: async () => undefined,
-  onTapped: () => undefined,
-};

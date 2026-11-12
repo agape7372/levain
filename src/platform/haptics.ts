@@ -11,10 +11,6 @@ export function setHapticsEnabled(value: boolean): void {
   enabled = value;
 }
 
-export function isHapticsEnabled(): boolean {
-  return enabled;
-}
-
 async function fire(kind: HapticKind): Promise<void> {
   if (!isNative()) return;
   try {

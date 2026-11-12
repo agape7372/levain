@@ -71,7 +71,8 @@ describe('recipes — discard 쿨다운·비율 해금 (GDD §6-1·§3-3)', () =
 
     const fed = applyAction(stage2, { type: 'feed', ratio: '1:1:1' }, t0 + 2 * HOUR).state;
     const ok = applyAction(fed, { type: 'bakeDiscard', recipeId: 'pancake' }, t0 + 3 * HOUR);
-    expect(ok.events).toEqual([{ type: 'bakedDiscard', recipeId: 'pancake' }]);
+    // 굽기는 되지만 직전 discard에서 3h라 굽기 미션은 안 센다(벽시계 6h 게이트, 감사 T1-02)
+    expect(ok.events).toEqual([{ type: 'bakedDiscard', recipeId: 'pancake', counted: false }]);
     expect(ok.state.lastDiscardBakeAt).toBe(t0 + 3 * HOUR);
   });
 
@@ -99,7 +100,7 @@ describe('recipes — 해금은 집 최고 단계 houseStage', () => {
 
   it('houseStage 4면 0단계 르방으로도 팬케이크(discard 2단계)를 만든다', () => {
     const res = applyAction(young, { type: 'bakeDiscard', recipeId: 'pancake', houseStage: 4 }, t0);
-    expect(res.events).toEqual([{ type: 'bakedDiscard', recipeId: 'pancake' }]);
+    expect(res.events).toEqual([{ type: 'bakedDiscard', recipeId: 'pancake', counted: true }]);
   });
 
   it('houseStage 부재 = 기존 동작 — 활성 르방 단계로 막힌다 (후방 호환)', () => {

@@ -30,6 +30,8 @@ export function reanchor(state: SimState, delta: number): SimState {
 }
 
 export function advance(state: SimState, now: number): SimState {
+  // NaN·Infinity면 타임스탬프가 비유한이 돼 저장에서 르방이 버려진다 — 받지 않는다
+  if (!Number.isFinite(now)) return state;
   let s = state;
 
   if (now < s.lastSimulatedAt - REWIND_TOLERANCE_MS) {

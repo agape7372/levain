@@ -42,6 +42,31 @@ if (!/^\d+\.\d+\.\d+$/.test(version)) {
   process.exit(1);
 }
 
+const historyPath = path.join(root, 'ota', 'history.json');
+let history = [];
+if (existsSync(historyPath)) {
+  try {
+    const parsed = JSON.parse(readFileSync(historyPath, 'utf8'));
+    if (Array.isArray(parsed)) history = parsed;
+    else console.error('ota/history.json이 배열이 아닙니다 — 새로 시작합니다.');
+  } catch {
+    console.error('ota/history.json 파싱 실패 — 새로 시작합니다.');
+  }
+}
+
+/** history에서 가장 높은 버전 — 없으면 null */
+function latestVersion(entries) {
+  const vs = entries.map((e) => e?.version).filter((v) => typeof v === 'string' && /^\d+\.\d+\.\d+$/.test(v));
+  return vs.sort(compareSemver).at(-1) ?? null;
+}
+
+// 같은 버전 재발행·다운그레이드 거부 — 기기는 지금 버전 이하 매니페스트를 무시하므로 아무에게도 가지 않는다(감사 T3-13)
+const latest = latestVersion(history);
+if (latest && compareSemver(version, latest) <= 0) {
+  console.error(`${version}은 이미 발행된 최신 ${latest}보다 높지 않습니다 — 더 높은 버전으로 발행하세요.`);
+  if (!dryRun) process.exit(1); // dry-run은 아무것도 쓰지 않으니 경고만
+}
+
 // APP_VERSION 단일 출처(2026-09-03) — 수동 계좌 드리프트(1.3.7 vs 1.3.9 실사고) 방지
 if (!dryRun) {
   const pkgPath = path.join(root, 'package.json');
@@ -147,17 +172,6 @@ console.log(`저장: ${path.relative(root, bundlePath)}`);
 writeFileSync(path.join(otaDir, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 console.log('저장: ota/manifest.json');
 
-const historyPath = path.join(otaDir, 'history.json');
-let history = [];
-if (existsSync(historyPath)) {
-  try {
-    const parsed = JSON.parse(readFileSync(historyPath, 'utf8'));
-    if (Array.isArray(parsed)) history = parsed;
-    else console.error('ota/history.json이 배열이 아닙니다 — 새로 시작합니다.');
-  } catch {
-    console.error('ota/history.json 파싱 실패 — 새로 시작합니다.');
-  }
-}
 history.push(manifest);
 writeFileSync(historyPath, JSON.stringify(history, null, 2) + '\n');
 console.log('저장: ota/history.json');
