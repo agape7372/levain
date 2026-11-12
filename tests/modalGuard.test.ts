@@ -86,14 +86,14 @@ describe('modal — 닫힘 중 입력 차단 (T7-01)', () => {
 });
 
 describe('modal — 포커스·제목 연결 (T7-20)', () => {
-  it('열면 카드 안 첫 버튼으로, 닫으면 이전 포커스로 돌아간다', () => {
+  it('열면 카드로(첫 버튼이 아니다 — 되돌릴 수 없는 단추가 첫 자리일 수 있다), 닫으면 이전 포커스로 돌아간다', () => {
     const opener = doc.createElement('button');
     opener.focus();
     const content = doc.createElement('div');
     const first = doc.createElement('button');
     content.append(first, doc.createElement('button'));
     const h = openModal(content as unknown as HTMLElement, { title: '제목' });
-    expect(doc.activeElement).toBe(first);
+    expect(doc.activeElement).toBe(h.el);
     h.close();
     expect(doc.activeElement).toBe(opener);
   });

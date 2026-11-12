@@ -94,7 +94,9 @@ export function openModal(content: HTMLElement, opts: ModalOptions = {}): ModalH
 
   // 포커스는 모달 안으로, 닫으면 연 자리로 (가둠까지는 하지 않는다 — 뒤는 inert라 Tab이 새지 않는다).
   // preventScroll — 긴 시트가 첫 단추 자리로 스크롤된 채 열리지 않게, 닫힐 때 뒤 화면이 튀지 않게
-  (card.querySelector('button') ?? card).focus({ preventScroll: true });
+  // 첫 단추가 아니라 카드가 받는다 — 부트 모달(곰팡이·브리핑)에서 첫 단추에 브라우저 포커스 링이 그려졌고,
+  // 그 첫 단추가 「보내주고 새로 시작하기」 같은 되돌릴 수 없는 쪽일 수 있다. 카드는 이름(aria-label·labelledby)을 읽힌다
+  card.focus({ preventScroll: true });
   // Esc = 맨 위 모달 닫기 (Android 뒤로와 같은 계약 — router의 closeTopModal). 문서에 한 번만 건다
   if (!escBound && typeof document.addEventListener === 'function') {
     escBound = true;
