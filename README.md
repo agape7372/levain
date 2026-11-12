@@ -16,7 +16,7 @@ TypeScript(strict) · Vite · three.js(npm) · vitest · Capacitor 8 (Android, �
 ```bash
 npm install
 npm run dev      # 웹 개발 서버
-npm test         # sim 코어 vitest
+npm test         # vitest 전 suite (sim·store·platform·UI 계약)
 npm run build    # dist/ (Capacitor webDir)
 ```
 
@@ -30,7 +30,12 @@ Android 빌드·에뮬·서명·Play 제출은 [docs/RELEASE.md](docs/RELEASE.md
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 코드 계약·레이어링·저장·플랫폼 **정본** |
 | [docs/VISUAL.md](docs/VISUAL.md) | 씬·uniform·연출·UI 룩 **정본** |
 | [docs/RELEASE.md](docs/RELEASE.md) | 빌드·서명·Play 제출 절차 |
-| [docs/QA.md](docs/QA.md) | 수동 QA 릴리스 게이트 |
+| [docs/QA.md](docs/QA.md) | 수동 QA 릴리스 게이트 · 감사 하네스(`scripts/qa-shots.mjs`) |
+| [docs/BREADS.md](docs/BREADS.md) | 빵 3D(GLB) 제작 절차 |
+| [docs/INGREDIENTS.md](docs/INGREDIENTS.md) | 재료 3D(GLB) 제작 절차·예산 |
+| [docs/PRIVACY.md](docs/PRIVACY.md) | 개인정보처리방침 원문(게시본 = `ota/privacy.html`) |
+| [docs/STORE_LISTING.md](docs/STORE_LISTING.md) | Play 등록정보·앱 콘텐츠·데이터 보안 답안 |
+| [docs/audit/AUDIT-2026-11-12.md](docs/audit/AUDIT-2026-11-12.md) | 출시 전 전면 감사(2026-11-12) 정본 · 남은 사용자 작업 |
 | docs/design/ | 설계 워크플로 원문 (정본 아님 — 참고용) |
 
 세 정본이 충돌하면 각자의 관할 영역이 이긴다.

@@ -1,13 +1,16 @@
 # 르방이 — 빌드·릴리스 절차
 
 > podoal 셸(`D:\podoal-shell-spike\README.md`)에서 절차만 이식. 르방이는 **로컬 번들 셸**이라
-> `server.url` 라이브 리로드·FCM·Firebase·AdMob·딥링크 관련 절차는 전부 해당 없음.
+> `server.url` 라이브 리로드·FCM·Firebase·딥링크 관련 절차는 전부 해당 없음.
+> AdMob은 2026-08-30부터 쓴다(§6-2). 출시 전 감사 정본 = [audit/AUDIT-2026-11-12.md](audit/AUDIT-2026-11-12.md).
 > (OTA 정적 배포처는 별개 — §8.)
 
 ## 1. 로컬 검증 (CI 없음 — GitHub Actions 비활성, 전부 로컬)
 
 ```bash
-npm test              # vitest — sim 코어 전 suite
+npm test              # vitest 전 suite (sim·store·platform·UI 계약, 2026-11-12 기준 34파일 372)
+npx tsc --noEmit && npx eslint src
+node scripts/gen-licenses.mjs   # 의존성을 바꿨으면 public/licenses.txt를 다시 만들어 같이 커밋
 npm run build         # vite build → dist/
 npm run dev           # 웹 확인 (Chrome 모바일 뷰포트)
 ```
@@ -26,6 +29,10 @@ cd ota && npx vercel --prod --scope jirings-projects
 curl -s https://levain-ota.vercel.app/manifest.json   # version 확인
 ```
 
+**2026-11-12 원인 제거(감사 T3-05)**: 내장 번들 비교 기준이 이제 `versionName`이 아니라 `APP_VERSION`(빌드 때의 package.json 버전)이다.
+`versionName`도 `build.gradle`이 package.json에서 읽는다. 매니페스트가 내장 번들보다 높을 때만 받으므로 위 다운그레이드는 더 생기지 않는다.
+아래 문장은 「APK에 넣은 코드를 OTA 사용자에게도 같이 보낸다」는 뜻으로 남긴다.
+
 `versionName`을 올리는 빌드라면 OTA 버전도 그보다 높게 잡는다. 발행을 건너뛰려면 매니페스트가 네이티브 이하여야 한다(그 경우 OTA 자체가 무효). 적용 트리거는 §8대로 **백그라운드 전환 후 복귀**.
 
 ## 2. Android 빌드
@@ -38,6 +45,9 @@ JAVA_HOME="D:/android-toolchain/jdk21" ./gradlew assembleDebug
 ```
 
 - `android/local.properties`(sdk.dir)는 기기별 — 커밋 금지. 새 PC에선 `sdk.dir=D:\\android-toolchain\\sdk` 직접 생성.
+- **버전**(2026-11-12): `versionName`은 `build.gradle`이 `package.json` version을 읽는다. 손으로 쓰지 않는다. `versionCode`는 손으로 올린다(현재 5).
+- 서명 없는 디버그 빌드 확인 환경: `JAVA_HOME=D:/android-toolchain/jdk21` · `ANDROID_HOME=D:/android-toolchain/sdk`.
+- `npm run build`는 `dist/`를 비우지 않는다. 깨끗한 dist로 확인하려면 `npm run ota:release -- <version> --dry-run`(dist를 비우고 빌드한다).
 - 릴리스: `./gradlew bundleRelease` → 서명 AAB.
 
 ## 3. 에뮬레이터 (D:\android-toolchain — podoal에서 검증된 조합)
@@ -83,7 +93,8 @@ npx @capacitor/assets generate --android \
 - gradle 서명: `android/key.properties`(gitignore) — 분실 시 credentials.txt 값으로 재작성.
 - 릴리스: `cd android && JAVA_HOME="D:/android-toolchain/jdk21" ./gradlew bundleRelease`
   → `android/app/build/outputs/bundle/release/app-release.aab`
-- Play App Signing 사용(업로드 키 분리) 권장. **키 분실 = Play 업데이트 불가.**
+- Play App Signing 사용(업로드 키 분리). 업로드 키를 잃으면 Play 콘솔에서 재설정을 요청할 수 있다(2026-11-12 정정).
+  Play App Signing 없이 앱 서명 키를 잃으면 업데이트 불가.
 
 ## 6. appId (확정: 2026-08-23)
 
@@ -113,18 +124,23 @@ npx @capacitor/assets generate --android \
   (`docs/STORE_LISTING.md` 2026-08-30 개정판: 광고 있음·광고 ID 사용·기기 ID 공유).
   처리방침도 게시본(`ota/privacy.html`)까지 같이 배포해야 앱 내 링크와 어긋나지 않는다.
 - SSV 미사용(백엔드 0) — 클라이언트 보상. 콘솔에서 SSV 설정을 켜지 말 것.
+- **초기화 순서**(2026-11-12): UMP 동의 확인(`requestConsentInfo` → 필요하면 `showConsentForm`) → `initialize({ maxAdContentRating: MaxAdContentRating.General })`.
+  동의가 REQUIRED인 지역에서만 설정에 「광고 개인정보 설정」 행이 생긴다. EEA·UK 배포 여부는 사용자 결정.
+- **SDK 버전 고정**: `android/variables.gradle` `playServicesAdsVersion = '25.4.0'`. 플러그인 기본값이 바뀌어도 AAB가 흔들리지 않게 한다.
+- 출시 전 앱도 AdMob 콘솔에 수동 등록하면 App ID·광고 단위 ID를 받는다. Play 게시를 기다릴 필요가 없다.
+- Data Safety 답안 정본은 [audit/AUDIT-2026-11-12.md](audit/AUDIT-2026-11-12.md) ⑥이다(2026-11-13. 위 08-30 개정판보다 우선).
 
 ## 7. Play Console 내부테스트 제출물 체크리스트
 
 - [ ] 서명 AAB (`bundleRelease` + keystore)
-- [ ] **개인정보처리방침 URL** — 수집 데이터 0·완전 로컬이라 최단 코스. 정적 페이지 1장
-      (기존 Vercel 계정에 정적 호스팅 또는 GitHub Pages)
-- [ ] **Data Safety 폼** — "수집하는 데이터 없음, 제3자 공유 없음, 모든 데이터 기기 내 저장"
+- [ ] **개인정보처리방침 URL**: `ota/privacy.html`. 2026-11-13 개정판(AdMob SDK 자동 수집 · 국외 이전 고지)은
+      코드 OTA와 같이 또는 뒤에 게시한다
+- [ ] **Data Safety 폼**: 답안 = [audit/AUDIT-2026-11-12.md](audit/AUDIT-2026-11-12.md) ⑥. AdMob SDK가 대략적 위치·앱 상호작용·진단·기기 ID를 수집·공유한다(필수). 「수집 없음」은 틀린 답(2026-11-12)
 - [ ] 콘텐츠 등급 설문 — 전체이용가(폭력·도박·공포 요소 0)
 - [ ] 스토어 등록정보: 앱 이름 "르방이", 짧은 설명, 자세한 설명
 - [ ] 아이콘 512×512 PNG
 - [ ] 피처 그래픽 1024×500
-- [ ] 스크린샷 최소 2장 (폰 세로)
+- [ ] 스크린샷 최소 2장 (폰 세로). `node scripts/store-shots.mjs <outDir>`(폰·7"·10" 각 2장)
 - [ ] 내부테스트 트랙 테스터 이메일 등록
 - [ ] targetSdk — 현재 `android/variables.gradle`이 **36**(Android 16). 정본은 그 파일이지 이 줄이 아니다
 
@@ -161,11 +177,13 @@ cd ota && npx vercel --prod --scope jirings-projects   # 실제 배포는 이 �
 `scripts/ota-release.mjs`가 `ota/manifest.json`(현재 배포 버전)과 `ota/history.json`(발행 이력 누적)을
 같이 갱신하고, `ota/bundles/`에는 최근 4개 버전만 남기고 자동 정리한다.
 
-**롤백**: `ota/history.json`에서 되돌릴 버전의 항목(version/url/checksum)을 찾아 그대로
-`ota/manifest.json`에 덮어쓰고 다시 `cd ota && npx vercel --prod --scope jirings-projects`로 배포한다.
-앱은 다음 확인 때 그 버전을 받는다. **주의**: `bundles/*.zip`은 1년 immutable 캐시로 서빙되므로
-같은 파일명을 새로 쓰지 않는다 — 롤백은 기존 zip을 다시 가리키기만 할 뿐 파일을 교체하지 않는다.
-4개보다 오래된 버전은 zip 자체가 정리되어 없을 수 있으니 history.json으로 존재를 먼저 확인.
+**롤백**(2026-11-12 다시 씀, 감사 T2-06): 옛 항목을 manifest에 덮어쓰는 방법은 **안 먹는다**.
+기기는 지금 버전 이하의 매니페스트를 무시한다(다운그레이드 거부). `ota-release`도 최신 이하 버전 발행을 거부한다.
+쓸 수 있는 롤백은 하나다: 되돌릴 커밋을 체크아웃하고 `npm run ota:release -- <현행보다 높은 버전>`으로 재발행한 뒤 배포한다.
+- 부팅에 실패해 플러그인이 되돌린 버전은 `levain:ota:bad`에 남아 다시 받지 않는다. 고친 코드는 새 버전 번호로 낸다.
+- 매니페스트 url은 앱에 박힌 `https://levain-ota.vercel.app/bundles/` 아래여야 하고 checksum은 64자 hex여야 한다.
+  릴리스 때 `LEVAIN_OTA_BASE`로 다른 주소를 쓰면 앱이 그 매니페스트를 무시한다.
+- `bundles/*.zip`은 1년 immutable 캐시로 서빙되므로 같은 파일명을 새로 쓰지 않는다.
 **⚠️ 저장 스키마 하위호환(2026-08-24 추가)**: 저장 v2(멀티 르방) 이후 번들이 한 번이라도
 사용자 기기에 저장을 쓰면, **v2를 모르는 옛 번들로 롤백 금지** — 옛 코드가 schemaVersion 2를
 읽지 못해 조용히 새 게임으로 덮어쓴다(미러까지). 롤백 후보는 반드시 v2 인지 버전 중에서 고른다.
@@ -180,8 +198,8 @@ cd ota && npx vercel --prod --scope jirings-projects   # 실제 배포는 이 �
 **통 로트 원장 — 1.5.0**(2026-09-05, GDD §6-2 개정): `shared.pantryLots[]`(뗀 순간의 발효력·산미·가루를 담는 로트, 굽기는 레시피 best-fit 선택)를 무버전
 추가 키로 얹고, `shared.pantry`(총 g)는 Σ로트의 **미러**로 계속 저장한다. 그래서 **1.4.x로 롤백해도 저장은 안전**하다 — 옛 코드는
 `pantryLots`를 모를 뿐 g은 그대로 읽고, 등급은 옛 규칙(활성 르방)으로 돌아간다. 옛 번들에서 떼거나 굽어 g이 바뀌면 로트와 어긋나는데,
-다시 1.5.0으로 올라올 때 적재기가 Σg를 pantry에 맞춘다(부족분은 레거시 품질 로트로 맨 앞에, 초과분은 앞에서 잘라냄) — 세이브 손실 0,
-잃는 건 옛 번들에서 뗀 그램의 "뗀 순간 품질"(레거시 0.8/25로 대체)뿐이다. 1.4.0 저장본을 1.5.0이 처음 읽을 때도 같은 규칙으로 로트
+다시 1.5.0으로 올라오면 **모든** 로트가 레거시 1개(0.8/25·white)로 합쳐진다. 1.4.0이 shared를 다시 조립하며 `pantryLots` 키를
+통째로 버리기 때문이다(2026-11-12 정정, 감사 T2-18. 이전 판은 「옛 번들에서 뗀 그램의 품질만 잃는다」고 썼다). g·르방·도감은 무손실이다. 1.4.0 저장본을 1.5.0이 처음 읽을 때도 같은 규칙으로 로트
 1개가 물질화된다. 1.5.0은 네이티브 변경 0 — OTA 단독 발행, AAB 재빌드 없음.
 
 **★"무버전 추가 키라 안전"은 키 추가에만 성립한다 — 기존 키가 담는 값의 집합이 커진 경우는 다르다**
@@ -205,11 +223,14 @@ cd ota && npx vercel --prod --scope jirings-projects   # 실제 배포는 이 �
 다른 PC에서 `vercel --prod`를 돌리면 로컬에 없는 과거 zip이 배포본에서 사라져 롤백 URL이 404가 된다 —
 새 PC에서 배포하기 전에 `ota/bundles/`를 함께 옮길 것.
 
-**안전장치**: 앱은 부팅 즉시 `notifyAppReady()`를 호출한다(`src/platform/ota.ts`). 이걸 받지 못하면
-(크래시 등으로 부팅이 안 끝나면) 플러그인이 "깨진 번들"로 판단해 다음 실행에 자동으로 이전 번들로
-되돌아간다 — 별도 조치 불필요. 번들 적용은 백그라운드 전환 후 복귀에만 일어난다(세션 중 무적용).
+**안전장치**(2026-11-12 개정): `app.ts`가 `initOta({ deferReady: true })`로 시작하고 부팅 끝에 `markOtaReady()`를 부른다.
+이 짝이 와야 `notifyAppReady()`가 나간다. 부팅이 안 끝나면(크래시 등) 플러그인이 새 번들을 30초 뒤 "깨진 번들"로 판단해 이전 번들로 되돌린다.
+**짝 하나가 빠지면 모든 새 번들이 30초 뒤 롤백된다.** 부팅 코드를 고칠 때 이 짝을 지킨다(`tests/otaStage.test.ts`). 번들 적용은 백그라운드 전환 후 복귀에만 일어난다(세션 중 무적용).
 
-**★새 APK/AAB를 구웠다면 OTA도 같이 발행할 것** — 매니페스트가 `versionName`보다 높은 옛 번들을 가리키고 있으면 새 APK가 백그라운드 복귀 때 옛 웹 자산으로 덮인다(다운그레이드). 절차·근거는 §1-1.
+**★새 APK/AAB를 구웠다면 OTA도 같이 발행할 것**: OTA 사용자도 같은 코드를 받게 한다. 옛 다운그레이드 사고는 2026-11-12에 막혔다(§1-1).
+
+**기록 복구 지원**(2026-11-12): 저장을 못 읽어 새로 시작한 기기는 원문을 `levain:save:broken`(localStorage + Preferences)에 남긴다.
+백업 규칙(`res/xml/backup_rules.xml`·`data_extraction_rules.xml`)은 OTA 번들 폴더 `versions/`를 빼고 나머지를 백업한다.
 
 **Play 정책**: 웹 자산(JS/HTML/CSS 등) 무선 갱신은 허용 범위. 네이티브 코드·권한 교체는 금지 —
 이 구조는 전자만 다루므로 해당 없음. 위 표의 "안 되는 것"이 필요해지면 통상 절차(§2~§6)로 AAB 재배포.

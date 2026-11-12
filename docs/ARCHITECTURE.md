@@ -51,7 +51,7 @@ levain/
 │  │  ├─ components/ modal.ts toast.ts observeCard.ts settingsModal.ts
 │  │  ├─ copy.ts               # 전체 한국어 문구 사전 (한 파일 — 전수 감수용)
 │  │  └─ format.ts             # 시간·수치 한국어 포맷
-│  ├─ audio/sounds.ts          # WebAudio 합성 3종 + 마스터 게인·음소거
+│  ├─ audio/sounds.ts          # WebAudio 합성 9종 + 마스터 게인·음소거 (VISUAL §6)
 │  ├─ platform/                # 부수효과 전담 포트. 웹/네이티브 분기는 전부 여기서 끝
 │  │  ├─ clock.ts              # Clock { now(): number } + systemClock / FakeClock
 │  │  ├─ storage.ts            # StorageAdapter: localStorage 주 + Preferences 미러
@@ -76,6 +76,7 @@ levain/
 
 **의존 방향(ESLint `no-restricted-imports`로 잠금)**: `sim` ← `store` ← (`ui`, `render`).
 `platform`은 `app.ts`가 주입. sim은 아무것도 import하지 않는다.
+2026-11-12부터 sim에서 `@capacitor/*` import와 인자 없는 `new Date()`도 린트가 막는다(`eslint.config.js`).
 
 ## 2. 시뮬레이션 코어 계약
 
@@ -105,16 +106,23 @@ export type Action =
 ```
 
 - **닫힌 함수**: `advance`는 시계 역행 재정박(GDD §3-8)과 60일 클램프만 수행하고 `lastSimulatedAt`을 갱신.
+  `now`가 유한수가 아니면(NaN·Infinity) 상태를 그대로 돌려준다(2026-11-12). store의 tick·dispatch도 같은 가드를 둔다.
   나머지는 전부 `deriveSnapshot`의 파생 — advance에 적분 루프 없음.
   (예외적으로 acidity만 누적값: advance가 구간별 요율로 갱신 — 구간 경계는 닫힌 식으로 산출, 루프 없음.)
 - **액션 순서 불변식**: `dispatch(action)` = `tick(now)` 선행 → `applyAction`. gameStore 파이프라인에 계약으로 박는다.
 - **떼기/통 게이트 분리**(2026-08-25, 보관 통 경제 — GDD §6-2): `split`(떼어내기)의 게이트(`SPLIT_MIN_G`·
-  마지막 급여 후 유효 6h)는 sim(`actions.ts`)이 진다 — 순수 함수라 전역 상태를 모른다. 반대로 굽기의
+  마지막 급여 후 유효 `splitGateH` = min(6h, 비율 피크 시작). 2026-11-12부터 1:1:1은 4.5h)는 sim(`actions.ts`)이 진다 — 순수 함수라 전역 상태를 모른다. 반대로 굽기의
   통 잔량 게이트는 store(`gameStore.pantryGate`)가 진다 — `canBakeBread`는 이제 단계만 보고, 원가는
   sim 밖의 전역 `shared.pantry`에서 나간다. "sim은 전역을 모른다"는 같은 원칙이 도감·재료함·경제와도
   동일 — pantry는 그 네 번째 사례일 뿐이다.
 - **SimEvent** (`'peaked' | 'becameHungry' | 'wentDormant' | 'recipeUnlocked' | 'stageUp' | 'revived'` …):
   반환값으로만 흘린다 — 상태에 넣지 않음. UI 토스트·연출 트리거용.
+  `fed`·`bakedDiscard`는 `counted: boolean`을 싣는다. economy(미션)는 `counted`만 센다(2026-11-12, GDD §6-5).
+- **store가 내는 stageUp**(2026-11-12): sim의 `stageUp`은 급여로 넘긴 승급만 낸다. store는 집 최고 단계가 오를 때마다
+  `houseStageUps`로 빠진 단계를 채운다(tick·dispatch). 부팅 때 정산분은 `InitResult.stageUps`로 넘긴다.
+- **dispatch 원자성**(2026-11-12): `doDispatch`는 advanceTo부터 deriveSnapshot까지 try로 감싼다. throw하면 env·snap을 dispatch 전으로 되돌린다.
+  `setActiveSim` 다음 `syncStageMax(now)`를 불러 승급 보상이 같은 dispatch에 들어간다.
+- **광고 지급 가능 수**: `adDeliveryRemaining()`은 캡 미만 재료가 없으면 0이다. UI는 이 값으로 광고 행을 잠근다.
 - **결정론 테스트**: 닫힌 함수라 "파생값이 저장·tick 시점과 무관"을 검증
   (임의 시점에 advance를 몇 번 끼워 넣어도 같은 now의 Snapshot이 동일).
 - **SimState**: `flake: { madeAt: number; maturity: number } | null` 필드 추가 — `flake.madeAt`은 시계 역행
@@ -123,6 +131,7 @@ export type Action =
   moldy 중 허용 액션은 `discardStarter`/`restoreFlake` 뿐, 그 외는 전부 `moldBlocked` 이벤트로 거부하고
   상태 불변.
 - **알림**: `planNotifications` 반환 슬롯이 2종에서 **3종**으로 확장(GDD §7) — 신규 슬롯 3(`moldWarn`, 곰팡이 예고).
+  2026-11-12 기준 슬롯 1~8. 냉장 주간은 전용 `NOTIFY_SLOT_FRIDGE = 8`이다.
 - **`MAX_CATCHUP_MS`**(constants.ts): 60일 유지. 근거 갱신 — 실온에서는 곰팡이 종착(≤15일)과 산미 포화가
   고정점이라 그 이상은 상태 불변. 곰팡이 판정 자체는 파생이라 이 캡과 무관하며, 캡은 acidity 적분의
   안전벨트일 뿐이다(GDD §3-8).
@@ -132,7 +141,7 @@ export type Action =
 - `Clock { now(): number }` — gameStore.tick만 clock 접근. sim은 Clock조차 모른다.
 - 포그라운드 tick: **5초 setInterval** (rAF 아님 — 백그라운드에서 멈추는 rAF에 게임 시간을 태우지 않는다).
 - rAF는 렌더 전용, **홈 화면 + visible일 때만** 구동.
-- 렌더 `uTime`은 `performance.now()` 기반 — rAF 델타 누적 금지.
+- 렌더 `uTime`은 `performance.now()` 기반 — rAF 델타 누적 금지. `start()`마다 원점을 다시 잡는다(`shaderT0`, float32 정밀도, 2026-11-12).
 
 ## 3. 저장
 
@@ -153,8 +162,17 @@ interface SaveEnvelope {
                                                // 무버전 추가 키. 부재→pantry>0이면 레거시 로트 1개(act 0.8·acid 25·white)로 물질화.
                                                // 적재 시 Σg를 pantry에 맞춘다(부족분 = 레거시 로트를 맨 앞에, 초과분 = 앞에서 잘라냄).
   };
-  settings: { muted: boolean; haptics: boolean; notifyEnabled: boolean };
-  flags: { onboarded: boolean; pendingBake: { recipeId: string; grade: string } | null };
+  settings: {                       // 2026-11-12 현행 모양 (persistence.ts SaveSettings)
+    muted: boolean; haptics: boolean; notifyEnabled: boolean;
+    notifyPeak: boolean; notifySour: boolean; notifyStage: boolean; notifyFirstWeek: boolean;
+    quietStartH: number; quietEndH: number;           // 무버전 추가 키
+  };
+  flags: {
+    onboarded: boolean;
+    pendingBake: { recipeId: string; grade: string; variantId?: string } | null;
+    retapHints: number;             // 쓰지 않음(재탭 힌트 삭제). 옛 저장과 모양을 맞추는 자리
+    dev?: boolean;                  // true일 때만 저장. 출시 빌드 개발자 도구 허용
+  };
 }
 ```
 
@@ -181,8 +199,12 @@ interface SaveEnvelope {
 - **미러 = Capacitor Preferences** (네이티브만, 저장 성공 후 fire-and-forget — Android WebView 스토리지
   evict 보험. SharedPreferences는 evict 대상 아님). 웹에서는 no-op.
 - 저장 시점 4종: 모든 액션 직후 / `visibilitychange hidden` / `App.pause` / 포그라운드 60초.
-  전부 같은 `persistence.save()` 하나.
+  전부 같은 `persistence.save()` 하나. 기록 불러오기 중엔 `reloading` 플래그로 hidden 저장을 건너뛴다.
+  reload 언로드 때 옛 메모리가 새 기록을 덮던 결함(2026-11-12, T2-01). 불러오기 저장이 실패하면 reload하지 않는다.
 - **복구 사다리(2계층)**: 주 파싱+범위 가드 → 실패 시 미러 → 실패 시 새 게임 + 담백한 안내.
+  못 읽은 원문은 `levain:save:broken`(localStorage + 네이티브 Preferences)에 남기고 7초 토스트 「저장된 기록을 읽을 수 없어 새로 시작해요」를 띄운다
+  (`loadDetailed` → `{ result, broken }`, `StorageAdapter.keepBroken`, 2026-11-12).
+  flags가 객체가 아니거나 `onboarded`가 boolean이 아니면 `onboarded=true`로 읽는다. 온보딩이 기록을 덮지 않게 하려는 것이다.
   가드는 손으로 쓴 타입·범위 검사(라이브러리 불필요). **NaN·범위 밖은 버리지 말고 clamp로 살린다.**
   starter 항목은 단위 관대 — 불량 항목만 폐기, 전 항목이 죽으면 새 게임.
 - **마이그레이션**: 파싱 순서는 **migrate(raw) → validateAndClamp(현행)** — 검증은 현행 스키마만
@@ -192,6 +214,7 @@ interface SaveEnvelope {
   새 게임으로 덮는다 — **롤백 대상은 반드시 v2 인지 번들**(RELEASE.md §8 주의).
 - **기기 이전**: 설정 "기록 내보내기/불러오기" — envelope JSON을 `@capacitor/filesystem` + 공유 시트
   (웹은 파일 다운로드/업로드). `android:allowBackup="true"` 유지 — 재설치 복원은 QA.md에서 실검증.
+  백업 규칙(`res/xml/backup_rules.xml`·`data_extraction_rules.xml`)이 OTA 번들 폴더 `versions/`를 뺀다(번들당 약 9.35MB, 2026-11-12).
 
 ## 4. 렌더러 계약
 
@@ -208,7 +231,9 @@ SimState → deriveSnapshot(state, now) → Snapshot → toRenderParams(snap) �
   컨텍스트 유실 = **전체 재구축**
   (`webglcontextlost` preventDefault→stop, `restored`→dispose→mount→마지막 params 재주입→start.
   씬이 작아 1프레임 미만 — 부분 복구 로직의 버그 표면을 사지 않는다).
-- resize: `#stage`에 ResizeObserver. DPR = `min(devicePixelRatio, 2)` 고정.
+  재구축 뒤 시드·마지막 params·실행 상태(멈춰 있던 씬은 멈춘 채)·쇼케이스 url을 다시 적용한다(2026-11-12, `onContextRestored`).
+  이전엔 시드가 기본값 0.37로 돌아갔다. 천 덮개 상태는 아직 잃는다.
+- resize: `#stage`에 ResizeObserver. DPR = `fitPixelRatio` = min(devicePixelRatio, 2, √(2.2e6 / (w×h))) (2026-11-12, 버퍼 픽셀 총량 상한).
 
 ## 5. UI 계약 — 2탭 4화면
 
@@ -218,8 +243,14 @@ SimState → deriveSnapshot(state, now) → Snapshot → toRenderParams(snap) �
 - **모달 = 중앙 팝업 고정** (`components/modal.ts` 하나로 강제. 바닥 시트 금지 — 사용자 규칙, 되돌림 방지 주석 필수).
   `footer` 옵션(2026-09-03)은 같은 중앙 팝업에 본문 스크롤 + 바닥 고정 footer를 더한 **시트형**이지 바닥 시트가 아니다.
   **모달 위 모달은 열지 않는다** — 확인이 필요하면 닫은 뒤 `confirmModal`(관찰 카드·빵 시트 선례).
+  설정 하위(알림·방해 없는 시간·라이선스)는 설정을 닫고 연다. 닫으면 부모로 돌아온다(`onClose`, 2026-11-12).
+  부팅 때 순서는 브리핑 → 곰팡이 → 구운 빵 재노출이다. 복귀 브리핑은 모달이 떠 있으면 건너뛴다.
+- **모달 접근성**(2026-11-12): 열면 카드(`tabindex -1`, 포커스 링 없음)가 포커스를 받고, 닫으면 이전 포커스로 돌린다.
+  첫 단추에 주지 않는 이유: 부트 모달의 첫 단추가 「보내주고 새로 시작하기」처럼 되돌릴 수 없는 쪽일 수 있다(`d92337f`). 이름은 제목의 `aria-labelledby` 또는 `ariaLabel` 옵션.
+  Esc는 맨 위 모달을 닫는다(`closeTopModal`). 열린 동안 뒤는 `inert`. `close()`는 첫머리에 카드를 `pointer-events:none`+`inert`로 막는다. `confirmModal` 확인은 1회만 받는다.
 - **획득 연출 = 비차단 레이어** (`components/celebrate.ts`, 2026-09-03): 모달이 아니라 z 45 오버레이(모달 위·토스트 아래).
-  호출 계약은 `celebrateIngredients(api, ids)`·`celebrateStageUp(api, stage)` 둘뿐, 열린 빵 계산·병합·퇴장은 내부.
+  호출 계약은 `celebrateIngredients(api, ids)`·`celebrateStageUp(api, stage, prevHouseStage)` 둘뿐, 열린 빵 계산·병합·퇴장은 내부.
+  열린 빵 수는 집 최고 단계 기준이다(2026-11-12). 천이 덮여 있으면 `app.ts`의 `stageQueue`에 모았다가 `scene.onClothOpen` 때 띄운다.
 - **시각 원형은 `components/recipeVisuals.ts`**: 카드·상태 줄·시트 머리·정보 행(`infoRows`)·선반 타일·칩·구분선·형태 행·결과 카드의
   DOM 모양. 화면(`screens/recipes.ts`·`components/breadSheet.ts`·`exchangeModal.ts`)은 데이터·핸들러만 붙인다 — 클래스 이름을 화면
   코드에서 새로 조립하지 말 것. 아트는 `breadThumb(artId, fallbackId)` 폴백 사다리(변형 PNG → 베이스 PNG+재료 → SVG) 하나만.
@@ -227,7 +258,9 @@ SimState → deriveSnapshot(state, now) → Snapshot → toRenderParams(snap) �
   footer `[3D로 보기] [다시 만들기]`). 3D 쇼케이스는 여전히 Screen push이되 결과 카드의 선택지다.
 - **Android backButton 계약**: `@capacitor/app` backButton 리스너 —
   ① 열린 모달 있으면 닫기 ② router depth>0면 back() ③ 루트면 `App.minimizeApp()` (종료 아님 —
-  다마고치는 백그라운드 생존이 자연). 연출 중엔 백 = 연출 스킵. 웹은 no-op.
+  다마고치는 백그라운드 생존이 자연). 연출 중엔 백 = 연출 스킵. 획득 연출이 떠 있으면 백이 먼저 닫는다(`dismissCelebrate`, 2026-11-12). 웹은 no-op.
+- 현재 탭은 `document.body.dataset.tab`에 둔다. 탭별 토스트 자리 CSS의 기준이다(VISUAL §7-2).
+- **부트 실패**: `main.ts`가 `startApp()` reject를 잡아 `#ui-root`에 `copy.app.bootFailed` 한 줄을 띄운다(WebGL 생성 실패 등).
 - 세로 고정(`android:screenOrientation="portrait"`), `env(safe-area-inset-top/bottom)`.
 
 ## 6. Capacitor 통합 (로컬 번들 셸 — podoal과 반대 구성)
@@ -256,15 +289,21 @@ export default {
   `scripts/ota-release.mjs`(릴리스 패키저)·`ota/`(정적 배포처 산출물: manifest.json·history.json·bundles/)
   세 곳에만 산다. **sim·store는 OTA의 존재를 모른다** — platform 층 밖으로 새지 않는다(§0 의존 방향과 동일
   원칙). 무엇이 OTA로 되고 안 되는지·릴리스 절차·롤백은 [RELEASE.md §8](RELEASE.md)이 정본.
+  2026-11-12 계약: 부팅은 `initOta({ deferReady: true })`로 시작하고 부팅 끝에 `markOtaReady()`를 부른다. 이 짝이 빠지면 새 번들은 30초 뒤 전부 롤백된다.
+  내장 번들 판정은 `APP_VERSION` 기준이다. 실패한 버전은 `levain:ota:bad`에 두고 다시 받지 않는다.
+  매니페스트 url이 `${OTA_BASE}/bundles/`로 시작하고 checksum이 64자 hex일 때만 받는다.
 - `android/`는 레포 안. 릴리스: `npm run build && npx cap sync android` → Gradle.
 - **podoal에서 절차만 재사용**: JDK21 Gradle 경로, 에뮬 함정 6종(README·RELEASE.md에 이식),
   `@capacitor/assets --iconBackgroundColor "#E8D9C4"` + 밀도별 스플래시 비트맵 삭제→단색 windowSplashScreen,
-  WebView CDP 디버깅. **재사용 안 함**: FCM·push-notifications·google-services.json·AdMob·딥링크·OAuth.
+  WebView CDP 디버깅. **재사용 안 함**: FCM·push-notifications·google-services.json·딥링크·OAuth.
+- **AdMob**(보상형 광고, `src/platform/ads.ts`): 초기화 순서 = UMP 동의 확인(`requestConsentInfo` → 필요하면 `showConsentForm`) → `initialize({ maxAdContentRating: General })`.
+  `initDone`은 초기화 성공 뒤에 세운다. Play 서비스 ads 버전은 `android/variables.gradle`의 `playServicesAdsVersion = '25.4.0'`로 고정(2026-11-12).
 - keystore **신규 `D:\keys\levain`** (podoal 키 재사용 금지). Play App Signing 권장.
-- StatusBar `style: Dark`(베이지 위 어두운 아이콘 — 기본 흰 아이콘은 비가시) + edge-to-edge(targetSdk 35) +
+- StatusBar `style: Dark`(베이지 위 어두운 아이콘 — 기본 흰 아이콘은 비가시) + edge-to-edge(targetSdk 36) +
   스플래시 단색 #E8D9C4 연속성.
 - **LocalNotifications**: `@capacitor/local-notifications` (push 아님 — 혼동 주의). 채널 1개 "르방이 돌보기".
-  inexact 알람. 고정 id 슬롯 cancel→schedule (GDD §7). 냉장 슬롯은 `every:'week'` 반복.
+  inexact 알람. 고정 id 슬롯 cancel→schedule (GDD §7). 냉장 슬롯(8)도 `{ at }` 원샷이다(2026-11-12, 이전 `every:'week'`).
+  예약 적용(`applyPlan`)은 체인으로 직렬화한다. 동시에 두 번 불려도 순서대로 끝난다.
   M6 실기기 판정 2건: ① 재부팅 후 예약 생존(안 되면 resume 재예약으로 커버되는지)
   ② manifest merge가 EXACT_ALARM 권한을 끌고 오면 override 제거.
 - resume 흐름: `App.resume`/visible → `tick(now)` catch-up → 스냅 반영 → 알림 재계산·재예약.
@@ -283,7 +322,9 @@ vitest (`environment: 'node'` — sim에 DOM 불필요), FakeClock으로 시간 
 | `notifyPlan.test.ts` | 상태별 슬롯, 냉장 주간 전환, 휴면 침묵, revive 분기, 조용시간 클램프 |
 | `renderParams.test.ts` | Snapshot→RenderParams 앵커 값(VISUAL §2-3 표), 범위 클램프 |
 
-렌더·UI는 수동 QA(QA.md).
+2026-11-12 감사로 더한 테스트: `rulesAudit` · `directorAudit` · `modalA11y` · `modalGuard` · `routerBack` · `otaStage` · `adsInit` · `notifySerial` · `saveFlags` · `render` (전체 34파일 372).
+
+렌더·UI는 수동 QA(QA.md). 화면 캡처·접근성 측정은 `scripts/qa-shots.mjs`(QA.md 「감사 하네스」).
 
 ## 8. 마일스톤
 

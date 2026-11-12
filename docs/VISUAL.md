@@ -276,7 +276,7 @@ hemisphere 증분과 겹쳐 컷 페이스가 다른 빵보다 더 크게 밝아�
 | 0.5–1.2s | 물기 — 표면 광 상승 | `uSpecStr` 램프 (물 리본 메시는 컷 — 사운드 없이 광으로만) |
 | 1.2–2.4s | 젓기 소용돌이, 가루·hooch 소멸, 색 크림 리셋 | `uStirPos` 원형 경로 구동 (버텍스 XZ 회전장) + wobble 원형 1회전 |
 | 2.4–2.8s | 정착 — 눌렸다 복귀, 기포 2~3개 (개정 2026-08-24: 고무줄 마커 제거 반영) | y damped spring 0.4s |
-| 완료 | 햅틱 impactLight + 2음 사운드 | |
+| 0.0s(시작) | 햅틱 impactLight + 사락(`sfxPour`) + 2음 사운드. 완료 때가 아니라 시작 때 울린다(2026-11-12 정정, `app.ts` `fed` 이벤트) | |
 
 ### 4-2. 빵굽기 (v1 = 카드 리절트/쇼케이스 — 절차적 3D 시퀀스는 v2 백로그)
 
@@ -321,6 +321,12 @@ hemisphere 증분과 겹쳐 컷 페이스가 다른 빵보다 더 크게 밝아�
 draw call ≤4(§8). GLB 캐시는 Map으로 최근 1개만 유지, exit 시 이전 GLB dispose. WebGL 컨텍스트는
 1개 유지(§4 SceneHost 계약 그대로).
 
+2026-11-12 보강:
+- 열기 가드: 로딩·표시 중엔 다시 열지 않는다. 로딩 중 탭이 바뀌었으면 다 받아도 띄우지 않는다.
+- 변형 GLB가 없으면 기본 빵 GLB로 한 번 더 시도한다.
+- WebGL 컨텍스트를 잃었다 되찾으면 시드·렌더 파라미터·실행 상태·쇼케이스 url을 다시 적용한다. 천 덮개 상태는 아직 잃는다(남은 흠).
+- 김 파티클은 수명 끝 0.3s 동안 흐려진다(`STEAM_FADE_S`). 이전엔 툭 사라졌다.
+
 ## 5. 게임필
 
 ### 제스처 (input.ts FSM)
@@ -353,11 +359,11 @@ down ─ 이동<8px & <250ms 내 up → poke
   완료 판정은 확장기획 §4-1 목표 장면의 실기기 촬영 비교.
 - **햅틱(희소)**: 밥 완료 impactLight / 해금·빵 notificationSuccess / 부활 impactMedium.
   **젓기(stir) 세션(down~up)당 최대 1회**(첫 기포 팝에 impactLight, 이후 무진동) — 연속 팝마다 울리면 소란스럽다.
-  탭·기포·롱프레스·덮개 걷기 = 무진동. 설정에서 끄기 가능.
+  grab(당기기)는 놓을 때 light 1회(2026-11-12). 탭·기포·롱프레스·덮개 걷기 = 무진동. 설정에서 끄기 가능.
 
-## 6. 사운드 (WebAudio 전량 합성, 에셋 0 — v1 5종)
+## 6. 사운드 (WebAudio 전량 합성, 에셋 0, 2026-11-12 기준 9종)
 
-인프라: 첫 사용자 제스처에서 AudioContext 생성·resume(모바일 정책). hidden/pause 시 suspend.
+인프라: 첫 사용자 제스처에서 AudioContext 생성·resume(모바일 정책). 생성은 `unlockAudio()`만 한다. 그 전엔 유휴 기포 소리도 나지 않는다(2026-11-12). hidden/pause 시 suspend.
 마스터 GainNode(0.25) → LPF 3kHz → destination. 리버브 금지. 음소거 = `settings.muted`.
 
 | 사운드 | 스펙 | 길이 |
@@ -365,10 +371,14 @@ down ─ 이동<8px & <250ms 내 up → poke
 | 기포 뽀글 | sine 400→700Hz 글라이드 40ms, A5ms/D80ms, 피치 ±15% 랜덤, 동시 최대 3성 | 0.12s |
 | 밥 완료 | triangle 2음 C5→E5, 짧은 decay, 간격 120ms — 마림바 | 0.4s |
 | 해금·빵 완성 | triangle 3음 G4–C5–E5 간격 90ms, 끝음 5도 배음 | 0.5s |
-| squelch(젓기) | 밴드패스 300~900Hz 노이즈 루프(Q·게인 = 드래그 속도 추종) + 방향 반전 시 sine 180Hz 드롭 트랜지언트. API `sfxStirStart/sfxStirUpdate(speed)/sfxStirEnd` | 젓는 동안 지속 |
+| squelch(젓기) | 밴드패스 300~900Hz 노이즈 루프(Q·게인 = 드래그 속도 추종). API `sfxStirStart/sfxStirUpdate(speed)/sfxStirEnd`. grab(당기기)도 같은 루프를 속도 ×0.6으로 쓴다. 방향 반전 드롭은 구현하지 않아 스펙에서 뺐다(2026-11-12) | 젓는 동안 지속 |
+| 굽기 결과 `sfxBaked(2\|3\|4)` | 해금 3음을 어디까지 올라가느냐로 등급을 말한다. 4 = 최고(`sfxUnlock`) · 3 = 잘 구움 · 2 = 납작·덜어낸 반죽 굽기(둘째 음에서 멈춤) | 0.4~0.5s |
+| 가루 사락 `sfxPour` | 하이패스 1500Hz 노이즈 0.6s. 밥·부활 시작·말린 조각 되살리기 | 0.6s |
+| 병 내려놓기 `sfxSetDown` | sine 150Hz 한 점 + 1600Hz 틱. 자리 옮기기·르방 바꾸기·새 병 | 0.1s |
+| 떼기 쩍 `sfxPinch` | 밴드패스 560→240Hz 노이즈 내림 | 0.17s |
 | 사락(천 덮개) | 하이패스 노이즈 버스트 | 0.25s |
 
-부활 성공 = 뽀글 1회 + 밥 2음 재사용. **휴면 진입 = 무음 — 침묵이 표현.** 나머지 사운드(물 등)는 v2.
+부활 성공 = 뽀글 1회 + 밥 2음 재사용. **휴면 진입 = 무음 — 침묵이 표현.** 쇼케이스 중엔 숨은 반죽의 기포 소리를 막는다(2026-11-12). 나머지 사운드(물 등)는 v2.
 
 ## 7. UI 비주얼
 
@@ -380,9 +390,9 @@ down ─ 이동<8px & <250ms 내 up → poke
 --bg-deep:     #DCCAB0;  /* 탭바·구분면 */
 --ink:         #4A3220;  /* 제목·활성 (현행) */
 --ink-soft:    #6B5340;  /* 본문 (현행) */
---ink-faint:   #8A6A4A;  /* 캡션·비활성 (현행) */
---accent:      #C4784A;  /* 테라코타 — 버튼·고무줄·탭 인디케이터 (현행 병색) */
---accent-deep: #A95F38;  /* pressed */
+--ink-faint:   #77593C;  /* 캡션·비활성. 2026-11-12 AA로 진하게(--bg 4.6:1 · --bg-soft 5.2:1, 이전 #8A6A4A는 3.6~4.0) */
+--accent:      #C4784A;  /* 테라코타. 탭 인디케이터·스위치·선택 테두리 (현행 병색) */
+--accent-deep: #A95F38;  /* 주 버튼 배경(2026-11-12, 흰 글자 4.55:1). 눌림은 filter: brightness(0.92) */
 --cream:       #F4EAD4;  /* 반죽색 — 게이지·강조면 */
 --crust:       #A9713F;  /* 구운 빵·완료 뱃지 */
 --hooch:       #9C927F;  /* 배고픔·휴면 정보 톤 (경고 아님) */
@@ -393,6 +403,8 @@ down ─ 이동<8px & <250ms 내 up → poke
 - **Pretendard Variable 번들**(`public/fonts/` — CDN 불가). fallback `system-ui, sans-serif`.
 - 제목 20px/600 · 본문 15px/400 lh1.6 · 캡션 13px/400. 수치·타이머 `font-variant-numeric: tabular-nums`.
 - **타이포 토큰**(2026-09-05 명문화, `main.css :root`): `--fs-title 20` · `--fs-body 15` · `--fs-cap 13` · `--fs-num 12`.
+  `--fs-display 36`(2026-11-12)은 온보딩 첫 화면 이름 하나에만 쓴다.
+  **`font` 단축 속성의 가족명 자리에 `inherit`를 쓰지 않는다**(2026-11-12). `font: 15px/1 inherit`는 선언 전체가 무효가 된다.
   **`--fs-num`은 숫자 pill 전용**(변형 진행 `3/16`·수량 `9`·`+N`). 글자는 `--fs-cap` 13px이 하한 — 실측(2026-09-05)에서 레시피 절이
   10·11·11.5·12·12.5px를 8종 쓰고 있었다(칩 이름 11.5 ×24, 수량 pill 10 ×23 …). 새 크기를 지어내지 말고 토큰만 쓴다.
 - **줄바꿈 규율**(2026-09-05): ① 폭 240px 미만 컨테이너에서 ` · `로 문장을 이어 붙이지 않는다 — 정보는 **k/v 정보 행**(`.info-rows`)
@@ -481,6 +493,13 @@ down ─ 이동<8px & <250ms 내 up → poke
   높이는 **상수로 박지 않는다** — `home.ts`의 ResizeObserver가 `.hud-top` 실측값을 `--hud-top-h`로
   넘기고, CSS가 `max(var(--hud-top-h), 118px)`로 **오른쪽 코너 높이(38+10+70)까지** 함께 피한다.
   글자 블록만 피하면 문장이 한 줄인 상태에서 토스트가 항아리 바닥과 1px까지 붙는다(실측).
+  **탭별 자리**(2026-11-12): 홈 = HUD 아래(위 규칙) · 레시피 탭 = 탭 막대 바로 위(`body[data-tab="recipes"]`) ·
+  모달이 열려 있으면 탭 막대 띠 하나 · 3D 쇼케이스 = 화면 위. 토스트는 한 번에 하나다.
+- **잠금 표시**(2026-11-12): `.seg button.is-locked`·`.btn.is-locked`는 불투명도 0.6. `disabled`는 쓰지 않는다(눌러야 이유를 말할 수 있다).
+- **탭 대상 44px**(2026-11-12): 보이는 크기는 그대로 두고 투명 의사요소를 음수 inset으로 넓힌다.
+  하단 세그먼트·`+` 칩·아이콘 단추·레시피 세그먼트가 이 방식이다.
+- **모달 포커스**(2026-11-12): 모달을 열면 첫 단추가 아니라 카드가 포커스를 받는다(포커스 링 없음, 이름은 aria-label·aria-labelledby).
+  부트 모달의 첫 단추에 브라우저 포커스 링이 그려졌고, 그 단추가 「보내주고 새로 시작하기」 같은 되돌릴 수 없는 쪽일 수 있어서다.
   **★`.hud-status`에 인라인 style 금지**(2026-08-26 발견): `home.ts`가 `style.cssText`로 `font:inherit;color:inherit`를
   박아 두는 바람에 `.hud-status`의 `font-size/weight/color`가 **한 번도 적용되지 않았다**(실렌더 16px/400/`--ink-soft`).
   제목이 캡션과 같은 급이 된 진짜 원인이 이것이다. 버튼 리셋은 전부 CSS에 둔다.
@@ -513,12 +532,12 @@ down ─ 이동<8px & <250ms 내 up → poke
 | 항목 | 기준 |
 |---|---|
 | draw call | **총 ≤ 10** — 홈 6(배경 CSS 0·섀도1·유리2·립1·반죽1·hooch1·파티클풀1·천1) 실측(implementation-notes 2026-08-23 저녁 참조) / **쇼케이스 별도 ≤4**(빵1~2+섀도1) (개정 2026-08-24: 고무줄 마커 제거 반영) |
-| DPR | `min(devicePixelRatio, 2)` 고정 (어댑티브 강하 없음 — 컷) |
-| 지오메트리 | 반죽 icosa detail 5(~20k tri) / 유리 radial 48 |
+| DPR | `fitPixelRatio` = min(devicePixelRatio, 2, √(2.2e6 / (w×h))). 버퍼 픽셀 총량 2.2M 상한(2026-11-12, `SceneHost.ts` `MAX_DPR`·`MAX_BUFFER_PIXELS`). 그 밖의 어댑티브 강하는 없음 |
+| 지오메트리 | 반죽 `IcosahedronGeometry(R, 5)` = 720 tri / 유리 radial 48 (2026-11-12 정정, 이전 표기 ~20k는 틀림) |
 | 파티클 | 전 효과 **공용 InstancedMesh 풀 256 고정**. 동시 상한: 밀가루 80·김 10·기타 32. 유휴 시 갱신 스킵 |
 | 기포 | 셰이더 절차(§2) — 비용 고정, 폭주 불가 |
 | 반죽 프래그 fbm 호출 | **상시 ≤2회**(`fbmG` 마이크로 노멀 + 모틀링) + 조건부 게이트 7곳(uPoreDensity·uWallCell·vStretch·uRipe·uCrust·uKahm·uMold). **동시 개방 상한 8** — `wallCells`·`poreDensity`에 `(1−dormancy)·(kahm?0:1)·(1−mold)`을 곱해 **살아있는 분기와 죽은 분기를 상호배타**로 만들었다: 살아있는 최악(피크+grab) 7.3 / 죽은 최악(휴면+곰팡이+kahm+grab) 8.0 / 상태 크로스페이드 과도기 ≈9.3(≤2초). 개편 전 병리적 상한이 11이었으므로 **예산은 오히려 내려갔다**. 유리벽 기공은 fbm이 아니라 2옥타브 sin/cos 값+기울기 동시 산출(`cellField`, 8 trig ≈ fbm 1.33회)이고, 피크 크래그는 기존 `fbmG(vXZ*5.0)` 호출에 진폭만 얹어 **추가 호출 0**이다 (개정 2026-08-25: 축 분해·유리벽 기공) |
 | 셰이더 | 살아있는 도우·유리·파티클은 텍스처 fetch 0 유지, `mediump`, 루프 컴파일 타임 고정 상한(배열 8), 동적 분기 최소. **구운 빵 GLB는 예외**: basecolor 1장 ≤512² webp/png(예산 내 — GLTFExporter는 png만 임베드), PBR 맵 금지 |
 | GLB 예산 (빵) | 개당 ≤250KB·10종 합 ≤2.5MB·8k tri/개 (`scripts/check-budget.mjs` 검사) |
-| GLB 예산 (재료) | 개당 **≤100KB·2500 tri**, 합계는 **개수 비례 64KB/개**(12 → 30종으로 자라는 집합이라 고정 상수를 안 쓴다 — 고정이면 늘 때마다 손으로 올리게 되고 그건 예산을 결과에 맞추는 것이다). 텍스처는 기본 0장, 탈출구도 ≤256². **쇼케이스 draw call ≤4는 빵과 공유이지 2배가 아니다.** 예산 정본 = `scripts/lib/families.mjs`, 절차 = `docs/INGREDIENTS.md` |
-| 배터리 | hidden/타 화면 → rAF 완전 정지 + AudioContext suspend. 복귀 시 uTime은 performance.now 재계산 |
+| GLB 예산 (재료) | 개당 **≤250KB·8000 tri**, 합계는 **개수 비례 160KB/개**(2026-11-12 정정, 정본 `scripts/lib/families.mjs`)(12 → 30종으로 자라는 집합이라 고정 상수를 안 쓴다 — 고정이면 늘 때마다 손으로 올리게 되고 그건 예산을 결과에 맞추는 것이다). 텍스처는 기본 0장, 탈출구도 ≤256². **쇼케이스 draw call ≤4는 빵과 공유이지 2배가 아니다.** 예산 정본 = `scripts/lib/families.mjs`, 절차 = `docs/INGREDIENTS.md` |
+| 배터리 | hidden/타 화면 → rAF 완전 정지 + AudioContext suspend. 복귀 시 쇼케이스든 홈이든 rAF를 다시 켠다. uTime은 `start()`마다 원점을 다시 잡는다(`shaderT0`, float32 정밀도, 2026-11-12) |
