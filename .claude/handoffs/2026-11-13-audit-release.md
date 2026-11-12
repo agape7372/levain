@@ -1,22 +1,22 @@
-# 핸드오프: 출시 전 전면 감사 · 수리 끝, 운영 반영 대기 (2026-11-13)
+# 핸드오프: 출시 전 전면 감사 · 수리 끝, OTA 1.6.0 게시됨 · 콘솔 · AAB 대기 (2026-11-13)
 
 - 정본: [`docs/audit/AUDIT-2026-11-12.md`](../../docs/audit/AUDIT-2026-11-12.md). 결함 136개를 전부 닫았다(고침 117 · 안 함 12 · 기록만 7).
 - 가지 `release/audit-1112` · 작업 폴더 `D:\levain-wt-fix`.
 - 커밋: `7eb0389`(수리) · `d92337f`(모달 포커스 보정). 문서 갱신은 그 뒤 커밋으로 들어간다.
-- main = `c51c149`(OTA 1.5.1). **push · 머지 · OTA 발행 · `ota/` 재배포 · Play 콘솔 전부 안 했다.**
+- main = `8c00457`(OTA 1.6.0, origin과 같음). **머지 · push · OTA 발행 · `ota/` 재배포는 2026-11-13에 끝났다. Play 콘솔 · AAB는 안 했다.**
 
 ## 지금 상태
 
 | 항목 | 값 |
 |---|---|
 | 검증 (2026-11-13) | vitest 34파일 372 통과 · `tsc --noEmit` 0 · `eslint src` 0 · `npm run build` 성공 · `check-budget` 통과 · `gradlew assembleDebug` 성공(서명 없음) |
-| 버전 | `package.json` 1.5.1 · 매니페스트 1.5.1 · `versionCode 5` |
+| 버전 | `package.json` 1.6.0 · 라이브 매니페스트 1.6.0 · `versionCode 5` (AAB를 지으면 versionName 1.6.0) |
 | 실기기 확인 | 0 |
 | 스토어 스크린샷 6장 | `D:\levain-wt-fix\.audit\store-shots\` (git 밖) |
 
 ## 사용자 승인이 필요한 것
 
-1. 머지 · OTA · `ota/` 재배포 승인. 처리방침 게시는 코드 OTA와 같이 또는 뒤.
+1. ~~머지 · OTA · `ota/` 재배포 승인~~ 끝.
 2. Play 콘솔 「데이터 보안」 정정 (정본 ⑥ 표).
 3. AdMob 실 ID (수동 등록이면 출시 전에도 받는다).
 4. vc5 AAB 업로드 · 비공개 테스트 12명 × 14일.
@@ -29,8 +29,8 @@
 
 ## 승인 뒤 순서
 
-1. **머지**: `release/audit-1112` → main.
-2. **OTA 발행**: `npm run ota:release -- <1.5.1보다 높은 버전>`. `package.json` 버전도 같이 오른다.
+1. ~~**머지**: `release/audit-1112` → main~~ 끝(ff, `8c00457`).
+2. ~~**OTA 발행**~~ 끝: 1.6.0. 다음 발행은 1.6.0보다 높은 버전으로.
 3. **`ota/` 재배포**: `cd ota && npx vercel --prod --scope jirings-projects`. 새 `privacy.html`이 같이 나간다.
    `curl -s https://levain-ota.vercel.app/manifest.json`으로 버전을 확인한다.
 4. **AAB**: vc5로 `bundleRelease`. 업로드는 사람 손(브리지 10MB 한도).
@@ -42,6 +42,7 @@
   `src/app.ts`를 고칠 때마다 `tests/otaStage.test.ts`를 돌린다.
 - **원본 체크아웃** `C:\Users\agape\Desktop\코딩\levain`(main)에 미커밋 148파일이 있다. 머지 전에 겹치는지 본다. 원본을 정리하거나 덮지 않는다.
 - **`git add -A` 금지**. `.audit/`(화면 수천 장)이 딸려 들어간다. 파일을 이름으로 올린다.
+- **미추적 자산이 라이브에 실려 있다**: 딸기 팬케이크 GLB · 썸네일(`public/breads/pancake--strawberry-fresh.glb` · `thumbs/…png`)은 미추적인데 라이브 번들(1.5.1 · 1.6.0)에 실려 있다. 깨끗한 트리에서 빌드하면 빠진다. 발행 전에 `unzip -Z1`로 옛 zip과 대조한다.
 - **옛 OTA zip은 원본 체크아웃의 `ota/bundles/`(1.3.9 · 1.4.0 · 1.5.0 · 1.5.1)에만 있다.** `D:\levain-wt-fix\ota\`엔 `bundles/`가 없다.
   워크트리에서 `vercel --prod`를 돌리면 옛 zip이 배포본에서 빠진다. 발행은 원본에서 하거나 `bundles/`를 먼저 옮긴다.
 - 롤백은 옛 manifest 덮어쓰기로 안 된다. 되돌릴 코드를 더 높은 버전으로 재발행한다(RELEASE §8).
