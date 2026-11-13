@@ -178,7 +178,7 @@ export const copy = {
   },
 
   feed: {
-    ratioTitle: '어떻게 줄까요',
+    ratioTitle: '밥 주기',
     ratioHint: {
       '1:1:1': '반나절이면 부풀어요',
       '1:2:2': '하루짜리 든든한 밥이에요',
@@ -190,7 +190,7 @@ export const copy = {
     // 상세 펼치기 (§7-1 — 성숙 4단계 해금): 밀가루 선택 + 피크 범위 예보
     detailOpen: '자세히',
     detailClose: '접기',
-    flourTitle: '어떤 가루로 줄까요',
+    flourTitle: '가루',
     flourNames: { white: '다목적', wholewheat: '통밀', rye: '호밀' } as Record<string, string>,
     flourHint: {
       white: '늘 먹던 밥이에요',
