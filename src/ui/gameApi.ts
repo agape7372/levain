@@ -135,6 +135,8 @@ export interface GameApi {
   checkNotifyPermission(): Promise<'granted' | 'denied' | 'unavailable'>;
   /** 개발자 도구(설정 버전 7탭) 허용 — dev 빌드이거나 저장본 flags.dev === true */
   devToolsEnabled(): boolean;
+  /** 암호가 맞으면 이 기기 저장본에 flags.dev를 심는다 (출시 빌드에서 개발자 도구를 여는 길) */
+  unlockDevTools(code: string): Promise<boolean>;
 
   /** 미표시 굽기 결과 (강제종료 복구) — 표시 후 clear. variantId = 변형을 구웠을 때 */
   pendingBake(): { recipeId: string; grade: string; variantId?: string } | null;

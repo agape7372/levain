@@ -149,13 +149,7 @@ export function openSettings(api: GameApi): void {
   void api.ads.privacyOptionsRequired().then((required) => {
     if (required) privacyRow.after(actionRow(copy.settings.adPrivacy, () => void api.ads.showPrivacyOptions()));
   });
-  // 오픈소스 고지 · 문의 — 출시작에 있어야 할 두 줄 (감사 T8-07)
-  wrap.appendChild(
-    actionRow(copy.settings.licenses, () => {
-      handle.close();
-      openLicenses(api);
-    }),
-  );
+  // 문의 (감사 T8-07). 오픈소스 라이선스 줄은 2026-11-13 사용자 요청으로 뺌
   wrap.appendChild(
     actionRow(copy.settings.contact, () => {
       const subject = encodeURIComponent(copy.settings.version(APP_VERSION));
@@ -188,31 +182,22 @@ export function openSettings(api: GameApi): void {
   version.textContent = copy.settings.version(APP_VERSION);
   let taps = 0;
   // 출시 빌드는 누구에게나 열리던 치트였다 (T7-07) — 판정은 api.devToolsEnabled() 한 곳
-  if (api.devToolsEnabled()) {
-    version.addEventListener('click', () => {
-      taps += 1;
-      if (taps === 7 && !wrap.querySelector('.dev-rows')) {
-        toast(copy.devMode.on);
-        wrap.insertBefore(buildDevRows(api), version);
-      }
-    });
-  }
+  // 허용 안 된 기기(출시 빌드)는 7탭 뒤 암호를 묻는다 — 맞으면 flags.dev가 심겨 그 기기만 열린다
+  version.addEventListener('click', () => {
+    taps += 1;
+    if (taps !== 7 || wrap.querySelector('.dev-rows')) return;
+    const open = (): void => {
+      toast(copy.devMode.on);
+      wrap.insertBefore(buildDevRows(api), version);
+    };
+    if (api.devToolsEnabled()) return open();
+    taps = 0;
+    const code = window.prompt('');
+    if (code) void api.unlockDevTools(code).then((ok) => ok && open());
+  });
   wrap.appendChild(version);
 
   const handle = openModal(wrap, { title: copy.settings.title });
-}
-
-/** 오픈소스 고지 — 번들에 든 전문(public/licenses.txt, scripts/gen-licenses.mjs가 만든다)을 그대로 보여준다 */
-function openLicenses(api: GameApi): void {
-  const text = document.createElement('p');
-  text.className = 'modal-body license-text';
-  openModal(text, { title: copy.settings.licenses, onClose: () => openSettings(api) });
-  void fetch('/licenses.txt')
-    .then((r) => (r.ok ? r.text() : ''))
-    .then((t) => {
-      text.textContent = t;
-    })
-    .catch(() => undefined);
 }
 
 /**

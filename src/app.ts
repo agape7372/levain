@@ -281,6 +281,14 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     checkNotifyPermission: () => notifier.checkPermission(),
     // 개발자 도구 판정은 여기 한 곳 — 출시 빌드는 기록 불러오기로 flags.dev를 심은 기기만
     devToolsEnabled: () => import.meta.env.DEV || store.getEnvelope().flags.dev === true,
+    // 암호는 해시로만 둔다 — 번들을 열어도 원문이 안 나온다
+    unlockDevTools: async (code) => {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(code.trim()));
+      const hex = Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, '0')).join('');
+      if (hex !== 'f16ea3f72d2f5f1cdadba70960d3db2321f3371df571dabe21c7c5079969a777') return false;
+      store.setFlags({ dev: true });
+      return true;
+    },
     pendingBake: () => store.getEnvelope().flags.pendingBake,
     clearPendingBake: () => store.setFlags({ pendingBake: null }),
   };

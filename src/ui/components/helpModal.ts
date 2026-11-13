@@ -47,11 +47,6 @@ export function openHelp(): void {
   const wrap = document.createElement('div');
   wrap.className = 'help-doc';
 
-  const intro = document.createElement('p');
-  intro.className = 'help-intro';
-  intro.textContent = copy.help.intro;
-  wrap.appendChild(intro);
-
   copy.help.sections.forEach((s, i) => {
     const sec = document.createElement('section');
     sec.className = 'help-sec';

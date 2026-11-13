@@ -514,7 +514,6 @@ html {
 
 /* ── 설명서 (우상단 ?) ─────────────────────────────
    읽기 전용이라 버튼이 없다. 여기에 조작을 달지 말 것 — 관찰 카드와 같은 규칙(GDD §5). */
-.help-intro { margin: 0 0 18px; font-size: 14px; color: var(--ink-faint); }
 .help-sec { margin: 0 0 18px; }
 .help-sec:last-child { margin-bottom: 0; }
 .help-q { margin: 0 0 6px; font-size: 15px; font-weight: 600; color: var(--ink); }
