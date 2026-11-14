@@ -81,6 +81,10 @@ fill    = DirectionalLight(0xffffff, 0.3)   position (2.5, 3, -2)
 0xffe2b0의 B채널이 ×0.69라 파랑을 가장 심하게 깎았기 때문. 사용자 확정 방침(황금·앰버 연출 폐기,
 자연 주광=중성 화이트밸런스)에 따라 3灯 전부 순백(0xffffff)으로 바꾸고 세기만으로 노출을 맞춘다.
 
+2026-11-14 추가: Blender 파이프라인 PBR 빵(노멀·거칠기 맵이 있는 GLB)은 `MeshStandardMaterial`(금속성 0)로
+그리고 방 환경맵은 **반사만** 싣는다(`src/render/breadMaterial.ts` — IBL 확산 줄을 셰이더에서 뺐다). 그래서 확산항은
+아래 Lambert 유도와 같은 식이고 같은 노출 캘리브레이션을 받는다. 확산 IBL을 넣으면 전 색이 허옇게 바랬다(실측).
+
 **유도**: 빵 GLB는 `MeshLambertMaterial`(런타임·하네스 공통 `forceLambert` 강제 교체)로 렌더되고,
 윗면(normal +Y)의 출력은 `albedo · (dotNL_key·Ik + dotNL_fill·If + Ia) / π`다(three 0.185, 기본
 `NoToneMapping`+`SRGBColorSpace`, 색관리 활성 — 물리 단위 라이트). 키·필 위치가 고정이라
@@ -321,6 +325,11 @@ hemisphere 증분과 겹쳐 컷 페이스가 다른 빵보다 더 크게 밝아�
 draw call ≤4(§8). GLB 캐시는 Map으로 최근 1개만 유지, exit 시 이전 GLB dispose. WebGL 컨텍스트는
 1개 유지(§4 SceneHost 계약 그대로).
 
+2026-11-14: 쇼케이스 그룹의 윗면을 카메라 반대쪽(−Z)으로 16° 젖힌다(`breadShowcase.ts` `TILT` = −16°). 홈 카메라는
++Z 쪽 위에서 52° 부감이라 빵이 정수리만 보였다 — 젖히면 썸네일·레퍼런스와 같은 36°에서 보인다. 부호가 반대면(+16°)
+윗면이 카메라 쪽으로 숙어 68°가 된다(첫 판이 그랬고 QA 캡처에서 팬케이크가 원반으로 보여 잡았다). 턴테이블 회전은 안쪽 `spin` 그룹이
+맡아 숙인 축이 아니라 빵 자신의 세로축으로 돈다.
+
 2026-11-12 보강:
 - 열기 가드: 로딩·표시 중엔 다시 열지 않는다. 로딩 중 탭이 바뀌었으면 다 받아도 띄우지 않는다.
 - 변형 GLB가 없으면 기본 빵 GLB로 한 번 더 시도한다.
@@ -537,7 +546,7 @@ down ─ 이동<8px & <250ms 내 up → poke
 | 파티클 | 전 효과 **공용 InstancedMesh 풀 256 고정**. 동시 상한: 밀가루 80·김 10·기타 32. 유휴 시 갱신 스킵 |
 | 기포 | 셰이더 절차(§2) — 비용 고정, 폭주 불가 |
 | 반죽 프래그 fbm 호출 | **상시 ≤2회**(`fbmG` 마이크로 노멀 + 모틀링) + 조건부 게이트 7곳(uPoreDensity·uWallCell·vStretch·uRipe·uCrust·uKahm·uMold). **동시 개방 상한 8** — `wallCells`·`poreDensity`에 `(1−dormancy)·(kahm?0:1)·(1−mold)`을 곱해 **살아있는 분기와 죽은 분기를 상호배타**로 만들었다: 살아있는 최악(피크+grab) 7.3 / 죽은 최악(휴면+곰팡이+kahm+grab) 8.0 / 상태 크로스페이드 과도기 ≈9.3(≤2초). 개편 전 병리적 상한이 11이었으므로 **예산은 오히려 내려갔다**. 유리벽 기공은 fbm이 아니라 2옥타브 sin/cos 값+기울기 동시 산출(`cellField`, 8 trig ≈ fbm 1.33회)이고, 피크 크래그는 기존 `fbmG(vXZ*5.0)` 호출에 진폭만 얹어 **추가 호출 0**이다 (개정 2026-08-25: 축 분해·유리벽 기공) |
-| 셰이더 | 살아있는 도우·유리·파티클은 텍스처 fetch 0 유지, `mediump`, 루프 컴파일 타임 고정 상한(배열 8), 동적 분기 최소. **구운 빵 GLB는 예외**: basecolor 1장 ≤512² webp/png(예산 내 — GLTFExporter는 png만 임베드), PBR 맵 금지 |
-| GLB 예산 (빵) | 개당 ≤250KB·10종 합 ≤2.5MB·8k tri/개 (`scripts/check-budget.mjs` 검사) |
+| 셰이더 | 살아있는 도우·유리·파티클은 텍스처 fetch 0 유지, `mediump`, 루프 컴파일 타임 고정 상한(배열 8), 동적 분기 최소. **구운 빵 GLB는 예외**: 옛 절차 GLB = basecolor 1장 ≤512² png. **Blender PBR 빵(2026-11-14~)** = 재질 1장에 색 1024² · 노멀 1024² · 거칠기 512² WebP + 방 환경맵 PMREM 1장(렌더러당 1회 생성, 반사만). 메시 1·재질 1이라 쇼케이스 draw call은 그대로. 탄젠트 속성은 싣지 않는다(화면 미분 TBN) |
+| GLB 예산 (빵) | **2026-11-14 개정(Blender PBR)**: 개당 ≤500KB · ≤20k tri · 합 ≤5120KB(`scripts/check-budget.mjs` 검사, 정본 `scripts/lib/families.mjs`). 크기는 텍스처가 정한다. 14종 실측 123~457KB · 합 3374KB. 쇼케이스는 1개만 올리고 이전 것을 dispose해서 런타임 비용은 개수와 무관하다. 합계는 OTA 묶음 몫(zip 5.5MB → 7.4MB). 옛 절차 판은 개당 ≤250KB · 8k tri · 합 2.5MB였다 |
 | GLB 예산 (재료) | 개당 **≤250KB·8000 tri**, 합계는 **개수 비례 160KB/개**(2026-11-12 정정, 정본 `scripts/lib/families.mjs`)(12 → 30종으로 자라는 집합이라 고정 상수를 안 쓴다 — 고정이면 늘 때마다 손으로 올리게 되고 그건 예산을 결과에 맞추는 것이다). 텍스처는 기본 0장, 탈출구도 ≤256². **쇼케이스 draw call ≤4는 빵과 공유이지 2배가 아니다.** 예산 정본 = `scripts/lib/families.mjs`, 절차 = `docs/INGREDIENTS.md` |
 | 배터리 | hidden/타 화면 → rAF 완전 정지 + AudioContext suspend. 복귀 시 쇼케이스든 홈이든 rAF를 다시 켠다. uTime은 `start()`마다 원점을 다시 잡는다(`shaderT0`, float32 정밀도, 2026-11-12) |

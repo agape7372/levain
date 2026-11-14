@@ -1,27 +1,57 @@
 {
   "id": "pancake",
-  "version": 2,
+  "version": 5,
   "name_ko": "팬케이크",
-  "subject": "a stack of three fluffy round pancakes",
+  "subject": "a tall stack of three thick, fluffy buttermilk pancakes with a square pat of butter on top and warm maple syrup poured over, running down the sides",
+  "hero_ko": "버터 조각 + 메이플 시럽 (클래식)",
   "geometry": {
-    "silhouette": "three stacked flat disks, slightly irregular hand-poured edges, each disk slightly offset from the one below, subtle sag at the stack edges",
-    "crust": [
-      "top surface of each disk in soft clay matte medium brown #C68958",
-      "underside and edge rim of each disk in deeper golden brown #A9713F",
-      "small irregular bubbles and tiny burst pore holes scattered across every top surface, rendered as low-poly faceted dimples"
-    ]
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The top face of each pancake is griddle-browned in a soft, blotchy, uneven gradient — warm caramel brown (#B9793F) at the centre where it sat longest on the hot pan, fading through toasty golden (#CF9455) into light golden (#D9A76B) toward the rim, with a few slightly darker freckles and one paler patch where a bubble lifted the batter, the way real pancakes never brown evenly. The side wall of every pancake is the pale cream of the risen crumb (#F1DDB0): a soft, spongy band with a fine open crumb texture, tiny irregular air pockets catching the light, meeting the browned top in a soft blurred edge rather than a hard line. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
   },
-  "style_ref": "shared-style-v2",
-  "camera": "three-quarter top-front view, object centered, 15% margin",
-  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
-  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
-  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "syrup", "butter"],
-  "views": ["three-quarter top-front", "front elevation", "top-down"],
-  "output": { "aspect": "1:1", "size": 1024 },
-  "prompt_flat": "A cozy low-poly stylized 3D render of a stack of three fluffy round pancakes, a single game asset object on a plain backdrop. Geometry: three stacked flat disks with slightly irregular hand-poured edges, each disk slightly offset from the one below with a subtle sag at the stack edges. Crust: the top surface of each pancake is a soft clay-like matte medium brown (#C68958), while the underside and edge rim of each disk show a deeper golden brown (#A9713F); small irregular bubbles and tiny burst pore holes are scattered across every top surface as low-poly faceted dimples. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no syrup, no butter pat, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
-  "followup_views": [
-    "Same exact pancake stack, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view), so the three offset layers are clearly visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
-    "Same exact pancake stack, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the bubbles and pore holes on the top disk are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  "toppings": [
+    {
+      "label": "BUTTER",
+      "text": "One square pat of butter, about 2 cm across with slightly uneven cut edges, sits just off-centre on the top pancake. It is still a solid, recognisable square — pale yellow (#F3DDA0) with a faint sheen where the light lands — but it has been there for half a minute: its corners have softened, its bottom edge has begun to melt into a small glossy golden pool (#E8C170) that soaks a darker ring into the crumb around it, and one side is slumping very slightly toward the syrup."
+    },
+    {
+      "label": "SYRUP",
+      "text": "Warm maple syrup (#A85A1A), translucent amber and slow, has been poured generously over the stack from above: it sheets across the top face, gathers in the shallow dip around the butter, spills over the edge at two places and runs down the side walls in several drips of different lengths and widths — one broad drip reaching the bottom pancake and rounding into a soft bead, a couple of thinner ones stopping on the middle layer, one just starting. Where the syrup runs over the pale cream side walls it turns them a darker, glossy soaked gold and catches a bright highlight along every drip; a few tiny bubbles are trapped in the thickest pool, and a thin line of syrup has seeped into the seam between the top two pancakes."
+    },
+    {
+      "label": "FINISHING",
+      "text": "A barely-there dusting of powdered sugar over the rim of the top pancake away from the syrup, settling into the little browning freckles and dissolving into faint translucent specks where it meets the syrup. Nothing else on top — the classic stack, generous and simple. The pour lands toward the front-left so the beautifully browned surface stays visible on the far side, and everything reads as one deliberate, appetizing plate: realistic portion size, no duplicate identical elements."
+    }
   ],
-  "notes_ko": "팬케이크는 표면에 작은 기포와 터진 구멍이 흩뿌려져 있어야 한다 — 이게 없으면 매끈한 플라스틱 원반처럼 보인다. v2: 시럽·버터 negative 추가 — 팬케이크 스택은 생성 모델이 시럽·버터를 기본으로 얹는 경향이 강하다."
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, a solid butter pat just starting to gleam at its melting base, and translucent, glossy syrup with bright soft highlights. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "a warm weekend-morning breakfast stack, syrup still moving, that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy buttermilk pancakes with a square pat of butter on top and warm maple syrup poured over, running down the sides — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The top face of each pancake is griddle-browned in a soft, blotchy, uneven gradient — warm caramel brown (#B9793F) at the centre where it sat longest on the hot pan, fading through toasty golden (#CF9455) into light golden (#D9A76B) toward the rim, with a few slightly darker freckles and one paler patch where a bubble lifted the batter, the way real pancakes never brown evenly. The side wall of every pancake is the pale cream of the risen crumb (#F1DDB0): a soft, spongy band with a fine open crumb texture, tiny irregular air pockets catching the light, meeting the browned top in a soft blurred edge rather than a hard line. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nBUTTER. One square pat of butter, about 2 cm across with slightly uneven cut edges, sits just off-centre on the top pancake. It is still a solid, recognisable square — pale yellow (#F3DDA0) with a faint sheen where the light lands — but it has been there for half a minute: its corners have softened, its bottom edge has begun to melt into a small glossy golden pool (#E8C170) that soaks a darker ring into the crumb around it, and one side is slumping very slightly toward the syrup.\n\nSYRUP. Warm maple syrup (#A85A1A), translucent amber and slow, has been poured generously over the stack from above: it sheets across the top face, gathers in the shallow dip around the butter, spills over the edge at two places and runs down the side walls in several drips of different lengths and widths — one broad drip reaching the bottom pancake and rounding into a soft bead, a couple of thinner ones stopping on the middle layer, one just starting. Where the syrup runs over the pale cream side walls it turns them a darker, glossy soaked gold and catches a bright highlight along every drip; a few tiny bubbles are trapped in the thickest pool, and a thin line of syrup has seeped into the seam between the top two pancakes.\n\nFINISHING. A barely-there dusting of powdered sugar over the rim of the top pancake away from the syrup, settling into the little browning freckles and dissolving into faint translucent specks where it meets the syrup. Nothing else on top — the classic stack, generous and simple. The pour lands toward the front-left so the beautifully browned surface stays visible on the far side, and everything reads as one deliberate, appetizing plate: realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, a solid butter pat just starting to gleam at its melting base, and translucent, glossy syrup with bright soft highlights. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: a warm weekend-morning breakfast stack, syrup still moving, that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact classic buttermilk pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three pale cream side walls, the browned edges, the syrup drips running down the front and the butter pat sitting on top are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact classic buttermilk pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the square pat of butter, the pooled syrup on the top pancake and the dusting of powdered sugar are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): v3·v4 실물 기각(맨 스택=플라스틱 스펀지). 베이스는 클래식 플레이팅(각진 버터 조각+메이플 시럽 흘림+슈가파우더). 리서치: 서양식 정석은 버터가 액체가 아니라 각진 고체 조각 — 밑면만 녹기 시작하는 상태로 서술. 반죽 몸통은 v4 계승, 광택·시럽 금지 레일 폐기(레퍼런스는 절차 모델링 입력). 생성기=Codex 수동 붙여넣기."
 }

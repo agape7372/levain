@@ -7,6 +7,7 @@ import { createGroundShadow } from './background';
 import { attachInput } from './input';
 import { Cloth } from './cloth';
 import { BreadShowcase } from './breadShowcase';
+import { createRoomEnvironment } from './breadMaterial';
 import { ParticlePool } from './particles';
 import { smoothParams, type RenderParams } from './renderParams';
 
@@ -87,6 +88,8 @@ export class SceneHost {
   private cloth: Cloth | null = null;
   private jar: Jar | null = null;
   private showcase: BreadShowcase | null = null;
+  /** PBR 빵 환경맵 — 쇼케이스가 처음 요구할 때 만든다(breadMaterial.ts) */
+  private roomEnv: THREE.Texture | null = null;
   /** 조명 3등 — 쇼케이스 진입/이탈 시 HOME_LIGHT ↔ SHOWCASE_LIGHT 스왑 대상 */
   private keyLight: THREE.DirectionalLight | null = null;
   private ambientLight: THREE.AmbientLight | null = null;
@@ -157,7 +160,8 @@ export class SceneHost {
     this.cloth = new Cloth();
     this.scene.add(this.cloth.mesh);
 
-    this.showcase = new BreadShowcase();
+    // 환경맵은 PBR 빵을 처음 띄울 때 한 번 만든다 — 렌더러 수명(dispose가 버린다)
+    this.showcase = new BreadShowcase(() => (this.roomEnv ??= createRoomEnvironment(renderer)));
     this.scene.add(this.showcase.group);
     // 파티클 풀은 홈·쇼케이스 공용(김) — homeGroup에서 제외
     this.homeGroup = [jar.group, this.dough.mesh, this.cloth.mesh];
@@ -593,6 +597,8 @@ export class SceneHost {
     this.showcase?.dispose();
     this.showcase = null;
     this.showcaseUrl = null;
+    this.roomEnv?.dispose();
+    this.roomEnv = null;
     this.homeGroup = [];
     this.keyLight = null;
     this.ambientLight = null;

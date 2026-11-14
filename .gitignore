@@ -17,3 +17,6 @@ ota/bundles/
 # Python 캐시 (빵 스펙 저작 스크립트)
 __pycache__/
 *.pyc
+
+# 로컬 검수 렌더 · Blender 중간 산출물 (scripts/glb-shot.mjs · scripts/blender-export.mjs)
+.work/

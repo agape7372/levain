@@ -18,6 +18,15 @@
 // 재료는 12 → 30종으로 자란다. 고정 상수면 재료가 늘 때마다 손으로 올려야 하고,
 // 그 손질은 "예산을 지켰다"가 아니라 "예산을 예산에 맞췄다"가 된다.
 // 그래서 재료는 **개수 비례**(perItemKB)로 잡는다 — 평균이 기준선을 넘으면 그때 걸린다.
+//
+// ## 빵 예산 개정 (2026-11-14 — Blender PBR 파이프라인, docs/BREADS.md §Blender)
+// 크기를 정하는 게 삼각형이 아니라 **텍스처**가 됐다: 색 1024² WebP 100~190KB + 노멀·거칠기 ≈60KB
+// + meshopt 기하 ≈11 B/tri. 14종 실측: 123~457KB · 5.3k~18.6k tri · 합 3366KB
+// (최대 = 토핑 변형 딸기 팬케이크 457KB · 포카치아 18.6k tri). 그래서 개당 500KB · 20k tri.
+// 런타임 비용은 개수와 무관하다 — 쇼케이스는 한 번에 1개만 올리고 이전 것을 dispose한다(breadShowcase.ts).
+// 합계는 OTA가 매 판 통째로 내려받는 몫이다. WebP·meshopt라 zip이 9%밖에 못 줄인다:
+// OTA zip 실측 5.5MB(1.6.4, 옛 빵) → 7.4MB(새 빵 14종, 빵을 뺀 묶음 4.4MB). 합계 상한 5MB면 zip ≈ 9MB다.
+// 넘기면 새 빵을 얹기 전에 색 맵 품질·해상도부터 다시 본다(wholewheat는 WebP 품질 76으로 맞췄다).
 
 /** @type {import('./families.d.ts').FamilyKey[]} */
 export const FAMILY_KEYS = ['bread', 'ingredient'];
@@ -32,10 +41,10 @@ export const FAMILIES = {
     refDir: 'breads',
     /** assets/prompts/<promptDir>/<id>.json — 색 정본 */
     promptDir: 'breads',
-    perKB: 250,
-    maxTri: 8000,
-    /** 베이스 10종(닫힌 집합) + 변형(호환성 규칙 수만큼, 열려 있으나 유한) — 고정 합계 */
-    totalKB: 2560,
+    perKB: 500,
+    maxTri: 20000,
+    /** 베이스 10종(닫힌 집합) + 변형(호환성 규칙 수만큼, 열려 있으나 유한) — 고정 합계 = OTA 묶음 몫 */
+    totalKB: 5120,
     perItemKB: null,
   },
   ingredient: {
@@ -49,6 +58,8 @@ export const FAMILIES = {
     // (`breadShowcase.ts`의 `FIT_SIZE = 1.6`이 패밀리를 안 가린다).
     // 결과: 64px 썸네일에서는 멀쩡하고 전체 화면에서는 각지고 조잡했다 — 실기기에서 드러났다.
     // 상한을 빵과 같게 둔다. 같은 화면에서 같은 크기로 보는 것에 다른 예산을 줄 근거가 없다.
+    // (2026-11-14) 빵은 Blender PBR로 옮겨 500KB가 됐다. 재료는 아직 옛 절차 파이프라인(텍스처 0장)이라
+    // 250KB가 그 파이프라인의 상한이다. 재료를 Blender로 옮기면 빵 예산을 따른다.
     perKB: 250,
     maxTri: 8000,
     totalKB: null,

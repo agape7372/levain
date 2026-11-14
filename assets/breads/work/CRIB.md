@@ -1,5 +1,8 @@
 # 빵 모델링 크립 — M2 위임 정본 (pancake 파일럿에서 증류, 2026-08-30 변형 3종 라운드로 개정)
 
+> **2026-11-14: 이 크립은 옛 three.js 절차 파이프라인 기록이다.** 새 정본은 Blender 구운 PBR 파이프라인 —
+> `docs/BREADS.md` §Blender 파이프라인(절차·함정·예산·검수 도구). 옛 빌더(`scripts/breads/*.ts`)를 고칠 때만 아래를 본다.
+
 레포 `C:\Users\agape\Desktop\코딩\levain` · 스킬 루트 `C:\Users\agape\.claude\skills\img2threejs`.
 계약 정본 = `scripts/breads/types.ts` 주석 전체(먼저 정독). 선례 = `scripts/breads/pancake.ts` + `assets/breads/work/pancake/`
 (마감 정본은 아래 §마감 계약으로 갱신됨 — pancake의 facet 마감은 참고용, 그대로 복제하지 말 것).

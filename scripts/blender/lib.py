@@ -1,0 +1,672 @@
+"""르방이 빵 GLB — Blender(bpy) 공용 도구. 절차 정본 = docs/BREADS.md §Blender 파이프라인.
+
+헤드리스 전용: node scripts/blender-export.mjs <id>  (안에서 blender -b --factory-startup -P run.py)
+좌표: Blender Z-up. 단위는 실제 비율만 맞춘다(런타임이 최장축을 1.6으로 맞춘다).
+정면 = Blender -Y (glTF/three +Z, 썸네일 카메라 쪽).
+
+흐름: 빌더가 파트별 고해상 메시 + 절차 재질(노드)을 만든다 → bake_and_export()가
+  합치기 → UV(재질별 밀도 가중) → Cycles 굽기(색·거칠기·노멀·AO) → AO를 색에 곱함 →
+  재질 1장(색·노멀·거칠기 텍스처)으로 바꿔 GLB 1메시로 내보낸다. 런타임은 PBR 경로(breadMaterial.ts).
+"""
+import math
+import os
+import random
+
+import bmesh
+import bpy
+import numpy as np
+from mathutils import Matrix, Vector, noise
+
+TAU = math.tau
+UP = Vector((0, 0, 1))
+# 썸네일 카메라 three (-1.6, 2.2, 2.6) → Blender (-1.6, -2.6, 2.2) 의 수평 방위
+CAM = math.atan2(-2.6, -1.6)
+
+
+# ── 방향 ──────────────────────────────────────────────────────────────────────
+
+def az(alpha_deg):
+    """카메라 기준 각(도) → 세계 방위(라디안). + = 화면 오른쪽"""
+    return CAM + math.radians(alpha_deg)
+
+
+def horiz(th):
+    return Vector((math.cos(th), math.sin(th), 0.0))
+
+
+def frame(z_axis, x_hint):
+    """국소 Z → z_axis, 국소 X → x_hint(직교화) 회전 4×4"""
+    ez = z_axis.normalized()
+    ex = (x_hint - ez * x_hint.dot(ez)).normalized()
+    ey = ez.cross(ex)
+    return Matrix((ex, ey, ez)).transposed().to_4x4()
+
+
+# ── 단면 경로 (흘러내림·줄기를 표면 따라 놓을 때) ─────────────────────────────
+
+def prof_r(prof, h):
+    """프로필(아래 극 → 위 극)이 높이 h에서 갖는 가장 바깥 반지름"""
+    best = 0.0
+    for (r0, z0), (r1, z1) in zip(prof, prof[1:]):
+        if z0 != z1 and (z0 - h) * (z1 - h) <= 0:
+            best = max(best, r0 + (r1 - r0) * (h - z0) / (z1 - z0))
+    return best
+
+
+def bridged(fn, z, gap):
+    """골을 건너뛴다 — 위아래 gap 안에 더 넓은 데가 둘 다 있으면 그 작은 쪽까지 채운 반지름"""
+    up = max(fn(z + gap * k / 4) for k in range(1, 5))
+    dn = max(fn(z - gap * k / 4) for k in range(1, 5))
+    return max(fn(z), min(up, dn))
+
+
+def with_normals(pts):
+    """[(r, z)] → [(r, z, 바깥 법선 r, 바깥 법선 z, 호 길이)] — 경로는 안쪽 → 바깥 → 아래 순"""
+    out, s = [], 0.0
+    for i, (r, z) in enumerate(pts):
+        a, b = pts[max(0, i - 1)], pts[min(len(pts) - 1, i + 1)]
+        dr, dz = b[0] - a[0], b[1] - a[1]
+        ln = math.hypot(dr, dz) or 1.0
+        if i:
+            s += math.hypot(r - pts[i - 1][0], z - pts[i - 1][1])
+        out.append((r, z, -dz / ln, dr / ln, s))
+    return out
+
+
+def at(path, s):
+    """with_normals 경로의 호 길이 s 지점 (r, z, 법선 r, 법선 z)"""
+    for a, b in zip(path, path[1:]):
+        if b[4] >= s:
+            t = 0.0 if b[4] == a[4] else (s - a[4]) / (b[4] - a[4])
+            return tuple(a[i] + (b[i] - a[i]) * t for i in range(4))
+    return path[-1][:4]
+
+
+# ── 장면 ──────────────────────────────────────────────────────────────────────
+
+def reset(seed: int) -> None:
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    random.seed(seed)
+    sc = bpy.context.scene
+    sc.render.engine = 'CYCLES'
+    sc.cycles.device = 'CPU'
+    sc.cycles.samples = 1
+    world = bpy.data.worlds.new('world')
+    sc.world = world
+    # AO 굽기 거리 — 크림 골·층 사이 같은 가까운 틈만 어둡게(물체 단위, 지름 1 기준).
+    # 0.08이면 크림 전체가 회색으로 죽었다(2026-11-14) — 맞닿은 틈만 남긴다
+    world.light_settings.distance = 0.05
+
+
+def link(ob):
+    bpy.context.collection.objects.link(ob)
+    return ob
+
+
+def hex_lin(h: str):
+    """'#RRGGBB'(sRGB) → Blender 노드용 선형 RGBA"""
+    h = h.lstrip('#')
+    out = []
+    for i in (0, 2, 4):
+        c = int(h[i:i + 2], 16) / 255
+        out.append(c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4)
+    return (*out, 1.0)
+
+
+def n3(x, y, z, seed=0.0):
+    """결정론 노이즈 −1..1 (mathutils Perlin)"""
+    return noise.noise(Vector((x + seed * 17.13, y - seed * 9.71, z + seed * 3.37)))
+
+
+# ── 형상 ──────────────────────────────────────────────────────────────────────
+
+def lathe(name, profile, segs=96, rfn=None, zfn=None, theta0=0.0, theta1=TAU):
+    """회전체(세로축 Z). profile = [(r, z), ...] 아래 → 위. r≈0인 끝점은 극(정점 1개).
+    rfn(theta, z) → 반지름 배율(둘레 요철), zfn(theta, r) → z 더하기.
+    theta 범위가 한 바퀴가 아니면 열린 조각(가장자리 정점 따로)."""
+    full = abs((theta1 - theta0) - TAU) < 1e-9
+    n = segs if full else segs + 1
+    bm = bmesh.new()
+    rings = []
+    for (r, z) in profile:
+        if r <= 1e-9:
+            rings.append([bm.verts.new((0.0, 0.0, z))])
+            continue
+        ring = []
+        for i in range(n):
+            th = theta0 + (theta1 - theta0) * i / segs
+            rr = r * (rfn(th, z) if rfn else 1.0)
+            zz = z + (zfn(th, r) if zfn else 0.0)
+            ring.append(bm.verts.new((rr * math.cos(th), rr * math.sin(th), zz)))
+        rings.append(ring)
+    m = segs  # 면 개수(둘레)
+    for a, b in zip(rings, rings[1:]):
+        if len(a) == 1 and len(b) == 1:
+            continue
+        for i in range(m):
+            j = (i + 1) % n if full else i + 1
+            if len(a) == 1:
+                bm.faces.new((a[0], b[j], b[i]))
+            elif len(b) == 1:
+                bm.faces.new((a[i], a[j], b[0]))
+            else:
+                bm.faces.new((a[i], a[j], b[j], b[i]))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    me = bpy.data.meshes.new(name)
+    bm.to_mesh(me)
+    bm.free()
+    for p in me.polygons:
+        p.use_smooth = True
+    return link(bpy.data.objects.new(name, me))
+
+
+def superellipse_profile(radius, height, n=5.0, steps=40, dome=0.0, base=0.0):
+    """둥근 모서리 원반 단면(아래 극 → 위 극). n이 클수록 모서리가 각지다.
+    dome = 윗면 가운데 볼록 높이, base = 아랫면 가운데 오목(+면 위로)"""
+    pts = []
+    for k in range(steps + 1):
+        t = -math.pi / 2 + math.pi * k / steps
+        c, s = math.cos(t), math.sin(t)
+        x = radius * (abs(c) ** (2 / n))
+        z = height / 2 * (1 + math.copysign(abs(s) ** (2 / n), s))
+        u = x / radius
+        if s > 0:
+            z += dome * (1 - u * u)
+        else:
+            z += base * (1 - u * u)
+        pts.append((x if k not in (0, steps) else 0.0, z))
+    return pts
+
+
+def displace_normal(ob, fn):
+    """정점을 법선 방향으로 fn(co) 만큼 민다(절차 요철). 법선은 밀기 전에 다 읽는다 —
+    정점마다 v.normal을 읽으면 앞 정점을 민 뒤 다시 계산된 법선을 써서, 급한 변위(칼집 벼랑)가
+    틀어지고(깜빠뉴 X가 거꾸로 솟음, 2026-11-14) 정점마다 법선 전체를 다시 계산한다"""
+    me = ob.data
+    me.update()
+    nrm = [v.normal.copy() for v in me.vertices]
+    for v, n in zip(me.vertices, nrm):
+        v.co += n * fn(v.co)
+    me.update()
+
+
+def apply_modifiers(ob):
+    bpy.context.view_layer.objects.active = ob
+    ob.select_set(True)
+    for md in list(ob.modifiers):
+        bpy.ops.object.modifier_apply(modifier=md.name)
+    ob.select_set(False)
+
+
+def solidify(ob, thickness):
+    md = ob.modifiers.new('solid', 'SOLIDIFY')
+    md.thickness = thickness
+    md.offset = 0.0
+    apply_modifiers(ob)
+
+
+def decimate(ob, ratio):
+    if ratio >= 0.999:
+        return
+    md = ob.modifiers.new('dec', 'DECIMATE')
+    md.ratio = ratio
+    apply_modifiers(ob)
+
+
+def to_mesh(ob):
+    """곡선·메타볼 → 메시 오브젝트(원본은 지움). 곡선은 제자리 변환, 메타볼은 새 오브젝트가 생긴다"""
+    before = {o.name for o in bpy.data.objects}
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.view_layer.objects.active = ob
+    ob.select_set(True)
+    bpy.ops.object.convert(target='MESH')
+    new = [o for o in bpy.data.objects if o.name not in before and o.type == 'MESH']
+    out = new[0] if new else bpy.context.view_layer.objects.active
+    out.select_set(False)
+    return out
+
+
+def metaballs(name, elements, resolution=0.006, threshold=0.6):
+    """elements = [dict(type='BALL'|'ELLIPSOID'|'CAPSULE', co, radius, size=(x,y,z), rot=Quaternion)]"""
+    mb = bpy.data.metaballs.new(name)
+    mb.resolution = resolution
+    mb.render_resolution = resolution
+    mb.threshold = threshold
+    for e in elements:
+        el = mb.elements.new(type=e.get('type', 'BALL'))
+        el.co = e['co']
+        el.radius = e['radius']
+        if 'size' in e:
+            el.size_x, el.size_y, el.size_z = e['size']
+        if 'rot' in e:
+            el.rotation = e['rot']
+    ob = link(bpy.data.objects.new(name, mb))
+    me_ob = to_mesh(ob)
+    for p in me_ob.data.polygons:
+        p.use_smooth = True
+    return me_ob
+
+
+def curve_tube(name, points, radii, profile_obj=None, bevel_depth=0.01, caps=True):
+    """폴리 곡선 + 단면(오브젝트 또는 원형) → 메시. points = [(x,y,z)], radii = 점별 굵기 배율"""
+    cu = bpy.data.curves.new(name, 'CURVE')
+    cu.dimensions = '3D'
+    cu.resolution_u = 2
+    sp = cu.splines.new('POLY')
+    sp.points.add(len(points) - 1)
+    for p, co, r in zip(sp.points, points, radii):
+        p.co = (*co, 1.0)
+        p.radius = r
+    if profile_obj is not None:
+        cu.bevel_mode = 'OBJECT'
+        cu.bevel_object = profile_obj
+    else:
+        cu.bevel_mode = 'ROUND'
+        cu.bevel_depth = bevel_depth
+        cu.bevel_resolution = 4
+    cu.use_fill_caps = caps
+    ob = link(bpy.data.objects.new(name, cu))
+    me_ob = to_mesh(ob)
+    for p in me_ob.data.polygons:
+        p.use_smooth = True
+    return me_ob
+
+
+def profile_curve(name, pts2d):
+    """닫힌 2D 단면 곡선(베벨 오브젝트용) — 장면에 링크하되 굽기·내보내기 전에 지운다"""
+    cu = bpy.data.curves.new(name, 'CURVE')
+    cu.dimensions = '2D'
+    sp = cu.splines.new('POLY')
+    sp.points.add(len(pts2d) - 1)
+    for p, (x, y) in zip(sp.points, pts2d):
+        p.co = (x, y, 0.0, 1.0)
+    sp.use_cyclic_u = True
+    return link(bpy.data.objects.new(name, cu))
+
+
+def place(ob, loc=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1)):
+    ob.location = loc
+    ob.rotation_euler = rot
+    ob.scale = scale
+    return ob
+
+
+def bake_transform(ob):
+    """위치·회전·크기를 정점에 굳힌다(합치기 전에)"""
+    ob.data.transform(ob.matrix_world)
+    ob.matrix_world = Matrix.Identity(4)
+
+
+def delete_faces(ob, pred):
+    """pred(face_center, face_normal) 가 참인 면을 지운다 — 안 보이는 면 정리(텍스처·삼각형 절약)"""
+    bm = bmesh.new()
+    bm.from_mesh(ob.data)
+    bm.normal_update()
+    kill = [f for f in bm.faces if pred(f.calc_center_median(), f.normal)]
+    bmesh.ops.delete(bm, geom=kill, context='FACES')
+    bm.to_mesh(ob.data)
+    bm.free()
+
+
+def orient_faces(ob, outward):
+    """열린 조각의 면 방향 맞추기 — outward(face_center) 쪽을 보게 뒤집는다(recalc는 열린 면에서 못 믿는다)"""
+    bm = bmesh.new()
+    bm.from_mesh(ob.data)
+    bm.normal_update()
+    flip = [f for f in bm.faces if f.normal.dot(outward(f.calc_center_median())) < 0]
+    bmesh.ops.reverse_faces(bm, faces=flip)
+    bm.to_mesh(ob.data)
+    bm.free()
+
+
+def point_attr(ob, name, values):
+    """정점마다 실수 하나(FLOAT·POINT) — 재질에서 Mat.attr(name)로 읽는다"""
+    at = ob.data.attributes.new(name, 'FLOAT', 'POINT')
+    at.data.foreach_set('value', [float(v) for v in values])
+
+
+def catmull(points, sub=1):
+    """Catmull-Rom — 제어점 사이에 sub개씩 끼운다(끝점 유지). points = [(a, b), ...]"""
+    pts = [points[0], *points, points[-1]]
+    out = []
+    for i in range(1, len(pts) - 2):
+        p0, p1, p2, p3 = (Vector(p) for p in pts[i - 1:i + 3])
+        for k in range(sub + 1):
+            t = k / (sub + 1)
+            out.append(tuple(0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t
+                                    + (-p0 + 3 * p1 - 3 * p2 + p3) * t ** 3)))
+    out.append(tuple(points[-1]))
+    return out
+
+
+def tri_count(ob):
+    return sum(len(p.vertices) - 2 for p in ob.data.polygons)
+
+
+# ── 재질 노드 ─────────────────────────────────────────────────────────────────
+
+class Mat:
+    """Principled BSDF 하나짜리 절차 재질을 짧게 짓는 도우미"""
+
+    def __init__(self, name):
+        self.mat = bpy.data.materials.new(name)
+        self.mat.use_nodes = True
+        self.nt = self.mat.node_tree
+        self.bsdf = self.nt.nodes['Principled BSDF']
+        self.bsdf.inputs['Metallic'].default_value = 0.0
+
+    def node(self, kind, **props):
+        nd = self.nt.nodes.new(kind)
+        for k, v in props.items():
+            setattr(nd, k, v)
+        return nd
+
+    def link(self, a, b):
+        self.nt.links.new(a, b)
+
+    def coords(self, kind='Object'):
+        return self.node('ShaderNodeTexCoord').outputs[kind]
+
+    def lpos(self):
+        """파트 국소 좌표(tag_local) — 합친 뒤에도 파트 기준"""
+        return self.node('ShaderNodeAttribute', attribute_name='lpos', attribute_type='GEOMETRY').outputs['Vector']
+
+    def lnrm(self):
+        """파트 국소 법선(tag_local, 정점 보간)"""
+        return self.node('ShaderNodeAttribute', attribute_name='lnrm', attribute_type='GEOMETRY').outputs['Vector']
+
+    def mapping(self, vec, loc=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1)):
+        m = self.node('ShaderNodeMapping')
+        self.link(vec, m.inputs['Vector'])
+        m.inputs['Location'].default_value = loc
+        m.inputs['Rotation'].default_value = rot
+        m.inputs['Scale'].default_value = scale
+        return m.outputs['Vector']
+
+    def noise(self, vec, scale=5.0, detail=4.0, rough=0.5, distortion=0.0, w=None):
+        nd = self.node('ShaderNodeTexNoise')
+        if w is not None:
+            nd.noise_dimensions = '4D'
+            nd.inputs['W'].default_value = w
+        self.link(vec, nd.inputs['Vector'])
+        nd.inputs['Scale'].default_value = scale
+        nd.inputs['Detail'].default_value = detail
+        nd.inputs['Roughness'].default_value = rough
+        nd.inputs['Distortion'].default_value = distortion
+        return nd.outputs['Fac']
+
+    def voronoi(self, vec, scale=10.0, feature='F1', randomness=1.0, out='Distance', dims='3D'):
+        nd = self.node('ShaderNodeTexVoronoi', feature=feature, voronoi_dimensions=dims)
+        self.link(vec, nd.inputs['Vector'])
+        nd.inputs['Scale'].default_value = scale
+        nd.inputs['Randomness'].default_value = randomness
+        return nd.outputs[out]
+
+    def math(self, op, a, b=None, clamp=False):
+        nd = self.node('ShaderNodeMath', operation=op, use_clamp=clamp)
+        for i, v in enumerate((a, b)):
+            if v is None:
+                continue
+            if isinstance(v, (int, float)):
+                nd.inputs[i].default_value = v
+            else:
+                self.link(v, nd.inputs[i])
+        return nd.outputs[0]
+
+    def vmath(self, op, a, b=None):
+        nd = self.node('ShaderNodeVectorMath', operation=op)
+        for i, v in enumerate((a, b)):
+            if v is None:
+                continue
+            if isinstance(v, (tuple, list)):
+                nd.inputs[i].default_value = v
+            else:
+                self.link(v, nd.inputs[i])
+        return nd.outputs['Value'] if op in ('LENGTH', 'DOT_PRODUCT', 'DISTANCE') else nd.outputs['Vector']
+
+    def attr(self, name):
+        """정점 속성(point_attr) 실수값 — 없는 파트는 0"""
+        return self.node('ShaderNodeAttribute', attribute_name=name, attribute_type='GEOMETRY').outputs['Fac']
+
+    def combine(self, x=0.0, y=0.0, z=0.0):
+        nd = self.node('ShaderNodeCombineXYZ')
+        for i, v in enumerate((x, y, z)):
+            if isinstance(v, (int, float)):
+                nd.inputs[i].default_value = v
+            else:
+                self.link(v, nd.inputs[i])
+        return nd.outputs[0]
+
+    def sep(self, vec):
+        nd = self.node('ShaderNodeSeparateXYZ')
+        self.link(vec, nd.inputs[0])
+        return nd.outputs
+
+    def ramp(self, fac, stops, interp='LINEAR'):
+        """stops = [(pos, '#hex' 또는 float 0..1)]"""
+        nd = self.node('ShaderNodeValToRGB')
+        cr = nd.color_ramp
+        cr.interpolation = interp
+        self.link(fac, nd.inputs['Fac'])
+        while len(cr.elements) > 1:
+            cr.elements.remove(cr.elements[-1])
+        for i, (pos, col) in enumerate(stops):
+            el = cr.elements[0] if i == 0 else cr.elements.new(pos)
+            el.position = pos
+            el.color = hex_lin(col) if isinstance(col, str) else (col, col, col, 1.0)
+        return nd.outputs['Color']
+
+    def mix(self, fac, a, b):
+        """색 섞기 a→b. a·b = 소켓 또는 '#hex'"""
+        nd = self.node('ShaderNodeMix', data_type='RGBA', blend_type='MIX')
+        if isinstance(fac, (int, float)):
+            nd.inputs['Factor'].default_value = fac
+        else:
+            self.link(fac, nd.inputs['Factor'])
+        for sock, v in ((nd.inputs[6], a), (nd.inputs[7], b)):
+            if isinstance(v, str):
+                sock.default_value = hex_lin(v)
+            else:
+                self.link(v, sock)
+        return nd.outputs[2]
+
+    def mixf(self, fac, a, b):
+        """실수 섞기 a→b"""
+        nd = self.node('ShaderNodeMix', data_type='FLOAT')
+        for sock, v in ((nd.inputs['Factor'], fac), (nd.inputs[2], a), (nd.inputs[3], b)):
+            if isinstance(v, (int, float)):
+                sock.default_value = v
+            else:
+                self.link(v, sock)
+        return nd.outputs[0]
+
+    def smooth(self, x, e0, e1):
+        """smoothstep(e0, e1, x)"""
+        nd = self.node('ShaderNodeMapRange', interpolation_type='SMOOTHSTEP', clamp=True)
+        self.link(x, nd.inputs['Value'])
+        nd.inputs['From Min'].default_value = e0
+        nd.inputs['From Max'].default_value = e1
+        return nd.outputs['Result']
+
+    def bump(self, height, strength=0.3, distance=0.01, normal=None):
+        nd = self.node('ShaderNodeBump')
+        self.link(height, nd.inputs['Height'])
+        nd.inputs['Strength'].default_value = strength
+        nd.inputs['Distance'].default_value = distance
+        if normal is not None:
+            self.link(normal, nd.inputs['Normal'])
+        return nd.outputs['Normal']
+
+    def out(self, color=None, rough=None, normal=None):
+        for key, v in (('Base Color', color), ('Roughness', rough), ('Normal', normal)):
+            if v is None:
+                continue
+            sock = self.bsdf.inputs[key]
+            if isinstance(v, (int, float)):
+                sock.default_value = v
+            elif isinstance(v, str):
+                sock.default_value = hex_lin(v)
+            else:
+                self.link(v, sock)
+        return self.mat
+
+
+def assign(ob, mat):
+    ob.data.materials.clear()
+    ob.data.materials.append(mat)
+    return ob
+
+
+# ── 굽기·내보내기 ─────────────────────────────────────────────────────────────
+
+def tag_local(ob):
+    """파트 자신의 좌표·법선을 정점 속성(lpos·lnrm)에 적는다. 합치면 Object 좌표가 월드가 되므로
+    재질은 이 속성(Mat.lpos·Mat.lnrm)을 쓴다 — 딸기 단면 무늬·윗면/옆면 가르기가 배치와 무관해진다"""
+    me = ob.data
+    if 'lpos' in me.attributes:
+        return
+    me.update()
+    pos = me.attributes.new('lpos', 'FLOAT_VECTOR', 'POINT')
+    nrm = me.attributes.new('lnrm', 'FLOAT_VECTOR', 'POINT')
+    for i, v in enumerate(me.vertices):
+        pos.data[i].vector = v.co
+        nrm.data[i].vector = v.normal
+
+
+def _join(parts, name):
+    bpy.context.view_layer.update()  # place()가 바꾼 위치·회전을 matrix_world에 반영
+    bpy.ops.object.select_all(action='DESELECT')
+    for p in parts:
+        tag_local(p)
+        bake_transform(p)
+        p.select_set(True)
+    bpy.context.view_layer.objects.active = parts[0]
+    bpy.ops.object.join()
+    ob = bpy.context.view_layer.objects.active
+    ob.name = name
+    ob.data.name = name
+    return ob
+
+
+def _unwrap(ob, uv_weight):
+    """Smart UV + 재질별 밀도 가중 + 섬 포장. uv_weight = {재질 이름: 배율}"""
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.view_layer.objects.active = ob
+    ob.select_set(True)
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.uv.smart_project(angle_limit=math.radians(60), island_margin=0.0, area_weight=0.0,
+                             correct_aspect=True, scale_to_bounds=False)
+    bpy.ops.object.mode_set(mode='OBJECT')
+    if uv_weight:
+        me = ob.data
+        uv = me.uv_layers.active.data
+        for mi, mat in enumerate(me.materials):
+            w = uv_weight.get(mat.name, 1.0)
+            if abs(w - 1.0) < 1e-6:
+                continue
+            loops = [li for p in me.polygons if p.material_index == mi for li in p.loop_indices]
+            if not loops:
+                continue
+            cx = sum(uv[li].uv.x for li in loops) / len(loops)
+            cy = sum(uv[li].uv.y for li in loops) / len(loops)
+            for li in loops:
+                u = uv[li].uv
+                u.x = cx + (u.x - cx) * w
+                u.y = cy + (u.y - cy) * w
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.uv.pack_islands(rotate=True, margin=0.004)
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+
+def _bake(ob, img, kind, samples=8, **kw):  # 8 = 텍셀 안 지터(씨앗·기공 가장자리 계단 방지)
+    for mat in ob.data.materials:
+        nt = mat.node_tree
+        nd = nt.nodes.get('__bake__') or nt.nodes.new('ShaderNodeTexImage')
+        nd.name = '__bake__'
+        nd.image = img
+        nt.nodes.active = nd
+    bpy.context.scene.cycles.samples = samples
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.view_layer.objects.active = ob
+    ob.select_set(True)
+    bpy.ops.object.bake(type=kind, margin=8, margin_type='EXTEND', use_clear=True, **kw)
+
+
+def _image(name, size, non_color=False):
+    img = bpy.data.images.new(name, size, size, alpha=False)
+    if non_color:
+        img.colorspace_settings.name = 'Non-Color'
+    return img
+
+
+def _px(img):
+    a = np.empty(len(img.pixels), dtype=np.float32)
+    img.pixels.foreach_get(a)
+    return a.reshape(img.size[1], img.size[0], 4)
+
+
+def bake_and_export(parts, out_dir, name, size=1024, rough_size=512, ao_strength=0.6,
+                    ao_samples=48, uv_weight=None, quality=82):
+    """파트들 → 1메시 · 재질 1장(색·노멀·거칠기 텍스처) → <out_dir>/raw.glb. 통계 dict를 돌려준다"""
+    os.makedirs(out_dir, exist_ok=True)
+    for ob in list(bpy.data.objects):  # 베벨 단면 같은 보조 곡선은 내보내지 않는다
+        if ob.type != 'MESH':
+            bpy.data.objects.remove(ob)
+    ob = _join(parts, name)
+    _unwrap(ob, uv_weight or {})
+
+    col = _image(f'{name}_col', size)
+    rough = _image(f'{name}_rough', rough_size, non_color=True)
+    nrm = _image(f'{name}_nrm', size, non_color=True)
+    ao = _image(f'{name}_ao', size, non_color=True)
+    _bake(ob, col, 'DIFFUSE', pass_filter={'COLOR'})
+    _bake(ob, rough, 'ROUGHNESS')
+    _bake(ob, nrm, 'NORMAL', normal_space='TANGENT')
+    _bake(ob, ao, 'AO', samples=ao_samples)
+
+    # AO는 색에 곱한다(시점 무관 그늘 — 크림 골·층 사이). 감마 공간 곱이라 세기를 조금 낮춘다.
+    # ao_strength 가 {재질: 세기, '*': 기본} 이면 재질마다 세기를 방출로 구워 텍셀마다 읽는다 —
+    # 토핑에 둘러싸인 흰 크림이 한 세기(0.6)로는 회색으로 죽었다(2026-11-14 딸기 팬케이크 r5)
+    c, a = _px(col), _px(ao)
+    s = ao_strength
+    if isinstance(ao_strength, dict):
+        aow = _image(f'{name}_aow', size, non_color=True)
+        for mat in ob.data.materials:  # 굽기용 재질은 아래에서 통째로 버린다 — 되돌리지 않는다
+            w = ao_strength.get(mat.name, ao_strength.get('*', 0.6))
+            bsdf = mat.node_tree.nodes['Principled BSDF']
+            bsdf.inputs['Emission Color'].default_value = (w, w, w, 1.0)
+            bsdf.inputs['Emission Strength'].default_value = 1.0
+        _bake(ob, aow, 'EMIT', samples=1)
+        s = _px(aow)[..., :1]
+    occ = 1.0 - s * (1.0 - a[..., :1])
+    c[..., :3] *= occ
+    col.pixels.foreach_set(c.ravel())
+    for img in (col, rough, nrm, ao):
+        img.filepath_raw = os.path.join(out_dir, f'{img.name}.png')
+        img.file_format = 'PNG'
+        img.save()
+
+    # 최종 재질 1장 — glTF 내보내기가 거칠기(G)를 metallicRoughness로 싣는다
+    final = Mat(f'{name}_pbr')
+    t_col = final.node('ShaderNodeTexImage', image=col)
+    t_nrm = final.node('ShaderNodeTexImage', image=nrm)
+    t_rgh = final.node('ShaderNodeTexImage', image=rough)
+    nmap = final.node('ShaderNodeNormalMap')
+    final.link(t_nrm.outputs['Color'], nmap.inputs['Color'])
+    sep = final.node('ShaderNodeSeparateColor')
+    final.link(t_rgh.outputs['Color'], sep.inputs['Color'])
+    final.out(color=t_col.outputs['Color'], rough=sep.outputs['Green'], normal=nmap.outputs['Normal'])
+    ob.data.materials.clear()
+    ob.data.materials.append(final.mat)
+
+    path = os.path.join(out_dir, 'raw.glb')
+    bpy.ops.object.select_all(action='DESELECT')
+    ob.select_set(True)
+    bpy.ops.export_scene.gltf(
+        filepath=path, export_format='GLB', use_selection=True, export_yup=True, export_apply=True,
+        export_tangents=False, export_image_format='WEBP', export_image_quality=quality,
+        export_extras=False, export_cameras=False, export_lights=False,
+    )
+    return {'name': name, 'tris': tri_count(ob), 'verts': len(ob.data.vertices), 'bytes': os.path.getsize(path)}

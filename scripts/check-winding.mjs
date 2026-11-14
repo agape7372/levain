@@ -20,42 +20,28 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { MeshoptDecoder } from 'meshoptimizer';
 import { FAMILIES, FAMILY_KEYS } from './lib/families.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-const COMP = {
-  5120: [1, 'readInt8'], 5121: [1, 'readUInt8'], 5122: [2, 'readInt16LE'],
-  5123: [2, 'readUInt16LE'], 5125: [4, 'readUInt32LE'], 5126: [4, 'readFloatLE'],
-};
-const NCOMP = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4 };
+// glTF Transform으로 읽는다 — Blender 파이프라인 GLB는 meshopt 압축·양자화라(2026-11-14)
+// 버퍼를 직접 읽으면 쓰레기 값이 나온다. getElement가 정규화 정수를 실수로 풀어 준다.
+// 양자화 배율은 노드 변환으로 빠지지만 부호부피의 부호는 양의 배율에서 그대로다.
+await MeshoptDecoder.ready;
+const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
 
-function readGlb(file) {
-  const b = fs.readFileSync(file);
-  let off = 12, json = null, bin = null;
-  while (off < b.length) {
-    const len = b.readUInt32LE(off);
-    const type = b.readUInt32LE(off + 4);
-    const data = b.slice(off + 8, off + 8 + len);
-    if (type === 0x4e4f534a) json = JSON.parse(data.toString('utf8'));
-    else if (type === 0x004e4942) bin = data;
-    off += 8 + len;
-  }
-  return { json, bin };
-}
-
-function readAccessor(json, bin, i) {
-  const a = json.accessors[i];
-  const bv = json.bufferViews[a.bufferView];
-  const base = (bv.byteOffset || 0) + (a.byteOffset || 0);
-  const [size, fn] = COMP[a.componentType];
-  const n = NCOMP[a.type];
-  const stride = bv.byteStride || size * n;
-  const out = [];
-  for (let k = 0; k < a.count; k++) {
-    for (let c = 0; c < n; c++) out.push(bin[fn](base + k * stride + c * size));
-  }
-  return out;
+function primArrays(prim) {
+  const pos = prim.getAttribute('POSITION');
+  const P = [];
+  const v = [0, 0, 0];
+  for (let k = 0; k < pos.getCount(); k++) P.push(...pos.getElement(k, v));
+  const idx = prim.getIndices();
+  // 비인덱스 프리미티브는 정점 순서가 곧 삼각형 순서다(빵 자산에 실제로 있다).
+  const I = idx ? Array.from(idx.getArray()) : Array.from({ length: P.length / 3 }, (_, k) => k);
+  return { P, I };
 }
 
 /**
@@ -97,15 +83,11 @@ for (const key of keys) {
   const files = fs.readdirSync(dir).filter((f) => f.endsWith('.glb'))
     .filter((f) => ids.length === 0 || ids.includes(f.slice(0, -4)));
   for (const f of files.sort()) {
-    const { json, bin } = readGlb(path.join(dir, f));
+    const doc = await io.read(path.join(dir, f));
     const flags = [];
-    for (const mesh of json.meshes) {
-      for (const p of mesh.primitives) {
-        const P = readAccessor(json, bin, p.attributes.POSITION);
-        // 비인덱스 프리미티브는 정점 순서가 곧 삼각형 순서다(빵 자산에 실제로 있다).
-        const I = p.indices != null
-          ? readAccessor(json, bin, p.indices)
-          : Array.from({ length: P.length / 3 }, (_, k) => k);
+    for (const mesh of doc.getRoot().listMeshes()) {
+      for (const p of mesh.listPrimitives()) {
+        const { P, I } = primArrays(p);
         const r = analyze(P, I);
         checked++;
         // 임계 -0.01: 뒤집힌 셸는 실측상 -0.06 아래고 평면 캡은 -0.001보다 위다.
