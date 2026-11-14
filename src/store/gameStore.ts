@@ -10,7 +10,7 @@ import type {
   PantryLot, SimEvent, SimState, Snapshot,
 } from '../sim';
 import {
-  LABEL_STAGE, REWIND_TOLERANCE_MS, STARTER_SLOTS_FREE,
+  LABEL_STAGE, REWIND_TOLERANCE_MS, STAGES, STARTER_SLOTS_FREE,
   activityAt, advance, applyAction, betterGrade, deriveBriefing, deriveSnapshot, initialState,
   isPlayable, planNotificationsAll, playableRules, reanchor, ruleByVariantId, stageOf,
   RECIPES, variantIdOf, DAY, INGREDIENT_SOFT_CAP, INGREDIENT_FLOUR_COST,
@@ -663,6 +663,7 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     devMatureActive(): void {
       const now = clock.now();
       advanceTo(now);
+      const stageBefore = houseStage();
       const sim = activeSim();
       // createdAt만 과거로 — 재정박 목록과 무관(더 과거로 미는 건 안전), 일수 게이트 통과용
       setActiveSim({ ...sim, createdAt: now - 40 * DAY, maturity: 45, mass: 480 });
@@ -671,14 +672,19 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
       // 치트로 구운 빵이 죄다 납작하게 나온다. 활발(1.0)·순한(산미 10) 로트 = 어떤 레시피든 최고 가능.
       const need = 1_000 - env.shared.pantry;
       if (need > 0) addLot({ g: need, act: 1.0, acid: 10, flour: 'white' });
+      // 해금 출처(stageMax)를 지금 올린다 — 안 하면 다음 tick(5초)까지 레시피가 잠겨 보인다
+      syncStageMax(now);
       snap = deriveSnapshot(activeSim(), now);
       persist(now);
       replan(now);
-      emit([]);
+      emit(houseStageUps(stageBefore));
     },
 
     devCompleteCollection(): void {
       const now = clock.now();
+      // 도감 완성 = 레시피도 전부 연다. 레시피 잠금은 도감이 아니라 집 최고 단계로 판정한다
+      const stageBefore = houseStage();
+      setEconomy({ stageMax: Math.max(stageBefore, STAGES.length - 1) });
       const collection = { ...env.shared.collection };
       const keys = [
         ...RECIPES.map((r) => ({ key: r.id, graded: r.kind === 'bread' })),
@@ -695,7 +701,7 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
       }
       env = { ...env, shared: { ...env.shared, collection } };
       persist(now);
-      emit([]);
+      emit(houseStageUps(stageBefore));
     },
 
     renameActive(name: string): void {
