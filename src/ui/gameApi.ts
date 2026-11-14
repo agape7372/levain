@@ -120,6 +120,7 @@ export interface GameApi {
     matureActive(): void;
     grantAllIngredients(): void;
     completeCollection(): void;
+    unlockRecipes(): void;
   };
 
   getSettings(): GameSettings;

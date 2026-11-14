@@ -124,6 +124,8 @@ export interface GameStore {
   devMatureActive(): void;
   /** 개발자 모드 — 도감 전부 완성(베이스 10 + v1 변형 40, 최고 등급) */
   devCompleteCollection(): void;
+  /** 개발자 모드 — 집 최고 단계를 끝까지 올려 레시피 전부 해금 */
+  devUnlockRecipes(): void;
   /**
    * 활성 르방 이름 짓기 — 게이트·규칙은 v1 setLabel과 동일(5단계·trim·12자).
    * Phase 3에서 자유화 예정(확장기획 §5-3). labeled/labelLocked 이벤트로 통지.
@@ -701,6 +703,16 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
       }
       env = { ...env, shared: { ...env.shared, collection } };
       persist(now);
+      emit(houseStageUps(stageBefore));
+    },
+
+    devUnlockRecipes(): void {
+      // 관리자 모드에 들어가면 레시피 10종이 다 열린다 — 해금 출처는 집 최고 단계 하나
+      const stageBefore = houseStage();
+      const top = STAGES.length - 1;
+      if (stageBefore >= top) return;
+      setEconomy({ stageMax: top });
+      persist(clock.now());
       emit(houseStageUps(stageBefore));
     },
 

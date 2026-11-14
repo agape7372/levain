@@ -81,6 +81,8 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       toast(copy.save.writeFailed);
     },
   });
+  // 관리자 모드 기기(flags.dev)는 켤 때마다 레시피가 다 열려 있다 — dev 서버(import.meta.env.DEV)는 제외해 성장 흐름을 시험할 수 있게 둔다
+  if (store.getEnvelope().flags.dev === true) store.devUnlockRecipes();
 
   // ── 씬 ──
   const scene = new SceneHost(canvas, stage);
@@ -240,6 +242,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
         if (fresh.length > 0) celebrateIngredients(api, fresh);
       },
       completeCollection: () => store.devCompleteCollection(),
+      unlockRecipes: () => store.devUnlockRecipes(),
     },
     getSettings: () => ({ ...store.getEnvelope().settings }),
     setSettings: (patch) => {

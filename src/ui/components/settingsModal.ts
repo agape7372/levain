@@ -187,6 +187,7 @@ export function openSettings(api: GameApi): void {
     taps += 1;
     if (taps !== 7 || wrap.querySelector('.dev-rows')) return;
     const open = (): void => {
+      api.dev.unlockRecipes(); // 관리자 모드 = 레시피 전부 열림 (2026-11-14 사용자 요청)
       toast(copy.devMode.on);
       wrap.insertBefore(buildDevRows(api), version);
     };

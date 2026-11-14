@@ -26,6 +26,12 @@ describe('개발자 치트 → 레시피 해금', () => {
     expect(store.getHouseStage()).toBe(STAGES.length - 1);
   });
 
+  it('관리자 모드 진입(unlockRecipes)은 레시피를 전부 연다', () => {
+    const store = freshStore();
+    store.devUnlockRecipes();
+    expect(store.getHouseStage()).toBe(STAGES.length - 1);
+  });
+
   it('도감 완성 치트는 레시피도 전부 연다', () => {
     const store = freshStore();
     store.devCompleteCollection();
