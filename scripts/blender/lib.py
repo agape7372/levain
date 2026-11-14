@@ -5,7 +5,7 @@
 정면 = Blender -Y (glTF/three +Z, 썸네일 카메라 쪽).
 
 흐름: 빌더가 파트별 고해상 메시 + 절차 재질(노드)을 만든다 → bake_and_export()가
-  합치기 → UV(재질별 밀도 가중) → Cycles 굽기(색·거칠기·노멀·AO) → AO를 색에 곱함 →
+  합치기 → UV(재질별 밀도 가중) → Cycles 굽기(색·거칠기·노멀·AO) → AO를 색에 곱함 → 음식 색 보정 →
   재질 1장(색·노멀·거칠기 텍스처)으로 바꿔 GLB 1메시로 내보낸다. 런타임은 PBR 경로(breadMaterial.ts).
 """
 import math
@@ -267,6 +267,13 @@ def curve_tube(name, points, radii, profile_obj=None, bevel_depth=0.01, caps=Tru
     cu.use_fill_caps = caps
     ob = link(bpy.data.objects.new(name, cu))
     me_ob = to_mesh(ob)
+    # 단면 곡선을 감는 방향에 따라 법선이 통째로 안쪽을 본다(크림 로제트 97%). 앱은 양면 재질이라 안 보이고
+    # 빵 전체 부피 감기 검사도 통과하지만, AO 굽기는 관 안쪽을 재서 그늘을 잘못 굽는다(2026-11-14)
+    bm = bmesh.new()
+    bm.from_mesh(me_ob.data)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me_ob.data)
+    bm.free()
     for p in me_ob.data.polygons:
         p.use_smooth = True
     return me_ob
@@ -607,6 +614,42 @@ def _px(img):
     return a.reshape(img.size[1], img.size[0], 4)
 
 
+def _sstep(e0, e1, x):
+    t = np.clip((x - e0) / (e1 - e0), 0, 1)
+    return t * t * (3 - 2 * t)
+
+
+def food_grade(rgb):
+    """음식 색 보정 — 감마 공간 RGB (..., 3) → 같은 모양. 2026-11-14 사용자 「조형은 괜찮은데 빛깔이 별로」.
+    따뜻한 색상(5~60°)만 만진다: 껍질(채도 높음)은 짙게, 그중 밝은 껍질만 채도를 누르고 색상을 황금 갈색 32°로
+    당긴다. 속살(채도 낮고 밝음)은 밝고 담백하게, 끝에 밝기 대비를 살짝. 딸기 · 잼(빨강) · 올리브(초록) · 회색은
+    창 밖이라 그대로. 실패한 판은 docs/BREADS.md 함정 목록"""
+    v = rgb.max(-1)
+    d = v - rgb.min(-1)
+    dd = np.maximum(d, 1e-6)
+    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+    h = np.where(v == r, (g - b) / dd, np.where(v == g, 2 + (b - r) / dd, 4 + (r - g) / dd)) * 60 % 360
+    s = d / np.maximum(v, 1e-6)
+    warm = _sstep(5, 15, h) * (1 - _sstep(55, 70, h))
+    crust = _sstep(0.45, 0.75, s) * warm
+    crumb = (1 - _sstep(0.25, 0.55, s)) * warm * _sstep(0.55, 0.8, v)
+    # 밝은 껍질(팬케이크 · 스콘 · 크래커 · 식빵 윗면)만 황금 갈색으로 옮긴다. 어두운 껍질(깜빠뉴 · 호밀 · 통밀)까지
+    # 색상을 당기고 채도를 누르면 올리브빛 회갈색 진흙이 됐다 — 잘 구운 어두운 껍질은 붉은 갈색이 맞다
+    bright = _sstep(0.6, 0.85, v)
+    v = v * (1 - crust * (0.08 + 0.12 * bright))
+    v = v + (1 - v) * 0.40 * crumb
+    v = np.clip(0.55 + (v - 0.55) * 1.05, 0, 1)
+    # 밝은 껍질의 채도는 0.62 위를 누른다. 실물 빵 스캔(ambientCG 3DBread CC0) 색 맵의 껍질 채도는 0.3~0.65인데
+    # 첫 판은 0.75~1.0이었다. 채도 1(파랑 0)인 껍질은 앱 반사광이 선형으로 흰빛을 더하면 sRGB에서 파랑만
+    # 솟아 색상이 6° 붉게 밀린다 — 팬케이크 윗면 #BB5F00이 화면에선 #BF6930 주황 플라스틱이었다
+    s = s - 0.6 * crust * bright * np.maximum(s - 0.62, 0)
+    s = s * (1 - 0.32 * crumb)
+    s = s + 0.04 * s * (1 - s)
+    h = h + (32 - h) * 0.5 * crust * bright
+    k = (np.array([5, 3, 1]) + h[..., None] / 60) % 6
+    return v[..., None] * (1 - s[..., None] * np.clip(np.minimum(k, 4 - k), 0, 1))
+
+
 def bake_and_export(parts, out_dir, name, size=1024, rough_size=512, ao_strength=0.6,
                     ao_samples=48, uv_weight=None, quality=82):
     """파트들 → 1메시 · 재질 1장(색·노멀·거칠기 텍스처) → <out_dir>/raw.glb. 통계 dict를 돌려준다"""
@@ -642,6 +685,7 @@ def bake_and_export(parts, out_dir, name, size=1024, rough_size=512, ao_strength
         s = _px(aow)[..., :1]
     occ = 1.0 - s * (1.0 - a[..., :1])
     c[..., :3] *= occ
+    c[..., :3] = food_grade(c[..., :3])
     col.pixels.foreach_set(c.ravel())
     for img in (col, rough, nrm, ao):
         img.filepath_raw = os.path.join(out_dir, f'{img.name}.png')
