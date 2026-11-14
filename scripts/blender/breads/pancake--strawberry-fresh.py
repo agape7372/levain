@@ -11,6 +11,7 @@ import random
 
 import bmesh
 import bpy
+from berry_cut import X0, X1, Z0, Z1, paint
 from lib import CAM, TAU, UP, at, az, bridged, frame, horiz, prof_r, with_normals
 from mathutils import Matrix, Quaternion, Vector
 from pancake_stack import DOME, RCT, build_cakes, crumb_material, stack_r, top_z
@@ -84,12 +85,26 @@ def cream_material(lib):
 BERRY = [(0, 0), (0.018, 0.008), (0.042, 0.030), (0.066, 0.064), (0.088, 0.104), (0.105, 0.146),
          (0.117, 0.186), (0.123, 0.218), (0.121, 0.242), (0.108, 0.264), (0.082, 0.280),
          (0.047, 0.289), (0.018, 0.287), (0, 0.282)]
-NTH, NZ = 20, 29.0  # 씨앗 격자 — 둘레 20칸, 높이 1당 29칸
+NTH, NZ = 20, 29.0  # 씨앗 격자 — 둘레 20칸, 껍질 길이(끝 → 꼭지 자오선) 1당 29칸
 
 
-def berry_rfn(lib, s):
-    return lambda th, z: (1 + 0.03 * math.sin(3 * th + s)
-                          + 0.018 * lib.n3(math.cos(th) * 1.5, math.sin(th) * 1.5, z * 7, s))
+def mer_attr(lib, ob, prof, n):
+    """정점마다 자오선 길이(끝 0 → 꼭지)를 'mer'로 — lathe 정점 순서(고리마다 n개, 극은 1개).
+    씨 격자를 높이 z로 나누던 판은 뭉툭한 끝 · 평평한 어깨에서 칸이 길게 늘어 씨가 끝으로 모이는 줄로 읽혔다"""
+    s, vals = 0.0, []
+    for k, (r, z) in enumerate(prof):
+        if k:
+            s += math.hypot(r - prof[k - 1][0], z - prof[k - 1][1])
+        vals += [s] * (1 if r <= 1e-9 else n)
+    assert len(vals) == len(ob.data.vertices), (ob.name, len(vals), len(ob.data.vertices))
+    lib.point_attr(ob, 'mer', vals)
+
+
+def berry_rfn(lib, s, half=False):
+    """둘레 요철. half = 반쪽 — 단면 가장자리(θ = 0 · π)는 요철 0이라 단면 윤곽이 BERRY 그대로다
+    (단면 그림 berry_cut.paint 의 붉은 테가 가장자리에 꼭 맞는다)"""
+    return lambda th, z: 1 + (math.sin(th) ** 2 if half else 1.0) * (
+        0.03 * math.sin(3 * th + s) + 0.018 * lib.n3(math.cos(th) * 1.5, math.sin(th) * 1.5, z * 7, s))
 
 
 def berry_top_z(prof, r):
@@ -138,6 +153,7 @@ def sepal(lib, name, prof, phi, L, W, curl):
 def build_whole(lib, mat, calyx_mat, M):
     prof = lib.catmull(BERRY, 1)
     ob = lib.lathe('berry', prof, segs=40, rfn=berry_rfn(lib, 1.7))
+    mer_attr(lib, ob, prof, 40)
     parts = [lib.assign(ob, mat)]
     rnd = random.Random(11)
     for k in range(8):  # 레퍼런스 꽃받침은 몸통보다 넓게 펼친 별 — 첫 판(7장 · 0.09)은 작고 가늘었다
@@ -153,28 +169,18 @@ def build_whole(lib, mat, calyx_mat, M):
     return parts
 
 
-def make_half(lib, mat, name, s):
-    """반쪽 딸기(국소: 끝 원점, 축 +Z, 껍질 +Y 쪽, 단면 y=0 이 −Y를 본다)
-    단면은 고리마다 격자를 깔고 flesh = |s|(가운데 0 → 껍질 1)를 정점 속성으로 — 하얀 심 · 붉은 테"""
-    rfn = berry_rfn(lib, s)
-    skin = lib.lathe(name, BERRY, segs=12, rfn=rfn, theta0=0.0, theta1=math.pi)
+def make_half(lib, mat, cut_mat, name, s, flip, tile):
+    """반쪽 딸기(국소: 끝 원점, 축 +Z, 껍질 +Y 쪽, 단면 y=0 이 −Y를 본다).
+    단면 무늬는 berry_cut 그림을 국소 x · z로 붙인다 — flip(±1) · tile(0 · 1)이 반쪽마다 좌우 · 익은 정도를 바꾼다"""
+    skin = lib.lathe(name, BERRY, segs=12, rfn=berry_rfn(lib, s, half=True), theta0=0.0, theta1=math.pi)
+    mer_attr(lib, skin, BERRY, 13)
     lib.orient_faces(skin, lambda c: c - Vector((0, 0, 0.16)))
-    nv = len(skin.data.vertices)
-    lib.point_attr(skin, 'cut', [0.0] * nv)
-    lib.point_attr(skin, 'flesh', [1.0] * nv)
-    bm, rows, flesh, S = bmesh.new(), [], [], 6
+    bm, rows, S = bmesh.new(), [], 6
     for r, z in BERRY:
         if r <= 1e-9:
             rows.append([bm.verts.new((0.0, 0.0, z))])
-            flesh.append(1.0 if z < 0.1 else 0.3)  # 끝은 붉게, 꼭지 쪽 심은 하얗게
             continue
-        rr, rl = r * rfn(0.0, z), r * rfn(math.pi, z)
-        row = []
-        for k in range(S + 1):
-            u = -1 + 2 * k / S
-            row.append(bm.verts.new((u * (rr if u > 0 else rl), 0.0, z)))
-            flesh.append(abs(u))
-        rows.append(row)
+        rows.append([bm.verts.new(((-1 + 2 * k / S) * r, 0.0, z)) for k in range(S + 1)])
     for a, b in zip(rows, rows[1:]):
         for k in range(S):
             if len(a) == 1:
@@ -188,9 +194,9 @@ def make_half(lib, mat, name, s):
     bm.free()
     cut = lib.link(bpy.data.objects.new(name + '_cut', me))
     lib.orient_faces(cut, lambda c: Vector((0, -1, 0)))
-    lib.point_attr(cut, 'cut', [1.0] * len(me.vertices))
-    lib.point_attr(cut, 'flesh', flesh)
-    return [lib.assign(skin, mat), lib.assign(cut, mat)]
+    lib.point_attr(cut, 'cflip', [flip] * len(me.vertices))
+    lib.point_attr(cut, 'ctile', [tile] * len(me.vertices))
+    return [lib.assign(skin, mat), lib.assign(cut, cut_mat)]
 
 
 # 반쪽 딸기 — (α°, 중심 거리, 단면 앙각°, 단면 방향°(0 = 바깥, 180 = 크림 쪽), 끝 방향 비틀기°, 크기, 들림)
@@ -212,7 +218,8 @@ HALVES = [
 ]
 
 
-def build_halves(lib, mat, top):
+def build_halves(lib, mat, cut_vis, cut_hid, top):
+    """cut_vis · cut_hid = 보이는 · 가려진 단면 재질(같은 그림, UV 밀도만 다르다 — 단면 앙각 40° 밑은 크림 · 아래를 본다)"""
     parts = []
     for i, (alpha, rho, elev, yaw, roll, scale, lift) in enumerate(HALVES):
         th = az(alpha)
@@ -224,7 +231,9 @@ def build_halves(lib, mat, top):
         r_ = math.radians(roll)
         a = -(d * math.cos(r_) + n.cross(d) * math.sin(r_))  # 끝 → 꼭지
         RS = frame(a, (-n).cross(a)) @ Matrix.Scale(scale, 4)
-        pieces = make_half(lib, mat, f'half{i}', 2.3 + i * 1.37)
+        cut = cut_hid if elev < 40 else cut_vis
+        flip = 1 if (i // 2) % 2 == 0 else -1  # 좌우 · 타일을 엇갈려 이웃 반쪽 단면이 같은 그림으로 안 보이게
+        pieces = make_half(lib, mat, cut, f'half{i}', 2.3 + i * 1.37, flip, i % 2)
         pts = [RS @ v.co for p in pieces for v in p.data.vertices]
         zmin = min(q.z for q in pts)
         cx = sum(q.x for q in pts) / len(pts)
@@ -249,24 +258,44 @@ def berry_material(lib):
     p = m.lpos()
     px = m.sep(p)
     th = m.math('ARCTAN2', px[1], px[0])  # 이음매(±π) = 국소 −X — 반쪽은 단면 가장자리, 통딸기는 뒤로 돌린다
-    uv = m.combine(m.math('MULTIPLY', th, NTH / TAU), m.math('MULTIPLY', px[2], NZ), 0.0)
-    d = m.voronoi(uv, scale=1.0, randomness=0.7, dims='2D')
-    seed = m.math('SUBTRACT', 1.0, m.smooth(d, 0.10, 0.15))
-    pit = m.math('SUBTRACT', 1.0, m.smooth(d, 0.15, 0.33))
+    uv = m.combine(m.math('MULTIPLY', th, NTH / TAU), m.math('MULTIPLY', m.attr('mer'), NZ), 0.0)
+    # 씨까지 거리는 실제 길이로 잰다(θ 칸 폭 = ρ·τ/NTH, 세로 칸 = 자오선 1/NZ) — 칸 단위로 재던 판은 끝으로
+    # 갈수록 칸이 좁아져 씨가 끝으로 모이는 줄(불꽃놀이)로 읽혔다(2026-11-14). 씨 반지름은 칸 폭의 0.3을 넘지 않는다
+    dl = m.sep(m.vmath('SUBTRACT', uv, m.voronoi(uv, scale=1.0, randomness=0.7, out='Position', dims='2D')))
+    cw = m.math('MULTIPLY', m.vmath('LENGTH', m.combine(px[0], px[1])), TAU / NTH)
+    d = m.vmath('LENGTH', m.combine(m.math('MULTIPLY', dl[0], cw), m.math('MULTIPLY', dl[1], 0.8 / NZ)))
+    d = m.math('DIVIDE', d, m.math('MINIMUM', m.math('MULTIPLY', cw, 0.3), 0.0047))  # 씨 반지름 = 1
+    seed = m.math('SUBTRACT', 1.0, m.smooth(d, 0.65, 1.0))
+    pit = m.math('SUBTRACT', 1.0, m.smooth(d, 1.0, 2.6))
     skin = m.ramp(m.noise(p, scale=7, detail=3), [(0.32, '#BF1B22'), (0.5, '#D3262A'), (0.68, '#E23530')])
     skin = m.mix(m.math('MULTIPLY', pit, 0.55), skin, '#93132A')
-    skin = m.mix(seed, skin, '#E6C058')
-    cut = m.attr('cut')
-    fl = m.math('ADD', m.attr('flesh'),
-                m.math('MULTIPLY', m.math('SUBTRACT', m.noise(p, scale=16, detail=3), 0.5), 0.14))
-    # 하얀 심은 가늘게 → 분홍 → 붉은 살(넓게). 심 0.30까지 하얗게 둔 판은 단면이 흰 삼각형으로 읽혔다(r4)
-    flesh = m.ramp(fl, [(0.0, '#FBE0D6'), (0.20, '#F7B6A6'), (0.38, '#EF7F72'), (0.56, '#E04A4A'),
-                        (0.78, '#D12C34'), (1.0, '#C21E2A')])
-    col = m.mix(cut, skin, flesh)
-    rough = m.mixf(cut, m.mixf(seed, 0.26, 0.5), 0.32)  # 단면 0.22는 방 반사로 허옇게 떴다
-    h = m.mixf(cut, m.math('SUBTRACT', m.math('MULTIPLY', seed, 0.6), pit),
-               m.math('MULTIPLY', m.noise(p, scale=45, detail=2), 0.25))
-    return m.out(col, rough, m.bump(h, strength=0.45, distance=0.003))
+    col = m.mix(seed, skin, '#E6C058')
+    h = m.math('SUBTRACT', m.math('MULTIPLY', seed, 0.6), pit)
+    return m.out(col, m.mixf(seed, 0.26, 0.5), m.bump(h, strength=0.45, distance=0.003))
+
+
+def berry_cut_material(lib, img, name):
+    """반쪽 단면 — berry_cut.paint 그림을 국소 x · z로 붙인다(반쪽마다 ctile 타일 · cflip 좌우).
+    첫 판(정점 flesh = |x| 램프)은 가운데 흰 줄 → 분홍 → 빨강 그러데이션뿐이라 종이 부채로 읽혔다(2026-11-14 사용자
+    「딸기 단면 디테일」). 거칠기 0.22 · 0.32는 하늘을 보는 단면이 방 천장 반사로 허옇게 떠서 0.42"""
+    m = lib.Mat(name)
+    p = m.lpos()
+    px = m.sep(p)
+    u = m.math('DIVIDE', m.math('SUBTRACT', m.math('MULTIPLY', px[0], m.attr('cflip')), X0), X1 - X0)
+    u = m.math('MULTIPLY', m.math('ADD', u, m.attr('ctile')), 0.5)
+    v = m.math('DIVIDE', m.math('SUBTRACT', px[2], Z0), Z1 - Z0)
+    tex = m.node('ShaderNodeTexImage', image=img, extension='EXTEND')
+    m.link(m.combine(u, v), tex.inputs['Vector'])
+    h = m.math('MULTIPLY', m.noise(p, scale=45, detail=2), 0.25)
+    return m.out(tex.outputs['Color'], 0.42, m.bump(h, strength=0.45, distance=0.003))
+
+
+def cut_image():
+    px = paint(BERRY)
+    img = bpy.data.images.new('berry_cut_paint', px.shape[1], px.shape[0], alpha=False)
+    img.pixels.foreach_set(px.ravel())
+    img.update()
+    return img
 
 
 def calyx_material(lib):
@@ -394,6 +423,8 @@ def build(lib):
     lib.reset(SEED)
     crumb, cream, berry = crumb_material(lib), cream_material(lib), berry_material(lib)
     calyx, sauce = calyx_material(lib), sauce_material(lib)
+    img = cut_image()
+    cut_vis, cut_hid = berry_cut_material(lib, img, 'berry_cut'), berry_cut_material(lib, img, 'berry_cut_hid')
 
     cakes, parts = build_cakes(lib, crumb, CAKES, top_hole=0.10)
     top = cakes[-1]
@@ -408,11 +439,15 @@ def build(lib):
     seat = cream_base + Vector((0, 0, CREAM_PEAK - 0.15)) + horiz(az(-90)) * 0.12 + horiz(CAM) * 0.02
     parts += build_whole(lib, berry, calyx, Matrix.Translation(seat) @ frame(UP + lean, horiz(CAM)))
 
-    parts += build_halves(lib, berry, top)
+    parts += build_halves(lib, berry, cut_vis, cut_hid, top)
     parts.append(build_sauce(lib, sauce, cakes, cream_base))
 
     for p in parts:
         print(f'  {p.name:12s} {lib.tri_count(p):6d} tri')
+    # 보이는 단면은 아틀라스 밀도를 1.6 → 2.6배(관다발 줄이 텍셀 하나 굵기 위로) — 가려진 단면 · 팬케이크 ·
+    # 소스에서 덜어 온다(실측 2026-11-14: 보이는 단면 351 → 576 텍셀/단위, 팬케이크 222 → 208)
     return parts, dict(size=1024, rough_size=512, ao_samples=48,
-                       ao_strength={'*': 0.6, 'crumb': 0.45, 'cream': 0.25, 'berry': 0.45},
-                       uv_weight={'crumb': 1.0, 'cream': 1.15, 'berry': 1.6, 'calyx': 1.8, 'sauce': 1.35})
+                       ao_strength={'*': 0.6, 'crumb': 0.45, 'cream': 0.25, 'berry': 0.45, 'berry_cut': 0.3,
+                                    'berry_cut_hid': 0.3},
+                       uv_weight={'crumb': 0.92, 'cream': 1.15, 'berry': 1.5, 'berry_cut': 2.6, 'berry_cut_hid': 0.8,
+                                  'calyx': 1.8, 'sauce': 1.2})
