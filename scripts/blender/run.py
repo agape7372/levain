@@ -23,6 +23,8 @@ t0 = time.time()
 parts, opts = mod.build(lib)
 if os.environ.get('LEVAIN_DRAFT'):  # 형태 확인용 빠른 굽기(텍스처 절반·AO 표본 적게)
     opts.update(size=512, rough_size=256, ao_samples=12)
+    if isinstance(opts.get('lit'), dict):  # 빛 굽기 표본도 줄인다
+        opts['lit'] = {'samples': 32, **opts['lit']}
 stats = lib.bake_and_export(parts, out_dir, bread_id.replace('--', '_'), **opts)
 stats['seconds'] = round(time.time() - t0, 1)
 with open(os.path.join(out_dir, 'stats.json'), 'w', encoding='utf-8') as f:
