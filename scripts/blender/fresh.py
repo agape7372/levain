@@ -203,7 +203,7 @@ def _smin(a, b, k):
 
 
 def sauce(name, cakes, pool, runs, mat, w=0.026, plate=0.0, thick=0.022, embed=0.005, ds=0.026, segs=48,
-          lump=0.0, lump_scale=13.0, seed=0.0, riv=None, fillet=0.05, across=13, fine=0.008, **_):
+          lump=0.0, lump_scale=13.0, seed=0.0, riv=None, fillet=0.05, across=13, fine=0.008, refine=0.0, **_):
     """고인 소스 + 줄기를 한 장으로 → [오브젝트]. pool = puddle(...) — (방위, 테 호 길이) → 고인 가장자리 호 길이.
     runs = [(방위, 턱 넘어 흐른 길이, 굵기 배율)].
     모양 = 거리장: 고인 데와 줄기(가는 줄 + 눈물방울 머리)를 부드러운 합집합으로 잇는다 — 줄기가 고인 데서
@@ -255,6 +255,14 @@ def sauce(name, cakes, pool, runs, mat, w=0.026, plate=0.0, thick=0.022, embed=0
         ths += [th0 + span * (2 * i / (across - 1) - 1) for i in range(across)]
     ths = sorted(t % TAU for t in ths)
     ths = [t for i, t in enumerate(ths) if i == 0 or t - ths[i - 1] > 0.006]
+    if refine:  # 고인 가장자리가 방위선과 비스듬한 데(웅덩이 옆 · 뒤)에 기둥을 더 세운다
+        # 성긴 기둥 사이에서 가장자리가 톱니 선으로 끊겼다(2026-11-15 초코칩 · 고구마 — 사용자 「식욕이 감퇴」)
+        more = []
+        for i, t0 in enumerate(ths):
+            t1 = ths[i + 1] if i + 1 < len(ths) else ths[0] + TAU
+            k = min(6, int(abs(pool(t1) - pool(t0)) / refine))
+            more += [(t0 + (t1 - t0) * j / (k + 1)) % TAU for j in range(1, k + 1)]
+        ths = sorted(ths + more)
     n = len(ths)
     i_lip = max(range(len(top.prof)), key=lambda i: top.prof[i][0])
     n_top = len(top.prof) - i_lip  # 경로에서 윗면 구간의 점 수(턱 = 그 끝)

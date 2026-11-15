@@ -45,7 +45,8 @@ export const FAMILIES = {
     perKB: 500,
     maxTri: 20000,
     /** 베이스 10종(닫힌 집합) + 변형(호환성 규칙 수만큼, 열려 있으나 유한) — 고정 합계 = OTA 묶음 몫 */
-    totalKB: 5120,
+    // 2026-11-15: 팬케이크 변형 9종(나머지 전부)을 얹으며 5120 → 8192. 근거 · 실측은 docs/BREADS.md §예산
+    totalKB: 8192,
     perItemKB: null,
   },
   ingredient: {
