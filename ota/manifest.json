@@ -1,8 +1,8 @@
 {
-  "version": "1.6.6",
-  "url": "https://levain-ota.vercel.app/bundles/1.6.6.zip",
-  "checksum": "564ad2b32f6d915d216c9fc746e4a67b2c64dd66fbf20c02d5ffa72ba69c8e63",
-  "size": 8792607,
-  "releasedAt": "2026-11-14T18:37:19.053Z",
+  "version": "1.6.7",
+  "url": "https://levain-ota.vercel.app/bundles/1.6.7.zip",
+  "checksum": "72c009c9f7d6bd8f4432dbbc73966139fbe67771a21f5e063210eb99952d50da",
+  "size": 10714914,
+  "releasedAt": "2026-11-15T03:32:55.331Z",
   "minNative": "1.0"
 }
