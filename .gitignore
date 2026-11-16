@@ -13,6 +13,7 @@ android/build/
 
 # OTA 번들 산출물
 ota/bundles/
+ota/assets/
 
 # Python 캐시 (빵 스펙 저작 스크립트)
 __pycache__/

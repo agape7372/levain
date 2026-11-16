@@ -147,7 +147,7 @@ npx @capacitor/assets generate --android \
 ## 8. OTA(웹 번들 갱신)
 
 `@capgo/capacitor-updater` — 정적 호스팅(`https://levain-ota.vercel.app`, `manifest.json` + `bundles/*.zip`
-두 파일뿐, 서버 로직 없음). 앱이 부팅 시 매니페스트를 읽어 새 버전이면 백그라운드로 받아 두고,
++ `assets/`(원격 빵 자산, 아래), 서버 로직 없음). 앱이 부팅 시 매니페스트를 읽어 새 버전이면 백그라운드로 받아 두고,
 **앱을 백그라운드로 보냈다 다시 열 때** 적용한다(세션 중 화면이 갈아끼워지지 않는다).
 실측 주의: 완전 종료 후 재시작만으로는 적용되지 않는다 — 홈으로 나갔다 돌아오는 전환이 트리거다. 계약·구현은
 [ARCHITECTURE.md §6](ARCHITECTURE.md)·`src/platform/ota.ts` 참조.
@@ -171,11 +171,24 @@ npm run ota:release -- <version>          # 예: 1.1.0 — build → zip → sha
 npm run ota:release -- <version> --min-native=<x.y>
 npm run ota:release -- <version> --dry-run   # 파일 쓰기 없이 빌드·zip·체크섬만 확인
 
-cd ota && npx vercel --prod --scope jirings-projects   # 실제 배포는 이 한 줄
+cd ota && npx vercel --prod --scope jirings-projects   # 실제 배포
+node scripts/check-remote-assets.mjs                   # 배포 뒤 — 원격 빵 자산이 다 떴는지(하나라도 200이 아니면 exit 1)
 ```
 
 `scripts/ota-release.mjs`가 `ota/manifest.json`(현재 배포 버전)과 `ota/history.json`(발행 이력 누적)을
 같이 갱신하고, `ota/bundles/`에는 최근 4개 버전만 남기고 자동 정리한다.
+
+**원격 빵 자산 `ota/assets/`**(2026-11-16): 묶음 밖 변형 143종의 GLB·썸네일. 빌드(`split-remote.mjs`)가 dist에서 빼고
+`dist/remote-assets.json`(키 → 내용 해시 앞 10자)을 묶음에 넣는다. 릴리스가 원본을 `ota/assets/breads/<id>.<hash>.glb` ·
+`breads/thumbs/<id>.<hash>.png`로 복사하고(같은 이름이 있으면 건너뜀) 그 판의 맵을 `ota/assets/maps/<version>.json`에 남긴다.
+최근 4개 판의 맵이 가리키는 파일만 남기고 정리한다(`--dry-run`은 복사 · 정리 목록만 찍는다). `/assets/*`는 1년 immutable + CORS `*`.
+앱은 처음 볼 때 받고(쇼케이스는 최대 4초 기다린 뒤 베이스 빵으로 물러남) 기기 Cache Storage에 둔다. 묶음 안 변형 규칙은 `scripts/lib/families.mjs`.
+- **순서**: ① `npm run ota:release -- <version>` ② 워크트리에서 릴리스했으면 `ota/assets/`와 새 zip을 배포 폴더(본 레포 `ota/`)로 옮긴다
+  ③ `vercel --prod` ④ `node scripts/check-remote-assets.mjs`. ④를 건너뛰면 원격 404가 앱에서 조용히 베이스 빵으로 가려져 아무도 모른다.
+- **배포 용량 주의(미확인)**: 본 레포 배포 폴더에 zip 13개(약 92MB)가 쌓여 있고 assets 약 50MB가 더해진다(1.6.9 dry-run 실측 50.75MB).
+  Vercel Hobby의 CLI 업로드 상한(문서상 100MB, 최근 완화 여부 미확인)에 걸릴 수 있다. 배포 전 zip을 최근 4개로 줄인다.
+- **발행 전 필수**: 개인정보처리방침 두 곳(`docs/PRIVACY.md` · `ota/privacy.html`)에 「빵 그림 파일을 같은 곳에서 받는다」 문장이
+  들어 있어야 한다(2026-11-16 개정). 이 기능을 처음 내보내는 판부터 해당한다.
 
 **롤백**(2026-11-12 다시 씀, 감사 T2-06): 옛 항목을 manifest에 덮어쓰는 방법은 **안 먹는다**.
 기기는 지금 버전 이하의 매니페스트를 무시한다(다운그레이드 거부). `ota-release`도 최신 이하 버전 발행을 거부한다.
@@ -221,7 +234,7 @@ cd ota && npx vercel --prod --scope jirings-projects   # 실제 배포는 이 �
 **zip은 커밋하지 않는다**(`.gitignore`의 `ota/bundles/` — 개당 5MB대). 따라서 과거 번들의 실체는
 ① 지금 배포돼 있는 Vercel 프로젝트와 ② 릴리스를 돌린 이 PC의 `ota/bundles/` 두 곳에만 있다.
 다른 PC에서 `vercel --prod`를 돌리면 로컬에 없는 과거 zip이 배포본에서 사라져 롤백 URL이 404가 된다 —
-새 PC에서 배포하기 전에 `ota/bundles/`를 함께 옮길 것.
+새 PC에서 배포하기 전에 `ota/bundles/`를 함께 옮길 것. `ota/assets/`도 같다(커밋할지는 미정 — 지금은 이 PC에만 있다).
 
 **안전장치**(2026-11-12 개정): `app.ts`가 `initOta({ deferReady: true })`로 시작하고 부팅 끝에 `markOtaReady()`를 부른다.
 이 짝이 와야 `notifyAppReady()`가 나간다. 부팅이 안 끝나면(크래시 등) 플러그인이 새 번들을 30초 뒤 "깨진 번들"로 판단해 이전 번들로 되돌린다.

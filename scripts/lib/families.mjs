@@ -28,6 +28,26 @@
 // OTA zip 실측 5.5MB(1.6.4, 옛 빵) → 8.77MB(1.6.5: 빵 GLB 3.1MB + 빵 썸네일 PNG 1.6MB, 나머지 4.0MB) → 8.79MB(1.6.6) → 10.71MB(1.6.7: 팬케이크 변형 4종).
 // 실사풍 썸네일은 PNG가 옛 판의 두 배다. 합계 상한 5MB면 zip ≈ 10.5MB다.
 // 넘기면 새 빵을 얹기 전에 색 맵 품질·해상도부터 다시 본다(wholewheat는 WebP 품질 76으로 맞췄다).
+//
+// ## 묶음 안 / 원격 (2026-11-16 — 변형 143종 라운드, docs/BREADS.md)
+// 변형 160종 GLB 합이 43MB라 OTA 묶음에 다 못 싣는다. 묶음 안에 두는 변형은 아래 규칙(17종)뿐이고,
+// 나머지 변형(id에 `--`)의 GLB·썸네일은 빌드가 dist에서 빼고(`split-remote.mjs`) 정적 호스트
+// `ota/assets/`에서 처음 볼 때 받는다(`src/platform/remoteAssets.ts`). 그래서 `totalKB`는 **묶음 안 것만** 센다.
+// 원격은 개당 상한(perKB·maxTri)만 지킨다 — 한 번에 하나씩 받으니 합계는 묶음이 아니라 호스트 용량 문제다.
+
+/** 묶음 안에 남기는 변형 — 팬케이크 변형 전부 + 첫 배선 3종(2026-08-30) */
+const BUNDLED_VARIANTS = new Set(['scone--choco-chip', 'campagne--strawberry-jam', 'focaccia--olive-flesh']);
+
+/** 빵 id가 원격(묶음 밖)인가 — 베이스(`--` 없음)와 위 규칙은 묶음 안 */
+export function isRemoteBread(id) {
+  return id.includes('--') && !id.startsWith('pancake--') && !BUNDLED_VARIANTS.has(id);
+}
+
+/** 맵 키 `breads/x.glb` + 해시 → 호스트 경로 `breads/x.<hash>.glb` (ota-release · check-remote-assets · 앱이 같은 꼴) */
+export function hashedPath(key, hash) {
+  const dot = key.lastIndexOf('.');
+  return `${key.slice(0, dot)}.${hash}${key.slice(dot)}`;
+}
 
 /** @type {import('./families.d.ts').FamilyKey[]} */
 export const FAMILY_KEYS = ['bread', 'ingredient'];
@@ -44,7 +64,7 @@ export const FAMILIES = {
     promptDir: 'breads',
     perKB: 500,
     maxTri: 20000,
-    /** 베이스 10종(닫힌 집합) + 변형(호환성 규칙 수만큼, 열려 있으나 유한) — 고정 합계 = OTA 묶음 몫 */
+    /** 베이스 10종 + 묶음 안 변형 17종(isRemoteBread가 false) — 고정 합계 = OTA 묶음 몫. 원격 변형은 안 센다 */
     // 2026-11-15: 팬케이크 변형 9종(나머지 전부)을 얹으며 5120 → 8192. 근거 · 실측은 docs/BREADS.md §예산
     totalKB: 8192,
     perItemKB: null,

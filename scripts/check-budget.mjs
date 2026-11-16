@@ -3,10 +3,11 @@
 // 예산 정본 = scripts/lib/families.mjs. 빵은 베이스 10종 + 변형(유한한 호환성 규칙 수만큼)이라
 // 고정 합계(8192KB = OTA 묶음 몫, families.mjs §빵 예산 개정), 재료는 12 → 30종으로 자라니 **개수 비례**(160KB/개)로 잰다 — 고정 상수면
 // 재료가 늘 때마다 손으로 올리게 되고 그건 예산을 지킨 게 아니라 예산을 결과에 맞춘 것이다.
+// 빵 합계는 묶음 안 것만 센다(2026-11-16) — 원격 변형(families.isRemoteBread)은 개당 상한만 보고 합계는 참고로 찍는다.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { FAMILIES, FAMILY_KEYS } from './lib/families.mjs';
+import { FAMILIES, FAMILY_KEYS, isRemoteBread } from './lib/families.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -47,10 +48,17 @@ for (const famKey of FAMILY_KEYS) {
   checked += files.length;
 
   let total = 0;
+  let remoteTotal = 0;
+  let remoteCount = 0;
   for (const f of files) {
     const p = path.join(dir, f);
     const kb = statSync(p).size / 1024;
-    total += kb;
+    // 원격 변형(묶음 밖)은 개당 상한만 — 합계는 OTA 묶음 몫이라 묶음 안 것만 센다(families.mjs §묶음 안 / 원격)
+    const remote = famKey === 'bread' && isRemoteBread(f.slice(0, -'.glb'.length));
+    if (remote) {
+      remoteTotal += kb;
+      remoteCount++;
+    } else total += kb;
     const tris = triCount(p);
     const overSize = kb > fam.perKB;
     const overTri = tris !== null && tris > fam.maxTri;
@@ -66,7 +74,10 @@ for (const famKey of FAMILY_KEYS) {
   const capLabel = fam.totalKB ? `${cap}KB` : `${cap}KB (${fam.perItemKB}KB × ${files.length}종)`;
   const overTotal = total > cap;
   if (overTotal) fail = true;
-  console.log(`${overTotal ? '✗' : '✓'} ${famKey} 합계 ${total.toFixed(0)}KB / ${capLabel}\n`);
+  const scope = remoteCount > 0 ? `(묶음 안 ${files.length - remoteCount}종)` : '';
+  console.log(`${overTotal ? '✗' : '✓'} ${famKey} 합계${scope} ${total.toFixed(0)}KB / ${capLabel}`);
+  if (remoteCount > 0) console.log(`  참고: 원격 ${remoteCount}종 ${(remoteTotal / 1024).toFixed(1)}MB (합계 상한 없음)`);
+  console.log('');
 }
 
 if (checked === 0) {

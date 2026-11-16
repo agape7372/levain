@@ -13,6 +13,7 @@ import { breadArt } from '../screens/breadArt';
 import { ingredientArt, ingredientArtNode } from '../screens/ingredientArt';
 import { ruleByVariantId } from '../../sim';
 import type { IngredientId } from '../../sim';
+import { thumbUrl } from '../../platform/remoteAssets';
 
 const el = <K extends keyof HTMLElementTagNameMap>(tag: K, className: string, text?: string): HTMLElementTagNameMap[K] => {
   const e = document.createElement(tag);
@@ -61,7 +62,9 @@ export function breadThumb(artId: string, fallbackId: string = artId): HTMLEleme
     img.remove();
     art.appendChild(breadArt(fallbackId));
   });
-  img.src = `/breads/thumbs/${artId}.png`;
+  // 원격 변형은 호스트에서(맵이 없거나 받지 못하면 error → 위 사다리 그대로)
+  img.loading = 'lazy';
+  img.src = thumbUrl(artId);
   art.appendChild(img);
   return art;
 }

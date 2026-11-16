@@ -2,6 +2,7 @@
 
 르방(사워도우 스타터) 키우기 실시간 다마고치. TS + Vite + three.js + Capacitor 8 Android(로컬 번들 셸).
 백엔드 0, 완전 로컬, CI 없음(검증 전부 로컬).
+예외: 묶음 밖 빵 변형 GLB·썸네일은 OTA 정적 호스트(`assets/`)에서 처음 볼 때 받는다(`src/platform/remoteAssets.ts`, docs/RELEASE.md §8).
 
 ## 정본 지도 — 코드 작성 전 반드시 해당 관할 문서를 따른다
 

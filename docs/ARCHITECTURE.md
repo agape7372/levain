@@ -292,6 +292,11 @@ export default {
   2026-11-12 계약: 부팅은 `initOta({ deferReady: true })`로 시작하고 부팅 끝에 `markOtaReady()`를 부른다. 이 짝이 빠지면 새 번들은 30초 뒤 전부 롤백된다.
   내장 번들 판정은 `APP_VERSION` 기준이다. 실패한 버전은 `levain:ota:bad`에 두고 다시 받지 않는다.
   매니페스트 url이 `${OTA_BASE}/bundles/`로 시작하고 checksum이 64자 hex일 때만 받는다.
+- **원격 빵 자산(「완전 로컬」의 예외, 2026-11-16)**: 묶음 밖 변형 143종의 GLB·썸네일은 같은 정적 호스트 `/assets/`에서 처음 볼 때 받는다.
+  `src/platform/remoteAssets.ts`만 안다(sim·store는 모른다). 부팅 때 묶음 안 `remote-assets.json`(키 → 해시)을 읽고, 못 읽으면 전부 로컬.
+  GLB는 Cache Storage `levain-assets` + id당 blob URL 하나(세션 동안 revoke 안 함 — 쇼케이스 url 캐시·컨텍스트 복구가 다시 읽는다).
+  쇼케이스는 최대 4초 기다리고 넘기면 베이스 빵, 받기는 뒤에서 이어 간다. 썸네일은 `<img>` + WebView HTTP 캐시, 실패하면 베이스 PNG + 재료 배지.
+  네트워크 실패는 조용히 삼킨다(ota.ts ③과 같은 태도). 나눔 규칙은 `scripts/lib/families.mjs`, 릴리스는 [RELEASE.md §8](RELEASE.md).
 - `android/`는 레포 안. 릴리스: `npm run build && npx cap sync android` → Gradle.
 - **podoal에서 절차만 재사용**: JDK21 Gradle 경로, 에뮬 함정 6종(README·RELEASE.md에 이식),
   `@capacitor/assets --iconBackgroundColor "#E8D9C4"` + 밀도별 스플래시 비트맵 삭제→단색 windowSplashScreen,

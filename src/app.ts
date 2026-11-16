@@ -13,6 +13,7 @@ import { onLifecycle } from './platform/lifecycle';
 import { haptic, setHapticsEnabled } from './platform/haptics';
 import { isNative } from './platform/native';
 import { initOta, markOtaReady } from './platform/ota';
+import { glbUrl, loadRemoteAssets } from './platform/remoteAssets';
 import { exportEnvelope, pickImportFile } from './platform/saveTransfer';
 import {
   setMuted, sfxBubble, sfxFed, sfxRevived, sfxUnlock, suspendAudio, resumeAudio, unlockAudio,
@@ -44,6 +45,11 @@ import { ruleByVariantId } from './sim';
 /** 굽기 결과 소리가 올라가는 음 수 — 등급이 높을수록 끝까지 (sounds.sfxBaked) */
 const BAKE_NOTES: Record<BakeGrade, 2 | 3 | 4> = { best: 4, good: 3, flat: 2 };
 
+/** 쇼케이스가 원격 변형 GLB를 기다리는 최대 시간 — 넘기면 베이스 빵 */
+const SHOWCASE_WAIT_MS = 4000;
+const within = <T>(p: Promise<T>, ms: number): Promise<T> =>
+  Promise.race([p, new Promise<never>((_, reject) => setTimeout(() => reject(new Error('slow')), ms))]);
+
 export interface StartAppDeps {
   /** Levain Lab 전용 주입점 — 프로덕션은 생략(systemClock·정식 저장 키) */
   clock?: Clock;
@@ -56,6 +62,8 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   // 뒤여야 「JS는 뜨는데 그 뒤에 죽는」 번들도 되돌려진다(감사 T2-05). ★두 줄은 한 쌍이다: 끝의
   // markOtaReady()가 빠지면 모든 OTA 번들이 30초 뒤 롤백된다.
   initOta({ deferReady: true });
+  // 원격 빵 자산 맵 — 묶음 안 로컬 파일이라 저장 읽기와 나란히 끝난다. 화면(썸네일)을 만들기 전에 기다린다
+  const assetsReady = loadRemoteAssets();
 
   const canvas = document.getElementById('c') as HTMLCanvasElement;
   // 보조기술 라벨 — 캔버스는 그림이자 상호작용면인데 접근성 트리에선 빈 노드였다 (2026-08-30 a11y)
@@ -81,6 +89,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       toast(copy.save.writeFailed);
     },
   });
+  await assetsReady;
   // 관리자 모드 기기(flags.dev)는 켤 때마다 레시피가 다 열려 있다 — dev 서버(import.meta.env.DEV)는 제외해 성장 흐름을 시험할 수 있게 둔다
   if (store.getEnvelope().flags.dev === true) store.devUnlockRecipes();
 
@@ -339,9 +348,13 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     const kind = opts?.kind ?? 'bread';
     const dir = kind === 'ingredient' ? 'ingredients' : 'breads';
     const tabAtRequest = currentTab;
+    // 받는 동안 멈춘 듯 보이지 않게 — 로컬 로드는 대개 이 안에 끝나 표시가 안 뜬다(main.css body.is-fetching)
+    const waitMark = setTimeout(() => document.body.classList.add('is-fetching'), 300);
     try {
       try {
-        await scene.enterShowcase(`/${dir}/${id}.glb`);
+        // 원격 변형은 최대 4초 기다린다. 넘기면 베이스로 물러나고 받기는 뒤에서 이어 가 캐시에 든다(다음엔 변형)
+        const url = kind === 'bread' ? await within(glbUrl(id), SHOWCASE_WAIT_MS) : `/${dir}/${id}.glb`;
+        await scene.enterShowcase(url);
       } catch {
         // 변형 GLB는 대부분 없다 — 베이스 GLB로 한 번 더 (썸네일의 베이스 PNG 폴백과 같은 규칙, T4-2)
         const base = id.split('--')[0];
@@ -352,6 +365,8 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       return false;
     } finally {
       showcaseLoading = false;
+      clearTimeout(waitMark);
+      document.body.classList.remove('is-fetching');
     }
     // 로드 중 탭을 옮겼으면 띄우지 않는다 (T7-10)
     if (currentTab !== tabAtRequest) {

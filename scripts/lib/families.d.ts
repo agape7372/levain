@@ -1,6 +1,9 @@
 // families.mjs의 타입 선언 — 브라우저 소비자(breadlab.ts·thumbsHarness.ts)가 TS로 읽는다.
 // 값의 정본은 families.mjs다. 필드를 늘리면 양쪽을 같이 고칠 것.
 
+export declare function isRemoteBread(id: string): boolean;
+export declare function hashedPath(key: string, hash: string): string;
+
 export type FamilyKey = 'bread' | 'ingredient';
 
 export interface Family {

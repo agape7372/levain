@@ -20,6 +20,7 @@ import type { InfoRow } from './recipeVisuals';
 import { INGREDIENTS, recipeById, ruleByVariantId, rulesForBase, variantIdOf } from '../../sim';
 import type { CompatibilityRule, IngredientId, RecipeDef, SimEvent } from '../../sim';
 import type { GameApi } from '../gameApi';
+import { prefetchGlb } from '../../platform/remoteAssets';
 
 export interface ShowcaseOpts {
   /** 쇼케이스 하단 "다시 만들기" — 닫힌 뒤 시트 재진입 */
@@ -185,6 +186,8 @@ export function openBreadSheet(
 
   /** 선택이 바뀌면 머리를 새로 만들어 갈아 끼우고, 요약·footer를 맞춘다 */
   const applySelection = (): void => {
+    // 고른 변형의 3D를 조용히 미리 받는다(묶음 밖 변형만 — 결과 화면에서 기다리지 않게)
+    if (selected !== null) prefetchGlb(variantIdOf(selected));
     const next = buildHead();
     head.replaceWith(next);
     head = next;
@@ -352,6 +355,7 @@ export function openBreadSheet(
       return;
     }
     handle.close();
+    if (selected !== null) prefetchGlb(variantIdOf(selected));
     // 이 빵으로 통이 정확히 빈다 — 되돌릴 수 없으니 먼저 알린다 (모달 위 모달 금지: 시트를 닫은 뒤)
     if (isBread && api.pantry() - recipe.cost <= 0) {
       confirmModal({

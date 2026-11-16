@@ -1354,6 +1354,26 @@ body #ui-root:has(> .modal-backdrop.open) > .toast-container {   /* body = 위 �
   transform-origin: left center;
 }
 
+/* ── 빵 3D 받는 중 (2026-11-16, app.ts openShowcase) — 글자 없는 점 하나. 300ms 넘게 걸릴 때만 붙는다 ── */
+body.is-fetching::after {
+  content: '';
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--crust);
+  z-index: 60;
+  pointer-events: none;
+  animation: fetch-pulse 0.9s ease-in-out infinite alternate;
+}
+@keyframes fetch-pulse { from { opacity: 0.25; transform: scale(0.7); } to { opacity: 0.9; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  body.is-fetching::after { animation: none; opacity: 0.6; }
+}
+
 /* ── 합성 썸네일 — 재료 아트를 빵 곁에 놓는다 (2026-09-05, recipeVisuals.breadThumb) ──────
    전용 PNG가 없는 변형(156종)은 베이스 PNG + 재료 썸네일(우하단에 **놓인 것처럼** 겹침 — 정물 구도).
    원형 크림 바탕·테두리는 쓰지 않는다: 그건 알림 뱃지 문법이라 같은 카드 우상단 count-pill과 부딪히고

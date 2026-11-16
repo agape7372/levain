@@ -1,13 +1,17 @@
 // OTA 릴리스 패키저 — dist/를 빌드·zip으로 묶어 ota/bundles·manifest.json·history.json에 배치.
+// 묶음 밖 원격 변형 GLB·썸네일은 ota/assets/(해시 이름 + maps/<version>.json)로 복사한다(아래 「원격 변형 자산」).
 // 사용: npm run ota:release -- <version> [--dry-run] [--min-native=X.Y]
 // 예: npm run ota:release -- 1.1.0
 // 배포(vercel)는 이 스크립트가 하지 않는다 — 마지막에 안내만 출력, 실행은 사람 몫.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, unlinkSync, rmSync } from 'node:fs';
+import {
+  copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, statSync, unlinkSync, rmSync,
+} from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { collectFiles, makeZip } from './lib/zip.mjs';
+import { hashedPath } from './lib/families.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_BASE = 'https://levain-ota.vercel.app';
@@ -129,6 +133,63 @@ if (!existsSync(distDir)) {
   process.exit(1);
 }
 
+// ── 원격 변형 자산 (2026-11-16) — split-remote.mjs가 dist에서 뺀 GLB·썸네일을 호스트 폴더 ota/assets/로 ──
+// 파일명에 내용 해시가 붙어 1년 immutable로 서빙된다(vercel.json). 같은 이름이 있으면 같은 내용이라 건너뛴다.
+// 판마다 맵을 maps/<version>.json에 남기고, 최근 KEEP개 판의 맵이 가리키는 파일만 둔다
+// (ota/bundles와 같은 수 — 그보다 옛 판으로 롤백할 일은 없다: 롤백은 새 버전 재발행뿐).
+{
+  const mapPath = path.join(distDir, 'remote-assets.json');
+  if (!existsSync(mapPath)) {
+    console.error('dist/remote-assets.json 없음 — build의 split-remote 단계를 확인하세요.');
+    process.exit(1);
+  }
+  const map = JSON.parse(readFileSync(mapPath, 'utf8'));
+  const assetsDir = path.join(root, 'ota', 'assets');
+  const mapsDir = path.join(assetsDir, 'maps');
+  const toCopy = [];
+  for (const [key, hash] of Object.entries(map)) {
+    const dst = path.join(assetsDir, hashedPath(key, hash));
+    if (!existsSync(dst)) toCopy.push({ src: path.join(root, 'public', key), dst });
+  }
+  // 남길 판 = 지난 맵들 + 이번 판 중 최신 KEEP개
+  const oldMaps = existsSync(mapsDir)
+    ? readdirSync(mapsDir).filter((f) => /^\d+\.\d+\.\d+\.json$/.test(f)).map((f) => f.slice(0, -5))
+    : [];
+  const keepVersions = [...new Set([...oldMaps, version])].sort(compareSemver).slice(-KEEP);
+  const keepFiles = new Set();
+  for (const v of keepVersions) {
+    const m = v === version ? map : JSON.parse(readFileSync(path.join(mapsDir, `${v}.json`), 'utf8'));
+    for (const [key, hash] of Object.entries(m)) keepFiles.add(path.join(assetsDir, hashedPath(key, hash)));
+  }
+  const toPrune = [];
+  for (const sub of ['breads', path.join('breads', 'thumbs')]) {
+    const dir = path.join(assetsDir, sub);
+    if (!existsSync(dir)) continue;
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isFile() && !keepFiles.has(p)) toPrune.push(p);
+    }
+  }
+  const staleMaps = oldMaps.filter((v) => !keepVersions.includes(v));
+  const copyBytes = toCopy.reduce((s, c) => s + statSync(c.src).size, 0);
+  console.log(
+    `ota/assets: 맵 ${Object.keys(map).length}항목 · 새로 복사 ${toCopy.length}개(${(copyBytes / 1048576).toFixed(2)}MB)` +
+      ` · 정리 ${toPrune.length}개 · 옛 맵 ${staleMaps.length}개 · 남길 판 ${keepVersions.join(', ')}`,
+  );
+  if (dryRun) {
+    for (const p of toPrune) console.log(`  (dry-run) 정리 대상: ${path.relative(root, p)}`);
+  } else {
+    for (const { src, dst } of toCopy) {
+      mkdirSync(path.dirname(dst), { recursive: true });
+      copyFileSync(src, dst);
+    }
+    mkdirSync(mapsDir, { recursive: true });
+    writeFileSync(path.join(mapsDir, `${version}.json`), JSON.stringify(map, null, 1) + '\n');
+    for (const p of toPrune) unlinkSync(p);
+    for (const v of staleMaps) unlinkSync(path.join(mapsDir, `${v}.json`));
+  }
+}
+
 const files = collectFiles(distDir);
 if (files.length === 0) {
   console.error('dist/ 가 비어 있습니다.');
@@ -187,3 +248,4 @@ if (zips.length > KEEP) {
 
 console.log('');
 console.log('다음: cd ota && npx vercel --prod --scope jirings-projects');
+console.log('배포 뒤: node scripts/check-remote-assets.mjs   (원격 빵 파일이 다 떴는지 — 404면 앱은 조용히 베이스로 물러난다)');
