@@ -480,3 +480,161 @@ def build_focaccia(lib, seed, L, W, T, RC, oil, olives, oil_r, oil_d, olive_r, o
     return parts, dict(size=1024, rough_size=512, ao_samples=48,
                        ao_strength={'*': 0.6, 'crust': ao_crust, 'salt': 0.3, 'oil': 0.3},
                        uv_weight={'crust': 1.0, 'olive': 1.3, 'rosemary': 1.6, 'salt': 1.2, 'oil': 1.0})
+
+
+# ── 크래커 (cracker · cracker--*) ────────────────────────────────────────────
+
+CRACKER_PAL = dict(ramp=('#E9A23C', '#F4B44E', '#F8C262'), edge='#CC8630', blist='#FAD48E', hole='#C07626',
+                   side='#D08C34', speck='#4A3020')
+
+
+def cracker_crust(lib, pal=None, rough=(0.88, 0.8), extra=None):
+    """크래커 껍질 — pal 로 색만 바꾼다. extra(m, col, p, nz) → col 로 무늬(가루 · 씨 반점)를 덧입힌다.
+    extra 가 (col, mask, rough) 를 돌려주면 mask 자리 거칠기를 rough 로(초콜릿 코팅 · 씨 윤)"""
+    c = dict(CRACKER_PAL, **(pal or {}))
+    m = lib.Mat('crust')
+    p = m.lpos()
+    nz = m.sep(m.lnrm())[2]
+    blot = m.noise(p, scale=6, detail=5, rough=0.6, distortion=0.25)
+    # 레퍼런스 실측 윗면 #F0B050~#F2B658 · 물집 #F5C474 · 옆면 #CC8D36 → 노출(위 0.93·옆 0.83)로 되짚은 값
+    col = m.ramp(blot, [(0.3, c['ramp'][0]), (0.5, c['ramp'][1]), (0.7, c['ramp'][2])])
+    col = m.mix(m.math('MULTIPLY', m.attr('edge'), 0.5), col, c['edge'])  # 가장자리 짙게(0.75 갈색 테는 탄 테두리로 읽혔다, r1)
+    col = m.mix(m.smooth(m.attr('blist'), 0.15, 0.6), col, c['blist'])  # 기포 물집은 연하게
+    col = m.mix(m.math('MULTIPLY', m.attr('hole'), 0.6), col, c['hole'])  # 깔때기 안쪽 구움(0.7은 때 낀 구멍으로 읽혔다, r2)
+    h = m.math('ADD', m.math('MULTIPLY', m.noise(p, scale=90, detail=2), 0.25), m.math('MULTIPLY', blot, 0.3))
+    if c['speck']:
+        # 검은 깨알 반점 — 보로노이 칸 넷 중 하나에만 작은 점
+        vp = m.mapping(p, scale=(1, 1, 1))
+        d = m.voronoi(vp, scale=38, randomness=0.9)
+        keep = m.smooth(m.sep(m.voronoi(vp, scale=38, randomness=0.9, out='Color'))[0], 0.62, 0.64)
+        speck = m.math('MULTIPLY', m.math('SUBTRACT', 1.0, m.smooth(d, 0.09, 0.13)), keep)
+        speck = m.math('MULTIPLY', speck, m.smooth(nz, 0.5, 0.8))
+        col = m.mix(speck, col, c['speck'])
+        h = m.math('ADD', h, m.math('MULTIPLY', speck, -0.3))
+    top = m.smooth(nz, 0.4, 0.7)
+    col = m.mix(m.math('MULTIPLY', m.math('SUBTRACT', 1.0, top), 0.6), col, c['side'])  # 옆면
+    gloss = None
+    if extra:  # 옆면까지 덮는다(초콜릿에 담근 반쪽)
+        col = extra(m, col, p, nz)
+        if isinstance(col, tuple):
+            col, *gloss = col
+    r = m.mixf(m.attr('blist'), *rough)  # 0.78은 방 반사 회색 막(본세션 교훈 11-14)
+    if gloss:
+        r = m.mixf(gloss[0], r, gloss[1])
+    return m.out(col, r, m.bump(h, strength=0.3, distance=0.002))
+
+
+def pebble(lib, name, sx, sy, sz, rnd, jit=0.12, taper=0.0, subdiv=1):
+    """씨 · 플레이크 한 알 — 찌그러진 이십면체(80 tri, 매끈). taper > 0 이면 +X 끝이 뾰족하다.
+    subdiv=2 는 윤곽이 둥글다(320 tri — 납작하고 큰 조각은 1이면 각진 보석으로 읽혔다)"""
+    bm = bmesh.new()
+    bmesh.ops.create_icosphere(bm, subdivisions=subdiv, radius=0.5)
+    for v in bm.verts:
+        j = 1 + rnd.uniform(-jit, jit)
+        k = 1 - taper * (v.co.x + 0.5)
+        v.co = Vector((v.co.x * sx * j, v.co.y * sy * j * k, v.co.z * sz * j))
+    me = bpy.data.meshes.new(name)
+    bm.to_mesh(me)
+    bm.free()
+    for p in me.polygons:
+        p.use_smooth = True
+    return lib.link(bpy.data.objects.new(name, me))
+
+
+def plain_mat(lib, name, a, b, rough=0.6, scale=60):
+    m = lib.Mat(name)
+    return m.out(m.ramp(m.noise(m.lpos(), scale=scale, detail=2), [(0.3, a), (0.7, b)]), rough)
+
+
+def scatter(rnd, n, L, W, gap, margin=0.06):
+    """판 위에 서로 gap 넘게 떨어진 점 n개(못 채우면 적게)"""
+    pts = []
+    for _ in range(n * 40):
+        x, y = rnd.uniform(-L / 2 + margin, L / 2 - margin), rnd.uniform(-W / 2 + margin, W / 2 - margin)
+        if all(math.hypot(x - a, y - b) > gap for a, b in pts):
+            pts.append((x, y))
+            if len(pts) == n:
+                break
+    return pts
+
+
+def build_cracker(lib, seed=5, L=1.0, W=1.0, cols=5, rows=5, pal=None, rough=(0.88, 0.8), extra=None, top=None,
+                  opts=None, dock=True, filling=None):
+    """크래커 판 — 도킹 홀 격자 · 기포 물집 · 가장자리 구움. top(put, rnd) 이 토핑을 얹는다.
+    put(ob, mat, x, y, lift=0.0, lean=20) → 표면에 앉힘(판 밖이면 False). dock=False 면 구멍 없는 판(씨앗 크리스프).
+    filling = (색, 색) 이면 두 장 사이에 크림을 낀 샌드 크래커. → (parts, opts)"""
+    lib.reset(seed)
+    rnd = random.Random(seed)
+    T, RC = 0.04, 0.025
+    HOLE_R, HOLE_D, PIT_R, PIT_D = 0.024, 0.014, 0.009, 0.012  # 깔때기 · 가운데 바늘 구멍
+    px, py = L * 0.165, W * 0.165 * 5 / rows
+    holes = [(px * (i - (cols - 1) / 2) + rnd.uniform(-0.006, 0.006), py * (j - (rows - 1) / 2) + rnd.uniform(-0.006, 0.006))
+             for j in range(rows) for i in range(cols)] if dock else []
+    blisters = []
+    while len(blisters) < int(64 * L * W):
+        x, y = rnd.uniform(-0.45, 0.45) * L, rnd.uniform(-0.45, 0.45) * W
+        if all(math.hypot(x - a, y - b) > 0.045 for a, b in holes) and \
+                all(math.hypot(x - a, y - b) > 0.04 for a, b, *_ in blisters):
+            blisters.append((x, y, rnd.uniform(0.017, 0.026), rnd.uniform(0.003, 0.005)))
+
+    ob = slab(lib, 'slab', rect_outline(lib, L, W, RC, wob=0.006, seed=4.0), T, 0.012, 0.006, voxel=0.006)
+
+    def push(co, n):
+        w = smoothstep(0.45, 0.9, n.z)
+        if w <= 0:
+            return None
+        dz = 0.003 * lib.n3(co.x * 3, co.y * 3, 0, 1.0) + 0.0012 * lib.n3(co.x * 14, co.y * 14, 0, 2.0)
+        for x, y in holes:
+            if abs(co.x - x) < HOLE_R and abs(co.y - y) < HOLE_R:
+                d = math.hypot(co.x - x, co.y - y)
+                dz += bowl(d / HOLE_R, HOLE_D) + bowl(d / PIT_R, PIT_D)
+        for x, y, r, h in blisters:
+            if abs(co.x - x) < r and abs(co.y - y) < r:
+                dz -= bowl(math.hypot(co.x - x, co.y - y) / r, h)
+        return Vector((0, 0, dz * w))
+
+    shape(ob, push)
+    finish(lib, ob, 11000)
+
+    def near(pts, r, co):
+        return max([1 - math.hypot(co.x - p[0], co.y - p[1]) / r for p in pts] + [0.0])
+
+    attrs(lib, ob, {
+        'edge': lambda co, n: 1 - smoothstep(0.0, 0.08, -rect_sdf(co.x, co.y, L, W, RC)),
+        'blist': lambda co, n: max([1 - math.hypot(co.x - x, co.y - y) / r for x, y, r, _ in blisters] + [0.0]),
+        'hole': lambda co, n: near(holes, HOLE_R * 1.3, co),
+    })
+    crust = cracker_crust(lib, pal, rough, extra)
+    parts = [lib.assign(ob, crust)]
+    if filling:  # 샌드 크래커 — 아래 판(같은 판을 성기게) + 크림 층, 위 판을 그 위로 올린다
+        F = 0.05  # 0.03 · 판보다 들인 크림은 3/4 각도에서 실선 하나로만 보였다
+        bot = lib.link(bpy.data.objects.new('slab_bot', ob.data.copy()))
+        lib.decimate(bot, min(1.0, 3500 / lib.tri_count(bot)))
+        parts.append(lib.assign(bot, crust))
+        ob.data.transform(Matrix.Translation((0, 0, T + F - 0.004)))
+        # 크림이 판 밖으로 비어져 나와야 위에서도 보인다(판 안으로 들인 판은 64px 에서 맨 크래커였다)
+        cr = slab(lib, 'filling', rect_outline(lib, L + 0.01, W + 0.01, RC, wob=0.012, seed=9.0), F + 0.012, 0.02,
+                  0.02, voxel=0.008)
+        shape(cr, lambda co, n: n * 0.012 * (1 + lib.n3(co.x * 6, co.y * 6, co.z * 6, 3.0)) if abs(n.z) < 0.6 else None)
+        cr.data.transform(Matrix.Translation((0, 0, T - 0.006)))
+        lib.decimate(cr, min(1.0, 2500 / lib.tri_count(cr)))
+        parts.append(lib.assign(cr, plain_mat(lib, 'filling', *filling, rough=0.55, scale=30)))
+    if top:
+        surf = surface(ob)
+
+        def put(o, mat, x, y, lift=0.0, lean=20):
+            hit = surf(x, y) if abs(x) < L / 2 - 0.03 and abs(y) < W / 2 - 0.03 else None
+            obs = o if isinstance(o, list) else [o]
+            if hit is None or any(math.hypot(x - a, y - b) < HOLE_R for a, b in holes):
+                for q in obs:
+                    bpy.data.objects.remove(q)
+                return False
+            R = tilt_frame(hit[1], rnd.uniform(0, TAU), math.radians(rnd.uniform(0, lean)), rnd.uniform(0, TAU))
+            for q in obs:
+                q.matrix_world = Matrix.Translation((x, y, hit[0] + lift)) @ R
+                parts.append(lib.assign(q, mat))
+            return True
+
+        top(put, rnd)
+    print(f'  slab {lib.tri_count(parts[0])} tri · total {sum(lib.tri_count(p) for p in parts)}')
+    return parts, dict(dict(size=1024, rough_size=512, ao_samples=48, ao_strength={'*': 0.45}), **(opts or {}))  # 구멍 그늘은 재질색(hole)으로

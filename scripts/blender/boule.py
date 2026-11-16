@@ -146,8 +146,16 @@ def drop_base(lib, ob):
     lib.delete_faces(ob, lambda c, n: n.z < -0.9 and c.z < 0.01)
 
 
-def campagne_crust(lib, shape, score, name='crust'):
-    """깜빠뉴 껍질 — 진한 갈색 + 바네통 동심 고리(볼록한 고리에 밀가루) + X 칼집(홈 = 노릇한 속살, 테 = 귀)"""
+CRUST_PAL = dict(ramp=('#7E3204', '#A04C0A', '#BC6014'), ring='#682A04', low='#561F02', base='#6A3412',
+                 ear='#B8661E', flour='#E8D3AE', lip='#4A1C04', inner=('#F6CC80', '#ECAC4E', '#C47228', '#7A3A0E'),
+                 pore='#B8732E')
+
+
+def campagne_crust(lib, shape, score, name='crust', pal=None, flour_a=0.85, extra=None):
+    """깜빠뉴 껍질 — 진한 갈색 + 바네통 동심 고리(볼록한 고리에 밀가루) + X 칼집(홈 = 노릇한 속살, 테 = 귀).
+    pal = CRUST_PAL 덮어쓰기(반죽색 변형) · flour_a = 고리 밀가루 농도(0 = 없음: 짙은 껍질 위 흰 가루는 곰팡이) ·
+    extra(m, col, rough, p, nz, cut) → (col, rough) 덧입힘(글레이즈 · 씨 코팅 · 기름 윤기)"""
+    c = dict(CRUST_PAL, **(pal or {}))
     m = lib.Mat(name)
     p = m.lpos()
     px = m.sep(p)
@@ -169,20 +177,23 @@ def campagne_crust(lib, shape, score, name='crust'):
 
     # 껍질 — 레퍼런스 실측 #8E4B1F~#A95821(위) · #713510(아래). 노출(위 ≈0.93×)만큼 밝혀 잡는다
     # r2·r7 렌더는 분홍 갈색(방 반사, 실측 #92522C) — 파랑을 빼 채도를 올리고 거칠기를 높였다
-    crust = m.ramp(blot, [(0.30, '#7E3204'), (0.48, '#A04C0A'), (0.66, '#BC6014')])
-    crust = m.mix(m.math('MULTIPLY', m.math('SUBTRACT', 1.0, band), m.math('MULTIPLY', zone, 0.15)), crust, '#682A04')
-    crust = m.mix(m.math('MULTIPLY', m.math('SUBTRACT', 1.0, m.smooth(px[2], 0.03, 0.22)), 0.55), crust, '#561F02')
-    crust = m.mix(m.smooth(m.math('MULTIPLY', nz, -1.0), 0.4, 0.8), crust, '#6A3412')  # 바닥
-    crust = m.mix(m.math('MULTIPLY', ear, 0.4), crust, '#B8661E')  # 귀 윗면 = 금갈색 껍질
-    crust = m.mix(m.math('MULTIPLY', flour, 0.85), crust, '#E8D3AE')  # 대비 한 단 낮춤
-    crust = m.mix(m.math('MULTIPLY', lip, 0.6), crust, '#4A1C04')  # 그을린 입술
+    crust = m.ramp(blot, [(0.30, c['ramp'][0]), (0.48, c['ramp'][1]), (0.66, c['ramp'][2])])
+    crust = m.mix(m.math('MULTIPLY', m.math('SUBTRACT', 1.0, band), m.math('MULTIPLY', zone, 0.15)), crust, c['ring'])
+    crust = m.mix(m.math('MULTIPLY', m.math('SUBTRACT', 1.0, m.smooth(px[2], 0.03, 0.22)), 0.55), crust, c['low'])
+    crust = m.mix(m.smooth(m.math('MULTIPLY', nz, -1.0), 0.4, 0.8), crust, c['base'])  # 바닥
+    crust = m.mix(m.math('MULTIPLY', ear, 0.4), crust, c['ear'])  # 귀 윗면 = 금갈색 껍질
+    if flour_a:
+        crust = m.mix(m.math('MULTIPLY', flour, flour_a), crust, c['flour'])  # 대비 한 단 낮춤(0.85)
+    crust = m.mix(m.math('MULTIPLY', lip, 0.6), crust, c['lip'])  # 그을린 입술
     # 홈 속살 — 꺼진 바닥은 노릇, 입술 밑으로 갈수록 짙게(u 0.6 = 입술)
-    inner = m.ramp(u, [(0.0, '#F6CC80'), (0.38, '#ECAC4E'), (0.54, '#C47228'), (0.62, '#7A3A0E')])
+    inner = m.ramp(u, [(0.0, c['inner'][0]), (0.38, c['inner'][1]), (0.54, c['inner'][2]), (0.62, c['inner'][3])])
     pore = m.math('SUBTRACT', 1.0, m.smooth(m.voronoi(m.mapping(p, scale=(1, 1, 1.6)), scale=55), 0.06, 0.14))
-    inner = m.mix(m.math('MULTIPLY', pore, 0.45), inner, '#B8732E')
+    inner = m.mix(m.math('MULTIPLY', pore, 0.45), inner, c['pore'])
     col = m.mix(cut, crust, inner)
 
     rough = m.mixf(cut, m.mixf(flour, 0.88, 0.94), 0.86)
+    if extra:
+        col, rough = extra(m, col, rough, p, nz, cut)
     h = m.math('MULTIPLY', m.math('MULTIPLY', band, zone), 0.6)
     h = m.math('ADD', h, m.math('MULTIPLY', m.noise(p, scale=90, detail=3), 0.35))
     h = m.math('ADD', h, m.math('MULTIPLY', flour, 0.25))
