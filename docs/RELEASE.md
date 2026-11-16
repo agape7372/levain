@@ -185,8 +185,9 @@ node scripts/check-remote-assets.mjs                   # 배포 뒤 — 원격 �
 앱은 처음 볼 때 받고(쇼케이스는 최대 4초 기다린 뒤 베이스 빵으로 물러남) 기기 Cache Storage에 둔다. 묶음 안 변형 규칙은 `scripts/lib/families.mjs`.
 - **순서**: ① `npm run ota:release -- <version>` ② 워크트리에서 릴리스했으면 `ota/assets/`와 새 zip을 배포 폴더(본 레포 `ota/`)로 옮긴다
   ③ `vercel --prod` ④ `node scripts/check-remote-assets.mjs`. ④를 건너뛰면 원격 404가 앱에서 조용히 베이스 빵으로 가려져 아무도 모른다.
-- **배포 용량 주의(미확인)**: 본 레포 배포 폴더에 zip 13개(약 92MB)가 쌓여 있고 assets 약 50MB가 더해진다(1.6.9 dry-run 실측 50.75MB).
-  Vercel Hobby의 CLI 업로드 상한(문서상 100MB, 최근 완화 여부 미확인)에 걸릴 수 있다. 배포 전 zip을 최근 4개로 줄인다.
+  본 레포엔 node_modules가 없어 릴리스는 워크트리에서 만들고, 배포는 `npx vercel --prod --scope jirings-projects --cwd <본 레포>/ota`로 한다(1.6.9 실측).
+- **배포 용량(1.6.9 실측)**: zip을 최근 4개(1.6.6~1.6.9)만 두고 assets 52MB를 더해 폴더 합 99MB로 Vercel 배포가 통과했다.
+  zip은 4개 유지(옛 zip 10개는 지움). 업로드 상한은 이번엔 안 걸렸지만 여유가 1MB 남짓이라 zip을 더 늘리지 않는다.
 - **발행 전 필수**: 개인정보처리방침 두 곳(`docs/PRIVACY.md` · `ota/privacy.html`)에 「빵 그림 파일을 같은 곳에서 받는다」 문장이
   들어 있어야 한다(2026-11-16 개정). 이 기능을 처음 내보내는 판부터 해당한다.
 
@@ -234,7 +235,7 @@ node scripts/check-remote-assets.mjs                   # 배포 뒤 — 원격 �
 **zip은 커밋하지 않는다**(`.gitignore`의 `ota/bundles/` — 개당 5MB대). 따라서 과거 번들의 실체는
 ① 지금 배포돼 있는 Vercel 프로젝트와 ② 릴리스를 돌린 이 PC의 `ota/bundles/` 두 곳에만 있다.
 다른 PC에서 `vercel --prod`를 돌리면 로컬에 없는 과거 zip이 배포본에서 사라져 롤백 URL이 404가 된다 —
-새 PC에서 배포하기 전에 `ota/bundles/`를 함께 옮길 것. `ota/assets/`도 같다(커밋할지는 미정 — 지금은 이 PC에만 있다).
+새 PC에서 배포하기 전에 `ota/bundles/`를 함께 옮길 것. `ota/assets/`도 같다(git 밖: `.gitignore`에 `ota/assets/` — 이 PC와 Vercel에만 있다).
 
 **안전장치**(2026-11-12 개정): `app.ts`가 `initOta({ deferReady: true })`로 시작하고 부팅 끝에 `markOtaReady()`를 부른다.
 이 짝이 와야 `notifyAppReady()`가 나간다. 부팅이 안 끝나면(크래시 등) 플러그인이 새 번들을 30초 뒤 "깨진 번들"로 판단해 이전 번들로 되돌린다.
