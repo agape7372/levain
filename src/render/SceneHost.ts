@@ -25,7 +25,8 @@ export function fitPixelRatio(dpr: number, w: number, h: number): number {
 }
 
 type LightRig = {
-  key: { color: number; intensity: number };
+  /** pos 생략 = KEY_POS(홈 · 기본 쇼케이스) */
+  key: { color: number; intensity: number; pos?: [number, number, number] };
   ambient: { color: number; intensity: number };
   fill: { color: number; intensity: number };
   /** 측면 노출 2차 캘리브레이션(2026-08-30) 전용 — HOME_LIGHT는 생략(=끔), SHOWCASE_LIGHT만 갖는다. */
@@ -49,6 +50,14 @@ const SHOWCASE_LIGHT: LightRig = {
   fill: { color: 0xffffff, intensity: 0.3 },
   hemi: { sky: 0x000000, ground: 0xffffff, intensity: 1.7 },
 };
+// 툰 빵(toonMaterial.ts) 쇼케이스 — 기본 쇼케이스 조명은 앰비언트 · 반구가 커서 세 단 그늘이 안 보인다.
+// 직광을 옆 뒤로 돌려 벽면이 단을 가르게 한다. thumbsHarness.ts 툰 분기와 같은 값(2026-11-17 스타일 시험).
+const TOON_SHOWCASE_LIGHT: LightRig = {
+  key: { color: 0xffffff, intensity: 2.8, pos: [-4, 2.5, -1] },
+  ambient: { color: 0xffffff, intensity: 0.3 },
+  fill: { color: 0xffffff, intensity: 0.3 },
+};
+const KEY_POS: [number, number, number] = [-2, 6, 2];
 
 export class SceneHost {
   private renderer: THREE.WebGLRenderer | null = null;
@@ -61,6 +70,7 @@ export class SceneHost {
   /** 마지막으로 받은 개체 시드·쇼케이스 url — 컨텍스트 복구 뒤 재적용 (T4-3) */
   private seed: number | null = null;
   private showcaseUrl: string | null = null;
+  private showcaseToon = false;
   /** 셰이더 시계 원점 — start()마다 새로 잡는다. uTime을 작게 유지해 float32 해상도를 지킨다 (T4-9) */
   private shaderT0 = 0;
   private resizeObserver: ResizeObserver | null = null;
@@ -130,7 +140,7 @@ export class SceneHost {
 
     // 조명: 홈 씬 값(HOME_LIGHT)으로 초기화 — 쇼케이스 진입 시에만 스왑(VISUAL §1-3)
     const key = new THREE.DirectionalLight(HOME_LIGHT.key.color, HOME_LIGHT.key.intensity);
-    key.position.set(-2, 6, 2);
+    key.position.set(...KEY_POS);
     this.scene.add(key);
     const ambient = new THREE.AmbientLight(HOME_LIGHT.ambient.color, HOME_LIGHT.ambient.intensity);
     this.scene.add(ambient);
@@ -200,6 +210,7 @@ export class SceneHost {
 
   private onContextRestored = (): void => {
     const showcaseUrl = this.showcaseUrl; // dispose가 비우기 전에 챙긴다
+    const toon = this.showcaseToon;
     this.dispose();
     this.mount();
     // 새 반죽은 기본값(시드 0.37·기본 파라미터)으로 태어난다 — 유실 전 상태를 다시 입힌다
@@ -207,7 +218,7 @@ export class SceneHost {
     if (this.current) this.dough?.applyParams(this.current);
     if (this.wantRunning) this.start(); // 레시피 탭처럼 멈춰 있던 씬은 멈춘 채로
     // 쇼케이스 중이었으면 빵을 다시 올린다 — enterShowcase가 showcaseSeq를 올려 늦은 이전 로드는 버려진다
-    if (showcaseUrl) this.enterShowcase(showcaseUrl).catch(() => {});
+    if (showcaseUrl) this.enterShowcase(showcaseUrl, toon).catch(() => {});
   };
 
   /** 라이브 목표 파라미터 — 프레임마다 지수 lerp로 따라간다 (τ≈1.2s) */
@@ -324,6 +335,7 @@ export class SceneHost {
   private applyLightRig(rig: LightRig): void {
     this.keyLight?.color.setHex(rig.key.color);
     if (this.keyLight) this.keyLight.intensity = rig.key.intensity;
+    this.keyLight?.position.set(...(rig.key.pos ?? KEY_POS));
     this.ambientLight?.color.setHex(rig.ambient.color);
     if (this.ambientLight) this.ambientLight.intensity = rig.ambient.intensity;
     this.fillLight?.color.setHex(rig.fill.color);
@@ -336,18 +348,19 @@ export class SceneHost {
   }
 
   /** 쇼케이스 진입 — 홈 씬 숨기고 GLB 턴테이블. 로드 실패는 reject (호출자 폴백) */
-  async enterShowcase(url: string): Promise<void> {
+  async enterShowcase(url: string, toon = false): Promise<void> {
     if (!this.showcase) throw new Error('scene not mounted');
     const seq = ++this.showcaseSeq;
-    await this.showcase.load(url);
+    await this.showcase.load(url, toon);
     // 늦게 도착해 버려진 로드면 진행하지 않는다 — show·리스너 부착이 두 번 되던 경로 (T7-02)
     if (seq !== this.showcaseSeq) throw new Error('showcase load superseded');
     this.showcaseUrl = url;
+    this.showcaseToon = toon;
     this.showcaseDrag?.detach();
     for (const o of this.homeGroup) o.visible = false;
     this.showcase.show();
     // 빵 GLB는 정본 hex 파리티 조명(SHOWCASE_LIGHT)으로 — 홈 씬 진입 전까지만 유효(exitShowcase가 원복)
-    this.applyLightRig(SHOWCASE_LIGHT);
+    this.applyLightRig(toon ? TOON_SHOWCASE_LIGHT : SHOWCASE_LIGHT);
     // 드래그 회전 — 쇼케이스 전용 임시 리스너 (반죽 입력과 분리)
     let lastX: number | null = null;
     const onDown = (e: PointerEvent): void => {

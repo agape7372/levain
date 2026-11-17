@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { applyBreadMaterials, disposeBreadMaterial } from './breadMaterial';
+import { applyToon } from './toonMaterial';
 
 const TURNTABLE_S = 12; // 12s/rev
 const FIT_SIZE = 1.6;   // 씬 단위 목표 크기 (병 폭과 비슷하게)
@@ -19,7 +20,7 @@ export class BreadShowcase {
   /** 턴테이블 회전 — 기울어진 group 안에서 빵 자신의 세로축으로 돈다 */
   private spin = new THREE.Group();
   private loader = new GLTFLoader();
-  private current: { url: string; root: THREE.Group } | null = null;
+  private current: { url: string; toon: boolean; root: THREE.Group } | null = null;
   private dragVel = 0;
   private dragging = false;
   private loadSeq = 0;
@@ -34,14 +35,15 @@ export class BreadShowcase {
   }
 
   /** 로드 + 정규화(중심·크기) — 실패 시 reject (호출자가 폴백) */
-  async load(url: string): Promise<void> {
+  async load(url: string, toon = false): Promise<void> {
     const seq = ++this.loadSeq;
-    if (this.current?.url === url) return; // 캐시 히트 — 즉시
+    if (this.current?.url === url && this.current.toon === toon) return; // 캐시 히트 — 즉시
     const gltf = await this.loader.loadAsync(url);
     if (seq !== this.loadSeq) return; // 늦게 도착한 로드 — 폐기
     const root = gltf.scene;
 
-    applyBreadMaterials(root, this.getEnv);
+    if (toon) applyToon(root); // 툰 빵(팬케이크 계열) — toonMaterial.ts
+    else applyBreadMaterials(root, this.getEnv);
 
     // 정규화: 바운딩 박스 중심을 원점으로, 최장축을 FIT_SIZE로
     const box = new THREE.Box3().setFromObject(root);
@@ -52,7 +54,7 @@ export class BreadShowcase {
     root.position.copy(center).multiplyScalar(-s);
 
     this.disposeCurrent();
-    this.current = { url, root };
+    this.current = { url, toon, root };
     this.spin.add(root);
   }
 
