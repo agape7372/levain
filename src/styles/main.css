@@ -1374,6 +1374,43 @@ body.is-fetching::after {
   body.is-fetching::after { animation: none; opacity: 0.6; }
 }
 
+/* ── 굽는 사이 (2026-11-17, ovenVeil.ts) — 오븐 안의 열. 글자·도형 0, 색 온도와 타이밍만 ──
+   위는 짙은 갈색, 아래로 갈수록 크러스트 쪽으로 데워진다(열원은 아래). ::after는 바닥에서 오르는
+   테라코타 기운이 숨 쉬듯 오르내린다 — 둥근 빛 덩어리·방사형이 아니라 세로 그라디언트 한 장.
+   #ui-root(30) 위라 결과 카드(모달)·쇼케이스가 이 아래서 준비되고, 걷힐 때 드러난다. */
+.oven-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--ink) 82%, var(--crust)) 0%,
+    color-mix(in srgb, var(--ink) 50%, var(--crust)) 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1);   /* 걷기 — 온기가 천천히 빠지며 빵이 드러난다(급한 이징은 0.3s 만에 사라졌다) */
+}
+.oven-veil.is-in {
+  opacity: 0.94;
+  pointer-events: auto;   /* 탭 = 넘기기 */
+  transition: opacity 0.55s ease-out;
+}
+.oven-veil.is-quick { transition-duration: 0.25s; }
+.oven-veil::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, color-mix(in srgb, var(--accent) 75%, transparent), transparent 62%);
+  opacity: 0.2;
+  animation: oven-heat 1.3s ease-in-out 0.35s infinite alternate;
+}
+@keyframes oven-heat { from { opacity: 0.2; } to { opacity: 0.62; } }
+@media (prefers-reduced-motion: reduce) {
+  .oven-veil, .oven-veil.is-in { transition-duration: 0.15s; }
+  .oven-veil::after { animation: none; opacity: 0.35; }
+}
+
 /* ── 합성 썸네일 — 재료 아트를 빵 곁에 놓는다 (2026-09-05, recipeVisuals.breadThumb) ──────
    전용 PNG가 없는 변형(156종)은 베이스 PNG + 재료 썸네일(우하단에 **놓인 것처럼** 겹침 — 정물 구도).
    원형 크림 바탕·테두리는 쓰지 않는다: 그건 알림 뱃지 문법이라 같은 카드 우상단 count-pill과 부딪히고

@@ -413,13 +413,19 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
   /**
    * 누적 미션 카운터 — 급여·굽기 이벤트만 센다 (차단·잠금은 세지 않는다).
    * 급여와 discard 굽기는 sim이 실어 준 counted만 센다 — 연타가 미션을 올리지 않게(감사 T1-01·02)
+   * 빵 굽기는 도감에 처음 드는 것이거나 그 항목 최고 등급을 올린 것만 센다(2026-11-17 — 싼 빵 연타 차단).
+   * `collectionBefore` = applyBakeEvents 전 도감(불변 갱신이라 옛 참조가 그대로 남는다)
    */
-  function applyEconomyEvents(events: SimEvent[]): void {
+  function applyEconomyEvents(events: SimEvent[], collectionBefore: Record<string, CollectionEntry>): void {
     let feeds = 0;
     let bakes = 0;
     for (const e of events) {
       if (e.type === 'fed' && e.counted) feeds += 1;
-      else if (e.type === 'baked' || (e.type === 'bakedDiscard' && e.counted)) bakes += 1;
+      else if (e.type === 'bakedDiscard' && e.counted) bakes += 1;
+      else if (e.type === 'baked') {
+        const prev = collectionBefore[e.variantId ?? e.recipeId];
+        if (!prev || betterGrade(prev.bestGrade, e.grade) !== prev.bestGrade) bakes += 1;
+      }
     }
     if (feeds === 0 && bakes === 0) return;
     setEconomy({ feeds: economy().feeds + feeds, bakes: economy().bakes + bakes });
@@ -502,11 +508,12 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
       setActiveSim(res.state);
       // 급여로 승급하면 단계 보상·stageMax가 이 dispatch의 델타·persist에 같이 든다(T1-06)
       syncStageMax(now);
+      const collectionBefore = env.shared.collection;
       applyBakeEvents(res.events, now);
       // 도감과 같은 델타 — 통 차감·적립도 이 persist 1회에 든다. 액션 후 상태를 넘기는 이유는
       // applyPantryEvents 주석(split의 떼는 순간 품질).
       applyPantryEvents(res.events, res.state, now, pick);
-      applyEconomyEvents(res.events); // 도감 갱신 뒤 — 레시피 최초 완성분까지 같은 델타에 든다
+      applyEconomyEvents(res.events, collectionBefore); // 도감 갱신 뒤 — 레시피 최초 완성분까지 같은 델타에 든다
       snap = deriveSnapshot(activeSim(), now);
     } catch (err) {
       env = prevEnv;

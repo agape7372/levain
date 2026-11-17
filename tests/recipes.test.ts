@@ -98,7 +98,7 @@ describe('recipes — 해금은 집 최고 단계 houseStage', () => {
     expect(res.events[0].type).toBe('baked');
   });
 
-  it('houseStage 4면 0단계 르방으로도 팬케이크(discard 2단계)를 만든다', () => {
+  it('houseStage 4면 0단계 르방으로도 팬케이크(discard 1단계)를 만든다', () => {
     const res = applyAction(young, { type: 'bakeDiscard', recipeId: 'pancake', houseStage: 4 }, t0);
     expect(res.events).toEqual([{ type: 'bakedDiscard', recipeId: 'pancake', counted: true }]);
   });

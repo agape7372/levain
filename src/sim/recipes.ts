@@ -1,5 +1,5 @@
 // 레시피 데이터·해금·판정 — 정본: docs/GDD.md §6
-import type { BakeGrade, Flour, RecipeDef, SimState } from './types';
+import type { BakeGrade, CollectionEntry, Flour, RecipeDef, SimState } from './types';
 import {
   BAKE_ACTIVITY_W, BAKE_SOUR_W, BAKE_WEIGHTS_BY_RECIPE, FLOUR_AFFINITY_BONUS, GRADE_BEST, GRADE_GOOD,
 } from './constants';
@@ -12,7 +12,8 @@ const STRICT = 0.04;
 
 export const RECIPES: readonly RecipeDef[] = [
   // discard — 판정 없음, "마지막 급여 후 1회"
-  { id: 'pancake', kind: 'discard', cost: 0, stage: 2, sourRange: null, slope: 0 },
+  // 팬케이크 1단계(2026-11-17, 이전 판 2단계) — 첫 굽기를 5일차에서 3일차로 당긴다
+  { id: 'pancake', kind: 'discard', cost: 0, stage: 1, sourRange: null, slope: 0 },
   { id: 'cracker', kind: 'discard', cost: 0, stage: 2, sourRange: null, slope: 0 },
   { id: 'scone', kind: 'discard', cost: 0, stage: 3, sourRange: null, slope: 0 },
   // 빵 — 보관 통 그램(cost) 소모 + 판정. cost는 통에서 나간다(르방이의 mass가 아니다)
@@ -53,6 +54,28 @@ export function gradeOf(score: number): BakeGrade {
 const GRADE_ORDER: Record<BakeGrade, number> = { flat: 0, good: 1, best: 2 };
 export const betterGrade = (a: BakeGrade | null, b: BakeGrade): BakeGrade =>
   a !== null && GRADE_ORDER[a] >= GRADE_ORDER[b] ? a : b;
+
+/**
+ * 솜씨 — 빵 베이스마다 도감의 그 베이스 키 + 변형 키(`<base>--…`)를 통틀은 최고 등급 (GDD §6-5, 2026-11-17).
+ * good = good 이상인 종 수, best = best인 종 수, total = 빵 베이스 수. 도감 파생이라 새 저장 키가 없다.
+ */
+export function breadSkill(collection: Record<string, CollectionEntry>):
+  { good: number; best: number; total: number } {
+  let good = 0;
+  let best = 0;
+  let total = 0;
+  for (const r of RECIPES) {
+    if (r.kind !== 'bread') continue;
+    total += 1;
+    let top: BakeGrade | null = null;
+    for (const [k, e] of Object.entries(collection)) {
+      if (e.bestGrade && (k === r.id || k.startsWith(`${r.id}--`))) top = betterGrade(top, e.bestGrade);
+    }
+    if (top === 'good' || top === 'best') good += 1;
+    if (top === 'best') best += 1;
+  }
+  return { good, best, total };
+}
 
 /**
  * 굽기 게이트: 단계만. 그램 원가는 보관 통(집 소유·전역)에서 나가므로 sim이 모른다 —

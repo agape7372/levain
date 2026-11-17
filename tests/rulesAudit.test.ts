@@ -71,7 +71,8 @@ describe('A2 굽기 미션은 discard 굽기 벽시계 6h 간격만 센다 (T1-0
     expect(store.getEconomy().bakes - b0).toBe(1);
   });
 
-  it('6h 뒤의 discard 굽기는 다시 센다 · 빵 굽기는 전부 센다', () => {
+  // 2026-11-17: 빵은 처음 굽거나 더 잘 구운 것만 센다(이전 판 = 빵 전부, 기대값 4)
+  it('6h 뒤의 discard 굽기는 다시 센다 · 같은 빵 같은 등급 재굽기는 안 센다', () => {
     const { store, clock } = mature(7);
     const b0 = store.getEconomy().bakes;
     store.dispatch({ type: 'bakeDiscard', recipeId: 'pancake' });
@@ -81,7 +82,7 @@ describe('A2 굽기 미션은 discard 굽기 벽시계 6h 간격만 센다 (T1-0
     store.grantPantry(200);
     store.dispatch({ type: 'bake', recipeId: 'flatbread' });
     store.dispatch({ type: 'bake', recipeId: 'flatbread' });
-    expect(store.getEconomy().bakes - b0).toBe(4);
+    expect(store.getEconomy().bakes - b0).toBe(3);
   });
 });
 

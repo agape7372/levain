@@ -245,3 +245,6 @@ export const MISSION_REWARD_FLOUR = 12;
 export const STAGE_REWARD_FLOUR = 12;
 /** 베이스 레시피 최초 완성 보상 — 도감 기록에서 파생(1종당 1회) */
 export const RECIPE_REWARD_FLOUR = 12;
+/** 솜씨 보상 (2026-11-17) — 빵 베이스마다(변형 포함 도감 최고 등급) good 이상 1회 · best면 추가 1회 */
+export const SKILL_GOOD_FLOUR = 12;
+export const SKILL_BEST_FLOUR = 24;

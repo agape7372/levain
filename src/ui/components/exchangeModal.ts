@@ -12,7 +12,8 @@ import { celebrateIngredients } from './celebrate';
 import { chipGrid, footerActions, footerText, ingredientChip, setChipCount, setChipSelected } from './recipeVisuals';
 import {
   INGREDIENTS, INGREDIENT_FLOUR_COST, INGREDIENT_SOFT_CAP, FLOUR_PER_INGREDIENT,
-  MISSION_REWARD_FLOUR, RECIPE_REWARD_FLOUR, STAGE_REWARD_FLOUR,
+  MISSION_REWARD_FLOUR, RECIPE_REWARD_FLOUR, STAGE_REWARD_FLOUR, SKILL_GOOD_FLOUR, SKILL_BEST_FLOUR,
+  breadSkill,
 } from '../../sim';
 import type { IngredientId } from '../../sim';
 import type { GameApi } from '../gameApi';
@@ -54,6 +55,11 @@ export function openMissionsModal(api: GameApi): void {
   addRow(
     copy.economy.missionRecipeLabel(eco.basesDone, eco.basesTotal),
     copy.economy.missionRecipe(RECIPE_REWARD_FLOUR),
+  );
+  const skill = breadSkill(api.collection());
+  addRow(
+    copy.economy.missionSkillLabel(skill.good, skill.total),
+    copy.economy.missionSkill(SKILL_GOOD_FLOUR, SKILL_BEST_FLOUR),
   );
   wrap.appendChild(rows);
 

@@ -11,7 +11,7 @@ export * from './ingredients';
 export { lotsSum, pantryQualityOf, pickDough, consumeLots, trimOldest, capLots, pushLot } from './pantry';
 export type { DoughPick } from './pantry';
 export {
-  RECIPES, recipeById, sourFit, bakeScore, gradeOf, betterGrade, canBakeBread, canBakeDiscard,
+  RECIPES, recipeById, sourFit, bakeScore, gradeOf, betterGrade, breadSkill, canBakeBread, canBakeDiscard,
 } from './recipes';
 export {
   RATIOS, TEMP_MULT, STAGES, FRIDGE_STAGE, FLOAT_OK_ACTIVITY, SEED_G, HOUR, DAY,
@@ -19,7 +19,7 @@ export {
   FLOUR_TIME_MULT, FLOUR_STAGE, FLOUR_AFFINITY_BONUS,
   INGREDIENT_SOFT_CAP, FLOUR_PER_INGREDIENT, INGREDIENT_FLOUR_COST,
   MISSION_FEED_STEP, MISSION_BAKE_STEP, MISSION_REWARD_FLOUR,
-  STAGE_REWARD_FLOUR, RECIPE_REWARD_FLOUR,
+  STAGE_REWARD_FLOUR, RECIPE_REWARD_FLOUR, SKILL_GOOD_FLOUR, SKILL_BEST_FLOUR,
   SPLIT_MIN_G, PANTRY_MAX, PANTRY_LEGACY_ACTIVITY, PANTRY_LEGACY_ACIDITY, PANTRY_LOT_MAX,
   AD_SLOT_DAILY, AD_TOTAL_DAILY, AD_SESSION_CAP,
   NOTIFY_MAX_PER_DAY,

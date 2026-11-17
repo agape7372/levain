@@ -7,18 +7,18 @@
 //   2. 타임스탬프가 없어 시계 조작 면역 + 재정박 목록(규칙 4)에 들어가지 않는다.
 //   3. 상수를 나중에 조정하면 잔액이 소급 재계산된다 — 발행 후 하향 조정은 잔액을
 //      깎을 수 있으니 상수는 올리는 방향으로만 만질 것.
-import { RECIPES } from '../sim';
+import { RECIPES, breadSkill } from '../sim';
 import type { CollectionEntry } from '../sim';
 import {
   FLOUR_PER_INGREDIENT, MISSION_BAKE_STEP, MISSION_FEED_STEP,
-  MISSION_REWARD_FLOUR, RECIPE_REWARD_FLOUR, STAGE_REWARD_FLOUR,
+  MISSION_REWARD_FLOUR, RECIPE_REWARD_FLOUR, SKILL_BEST_FLOUR, SKILL_GOOD_FLOUR, STAGE_REWARD_FLOUR,
 } from '../sim/constants';
 
 /** 집(계정) 경제 상태 — 전부 단조 증가 카운터. shared 하위 무버전 추가 키 */
 export interface EconomyState {
   /** 누적 급여 횟수 (fed 이벤트 중 counted — 유효 6h 간격) — 급여 미션의 축 */
   feeds: number;
-  /** 누적 굽기 횟수 (baked 전부 + bakedDiscard 중 counted — 벽시계 6h 간격) — 굽기 미션의 축 */
+  /** 누적 굽기 횟수 (baked 중 도감에 처음 들거나 최고 등급을 올린 것 + bakedDiscard 중 counted — 벽시계 6h 간격) — 굽기 미션의 축 (2026-11-17, 이전 판 = baked 전부) */
   bakes: number;
   /** 집 최고 도달 성장 단계 — 르방이 죽거나 삭제돼도 내려가지 않는다 */
   stageMax: number;
@@ -48,11 +48,14 @@ export function earnedFlour(
   eco: EconomyState,
   collection: Record<string, CollectionEntry>,
 ): number {
+  const skill = breadSkill(collection);
   return (
     milestonesOf(eco.feeds, MISSION_FEED_STEP) * MISSION_REWARD_FLOUR
     + milestonesOf(eco.bakes, MISSION_BAKE_STEP) * MISSION_REWARD_FLOUR
     + eco.stageMax * STAGE_REWARD_FLOUR
     + basesCompleted(collection) * RECIPE_REWARD_FLOUR
+    // 솜씨 — 도감 최고 등급은 내려가지 않으니 이 항도 단조 증가다(잔액 소급 감소 없음)
+    + skill.good * SKILL_GOOD_FLOUR + skill.best * SKILL_BEST_FLOUR
     + eco.exchanged * FLOUR_PER_INGREDIENT
   );
 }

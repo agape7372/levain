@@ -35,6 +35,7 @@ import { mountOnboarding } from './ui/screens/onboarding';
 import { openStarterGift } from './ui/components/ingredientPicker';
 import { celebrateIngredients, celebrateStageUp, dismissCelebrate } from './ui/components/celebrate';
 import { variantName } from './ui/components/breadSheet';
+import { openOvenVeil, skipOvenVeil } from './ui/components/ovenVeil';
 import type { GameApi } from './ui/gameApi';
 import { RECIPES, INGREDIENTS } from './sim';
 import { adPrivacyOptionsRequired, adsAvailable, showAdPrivacyOptions, showRewarded } from './platform/ads';
@@ -324,7 +325,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       }
       if (isNative()) void CapApp.minimizeApp().catch(() => undefined);
     },
-    trySkipSequence: () => dismissCelebrate() || scene.skipSequence(), // 획득 연출 레이어가 먼저
+    trySkipSequence: () => dismissCelebrate() || skipOvenVeil() || scene.skipSequence(), // 획득 연출 레이어가 먼저
   });
   let currentTab: 'levain' | 'recipes' = 'levain';
 
@@ -338,40 +339,64 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     else scene.stop();
   };
   let showcaseLoading = false;
+  // 굽기 결과가 **실제로 보이는 순간** 할 일(결과음·햅틱·pendingBake 걷기 타이머). onEvents가 커밋 때 맡기고
+  // 바로 뒤 openShowcase가 같은 자산 id로 가져간다. 커밋 때 울리면 원격 변형 GLB를 기다리는 4초 동안
+  // 타이머가 먼저 돌아 결과를 보기도 전에 pendingBake가 걷혔다(2026-11-17).
+  let bakeReveal: { id: string; run: () => void } | null = null;
   const openShowcase = async (
     id: string, headline: string, large: boolean,
     opts?: { onRebake?: () => void; kind?: 'bread' | 'ingredient'; name?: string },
   ): Promise<boolean> => {
-    // 로딩 중·표시 중 재진입은 먼저 온 요청이 화면을 띄운다 — true라 호출부가 2D 카드 폴백을 겹쳐 띄우지 않는다 (T7-02)
+    // 굽기 결과면 이 요청이 가져간다 — 다른 id(감상 진입)면 남은 것은 버린다(엉뚱한 때 울리지 않게)
+    let reveal = bakeReveal?.id === id ? bakeReveal.run : null;
+    bakeReveal = null;
+    // 로딩 중·표시 중 재진입은 먼저 온 요청이 화면을 띄운다 — true라 호출부가 2D 카드 폴백을 겹쳐 띄우지 않는다 (T7-02).
+    // 굽기 결과가 여기 걸리면 보여 준 적이 없으니 소리 없이 pendingBake를 남긴다 → 다음 부팅의 복구 모달이 보여 준다
     if (showcaseLoading || showcaseActive) return true;
     showcaseLoading = true;
     const kind = opts?.kind ?? 'bread';
     const dir = kind === 'ingredient' ? 'ingredients' : 'breads';
     const tabAtRequest = currentTab;
-    // 받는 동안 멈춘 듯 보이지 않게 — 로컬 로드는 대개 이 안에 끝나 표시가 안 뜬다(main.css body.is-fetching)
-    const waitMark = setTimeout(() => document.body.classList.add('is-fetching'), 300);
+    // 굽는 사이 연출 — 굽기 결과일 때만. 받는 시간이 길면 덮고, 짧으면 최소 길이만 채운다(ovenVeil.ts)
+    const veil = reveal ? openOvenVeil() : null;
+    const show = (): void => {
+      if (!reveal) return; // onShow는 위 화면이 닫혀 돌아올 때 또 불린다 — 결과음은 한 번
+      reveal();
+      reveal = null;
+      veil?.lift();
+      // 첫 김(onShow)은 걷히는 막 뒤에 반쯤 묻힌다 — 막이 걷힌 뒤 한 번 더 피워 「갓 나온」 순간을 잇는다
+      setTimeout(() => { if (scene.isShowcasing()) scene.spawnSteam(); }, 450);
+    };
+    // 받는 동안 멈춘 듯 보이지 않게 — 로컬 로드는 대개 이 안에 끝나 표시가 안 뜬다(main.css body.is-fetching).
+    // 굽는 사이 연출이 떠 있으면 그것이 기다림을 말한다
+    const waitMark = veil ? undefined : setTimeout(() => document.body.classList.add('is-fetching'), 300);
     try {
       try {
         // 원격 변형은 최대 4초 기다린다. 넘기면 베이스로 물러나고 받기는 뒤에서 이어 가 캐시에 든다(다음엔 변형)
         const url = kind === 'bread' ? await within(glbUrl(id), SHOWCASE_WAIT_MS) : `/${dir}/${id}.glb`;
         await scene.enterShowcase(url, kind === 'bread'); // 빵은 전부 툰(toonMaterial.ts)
-      } catch {
+      } catch (err) {
         // 변형 GLB는 대부분 없다 — 베이스 GLB로 한 번 더 (썸네일의 베이스 PNG 폴백과 같은 규칙, T4-2)
         const base = id.split('--')[0];
-        if (base === id) return false;
+        if (base === id) throw err;
         await scene.enterShowcase(`/${dir}/${base}.glb`, kind === 'bread');
       }
+      await veil?.ready;
     } catch {
+      // 2D 결과 카드로 물러난다 — 호출부가 이 false를 받자마자 카드를 띄우니 지금이 「보이는 순간」이다
+      await veil?.ready;
+      show();
       return false;
     } finally {
       showcaseLoading = false;
       clearTimeout(waitMark);
       document.body.classList.remove('is-fetching');
     }
-    // 로드 중 탭을 옮겼으면 띄우지 않는다 (T7-10)
+    // 로드 중 탭을 옮겼으면 띄우지 않는다 (T7-10) — 호출부의 카드 폴백이 결과를 보인다
     if (currentTab !== tabAtRequest) {
       scene.exitShowcase();
       restoreStage();
+      show();
       return false;
     }
     // 변형(id가 copy.recipes(.ingredientNames)에 없다)은 호출부가 name을 직접 넘긴다
@@ -384,6 +409,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
         scene.start();
         // 김은 **갓 구운 빵**의 다이제틱 신호다 — 생재료에서 김이 나면 거짓말이 된다
         if (kind === 'bread') scene.spawnSteam();
+        show();
       },
       onExit: () => {
         showcaseActive = false;
@@ -491,21 +517,33 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
           scene.playFeed(false);
           setTimeout(() => scene.playWatch(), 2800); // 지켜보기 — 급여 연출 뒤
           break;
-        case 'baked':
-          // 보상 소리는 하나이고 결과는 「어디까지 올라가느냐」로만 다르다 (sounds.sfxBaked)
-          sfxBaked(BAKE_NOTES[e.grade]);
-          haptic('success');
-          // 강제종료 안전: 결과를 flags에 심고, 3초 살아있으면(= 결과 모달을 봤으면) 걷는다
+        case 'baked': {
+          // 강제종료 안전: 결과를 flags에 심는 건 커밋 순간 그대로다
           const planted = { recipeId: e.recipeId, grade: e.grade, ...(e.variantId ? { variantId: e.variantId } : {}) };
           store.setFlags({ pendingBake: planted });
-          // 자기가 심은 값일 때만 걷는다 — 3초 안에 또 구우면 두 번째 기록이 1초 만에 지워졌다 (T2-12)
-          setTimeout(() => {
-            if (store.getEnvelope().flags.pendingBake === planted) store.setFlags({ pendingBake: null });
-          }, 3000);
+          // 소리·햅틱·걷기는 결과가 보이는 순간(openShowcase의 bakeReveal) — 3초 살아있으면(= 결과를 봤으면) 걷는다
+          bakeReveal = {
+            id: e.variantId ?? e.recipeId,
+            run: () => {
+              // 보상 소리는 하나이고 결과는 「어디까지 올라가느냐」로만 다르다 (sounds.sfxBaked)
+              sfxBaked(BAKE_NOTES[e.grade]);
+              haptic('success');
+              // 자기가 심은 값일 때만 걷는다 — 3초 안에 또 구우면 두 번째 기록이 1초 만에 지워졌다 (T2-12)
+              setTimeout(() => {
+                if (store.getEnvelope().flags.pendingBake === planted) store.setFlags({ pendingBake: null });
+              }, 3000);
+            },
+          };
           break;
+        }
         case 'bakedDiscard':
-          sfxBaked(2);
-          haptic('light');
+          bakeReveal = {
+            id: e.variantId ?? e.recipeId,
+            run: () => {
+              sfxBaked(2);
+              haptic('light');
+            },
+          };
           break;
         case 'moved':
           sfxSetDown();

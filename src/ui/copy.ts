@@ -52,6 +52,11 @@ export const copy = {
         a: '밥을 꾸준히 주면 단계가 올라요. 오르면 냉장고, 이름 붙이기, 말려 두기를 쓸 수 있어요.',
       },
       {
+        // 2026-11-17 — 여러 마리의 이점이 어디에도 안 드러났다
+        q: '여러 마리',
+        a: '르방이는 셋까지 키울 수 있어요. 항아리는 함께 써요. 시큼하게 둔 르방이는 호밀빵에 잘 맞아요.',
+      },
+      {
         q: '곰팡이',
         a: '오래 두면 곰팡이가 펴요. 반점이 보일 때 밥을 주면 괜찮아요. 말려 둔 조각이 있으면 거기서 다시 시작할 수 있어요.',
       },
@@ -334,7 +339,7 @@ export const copy = {
       loaf: '보들보들한 매일의 식빵',
       baguette: '겉은 바삭, 속은 쫄깃한 막대빵',
       campagne: '사워도우의 정석, 시골빵',
-      rye: '시큼함이 오히려 맛이 되는 빵',
+      rye: '시큼한 반죽이 오히려 맛이 되는 빵',
       wholewheat: '통밀의 구수함을 담은 깜빠뉴',
     } as Record<string, string>,
     // ── 세그먼트·상태 줄·빵 시트 (2026-09-03 개편: [빵|재료] 한 줄, 빵 카드 = 시트) ──
@@ -440,11 +445,14 @@ export const copy = {
     missionFeedLabel: (count: number) => `밥 주기 ${count}번`,
     missionFeed: (remaining: number, reward: number) => `${remaining}번 더 주면 가루 ${reward}개`,
     missionBakeLabel: (count: number) => `빵 굽기 ${count}번`,
-    missionBake: (remaining: number, reward: number) => `${remaining}번 더 구우면 가루 ${reward}개`,
+    missionBake: (remaining: number, reward: number) => `새 빵 · 더 잘 구운 빵 ${remaining}번에 가루 ${reward}개`,
     missionStageLabel: '단계',
     missionStage: (reward: number) => `한 단계 자랄 때마다 가루 ${reward}개`,
     missionRecipeLabel: (done: number, total: number) => `처음 만든 빵 ${done}/${total}`,
     missionRecipe: (reward: number) => `한 종류마다 가루 ${reward}개`,
+    // 솜씨(2026-11-17) — 빵 종류마다 가장 잘 구운 한 번 (변형 포함)
+    missionSkillLabel: (good: number, total: number) => `솜씨 ${good}/${total}`,
+    missionSkill: (good: number, best: number) => `잘 구우면 가루 ${good}개 · 최고면 ${best}개 더`,
     giftTitle: '첫 재료를 하나 골라요',
     giftBody: '르방이가 자라면 빵에 넣을 수 있어요',
   },

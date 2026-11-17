@@ -5,7 +5,8 @@ import { describe, it, expect } from 'vitest';
 import {
   DAY, HOUR, INGREDIENT_FLOUR_COST, INGREDIENT_SOFT_CAP, FLOUR_PER_INGREDIENT,
   MISSION_BAKE_STEP, MISSION_FEED_STEP, MISSION_REWARD_FLOUR, RECIPE_REWARD_FLOUR,
-  RECIPES, STAGE_REWARD_FLOUR, initialState, playableRules, ruleByVariantId, variantIdOf,
+  RECIPES, STAGE_REWARD_FLOUR, SKILL_BEST_FLOUR, SKILL_GOOD_FLOUR, breadSkill,
+  initialState, playableRules, ruleByVariantId, variantIdOf,
 } from '../src/sim';
 import type { SimEvent } from '../src/sim';
 import { FakeClock } from '../src/platform/clock';
@@ -67,6 +68,41 @@ describe('경제 — 잔액은 파생', () => {
     const vid = variantIdOf(playableRules()[0]);
     const collection = { [vid]: { bestGrade: null, count: 1, firstAt: T0 } };
     expect(earnedFlour(emptyEconomy(), collection)).toBe(0);
+  });
+});
+
+// 2026-11-17 솜씨 항 · 굽기 미션 축 (GDD §6-5)
+describe('경제 — 솜씨 · 굽기 미션 축', () => {
+  const at = (bestGrade: 'flat' | 'good' | 'best' | null) => ({ bestGrade, count: 1, firstAt: T0 });
+  const breadRule = playableRules().find((r) => RECIPES.find((x) => x.id === r.baseRecipeId)?.kind === 'bread')!;
+
+  it('변형 키로 best여도 그 베이스 솜씨에 잡힌다 · discard 등급은 무관', () => {
+    expect(breadSkill({ [variantIdOf(breadRule)]: at('best'), pancake: at('best') }))
+      .toEqual({ good: 1, best: 1, total: 7 });
+    expect(earnedFlour(emptyEconomy(), { [variantIdOf(breadRule)]: at('best') }))
+      .toBe(SKILL_GOOD_FLOUR + SKILL_BEST_FLOUR);
+  });
+
+  it('등급이 오를수록 획득이 줄지 않는다 (단조)', () => {
+    const e = (g: 'flat' | 'good' | 'best') => earnedFlour(emptyEconomy(), { flatbread: at(g) });
+    expect(e('flat')).toBe(RECIPE_REWARD_FLOUR);
+    expect(e('good')).toBe(RECIPE_REWARD_FLOUR + SKILL_GOOD_FLOUR);
+    expect(e('best')).toBe(RECIPE_REWARD_FLOUR + SKILL_GOOD_FLOUR + SKILL_BEST_FLOUR);
+  });
+
+  it('빵 굽기 미션은 처음 · 등급 갱신만 센다 (같은 등급 재굽기는 안 센다)', () => {
+    const { store } = matureStore();
+    const flat = { activity: 0.1, acidity: 25, flour: 'white' as const };
+    const bake = (): void => { store.dispatch({ type: 'bake', recipeId: 'flatbread' }); };
+    store.grantPantry(30, flat);
+    bake(); // 처음 — 셈
+    store.grantPantry(30, flat);
+    bake(); // 같은 flat — 안 셈
+    expect(store.getCollection().flatbread.bestGrade).toBe('flat');
+    store.grantPantry(30); // 레거시 품질 = best
+    bake(); // 등급 갱신 — 셈
+    expect(store.getCollection().flatbread.bestGrade).toBe('best');
+    expect(store.getEconomy().bakes).toBe(2);
   });
 });
 
