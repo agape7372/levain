@@ -1,13 +1,8 @@
 // 툰 스타일 빵 — 쇼케이스(breadShowcase.ts)와 썸네일 하네스(scripts/thumbsHarness.ts)가 공유.
-// 2026-11-17 스타일 시험에서 채택: 색 맵은 GLB 그대로 · 본체 = MeshToonMaterial 3단 · 가는 외곽선(썸네일 512px에서 1.2px).
+// 빵 전부(재료는 아님). 2026-11-17 스타일 시험에서 채택(팬케이크 → 같은 날 전 레시피): 색 맵은 GLB 그대로 · 본체 = MeshToonMaterial 3단 · 가는 외곽선(썸네일 512px에서 1.2px).
 // 외곽선 = 정점을 붙인 사본을 뒤집어(BackSide) 뷰 공간에서 법선 쪽으로 민다. 두 카메라가 다 직교라 뷰 공간 두께 = 화면 두께.
 import * as THREE from 'three';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-
-/** 툰으로 그리는 빵 — 팬케이크 계열(베이스 + 변형)만 */
-export function isToonBread(idOrUrl: string): boolean {
-  return /(^|\/)pancake(--[a-z0-9-]+)?(\.[0-9a-f]+)?(\.glb)?(\?|$)/.test(idOrUrl);
-}
 
 /** 세 단 그늘(어두운 단 → 밝은 단) */
 const RAMP = [0.35, 0.65, 1];

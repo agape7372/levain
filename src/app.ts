@@ -41,7 +41,6 @@ import { adPrivacyOptionsRequired, adsAvailable, showAdPrivacyOptions, showRewar
 import { basesCompleted, missionViews } from './store/economy';
 import type { BakeGrade, NotifySlot, SimEvent } from './sim';
 import { ruleByVariantId } from './sim';
-import { isToonBread } from './render/toonMaterial';
 
 /** 굽기 결과 소리가 올라가는 음 수 — 등급이 높을수록 끝까지 (sounds.sfxBaked) */
 const BAKE_NOTES: Record<BakeGrade, 2 | 3 | 4> = { best: 4, good: 3, flat: 2 };
@@ -355,12 +354,12 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       try {
         // 원격 변형은 최대 4초 기다린다. 넘기면 베이스로 물러나고 받기는 뒤에서 이어 가 캐시에 든다(다음엔 변형)
         const url = kind === 'bread' ? await within(glbUrl(id), SHOWCASE_WAIT_MS) : `/${dir}/${id}.glb`;
-        await scene.enterShowcase(url, kind === 'bread' && isToonBread(id));
+        await scene.enterShowcase(url, kind === 'bread'); // 빵은 전부 툰(toonMaterial.ts)
       } catch {
         // 변형 GLB는 대부분 없다 — 베이스 GLB로 한 번 더 (썸네일의 베이스 PNG 폴백과 같은 규칙, T4-2)
         const base = id.split('--')[0];
         if (base === id) return false;
-        await scene.enterShowcase(`/${dir}/${base}.glb`, kind === 'bread' && isToonBread(base));
+        await scene.enterShowcase(`/${dir}/${base}.glb`, kind === 'bread');
       }
     } catch {
       return false;
