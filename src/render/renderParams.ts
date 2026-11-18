@@ -6,9 +6,37 @@
 // 4축으로 분해 — levelness(형상) / fluidity(흐름) / cohesion(응집) / elasticity(되돌아옴).
 // `liquidity` 필드는 **부활 금지** — 남기면 두 의미가 다시 섞인다.
 import type { Snapshot } from '../sim/types';
-// seam 예외: 이 파일만 sim 상수를 읽는다 (ARCHITECTURE §4). markFill을 닫힌 형태로 재구성하기 위한
-// 것이고, 규칙 9(수치 하드코딩 금지)를 지키는 유일한 길이다. 의존 방향은 sim ← render로 합법.
-import { FILL_MAX, FILL_PEAK_RISE, STAGE_FILL_FACTOR } from '../sim/constants';
+// 2026-11-19: sim 상수 import(STAGE_FILL_FACTOR 이음새)는 지웠다 — 최고 수위는 Snapshot.peakFill을 그대로 읽는다.
+
+/** 병 높이(월드) — jar.ts JAR_HEIGHT와 같은 값. 이 파일은 three 무의존이라 숫자로 둔다 */
+const JAR_H = 1.9;
+/** 갓 밥준 수위(월드) — 실물 01 연속 사진: 병 높이의 약 40% (R1) */
+export const FED_LEVEL = 0.4 * JAR_H;
+/** 피크 상한(월드) — 병 높이 0.88. 넘침은 촛농으로 읽혀 쓰지 않는다 */
+export const PEAK_CAP = 0.88 * JAR_H;
+/** riseFill 1.6(sim 피크) → 2.1배. 실물 피크 사진 5장 가운데값 2.1 (R1) */
+const RISE_GAIN = 1.1 / 0.6;
+/** riseFill<1 압축 — 실물은 꺼져도 1.0배 근처(0.8→0.93 · 0.65→0.88) */
+const FALL_GAIN = 0.35;
+/** 렌더 전용 상승 배율 — (높이−1)에 곱한다. 어린 병은 덜 오른다. 0·1단계는 sim 계수가 이미 누른다 */
+const RISE_BY_STAGE = [1, 1, 0.85, 0.93, 1, 1];
+/** 기운 — 단계가 병에 보이게 하는 렌더 축(A3-01). 0단계(갓 섞음) · 1단계(잠잠기) · 2 첫 기포 … 5 */
+const VIGOR_BY_STAGE = [0.35, 0.25, 0.6, 0.8, 0.92, 1.0];
+/** 윗가장자리가 유리에서 물러나는 최대 폭(월드) — 마름·배고픔. 위 10~15% 높이만 */
+const PULL_MAX = 0.028;
+
+/**
+ * riseFill(질량 무관 부풀기 곡선) · massRatio · 단계 → 반죽 수위(월드 y, 병 바닥 0 기준).
+ * 순서를 보존하는 단조 재매핑이라 sim 규칙과 무관한 시각 배율이다(R2-03).
+ */
+export function doughHeight(riseFill: number, massRatio: number, stage: number): number {
+  const r = Number.isFinite(riseFill) ? riseFill : 1;
+  const ratio = r >= 1
+    ? 1 + RISE_GAIN * (r - 1) * (RISE_BY_STAGE[stage] ?? 1)
+    : 1 - FALL_GAIN * (1 - r);
+  const mass = Math.max(0.25, Math.min(1, Number.isFinite(massRatio) ? massRatio : 1));
+  return Math.min(PEAK_CAP, FED_LEVEL * ratio * mass);
+}
 
 export interface RenderParams {
   /** 반죽 색 [r,g,b] 0~1 */
@@ -20,7 +48,8 @@ export interface RenderParams {
   bubbleScale: number;     // 0.5~1.5
   specStr: number;         // 0.1~1.2
   crust: number;           // 0~1 (휴면 마른 껍질)
-  fillY: number;           // 0.6~1.6 (급여 시점=1.0 기준)
+  /** 반죽 수위(월드 y, 병 바닥 0) — doughHeight. 유리 테두리 높이이고 돔·크레이터는 그 위에 얹힌다 */
+  height: number;
   hoochAmt: number;        // 0~1
   wet: number;             // 0~1 급여 직후 젖은 광 → 마르면 무광 페이스트
   ripe: number;            // 0~1 피크 돔 + crackle
@@ -37,16 +66,22 @@ export interface RenderParams {
   /** 되돌아옴. 기공이 만든다 — 갓 밥준은 응집이 높아도 탄성은 낮다(태피), 피크가 탱탱 */
   elasticity: number;
   // ── 형상 파생 ──
-  /** 몸통 적도 반경 배율 — 병에 담긴 반죽은 늘 유리에 닿는다. 마르면 물러난다. 1.0~1.113 */
-  wallFill: number;
+  /** 윗가장자리가 유리에서 물러나는 폭(월드) 0~0.028 — 마름·배고픔. 옆벽 아래와 바닥은 늘 유리에 붙는다(A1-02) */
+  pull: number;
   /** 유리벽 기공 세기 0~1 — 살아있는 분기 전용(휴면·kahm·곰팡이에서 0) */
   wallCells: number;
   /** 유리벽 기공 주파수 34(크고 성김·피크)~80(잘고 촘촘·갓 밥준) */
   cellFreq: number;
-  /** 이번 사이클 최고 수위 — 유리 자국 배치용. fill과 같은 단위 */
-  markFill: number;
+  /** 이번 사이클 최고 수위(월드 y) — Snapshot.peakFill을 doughHeight로. 유리 자국 배치용 */
+  markHeight: number;
   /** 유리 자국 세기 0~1 — 피크를 찍고 내려온 뒤에만 존재한다 */
   residue: number;
+  /** 기운 0~1 — 단계(성숙)가 기포·돔·상승에 보이게 한다(A3-01). 5단계 = 1 */
+  vigor: number;
+  /** 냉장 0~1 — 유리 김서림·차가운 톤 */
+  chill: number;
+  /** 창가 0~1 — 아주 약한 따뜻함 */
+  warm: number;
   // ── grab 점탄성 물성 (확장기획 §4-2-6 — 상태별 촉감 분리) ──
   grabMax: number;         // 0.06~0.62 잡아 늘일 수 있는 최대 변위 — cohesion·elasticity·slack 구동
   grabCreepGain: number;   // 0~1 놓은 뒤 잔류 변형 비율 — 탄성이 낮을수록 크다(태피)
@@ -77,25 +112,36 @@ const MOLDY_TONE = hex(0xd8d0be);
 const WHOLEWHEAT_TONE = hex(0xd9c4a3);
 const RYE_TONE = hex(0xbfb096);
 const FLOUR_TONE_MIX = 0.35;
+// 냉장 = 차갑게 바랜 채도, 창가 = 아주 약한 햇빛 (R1 dormant: 「차갑게 바랜 채도와 뿌연 유리」)
+const COLD_TONE = hex(0xe2e3dc);
+const WARM_TONE = hex(0xf7e4c2);
 
 export function toRenderParams(s: Snapshot): RenderParams {
   const a = clamp01(s.activity);
   const moldy = s.phase === 'moldy';
+  // 기운 — 단계 축. 가짜 부풀기는 「적고 큰 불규칙 기포」(R1 0단계 D2)
+  const vigor = VIGOR_BY_STAGE[s.stage] ?? 1;
+  const fake = s.fakeRise ? 1 : 0;
+  const chill = s.location === 'fridge' ? 1 : 0;
+  const warm = s.location === 'window' ? 1 : 0;
 
   let color = mix(CREAM, HUNGRY_TONE, clamp01(s.hunger));
   // 밀가루 톤 — 상태 톤보다 먼저(재료가 바탕색), 상태 변화가 그 위를 지나간다
   if (s.flour === 'wholewheat') color = mix(color, WHOLEWHEAT_TONE, FLOUR_TONE_MIX);
   else if (s.flour === 'rye') color = mix(color, RYE_TONE, FLOUR_TONE_MIX);
-  color = mix(color, SOUR_TONE, smooth(0.25, 0.6, s.sourness));
+  // 시큼은 hooch 액체층이 말한다(R2-05) — 반죽 전체를 어둡게 하던 혼합은 약하게만 남긴다
+  color = mix(color, SOUR_TONE, 0.3 * smooth(0.25, 0.6, s.sourness));
   color = mix(color, DORMANT_TONE, clamp01(s.dormancy));
   if (moldy) color = mix(color, MOLDY_TONE, 0.7);
+  color = mix(color, COLD_TONE, 0.12 * chill);
+  color = mix(color, WARM_TONE, 0.06 * warm);
 
   // liquidity 재료 — 급여 직후 젖은 광 + 피크 거품광 바닥값 (실물 피크 르방은 젖은 유광)
   const wet = clamp01(Math.max(
     (1 - smooth(0.15, 0.8, a)) * (1 - smooth(0, 0.45, s.hunger)) * (1 - s.dormancy),
     0.5 * smooth(0.55, 0.95, a) * (1 - s.dormancy),
   ));
-  const ripe = smooth(0.7, 0.95, a) * (1 - clamp01(s.dormancy));
+  const ripe = smooth(0.7, 0.95, a) * (1 - clamp01(s.dormancy)) * (0.35 + 0.65 * vigor);
   const collapse = smooth(0.45, 0.8, s.sourness) * (1 - clamp01(s.dormancy));
 
   // ── 물성 4축 재료 — 전부 Snapshot에서 닫힌 형태 (sim 무변경) ──
@@ -121,11 +167,12 @@ export function toRenderParams(s: Snapshot): RenderParams {
   return {
     color,
     // moldy = 유일하게 숨이 완전히 멎는 상태 (휴면의 '완전 정지 금지'는 죽음 오인 방지책이었다)
-    breatheAmp: moldy ? 0 : 0.006 + (0.055 - 0.006) * a,
+    // 2026-11-19 R2-15: 실물은 초 단위로 정지해 있다 — 숨은 높이의 1.2% 이하. 살아 있음은 기포 몫
+    breatheAmp: moldy ? 0 : 0.003 + (0.012 - 0.003) * a,
     breathePeriod: 2.6 + (7.0 - 2.6) * Math.pow(1 - a, 1.5),
     noiseSpeed: moldy ? 0 : 0.1 + 1.5 * a,
-    bubbleDensity: moldy ? 0 : clamp01(a * 0.9 * (1 - 0.85 * s.dormancy)),
-    bubbleScale: 0.5 + 0.8 * a,
+    bubbleDensity: moldy ? 0 : clamp01(a * 0.9 * (1 - 0.85 * s.dormancy) * (0.3 + 0.7 * vigor) * (1 - 0.45 * fake)),
+    bubbleScale: Math.min(1.5, (0.5 + 0.8 * a) * (0.75 + 0.25 * vigor) * (1 + 0.45 * fake)),
     // 피크에서도 무광 페이스트 — 과한 스펙은 플라스틱으로 읽힌다 (젖은 광은 uWet 소관).
     // ⚠ 2026-08-25 실사진 관찰이 가설을 뒤집었다: "갓 섞은 젖은 페이스트가 가장 유광"이라 보고
     // wet 쪽으로 옮기려 했으나, 실제 병 사진의 갓 밥준은 **무광·칙칙**이다(밀가루 먼지 + 젓은 자국).
@@ -134,7 +181,7 @@ export function toRenderParams(s: Snapshot): RenderParams {
     // 광택이 아니라 물성(cohesion·creep)이 담당한다 — 그게 이번 개편의 요지다
     specStr: Math.min(1.0, Math.max(0.1, 0.12 + 0.18 * wet + 0.68 * gas - 0.3 * hun - 0.6 * dry)),
     crust: 0.8 * clamp01(Math.max(s.dormancy, moldy ? 1 : 0)),
-    fillY: s.fill,
+    height: doughHeight(s.riseFill, s.massRatio, s.stage),
     hoochAmt: clamp01(s.hooch),
     wet,
     ripe,
@@ -150,14 +197,17 @@ export function toRenderParams(s: Snapshot): RenderParams {
     // 영원히 0.62(월드 0.806)에 묶여 유리 내벽 0.92와 12.4% 틈이 남는다. 소프트 니 클램프도,
     // 메니스커스도 그래서 지금껏 한 번도 제대로 발동한 적이 없다 (2026-08-25 감사)
     // 굶으면 위쪽이 유리에서 떨어진다(실사진 관찰 f — "can pull fully away from glass near top"),
-    // 마르면 더 물러난다
-    wallFill: 1 + 0.113 * (1 - 0.62 * dry) * (1 - 0.22 * spent),
-    wallCells: clamp01(0.14 + 0.28 * cohesion + 0.72 * gas + 0.35 * collapse + 0.25 * spent) * alive,
+    // 마르면 더 물러난다. **윗가장자리만** — 아래·바닥은 늘 유리에 붙는다(A1-02)
+    pull: PULL_MAX * clamp01(dry + 0.5 * spent * (1 - dry)),
+    wallCells: clamp01(0.14 + 0.28 * cohesion + 0.72 * gas + 0.35 * collapse + 0.25 * spent) * alive
+      * (0.45 + 0.55 * vigor),
     // 아래는 압력에 눌려 잘고 촘촘, 위는 합쳐져 크고 성글 — 실물 병 사진의 문법
     cellFreq: 80 - 46 * clamp01(0.25 + 0.75 * gas + 0.45 * collapse + 0.2 * spent),
-    // 최고 수위를 sim의 peakFill과 같은 식으로 재구성 (derive.ts:143) — 상태 추가 0, 세션 기억 0.
-    // stage 0 D2 가짜 부풀기 구간만 실제보다 낮게 잡히는데 max(, fill)이 흡수한다(화장품 오차)
-    markFill: Math.min(FILL_MAX, Math.max(s.fill, 1 + FILL_PEAK_RISE * (STAGE_FILL_FACTOR[s.stage] ?? 1))),
+    // 최고 수위 = sim의 이번 사이클 peakFill을 같은 높이 매핑으로(A3-06 — 가짜 부풀기 1.72도 그대로 남는다)
+    markHeight: Math.max(
+      doughHeight(s.riseFill, s.massRatio, s.stage),
+      doughHeight(s.peakFill, s.massRatio, s.stage),
+    ),
     // 자국은 피크를 찍고 내려온 뒤에만 존재한다 — 상승기(hunger 0)엔 0
     residue: clamp01(Math.max(smooth(0.05, 0.55, hun), 0.9 * dry)) * (1 - 0.35 * hoo),
     // grab 물성 — 갓밥준 태피(응집↑ 탄성↓ 잔류↑) / 피크 탱탱 / 시큼 풀림 / 휴면 뻣뻣.
@@ -169,11 +219,29 @@ export function toRenderParams(s: Snapshot): RenderParams {
       : (0.11912 + 0.313 * cohesion + 0.205 * elasticity + 0.281 * slack - 0.08 * proteo) * (1 - 0.52 * dry),
     grabCreepGain: moldy ? 0.06 : clamp01(0.25 + 0.48 * (1 - elasticity) + 0.18 * hun) * (1 - 0.8 * dry),
     grabReturnZeta: 1.07 - 0.13 * elasticity,
+    vigor,
+    chill,
+    warm,
   };
 }
 
-/** 프레임 스무딩 — 지수 lerp (τ초). 앱 오픈 스냅은 호출자가 params를 직접 대입 */
+/** 수렴 판정 — 최대 차가 이 아래면 목표로 스냅한다(A1-20) */
+const SNAP_EPS = 1e-4;
+
+/**
+ * 프레임 스무딩 — 지수 lerp (τ초). 앱 오픈 스냅은 호출자가 params를 직접 대입.
+ * 수렴하면 **target 객체 그 자체**를 돌려준다 — 호출자의 `current !== target` 비교가 거짓이 되어
+ * 매 프레임 할당·uniform 대입이 멈춘다(A1-20).
+ */
 export function smoothParams(cur: RenderParams, target: RenderParams, dtSec: number, tau = 1.2): RenderParams {
+  let maxD = 0;
+  for (const key of Object.keys(target) as (keyof RenderParams)[]) {
+    const tv = target[key];
+    const cv = cur[key];
+    if (typeof tv === 'number') maxD = Math.max(maxD, Math.abs(tv - (cv as number)));
+    else for (let i = 0; i < 3; i++) maxD = Math.max(maxD, Math.abs(tv[i] - (cv as RGB)[i]));
+  }
+  if (!(maxD >= SNAP_EPS)) return target; // NaN도 목표로 스냅 — 스스로 복구
   const k = 1 - Math.exp(-dtSec / tau);
   const n = (c: number, t: number): number => c + (t - c) * k;
   return {
@@ -185,7 +253,7 @@ export function smoothParams(cur: RenderParams, target: RenderParams, dtSec: num
     bubbleScale: n(cur.bubbleScale, target.bubbleScale),
     specStr: n(cur.specStr, target.specStr),
     crust: n(cur.crust, target.crust),
-    fillY: n(cur.fillY, target.fillY),
+    height: n(cur.height, target.height),
     hoochAmt: n(cur.hoochAmt, target.hoochAmt),
     wet: n(cur.wet, target.wet),
     ripe: n(cur.ripe, target.ripe),
@@ -197,14 +265,17 @@ export function smoothParams(cur: RenderParams, target: RenderParams, dtSec: num
     fluidity: n(cur.fluidity, target.fluidity),
     cohesion: n(cur.cohesion, target.cohesion),
     elasticity: n(cur.elasticity, target.elasticity),
-    wallFill: n(cur.wallFill, target.wallFill),
+    pull: n(cur.pull, target.pull),
     wallCells: n(cur.wallCells, target.wallCells),
     // cellFreq도 보간 대상 — τ1.2s 동안 셀이 서서히 커진다 = 발효처럼 보인다(공짜 연출)
     cellFreq: n(cur.cellFreq, target.cellFreq),
-    markFill: n(cur.markFill, target.markFill),
+    markHeight: n(cur.markHeight, target.markHeight),
     residue: n(cur.residue, target.residue),
     grabMax: n(cur.grabMax, target.grabMax),
     grabCreepGain: n(cur.grabCreepGain, target.grabCreepGain),
     grabReturnZeta: n(cur.grabReturnZeta, target.grabReturnZeta),
+    vigor: n(cur.vigor, target.vigor),
+    chill: n(cur.chill, target.chill),
+    warm: n(cur.warm, target.warm),
   };
 }

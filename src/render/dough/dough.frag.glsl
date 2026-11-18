@@ -4,6 +4,9 @@
 //   ② 조명이 몸통(vBaseN)과 변형 전부(poke·ripe·collapse·수면 기울기·진행파)를 본다.
 //   ③ FBM 마이크로 노멀 유한차분(3회 호출) → 해석적 그라디언트 1회 — 추가분 예산 상쇄.
 // 주의: precision 선언 금지 — three 프렐류드와 버텍스/프래그 공유 uniform 정밀도가 어긋난다.
+//   그래서 실제 정밀도는 three 기본값(renderer.capabilities.precision = 대부분 highp)이다(A1-12, VISUAL §8).
+// 2026-11-19 반죽 모델 v2: 범프 4슬롯(동시 상한과 같다), 돔·크레이터 조명 짝은 윗면 전용(vTop),
+//   카메라 하프벡터는 상수 대신 viewMatrix에서 뽑는다(고도를 바꿔도 짝이 맞는다).
 uniform float uTime;
 uniform vec3 uColor;
 uniform float uSpecStr;
@@ -22,9 +25,9 @@ uniform float uCohesion;   // 응집 — 겹 가닥·메니스커스 세기
 uniform float uRBody;      // 몸통 적도 반경 = R × wallFill — **모든 반경 밴드의 정규화 기준**
 uniform vec2 uWallCell;    // x=유리벽 기공 세기, y=주파수
 uniform vec2 uWobble;
-uniform vec2 uBumpPos[8];
-uniform float uBumpAmp[8];
-uniform float uBumpK[8];
+uniform vec2 uBumpPos[4];
+uniform float uBumpAmp[4];
+uniform float uBumpK[4];
 uniform vec2 uTrailPos[4];
 uniform float uTrailAmp[4];
 uniform float uTrailK[4];
@@ -82,9 +85,9 @@ vec2 fbmG(vec2 p0) {
 float hash1(float x) { return fract(sin(x) * 43758.5453); }
 
 void main() {
-  // ── 하이트필드 그라디언트 합성: 범프8 + 트레일4 + poke + ripe/collapse + 기울기 + 파동 + FBM ──
+  // ── 하이트필드 그라디언트 합성: 범프4 + 트레일4 + poke + ripe/collapse + 기울기 + 파동 + FBM ──
   vec2 dBs = vec2(0.0);
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 4; i++) {
     float k = uBumpK[i] * 1.6; // 라이팅 첨도 — ×1.6 (VISUAL §0)
     vec2 d = vXZ - uBumpPos[i];
     dBs += uBumpAmp[i] * exp(-dot(d, d) * k) * (-2.0 * k) * d;
@@ -102,9 +105,9 @@ void main() {
   { // 피크 돔 / 과숙 크레이터 — kR은 vert와 같은 소스 (uRBody 확장 상대화)
     float kR = 0.3844 / (uRBody * uRBody);
     float k1 = 4.0 * kR;
-    dBs += (uRipe * 0.05) * exp(-dot(vXZ, vXZ) * k1) * (-2.0 * k1) * vXZ;
+    dBs += (uRipe * 0.05 * vTop) * exp(-dot(vXZ, vXZ) * k1) * (-2.0 * k1) * vXZ;
     float k2 = 3.2 * kR;
-    dBs += (-uCollapse * 0.08) * exp(-dot(vXZ, vXZ) * k2) * (-2.0 * k2) * vXZ;
+    dBs += (-uCollapse * 0.08 * vTop) * exp(-dot(vXZ, vXZ) * k2) * (-2.0 * k2) * vXZ;
   }
   // 슬로싱 수면 기울기 — 기울어진 수면이 빛을 다르게 받는다 (버텍스와 동일 계수)
   dBs += uWobble * (0.14 * uLevel * (0.5 + 0.5 * uFluid) * vTop);
@@ -145,7 +148,8 @@ void main() {
     float sheet = pow(max(dot(nrm, HS), 0.0), 22.0);
     // 균일 밝힘은 '반사'로 안 읽힌다 — 완만한 띠로 잘라 창 모양을 준다
     float band = 0.45 + 0.55 * smoothstep(-0.55, 0.30, dot(vXZ, vec2(-0.62, 0.78)));
-    vec3 HC = vec3(-0.405, 0.693, 0.597); // normalize(L+V) — 직교 카메라 상수
+    // normalize(L+V) — 직교 카메라라 V는 화면 전체에서 같다. viewMatrix 3행 = 카메라 +Z(월드)
+    vec3 HC = normalize(L + vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]));
     float spec = sheet * band * (0.10 + 0.55 * uWet)
                + pow(max(dot(nrm, HC), 0.0), 5.0) * 0.05;
     col += vec3(0.28, 0.16, 0.08) * spec * uSpecStr;
@@ -209,7 +213,7 @@ void main() {
 
   // 팝 링 하이라이트 — 함몰 잔상 대신 밝은 링 (음수 진폭 슬롯만, q·e^-q)
   float ringHi = 0.0;
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 4; i++) {
     float a = uBumpAmp[i];
     if (a < -0.001) {
       vec2 d = vXZ - uBumpPos[i];
@@ -224,7 +228,10 @@ void main() {
     float rr2 = length(vXZ);
     // 반경 밴드는 전부 uRBody 상대 — 몸통이 유리까지 확장되면서 |vXZ| 상한이 0.62 → 0.690으로
     // 커졌다. 절대 상수로 두면 승인된 룩(접촉 그늘·메니스커스·crackle·crust·kahm)이 조용히 이동한다
-    col *= 1.0 - 0.10 * smoothstep(uRBody * 0.645, uRBody, rr2);
+    // 접촉 그늘은 윗면 가장자리 전용 — 옆벽은 rr2가 늘 uRBody라 통째로 어두워져 회색 통으로 읽혔다(v2)
+    col *= 1.0 - 0.10 * smoothstep(uRBody * 0.645, uRBody, rr2) * vTop;
+    // 유리 너머 옆벽 — 정면 확산광이 약한 수직면이라 크림이 회색으로 죽는다. 유리에 눌린 단면 톤으로 올린다
+    col *= 1.0 + 0.08 * (1.0 - vTop);
     // 메니스커스 — 지금까지 rr2 최대(0.62)가 하한(0.58)을 겨우 넘어 **영원히 30% 세기**로 잠겨 있었다.
     // uRBody 확장으로 비로소 제대로 발동한다. 끈적할수록(cohesion) 벽을 더 타고 오른다
     col += vec3(0.20, 0.17, 0.13) * smoothstep(uRBody * 0.86, uRBody, rr2)

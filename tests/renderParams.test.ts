@@ -44,9 +44,10 @@ const sour: Snapshot = {
 };
 
 describe('renderParams — 상태 앵커 (VISUAL §3-3)', () => {
-  it('activity 1·hunger 0·dormancy 0 → breatheAmp≈0.055, bubbleDensity≈0.9, specStr 0.89', () => {
-    const rp = toRenderParams({ ...base, activity: 1, fill: 1.4 });
-    expect(rp.breatheAmp).toBeCloseTo(0.055, 5);
+  it('activity 1·hunger 0·dormancy 0·5단계 → breatheAmp≈0.012, bubbleDensity≈0.9, specStr 0.89', () => {
+    // 2026-11-19 R2-15: 숨은 높이의 1.2% 이하(실물은 초 단위로 정지). 기포 상한 0.9는 기운 1(5단계)에서만
+    const rp = toRenderParams({ ...base, activity: 1, fill: 1.4, stage: 5 });
+    expect(rp.breatheAmp).toBeCloseTo(0.012, 5);
     expect(rp.bubbleDensity).toBeCloseTo(0.9, 5);
     // 0.92 → 0.89 (2026-08-25 축 개편): activity 단독 구동을 그만두고 gas 주도 + wet 바닥으로 갈랐다.
     // 유광은 피크의 것이다 — 실사진에서 갓 밥준은 무광·칙칙(밀가루 먼지)이고 피크가 가장 번들거린다.
@@ -87,16 +88,23 @@ describe('renderParams — 상태 앵커 (VISUAL §3-3)', () => {
     expect(sr.cohesion).toBeLessThan(jf.cohesion);    // 글루텐이 끊겼다
   });
 
-  it('유리 접촉은 살아있는 동안 유지되고 마르면 물러난다', () => {
-    // 0.62 × 1.113 = 0.690 = R_XZ_MAX_BASE. 이 배율이 없으면 반죽이 유리에 영영 안 닿는다
-    expect(toRenderParams(peak).wallFill).toBeCloseTo(1.113, 3);
-    expect(toRenderParams(justfed).wallFill).toBeCloseTo(1.113, 3);
-    const dry = toRenderParams({ ...base, activity: 0.02, dormancy: 1, fill: 0.65 });
-    expect(dry.wallFill).toBeLessThan(1.05);
+  it('유리 접촉은 살아있는 동안 유지되고 마르면 윗가장자리만 물러난다(A1-02)', () => {
+    // 2026-11-19 반죽 모델 v2: 옆벽은 늘 유리에 붙고(형상), 물러남은 위 10~15% 높이의 pull 하나다
+    expect(toRenderParams(peak).pull).toBeCloseTo(0, 5);
+    expect(toRenderParams(justfed).pull).toBeCloseTo(0, 5);
+    const dry = toRenderParams({ ...base, activity: 0.02, dormancy: 1, fill: 0.65, riseFill: 0.65 });
+    expect(dry.pull).toBeGreaterThan(0.02);
+    expect(dry.pull).toBeLessThanOrEqual(0.03);
+    const hungry = toRenderParams({ ...base, activity: 0.25, hunger: 1, fill: 0.8, riseFill: 0.8 });
+    expect(hungry.pull).toBeGreaterThan(0);
+    expect(hungry.pull).toBeLessThan(dry.pull);
   });
 
   it('유리벽 기공은 살아있는 분기 전용 — 휴면·kahm·곰팡이에서 0 (예산 상호배타)', () => {
-    expect(toRenderParams(peak).wallCells).toBeGreaterThan(0.9);
+    // 2026-11-19: 기운(단계)이 벽 기포를 정한다 — 5단계 피크가 가장 빽빽하고, 3단계는 그보다 성기다
+    const peak5 = toRenderParams({ ...peak, stage: 5 });
+    expect(peak5.wallCells).toBeGreaterThan(0.9);
+    expect(toRenderParams(peak).wallCells).toBeLessThan(peak5.wallCells);
     expect(toRenderParams({ ...base, activity: 1, dormancy: 1 }).wallCells).toBeCloseTo(0, 5);
     expect(toRenderParams({ ...base, activity: 1, kahm: true }).wallCells).toBeCloseTo(0, 5);
     expect(toRenderParams({ ...base, activity: 1, moldStage: 'spread', mold01: 0.6 }).wallCells)
@@ -108,9 +116,9 @@ describe('renderParams — 상태 앵커 (VISUAL §3-3)', () => {
   it('유리 자국은 피크를 찍고 내려온 뒤에만 — 상승기엔 0, 최고 수위는 현재 수위 이상', () => {
     expect(toRenderParams(justfed).residue).toBeCloseTo(0, 5);
     expect(toRenderParams(peak).residue).toBeCloseTo(0, 5);
-    const falling = toRenderParams({ ...base, activity: 0.6, fill: 1.2, hunger: 0.3, stage: 3 });
+    const falling = toRenderParams({ ...base, activity: 0.6, fill: 1.2, riseFill: 1.2, hunger: 0.3, stage: 3 });
     expect(falling.residue).toBeGreaterThan(0.3);
-    expect(falling.markFill).toBeGreaterThan(falling.fillY);
+    expect(falling.markHeight).toBeGreaterThan(falling.height);
   });
 
   it('moldStage spot + mold01 0.01 → mold 바닥값 0.25 (예고 가시성)', () => {
@@ -120,9 +128,9 @@ describe('renderParams — 상태 앵커 (VISUAL §3-3)', () => {
     expect(none.mold).toBe(0);
   });
 
-  it('dormancy 1 → breatheAmp≈0.006(>0, 완전 정지 금지), bubbleDensity≈0, crust 0.8', () => {
+  it('dormancy 1 → breatheAmp≈0.003(>0, 완전 정지 금지), bubbleDensity≈0, crust 0.8', () => {
     const rp = toRenderParams({ ...base, activity: 0, dormancy: 1, fill: 0.65 });
-    expect(rp.breatheAmp).toBeCloseTo(0.006, 5);
+    expect(rp.breatheAmp).toBeCloseTo(0.003, 5);
     expect(rp.breatheAmp).toBeGreaterThan(0);
     expect(rp.bubbleDensity).toBeCloseTo(0, 5);
     expect(rp.crust).toBeCloseTo(0.8, 5);
@@ -130,8 +138,8 @@ describe('renderParams — 상태 앵커 (VISUAL §3-3)', () => {
 });
 
 describe('renderParams — 범위 클램프·스무딩 수렴', () => {
-  it('임의 극단 입력에도 전 출력이 문서 범위를 벗어나지 않는다 (fillY는 pass-through라 제외)', () => {
-    // fillY = s.fill 그대로 통과(derive.ts에서 이미 클램프됨) — 여기선 유효값만 넣는다
+  it('임의 극단 입력에도 전 출력이 문서 범위를 벗어나지 않는다', () => {
+    // fill·riseFill은 derive.ts에서 이미 클램프됨 — 여기선 유효값만 넣는다
     const extreme: Snapshot = {
       ...base,
       activity: 999,
@@ -147,8 +155,8 @@ describe('renderParams — 범위 클램프·스무딩 수렴', () => {
       expect(c).toBeGreaterThanOrEqual(0);
       expect(c).toBeLessThanOrEqual(1);
     }
-    expect(rp.breatheAmp).toBeGreaterThanOrEqual(0.004);
-    expect(rp.breatheAmp).toBeLessThanOrEqual(0.055);
+    expect(rp.breatheAmp).toBeGreaterThanOrEqual(0.003);
+    expect(rp.breatheAmp).toBeLessThanOrEqual(0.012);
     expect(rp.breathePeriod).toBeGreaterThanOrEqual(2.6);
     expect(rp.breathePeriod).toBeLessThanOrEqual(7.0);
     expect(rp.noiseSpeed).toBeGreaterThanOrEqual(0.1);
@@ -164,15 +172,17 @@ describe('renderParams — 범위 클램프·스무딩 수렴', () => {
     expect(rp.hoochAmt).toBeGreaterThanOrEqual(0);
     expect(rp.hoochAmt).toBeLessThanOrEqual(1);
     // 축 개편 신규 필드 (2026-08-25)
-    for (const k of ['levelness', 'fluidity', 'cohesion', 'elasticity', 'wallCells', 'residue'] as const) {
+    for (const k of ['levelness', 'fluidity', 'cohesion', 'elasticity', 'wallCells', 'residue', 'vigor', 'chill', 'warm'] as const) {
       expect(rp[k], k).toBeGreaterThanOrEqual(0);
       expect(rp[k], k).toBeLessThanOrEqual(1);
     }
-    expect(rp.wallFill).toBeGreaterThanOrEqual(1);
-    expect(rp.wallFill).toBeLessThanOrEqual(1.12);
+    expect(rp.pull).toBeGreaterThanOrEqual(0);
+    expect(rp.pull).toBeLessThanOrEqual(0.03);
+    expect(rp.height).toBeGreaterThan(0);
+    expect(rp.height).toBeLessThanOrEqual(0.88 * 1.9);
     expect(rp.cellFreq).toBeGreaterThanOrEqual(34);
     expect(rp.cellFreq).toBeLessThanOrEqual(80);
-    expect(rp.markFill).toBeGreaterThanOrEqual(rp.fillY);
+    expect(rp.markHeight).toBeGreaterThanOrEqual(rp.height);
     expect(rp.grabMax).toBeGreaterThanOrEqual(0);
     expect(rp.grabMax).toBeLessThanOrEqual(0.62);
     expect(rp.grabCreepGain).toBeGreaterThanOrEqual(0);
@@ -191,7 +201,7 @@ describe('renderParams — 범위 클램프·스무딩 수렴', () => {
     expect(cur.breatheAmp).toBeCloseTo(target.breatheAmp, 3);
     expect(cur.bubbleDensity).toBeCloseTo(target.bubbleDensity, 3);
     expect(cur.specStr).toBeCloseTo(target.specStr, 3);
-    expect(cur.fillY).toBeCloseTo(target.fillY, 3);
+    expect(cur.height).toBeCloseTo(target.height, 3);
     cur.color.forEach((c, i) => expect(c).toBeCloseTo(target.color[i], 3));
     // 신규 필드가 smoothParams에 빠지면 타입 오류 없이 초기값에 얼어붙는다 — 전수로 잡는다
     for (const k of Object.keys(target) as (keyof typeof target)[]) {

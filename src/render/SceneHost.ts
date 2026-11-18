@@ -14,6 +14,10 @@ import { smoothParams, type RenderParams } from './renderParams';
 // 세로폰(aspect ~0.46)에서 병 폭 ≈ 화면 70%, 병+헤드룸 55~65% 점유 (VISUAL §1-1 목표값 실측 보정)
 const VIEW_H = 5.4;
 const LOOK_Y = 0.8; // 병 몸통 중심보다 살짝 위 — 상단 HUD 헤드룸 확보
+/** 카메라 시선 고도(°) — 2026-11-19 52.1° → 42°(반죽 모델 v2, VISUAL §1-1). 옆벽 높이가 보여야 성장이 읽힌다 */
+const CAM_ELEV_DEG = 42;
+/** 시선 기준점까지 거리 — 직교라 화면 크기와 무관, near/far 안에만 두면 된다(구 (0,8,5.6)과 같은 9.12) */
+const CAM_DIST = 9.12;
 /** 픽셀 비율 상한(고정) · 버퍼 총 픽셀 상한 — 큰 태블릿(800×1280@2 = 3.9M px)에서 반죽 프래그 비용을 묶는다 (T4-11).
  *  360×728 폰은 비율 2 그대로(1.05M px) — 총량 상한은 큰 화면에서만 물린다 */
 const MAX_DPR = 2;
@@ -133,10 +137,9 @@ export class SceneHost {
     this.scene = new THREE.Scene();
     // 배경은 CSS 라디얼 그라디언트(#stage) — 캔버스는 투명
 
-    // 카메라: 직교 55° 틸트 3/4 부감 (VISUAL §1-1)
+    // 카메라: 직교 42° 틸트 3/4 부감 (VISUAL §1-1)
     this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 30);
-    this.camera.position.set(0, 8.0, 5.6);
-    this.camera.lookAt(0, LOOK_Y, 0);
+    this.setCameraElevation(CAM_ELEV_DEG);
 
     // 조명: 홈 씬 값(HOME_LIGHT)으로 초기화 — 쇼케이스 진입 시에만 스왑(VISUAL §1-3)
     const key = new THREE.DirectionalLight(HOME_LIGHT.key.color, HOME_LIGHT.key.intensity);
@@ -220,6 +223,13 @@ export class SceneHost {
     // 쇼케이스 중이었으면 빵을 다시 올린다 — enterShowcase가 showcaseSeq를 올려 늦은 이전 로드는 버려진다
     if (showcaseUrl) this.enterShowcase(showcaseUrl, toon).catch(() => {});
   };
+
+  /** 시선 고도(°) — 기본 CAM_ELEV_DEG. motionlab 고도 비교(?cam=)용으로 열어 둔다 */
+  setCameraElevation(deg: number): void {
+    const a = (deg * Math.PI) / 180;
+    this.camera.position.set(0, LOOK_Y + CAM_DIST * Math.sin(a), CAM_DIST * Math.cos(a));
+    this.camera.lookAt(0, LOOK_Y, 0);
+  }
 
   /** 라이브 목표 파라미터 — 프레임마다 지수 lerp로 따라간다 (τ≈1.2s) */
   setTargetParams(p: RenderParams): void {
@@ -556,15 +566,11 @@ export class SceneHost {
       // 쇼케이스 중엔 반죽이 숨어 있다 — 안 보이는 기포 소리를 내지 않는다 (T4-4)
       if (this.dough && this.dough.bubbles.popsThisFrame > 0 && !this.isShowcasing()) this.onBubblePop?.();
       if (this.dough && this.jar && this.current) {
-        // topY를 한 번만 뽑아 둘에 공급 — hooch 층과 유리 자국이 같은 수면 좌표계를 쓴다
-        const top = this.dough.topY();
-        this.jar.setHooch(this.current.hoochAmt, top + 0.02, ts);
-        this.jar.setLevel(
-          top,
-          this.dough.fillWorldY(this.dough.levelY(this.current.markFill)),
-          this.current.residue,
-          this.current.wet,
-        );
+        // 테두리 높이를 한 번만 뽑아 둘에 공급 — hooch 층과 유리 자국이 같은 수면 좌표계를 쓴다
+        const level = this.dough.levelY();
+        this.jar.setHooch(this.current.hoochAmt, level, this.current.height, ts);
+        this.jar.setLevel(level, Math.max(level, this.current.markHeight), this.current.residue, this.current.wet);
+        this.jar.setClimate(this.current.chill, this.current.warm);
       }
       this.renderer.render(this.scene, this.camera);
       this.raf = requestAnimationFrame(loop);

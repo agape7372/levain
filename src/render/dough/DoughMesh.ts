@@ -4,19 +4,30 @@
 // 축 개편(2026-08-25): 구 liquidity 1축이 형상과 물성을 동시에 몰던 것을 4축으로 쪼갰다 —
 // levelness(형상) / fluidity(흐름: 슬로싱 ζ·poke 아묾) / cohesion(응집: 실 능선 기억) /
 // elasticity(되돌아옴: poke 스프링·grab ζ). 한 축으로 되돌리지 말 것.
+// 반죽 모델 v2(2026-11-19): 초타원체(IcosahedronGeometry) → 「병 채움」 매개 메시. 옆벽은 유리에 붙은 원기둥,
+// 바닥은 y=0에 평평, 윗면이 하이트필드다(dough.vert.glsl 머리 주석). 높이는 RenderParams.height(월드)를
+// uniform으로 받고, mesh.scale.y는 숨쉬기만 맡는다 — 바닥 피벗이 y=0이라 숨이 바닥을 움직이지 않는다.
 import * as THREE from 'three';
 import vert from './dough.vert.glsl?raw';
 import frag from './dough.frag.glsl?raw';
 import type { RenderParams } from '../renderParams';
-import { BubbleSystem } from '../bubbles';
+import { BubbleSystem, DYN_SLOTS } from '../bubbles';
+import { createFillGeometry, FILL_RADIUS } from '../jar';
 
-const BASE_Y = 0.5;
-export const XZ_SCALE = 1.3; // 월드→오브젝트 XZ 변환에 입력층이 사용
-const Y_SCALE = 0.78;
-const R = 0.62; // 지오메트리 반지름
-/** 실루엣 반경 상한 기본값(오브젝트) — 유리 내벽까지 여유 0.69×1.3 = 0.897 < 0.92 */
-export const R_XZ_MAX_BASE = 0.69;
-const JAR_RADIUS = 0.92;
+export const XZ_SCALE = 1.3; // 월드→오브젝트 XZ 변환에 입력층이 사용 (월드 XZ = 오브젝트 XZ × XZ_SCALE)
+/** 옆벽 반경(오브젝트) — 유리 안쪽 FILL_RADIUS(0.912 월드) */
+export const R_BODY = FILL_RADIUS / XZ_SCALE;
+/** 메시 해상도 — 둘레 · 윗면 링 · 옆벽 행 (A1-04: 구 720 tri는 어깨가 각졌다) */
+const SEG = 128;
+const RINGS = 30;
+const ROWS = 20;
+/** 돔·크레이터 커널의 테두리 값 — vert의 exp(−c2·k·kR)에서 c2 = R_BODY²일 때 */
+const DOME_RIM = Math.exp(-2.5 * 0.3844);
+const CRATER_RIM = Math.exp(-2.0 * 0.3844);
+/** 롱프레스 — 0.03까지 천천히 부풀고(τ), 떼면 easeOut 지수 감쇠(VISUAL §5) */
+const HOLD_AMP = 0.03;
+const HOLD_RISE_TAU = 0.6;
+const HOLD_FALL_TAU = 0.3;
 
 const TRAIL_N = 4;
 const TRAIL_SAMPLE_S = 0.04; // 실 능선 샘플 간격
@@ -54,7 +65,10 @@ export class DoughMesh {
   private params: RenderParams | null = null;
   private lastT = -1;
   private pokeAge = Infinity; // 탭 눌림 경과(s) — Infinity = 비활성
-  private pokeAmp = 0.06;     // 양수 = 덴트, 음수 = 부풂(홀드)
+  private pokeAmp = 0.06;     // 양수 = 덴트
+  /** 롱프레스 홀드 — 탭과 같은 poke uniform을 쓰되 상태기는 따로(A1-15) */
+  private holding = false;
+  private holdLevel = 0;
 
   // ── 젓기 상태 — 입력층이 setStirInput으로 밀어 넣고, tick이 스프링·감쇠를 굴린다 ──
   private stirTarget = new THREE.Vector2();
@@ -88,7 +102,7 @@ export class DoughMesh {
   private grabHeldS = 0;
 
   constructor() {
-    const bumpPos = Array.from({ length: 8 }, () => new THREE.Vector2());
+    const bumpPos = Array.from({ length: DYN_SLOTS }, () => new THREE.Vector2());
     const trailPos = Array.from({ length: TRAIL_N }, () => new THREE.Vector2(9, 9)); // 화면 밖
     for (let i = 0; i < TRAIL_N; i++) this.trail.push({ x: 9, z: 9, amp: 0, bornAt: 0 });
     this.material = new THREE.ShaderMaterial({
@@ -108,8 +122,8 @@ export class DoughMesh {
         uMold: { value: 0 },
         uSeed: { value: 0.37 },
         uBumpPos: { value: bumpPos },
-        uBumpAmp: { value: new Float32Array(8) },
-        uBumpK: { value: new Float32Array(8) },
+        uBumpAmp: { value: new Float32Array(DYN_SLOTS) },
+        uBumpK: { value: new Float32Array(DYN_SLOTS) },
         uTrailPos: { value: trailPos },
         uTrailAmp: { value: new Float32Array(TRAIL_N) },
         uTrailK: { value: new Float32Array(TRAIL_N).fill(TRAIL_K0) },
@@ -123,10 +137,13 @@ export class DoughMesh {
         uLevel: { value: 0.5 },
         uFluid: { value: 0.3 },
         uCohesion: { value: 0.6 },
-        // 몸통 적도 반경(오브젝트) = R × wallFill. 프래그 반경 밴드 정규화와 **단일 소스**
-        uRBody: { value: R },
+        // 옆벽 반경(오브젝트). 프래그 반경 밴드 정규화와 **단일 소스**
+        uRBody: { value: R_BODY },
         uWallCell: { value: new THREE.Vector2(0, 60) }, // x=세기, y=주파수
-        uRXZMax: { value: R_XZ_MAX_BASE },
+        uRXZMax: { value: R_BODY },
+        uHeight: { value: 0.76 },
+        uPull: { value: 0 },
+        uMenH: { value: 0 },
         // 진값은 Y_SCALE·fill/XZ_SCALE ≈ 0.6·fill — 1.0에서 시작해 실기기에서 내리며 튜닝
         // (내리면 frag 범프 첨도 ×1.6 재튜닝 동반 — 오푸스 메모 §2-2b)
         uSlopeAspect: { value: 1.0 },
@@ -139,8 +156,12 @@ export class DoughMesh {
       vertexShader: vert,
       fragmentShader: frag,
     });
-    this.mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(R, 5), this.material);
-    this.mesh.position.y = BASE_Y;
+    const geo = createFillGeometry(SEG, RINGS, ROWS);
+    // 셰이더가 높이를 정하므로 자리 기준 구를 손으로 준다 — 병 전체(바닥~피크 상한)를 덮는다
+    geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0.9, 0), 1.4);
+    this.mesh = new THREE.Mesh(geo, this.material);
+    this.mesh.position.y = 0;
+    this.mesh.scale.set(XZ_SCALE, 1, XZ_SCALE);
     this.mesh.renderOrder = 2;
   }
 
@@ -161,9 +182,11 @@ export class DoughMesh {
     u.uLevel.value = p.levelness;
     u.uFluid.value = p.fluidity;
     u.uCohesion.value = p.cohesion;
-    u.uRBody.value = R * p.wallFill;
+    u.uHeight.value = p.height;
+    u.uPull.value = p.pull / XZ_SCALE;
+    u.uMenH.value = this.menH();
     (u.uWallCell.value as THREE.Vector2).set(p.wallCells, p.cellFreq);
-    this.bubbles.spawnR = 0.42 * p.wallFill;
+    this.bubbles.spawnR = 0.6 * R_BODY;
     // uWet은 tick에서 agitation 부스트와 합성
   }
 
@@ -179,11 +202,25 @@ export class DoughMesh {
     this.seedPhase = s * Math.PI * 2;
   }
 
-  /** 탭 눌림(양수)·홀드 부풂(음수) — 오브젝트 공간 XZ. 되튐/아묾은 elasticity가 가른다(tick) */
+  /** 탭 눌림 — 오브젝트 공간 XZ. 되튐/아묾은 elasticity가 가른다(tick) */
   pokeAt(x: number, z: number, amp = 0.06): void {
     (this.material.uniforms.uPokePos.value as THREE.Vector2).set(x, z);
     this.pokeAmp = amp;
     this.pokeAge = 0;
+    this.holding = false;
+    this.holdLevel = 0;
+  }
+
+  /** 롱프레스 시작 — 손가락 쪽 표면이 아주 천천히 0.03 부푼다(눈 없이 「알아챈다」만, VISUAL §5) */
+  holdStart(x: number, z: number): void {
+    (this.material.uniforms.uPokePos.value as THREE.Vector2).set(x, z);
+    this.pokeAge = Infinity;
+    this.holding = true;
+  }
+
+  /** 롱프레스 끝 — easeOut으로 가라앉는다. 홀드 중이 아니면 아무 일도 없다 */
+  holdEnd(): void {
+    this.holding = false;
   }
 
   private grabParam(key: keyof typeof GRAB_DEFAULTS): number {
@@ -250,60 +287,54 @@ export class DoughMesh {
     this.lastStirInputT = this.lastT;
   }
 
-  /** 형상 보정 fill — 초타원 어깨 확장분 상쇄 (fill × (1 − 0.10·levelness)) */
-  private fillEff(): number {
-    return this.levelY(this.params?.fillY ?? 1);
+  /** 메니스커스 높이(월드) — 응집이 높고 평평할수록 유리를 타고 오른다. vert uMenH와 단일 소스 */
+  private menH(): number {
+    const p = this.params;
+    return 0.018 * (0.3 + 0.7 * (p?.cohesion ?? 0.6)) * (p?.levelness ?? 0.5);
   }
 
-  /** fill 값 → 형상 보정 배율. topY와 유리 자국(markFill)이 **같은 산수**를 쓰게 하는 단일 소스 */
-  levelY(fill: number): number {
-    return fill * (1 - 0.1 * (this.params?.levelness ?? 0.5));
+  /** 반죽 높이(월드, 숨 제외) — RenderParams.height */
+  height(): number {
+    return this.params?.height ?? 0.76;
   }
 
-  /**
-   * 지금 이 프레임의 몸통 XZ 반경 (오브젝트 공간) — 입력 히트 테스트 전용.
-   * 고정 상한(R_XZ_MAX_BASE)을 쓰면 유리 접촉 확장(uRBody)과 숨쉬기 배율이 빠져
-   * 화면상 반죽 위인데도 "배경"으로 판정돼 스와이프로 새어 나간다 (2026-08-25).
-   */
+  /** 몸통 XZ 반경(오브젝트 공간) — 입력 히트 테스트 전용. 옆벽은 늘 유리 안쪽(R_BODY)에 붙어 있다 */
   bodyRadius(): number {
-    return (this.material.uniforms.uRBody.value as number) ?? R_XZ_MAX_BASE;
+    return this.material.uniforms.uRBody.value as number;
   }
 
-  /** 반죽 꼭대기 월드 y — hooch 층·레이캐스트 평면 배치용. 바닥 고정 피벗 기준 */
+  /** 테두리(반죽이 유리에 닿는 선) 월드 y — 유리 자국 수면·hooch 아랫단. 돔·크레이터 테두리 몫과 숨 포함 */
+  levelY(): number {
+    const p = this.params;
+    const rim = this.height() + this.menH()
+      + 0.05 * (p?.ripe ?? 0) * DOME_RIM - 0.08 * (p?.collapse ?? 0) * CRATER_RIM;
+    return rim * this.mesh.scale.y;
+  }
+
+  /** 반죽 가운데 꼭대기 월드 y — 레이캐스트 평면·밀가루 낙하 자리. 피크 돔·과숙 크레이터·숨까지(A1-11) */
   topY(): number {
-    return this.fillWorldY(this.fillEff());
-  }
-
-  /** 보정된 fill 배율 → 월드 y. 유리 자국이 수면과 같은 좌표계를 쓰도록 분리 */
-  fillWorldY(levelled: number): number {
-    const h = R * Y_SCALE;
-    return BASE_Y - h + 2 * h * levelled;
+    const p = this.params;
+    return (this.height() + 0.05 * (p?.ripe ?? 0) - 0.08 * (p?.collapse ?? 0)) * this.mesh.scale.y;
   }
 
   /** t = 렌더 시계(초, CPU 로직 전부). shaderT = 셰이더 uTime — 생략하면 t. 호출자가 원점을 옮긴 작은 값을 넘겨 float32 해상도를 지킨다 */
   tick(t: number, shaderT = t): void {
     const p = this.params;
-    const level = p?.levelness ?? 0.5;
     const fluid = p?.fluidity ?? 0.3;
     const ela = p?.elasticity ?? 0.5;
     const coh = p?.cohesion ?? 0.6;
-    const amp = p?.breatheAmp ?? 0.04;
+    const amp = p?.breatheAmp ?? 0.006;
     const period = p?.breathePeriod ?? 3.5;
-    const fill = this.fillEff();
     const breathe = 1 + amp * (0.5 + 0.5 * Math.sin((t * Math.PI * 2) / period + this.seedPhase));
-    // 병에 갇힌 액체는 폭이 아니라 수위가 숨쉰다 — 숨은 Y 위주, XZ는 평평할수록 고정
-    const bXZ = 1 + (breathe - 1) * (1 - 0.8 * level);
-    this.mesh.scale.set(XZ_SCALE * bXZ, Y_SCALE * breathe * fill, XZ_SCALE * bXZ);
-    // 부풀기는 바닥 고정 — 병 바닥에 앉은 채 위로만 차오른다
-    const h = R * Y_SCALE;
-    this.mesh.position.y = BASE_Y - h + h * fill;
+    // 병에 갇힌 반죽은 폭이 아니라 수위가 숨쉰다. 바닥이 y=0 피벗이라 scale.y만 곱해도 바닥 고정
+    this.mesh.scale.set(XZ_SCALE, breathe, XZ_SCALE);
+    this.mesh.position.y = 0;
 
-    const dt = this.lastT < 0 ? 1 / 60 : Math.min(t - this.lastT, 0.1);
+    // 시계 역행 방어(A1-18) — 하한 0. 역행이면 CPU 시각 기록을 그만큼 옮겨 연속성을 지킨다
+    if (this.lastT >= 0 && t < this.lastT) this.shiftClock(t - this.lastT);
+    const dt = this.lastT < 0 ? 1 / 60 : Math.min(Math.max(t - this.lastT, 0), 0.1);
     this.lastT = t;
     const u = this.material.uniforms;
-
-    // 반경 상한 — 숨쉬기 최대에도 유리 내벽(0.92) 관통 금지
-    u.uRXZMax.value = Math.min(R_XZ_MAX_BASE, JAR_RADIUS / (XZ_SCALE * bXZ) - 0.005);
 
     // ── 젓기 스프링·실 감쇠 ──
     const stirring = t - this.lastStirInputT < STIR_IDLE_S;
@@ -403,7 +434,7 @@ export class DoughMesh {
     // ── 기포 — 젓는 동안 부상·팝 가속 (agitation) ──
     this.bubbles.update(t, p?.bubbleDensity ?? 0.4, p?.bubbleScale ?? 1, this.agitation);
     const posArr = u.uBumpPos.value as THREE.Vector2[];
-    for (let i = 0; i < 8; i++) posArr[i].set(this.bubbles.pos[i * 2], this.bubbles.pos[i * 2 + 1]);
+    for (let i = 0; i < DYN_SLOTS; i++) posArr[i].set(this.bubbles.pos[i * 2], this.bubbles.pos[i * 2 + 1]);
     (u.uBumpAmp.value as Float32Array).set(this.bubbles.amp);
     (u.uBumpK.value as Float32Array).set(this.bubbles.k);
 
@@ -441,8 +472,16 @@ export class DoughMesh {
     }
     (u.uWobble.value as THREE.Vector2).copy(this.wobble);
 
-    // ── 탭 자국 — 고체는 스프링(되튐 1회), 액체는 "넓어지며 얕아지는" 점성 아묾 ──
-    if (this.pokeAge < 8) {
+    // ── 롱프레스 홀드 — 쥐는 동안 0.03까지 천천히, 떼면 easeOut (A1-15) ──
+    if (this.holding || this.holdLevel > 0) {
+      this.holdLevel = this.holding
+        ? this.holdLevel + (1 - this.holdLevel) * (1 - Math.exp(-dt / HOLD_RISE_TAU))
+        : this.holdLevel * Math.exp(-dt / HOLD_FALL_TAU);
+      if (!this.holding && this.holdLevel <= 1e-4) this.holdLevel = 0;
+      u.uPokeAmt.value = -HOLD_AMP * this.holdLevel;
+      u.uPokeK.value = POKE_K0 / 2; // 덴트보다 넓게 — 부풂은 손끝보다 크다
+    } else if (this.pokeAge < 8) {
+      // ── 탭 자국 — 고체는 스프링(되튐 1회), 액체는 "넓어지며 얕아지는" 점성 아묾 ──
       this.pokeAge += dt;
       const a = this.pokeAge;
       const springAmt = this.pokeAmp * Math.exp(-5 * a) * Math.cos(12 * a);
@@ -457,5 +496,37 @@ export class DoughMesh {
     } else if ((u.uPokeAmt.value as number) !== 0) {
       u.uPokeAmt.value = 0;
     }
+    this.recoverNaN();
+  }
+
+  /** 시계 역행 — CPU 시각 기록을 delta만큼 옮긴다(프로덕션 performance.now는 단조라 방어용) */
+  private shiftClock(delta: number): void {
+    this.lastStirInputT += delta;
+    this.lastTrailT += delta;
+    for (const s of this.trail) s.bornAt += delta;
+    this.bubbles.shift(delta);
+  }
+
+  /**
+   * NaN 자가 복구(A1-18) — 상태기 하나가 NaN이 되면(시계 역행 · 비정상 입력) 영원히 고착되던 것을 끊는다.
+   * NaN 비교는 늘 거짓이라 기존 「작으면 0」 수렴 조건으로는 빠져나오지 못했다.
+   */
+  private recoverNaN(): void {
+    const ok = (v: THREE.Vector2): boolean => Number.isFinite(v.x) && Number.isFinite(v.y);
+    const zero = (...vs: THREE.Vector2[]): void => vs.forEach((v) => v.set(0, 0));
+    if (!ok(this.wobble) || !ok(this.wobbleVel)) zero(this.wobble, this.wobbleVel);
+    if (!ok(this.stirVec) || !ok(this.stirVecVel)) zero(this.stirVec, this.stirVecVel);
+    const grab = [this.grabTarget, this.grabElastic, this.grabElasticVel, this.grabCreep, this.grabLag];
+    if (!grab.every(ok)) zero(...grab);
+    for (const s of this.trail) if (!Number.isFinite(s.amp)) s.amp = 0;
+    if (!Number.isFinite(this.holdLevel)) this.holdLevel = 0;
+    const u = this.material.uniforms;
+    (u.uWobble.value as THREE.Vector2).copy(this.wobble);
+    (u.uStirVec.value as THREE.Vector2).copy(this.stirVec);
+    if (!ok(u.uGrabDisp.value as THREE.Vector2)) (u.uGrabDisp.value as THREE.Vector2).set(0, 0);
+    (u.uGrabDispLag.value as THREE.Vector2).copy(this.grabLag);
+    const ta = u.uTrailAmp.value as Float32Array;
+    for (let i = 0; i < TRAIL_N; i++) ta[i] = this.trail[i].amp;
+    if (!Number.isFinite(u.uPokeAmt.value as number)) u.uPokeAmt.value = 0;
   }
 }

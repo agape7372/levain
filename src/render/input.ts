@@ -79,6 +79,7 @@ export function attachInput(
   let downHitZ = 0;
   let coveredGesture = false;
   let holdTimer: ReturnType<typeof setTimeout> | null = null;
+  let holding = false;
 
   let lastHitX = 0;
   let lastHitZ = 0;
@@ -101,6 +102,8 @@ export function attachInput(
       clearTimeout(holdTimer);
       holdTimer = null;
     }
+    if (holding) dough.holdEnd(); // 떼기·움직임·취소 = 홀드 끝(easeOut)
+    holding = false;
   };
 
   const endDrag = (): void => {
@@ -197,8 +200,10 @@ export function attachInput(
     }
     clearHold();
     holdTimer = setTimeout(() => {
-      // 홀드 — 손가락 쪽이 살짝 부푼다 (음수 덴트 = swell)
-      if (down && !moved) dough.pokeAt(lastHitX, lastHitZ, -0.045);
+      // 홀드 — 손가락 쪽이 아주 천천히 0.03 부풀고, 떼면 가라앉는다 (VISUAL §5, A1-15)
+      if (!down || moved) return;
+      holding = true;
+      dough.holdStart(lastHitX, lastHitZ);
     }, HOLD_MS);
   };
 
