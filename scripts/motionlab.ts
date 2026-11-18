@@ -17,6 +17,7 @@ const stage = document.getElementById('stage') as HTMLElement;
 const NOW = 1_700_000_000_000;
 const base: Snapshot = {
   phase: 'active', activity: 0.5, hunger: 0, sourness: 0.1, dormancy: 0, fill: 1.0,
+  riseFill: 1.0, peakFill: 1.6, massRatio: 1, location: 'room',
   hooch: 0, smell: 'flour', stage: 3, mass: 180, nextFeedAt: NOW, peakAt: NOW, peakEndAt: NOW,
   effSinceFeedMs: 0, moldStage: 'none', mold01: 0, moldDeadAt: NOW, kahm: false, hasFlake: false,
 };

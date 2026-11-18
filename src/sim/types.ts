@@ -155,8 +155,14 @@ export interface Snapshot {
   sourness: number;
   /** 휴면 깊이 0~1 */
   dormancy: number;
-  /** 반죽 높이 — 마지막 밥 시점 기준 1.0, 범위 0.6~1.6 */
+  /** 반죽 높이 — 마지막 밥 시점 기준 1.0, 범위 0.6~1.6 (= clamp(riseFill × massRatio)) */
   fill: number;
+  /** 질량 무관 부풀기 곡선 — 밥 시점 1.0, 피크 peakFill, 지치면 0.65까지. 렌더가 높이로 옮긴다 */
+  riseFill: number;
+  /** 이번 사이클의 피크 높이(riseFill 단위) — 사이클 시작 단계·가짜 부풀기·부활 계수 반영. 유리 최고 수위 자국용 */
+  peakFill: number;
+  /** 병 속 질량 / 마지막 비율의 급여 직후 질량 (0~1) — 떼어내면 줄고 밥 주면 1 */
+  massRatio: number;
   /** 부유액 층 0~1 */
   hooch: number;
   smell: SmellBand;
@@ -164,6 +170,8 @@ export interface Snapshot {
   mass: number;
   /** 마지막 급여의 밀가루 — 렌더 색 톤 시프트용 패스스루 */
   flour: Flour;
+  /** 병 위치 — 렌더 유리 톤(냉장 김서림)용 패스스루 */
+  location: Location;
   /** 배고픔 진입 예측 wall-clock (알림·안내) */
   nextFeedAt: number;
   /** 피크 진입 예측 wall-clock — 피크는 구간이라 peakEndAt과 짝으로 범위 표현 */

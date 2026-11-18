@@ -162,20 +162,26 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
   const phase = phaseAt(state, now);
   const activity = activityAt(state, now);
   const stage = stageOf(state, now);
-  const sf = stageFillFactor(state, now, stage);
+  // 부피 계수는 **사이클 시작(마지막 밥) 시점**의 단계·나이로 정한다(2026-11-19, 감사 A2-05).
+  // now로 읽으면 생후 24h·48h·단계 일수 게이트를 지나는 순간 밥 없이 반죽 높이가 계단처럼 튄다.
+  // 밥 직후 maturity가 이미 반영돼 있으므로 stageOf(state, lastFedAt) = 그 밥 직후의 단계다
+  const stageAtFeed = stageOf(state, state.lastFedAt);
+  const sf = stageFillFactor(state, state.lastFedAt, stageAtFeed)
+    // 부활 의식 중엔 activity가 ×0.3이다 — 피크 높이도 같이 눌러야 유효 피크 끝에서 안 튄다(A2-01)
+    * (state.reviveProgress === 1 ? 0.3 : 1);
 
-  // fill: 급여 시점 = 1.0 기준, 피크에서 넘고 지치면 그 아래로 꺼진다
-  let fill: number;
+  // riseFill: 급여 시점 = 1.0 기준, 피크에서 넘고 지치면 그 아래로 꺼진다(질량 무관 곡선)
+  let riseFill: number;
   const peakFill = 1.0 + FILL_PEAK_RISE * sf;
-  if (effH < b.peakEnd) fill = 1.0 + FILL_PEAK_RISE * sf * activity;
-  else if (effH < b.hungry) fill = lerp(peakFill, FILL_HUNGRY, smoothstep(b.peakEnd, b.hungry, effH));
-  else if (effH < b.sour) fill = lerp(FILL_HUNGRY, FILL_SOUR, (effH - b.hungry) / (b.sour - b.hungry));
-  else if (effH < b.dormant) fill = lerp(FILL_SOUR, FILL_DORMANT, (effH - b.sour) / (b.dormant - b.sour));
-  else fill = FILL_DORMANT;
+  if (effH < b.peakEnd) riseFill = 1.0 + FILL_PEAK_RISE * sf * activity;
+  else if (effH < b.hungry) riseFill = lerp(peakFill, FILL_HUNGRY, smoothstep(b.peakEnd, b.hungry, effH));
+  else if (effH < b.sour) riseFill = lerp(FILL_HUNGRY, FILL_SOUR, (effH - b.hungry) / (b.sour - b.hungry));
+  else if (effH < b.dormant) riseFill = lerp(FILL_SOUR, FILL_DORMANT, (effH - b.sour) / (b.dormant - b.sour));
+  else riseFill = FILL_DORMANT;
   // 질량비 — 떼어내면 병이 실제로 줄어야 한다. 급여 직후엔 mass === RATIOS[feedRatio].mass라
   // 계수가 정확히 1.0이고, 위 곡선의 "급여 시점 = 1.0" 캘리브레이션이 그대로 보존된다.
-  fill *= clamp(state.mass / RATIOS[state.feedRatio].mass, 0, 1);
-  fill = clamp(fill, FILL_MIN, FILL_MAX);
+  const massRatio = clamp(state.mass / RATIOS[state.feedRatio].mass, 0, 1);
+  const fill = clamp(riseFill * massRatio, FILL_MIN, FILL_MAX);
 
   const hunger = smoothstep(b.peakEnd, b.sour, effH);
   const hooch = smoothstep(b.hooch, b.dormant, effH);
@@ -197,11 +203,15 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
     sourness: clamp(state.acidity / 100, 0, 1),
     dormancy,
     fill,
+    riseFill,
+    peakFill,
+    massRatio,
     hooch,
     smell: smellOf(state.acidity),
     stage,
     mass: state.mass,
     flour: state.flour,
+    location: state.location,
     nextFeedAt: wallFor(b.hungry),
     peakAt: wallFor(b.peakStart),
     peakEndAt: wallFor(b.peakEnd), // 피크는 구간 — UI는 범위로 말한다 (§19-1 "정답 시간" 단정 금지)
