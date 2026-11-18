@@ -165,10 +165,14 @@ export const FLOAT_OK_ACTIVITY = 0.7;
 /** 시계 방어 */
 export const REWIND_TOLERANCE_MS = 5 * 60_000; // 5분 이내 역행은 무시(0 경과 취급)
 /**
- * catch-up 상한 — 실온 곰팡이 종착(≤15일)+산미 포화가 고정점이라 그 이상은 관측 불변.
- * 곰팡이·phase는 파생이라 이 캡과 무관 — 캡은 acidity 적분의 안전벨트일 뿐.
+ * (2026-11-19, 감사 A2-04) catch-up 상한을 없앴다 — 산미 적분은 경계 컷 최대 5개의 O(1) 식이라 구간 길이와 비용이 무관하고,
+ * 상한은 부활+냉장(0.04/h)·restoreFlake 뒤 냉장에서 쪼개기 등가만 깼다.
  */
-export const MAX_CATCHUP_MS = 60 * DAY;
+
+/** 브리핑 「한껏 부풀었다가 가라앉았어요」 = 피크 뒤 activity가 이 값 아래로 내려간 시각 (감사 A2-03) */
+export const BRIEFING_PEAKED_ACTIVITY = 0.5;
+/** 브리핑 「액체가 고였어요」 = hooch(0~1)가 눈에 보이는 이 양에 닿은 시각 (감사 A3-08) */
+export const BRIEFING_HOOCH_VISIBLE = 0.3;
 
 /** 알림 */
 export const QUIET_START_H = 22; // 로컬 시각 — 클램프 전용
@@ -184,7 +188,7 @@ export const NOTIFY_SLOT_FIRSTWEEK = 7;  // 0단계 D2 가짜 부풀기 안내 �
 // 냉장 주간 — 원래 슬롯 1 재사용이었지만 멀티 르방 병합에서 실온 르방의 feedTime에 묻혀 사라졌다(감사 T2-11).
 // 한 르방의 플랜에는 여전히 냉장 분기 1건뿐이라 르방당 슬롯 수는 7을 넘지 않는다.
 export const NOTIFY_SLOT_FRIDGE = 8;
-/** 하루 알림 상한 — GDD §7 "스팸 금지, 하루 최대 2건". weekly 슬롯은 집계 제외 */
+/** 하루 알림 상한 — GDD §7 "스팸 금지, 하루 최대 2건". 냉장 슬롯(원샷)도 같은 집계에 든다 */
 export const NOTIFY_MAX_PER_DAY = 2;
 
 // ── 보상형 광고 (확장기획 §10 — A/B 시작 가설값, 확정 아님) ──────────────────

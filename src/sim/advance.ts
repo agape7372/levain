@@ -6,7 +6,6 @@ import {
   ACID_MAX,
   ACID_RATE,
   HOUR,
-  MAX_CATCHUP_MS,
   REWIND_TOLERANCE_MS,
 } from './constants';
 import { boundariesH, clamp, rateMult } from './derive';
@@ -40,7 +39,7 @@ export function advance(state: SimState, now: number): SimState {
   if (now <= s.lastSimulatedAt) return s; // 허용 오차 내 역행 — 무시
 
   const t0 = s.lastSimulatedAt;
-  const t1 = Math.min(now, t0 + MAX_CATCHUP_MS); // 초과분은 포화 상태라 관측 차이 없음
+  const t1 = now; // 상한 없음 — 컷이 O(1)이라 길이와 무관하고, 상한은 쪼개기 등가를 깼다(A2-04)
 
   // 산미 적분 — [t0, t1]을 상태 전이 경계로 분할 (오프라인 중 위치·비율 불변이 전제:
   // 위치·급여는 액션이고, 액션은 tick(advance) 선행 후 적용된다)

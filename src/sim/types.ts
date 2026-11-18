@@ -208,7 +208,7 @@ export interface NotifySlot {
   copyKey:
     | 'feedTime' | 'fridgeWeek' | 'dormant' | 'reviveSecond' | 'moldWarn' | 'peak'
     | 'sour' | 'stageUp' | 'firstWeek';
-  /** 냉장 주간 반복 여부 */
+  /** 냉장 슬롯 표식 — 원샷 예약이며 반복이 아니다(하루 상한 집계에도 든다) */
   weekly: boolean;
   /** 멀티 르방 병합 수(§5-6) — 2 이상이면 집계 문구. 플랜 일시값, 저장 안 함 */
   count?: number;

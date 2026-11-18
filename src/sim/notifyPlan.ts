@@ -1,6 +1,6 @@
 // planNotifications(state, now, opts) — 알림 시각 계산(순수). 예약·취소는 platform 소관.
 // 정본: docs/GDD.md §7. 기본 슬롯 3개 고정 id + 옵트인 슬롯 4종(피크·시큼·단계·첫 주).
-// 완전 방치 시 총 4건(밥→시큼→휴면→곰팡이 경고) 후 침묵 — 사망 시점·사후 알림 0.
+// 완전 방치 시 총 5건(피크 4.5h·밥·시큼·휴면·곰팡이 경고, 옵트인 기본 on) 후 침묵 — 사망 시점·사후 알림 0.
 //
 // 2026-09-03 확장: 옵트인 슬롯 id 5~7 추가 + GDD §7 "스팸 금지, 하루 최대 2건"을
 // capPerDay로 코드에 옮겼다. 옵션 기본값은 전부 undefined(off) — opts 없이 부르면
@@ -48,7 +48,7 @@ const DROP_ORDER: Record<NotifySlot['copyKey'], number> = {
   dormant: 1,
   reviveSecond: 2,
   feedTime: 3,
-  fridgeWeek: 3, // weekly라 집계에서 빠지지만 Record 완전성을 위해 둔다
+  fridgeWeek: 3,
   sour: 4,
   peak: 5,
   stageUp: 6,
@@ -63,17 +63,13 @@ function dayKey(at: number): string {
 
 /**
  * GDD §7 "하루 최대 2건" 강제(순수). 같은 로컬 날짜에 3건 이상이면 우선순위가 낮은 것부터
- * 드롭한다. `weekly: true`(냉장 주간 반복)는 날짜가 고정 의미를 갖지 않으므로 집계에서 제외 —
- * 항상 남는다. 입력 순서는 보존한다(platform은 순서를 읽지 않지만 테스트·디버깅이 읽는다).
+ * 드롭한다. 냉장 슬롯(`weekly: true`)도 원샷이라 같은 날짜 집계에 든다(2026-11-19, 감사 검증 missed).
+ * 입력 순서는 보존한다(platform은 순서를 읽지 않지만 테스트·디버깅이 읽는다).
  */
 export function capPerDay(slots: NotifySlot[]): NotifySlot[] {
   const byDay = new Map<string, NotifySlot[]>();
   const keep = new Set<NotifySlot>();
   for (const s of slots) {
-    if (s.weekly) {
-      keep.add(s);
-      continue;
-    }
     const key = dayKey(s.at);
     const bucket = byDay.get(key);
     if (bucket) bucket.push(s);
@@ -113,13 +109,16 @@ export function planNotifications(state: SimState, now: number, opts?: NotifyOpt
     state.locAnchorAt + Math.max(0, h * HOUR - state.effBaseMs) / mult;
   const cq = (at: number): number => clampQuiet(at, opts?.quietStartH, opts?.quietEndH);
 
-  // 부활 의식 중 — 2회차 급여 시각 하나만.
+  // 부활 의식 중 — 2회차 급여 시각 + 곰팡이 예고(2026-11-19, 감사 A2-02: 1회차 급여·플레이크 복원 뒤 방치해도 곰팡이는 온다).
   // wallFor로 계산해야 한다: 게이트(effH < REVIVE_GAP_H)는 위치 앵커 회계를 타므로,
   // 부활 중 위치를 옮기면 room 배율 고정식은 게이트보다 이른 거짓 알림이 된다(2026-08-30 수정).
   if (state.reviveProgress === 1) {
     const at = cq(wallFor(REVIVE_GAP_H));
     if (at > now) slots.push({ id: NOTIFY_SLOT_FEED, at, copyKey: 'reviveSecond', weekly: false });
-    return { slots };
+    const spotAt = wallFor(b.moldSpot);
+    const moldAt = cq(spotAt > now ? spotAt : wallFor(b.moldSpread));
+    if (moldAt > now) slots.push({ id: NOTIFY_SLOT_MOLD, at: moldAt, copyKey: 'moldWarn', weekly: false });
+    return { slots: capPerDay(slots) };
   }
 
   // 곰팡이 확정 — 완전 침묵. 죽음을 푸시로 통지하지 않는다
@@ -133,7 +132,7 @@ export function planNotifications(state: SimState, now: number, opts?: NotifyOpt
     return { slots };
   }
 
-  // 냉장 — 주간 반복 슬롯 하나로 대체 (앱을 안 열어도 발화). 곰팡이는 ≈175일이라 제외.
+  // 냉장 — 배고픔 원샷 하나로 대체(재예약은 앱 복귀 때). 곰팡이는 ≈175일이라 제외.
   // 피크도 제외 — 냉장은 주 1회 케어 모드라 "한창" 창 자체가 관심사가 아니다.
   if (state.location === 'fridge') {
     const at = cq(wallFor(b.hungry));
@@ -186,13 +185,13 @@ export function planNotifications(state: SimState, now: number, opts?: NotifyOpt
   const moldAt = cq(wallFor(b.moldSpot));
   if (moldAt > now) slots.push({ id: NOTIFY_SLOT_MOLD, at: moldAt, copyKey: 'moldWarn', weekly: false });
 
-  // 하루 상한은 여기서만 걸면 된다 — 위 분기(부활·휴면·냉장)는 슬롯이 최대 1개다
+  // 하루 상한 — 휴면·냉장 분기는 슬롯 1개, 부활은 2개(날짜가 다르다)
   return { slots: capPerDay(slots) };
 }
 
 /**
  * 멀티 르방 병합 플랜 (확장기획 §5-6) — 알림 총량은 N배가 아니라 슬롯 수 그대로.
- * 같은 copyKey를 여러 르방이 원하면 **가장 이른 시각 1건**(그 르방의 weekly 채택),
+ * 같은 copyKey를 여러 르방이 원하면 **가장 이른 시각 1건**,
  * 병합 수는 count로 실어 문구를 집계형으로(ui/copy.ts notifyMany). 다른 copyKey는 세지 않는다.
  * 사망 침묵·휴면 1건·조용시간 처리는 개별 planNotifications가 이미 보장한다.
  */

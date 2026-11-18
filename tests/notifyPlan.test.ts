@@ -143,15 +143,16 @@ describe('planNotifications — 상태별 슬롯 (GDD §7)', () => {
     expect(planNotifications(moldy, t0).slots.length).toBe(0);
   });
 
-  it('reviveProgress 1: reviveSecond 슬롯 1개, at = lastFedAt+8h(클램프 적용)', () => {
+  it('reviveProgress 1: reviveSecond(lastFedAt+8h 클램프) + moldWarn(spot) 2건 — 예고 없는 죽음 금지(감사 A2-02)', () => {
     const t0 = local(2024, 0, 15, 6, 0);
     const reviving: SimState = { ...initialState(t0), reviveProgress: 1, lastFedAt: t0 };
 
     const plan = planNotifications(reviving, t0);
-    expect(plan.slots.length).toBe(1);
-    expect(plan.slots[0].copyKey).toBe('reviveSecond');
-    expect(plan.slots[0].weekly).toBe(false);
-    expect(plan.slots[0].at).toBe(clampQuiet(t0 + 8 * HOUR));
+    expect(plan.slots.length).toBe(2);
+    const second = plan.slots.find((sl) => sl.copyKey === 'reviveSecond')!;
+    expect(second.weekly).toBe(false);
+    expect(second.at).toBe(clampQuiet(t0 + 8 * HOUR));
+    expect(plan.slots.find((sl) => sl.copyKey === 'moldWarn')!.at).toBe(clampQuiet(t0 + 168 * HOUR));
   });
 });
 
@@ -277,9 +278,8 @@ describe('부활 알림 위치 배율 (2026-08-30 수정 — room 고정식은 �
       effBaseMs: 0,
     };
     const plan = planNotifications(s, t0);
-    expect(plan.slots.length).toBe(1);
-    expect(plan.slots[0].copyKey).toBe('reviveSecond');
-    expect(plan.slots[0].at).toBe(clampQuiet(t0 + 100 * HOUR));
+    const second = plan.slots.find((sl) => sl.copyKey === 'reviveSecond')!;
+    expect(second.at).toBe(clampQuiet(t0 + 100 * HOUR));
   });
 });
 
@@ -409,13 +409,13 @@ describe('capPerDay — 하루 최대 2건 (GDD 7절)', () => {
     expect(kept.map((sl) => sl.copyKey)).toEqual(['feedTime', 'moldWarn']); // 입력 순서 보존
   });
 
-  it('weekly 슬롯은 집계에서 빠진다 — 같은 날 3건이어도 전부 남는다', () => {
+  it('냉장(weekly) 슬롯도 집계에 든다 — 같은 날 3건이면 우선순위 낮은 것부터 드롭(2026-11-19)', () => {
     const kept = capPerDay([
       slotOf('fridgeWeek', d, true),
       slotOf('feedTime', d + HOUR),
       slotOf('moldWarn', d + 2 * HOUR),
     ]);
-    expect(kept.length).toBe(3);
+    expect(kept.map((sl) => sl.copyKey)).toEqual(['fridgeWeek', 'moldWarn']);
   });
 
   it('날짜가 다르면 서로 영향 없음', () => {
@@ -447,7 +447,6 @@ describe('planNotificationsAll — 확장 슬롯 병합 (2026-09-03)', () => {
 
     const perDay = new Map<string, number>();
     for (const sl of plan.slots) {
-      if (sl.weekly) continue;
       const dt = new Date(sl.at);
       const key = `${dt.getFullYear()}-${dt.getMonth()}-${dt.getDate()}`;
       perDay.set(key, (perDay.get(key) ?? 0) + 1);

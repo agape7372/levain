@@ -43,6 +43,18 @@ export const smoothstep = (edge0: number, edge1: number, x: number): number => {
   return t * t * (3 - 2 * t);
 };
 
+/** smoothstep(edge0, edge1, x) = s가 되는 x — 이분법(단조 증가라 안전). 브리핑이 「곡선이 어느 값 아래로 내려간 시각」을 구할 때 쓴다 */
+export const smoothstepInv = (edge0: number, edge1: number, s: number): number => {
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 40; i++) {
+    const m = (lo + hi) / 2;
+    if (m * m * (3 - 2 * m) < s) lo = m;
+    else hi = m;
+  }
+  return edge0 + ((lo + hi) / 2) * (edge1 - edge0);
+};
+
 const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
 
 /** 유효 경과 ms — 위치 앵커 회계(types.ts SimState 주석 참조) */
@@ -103,7 +115,7 @@ export function activityAt(state: SimState, now: number): number {
   else if (effH < b.peakEnd) a = 1;
   else if (effH < b.hungry) a = lerp(1, 0.2, smoothstep(b.peakEnd, b.hungry, effH));
   else if (effH < b.sour) a = lerp(0.2, 0.08, (effH - b.hungry) / (b.sour - b.hungry));
-  else if (effH < b.dormant) a = lerp(0.08, 0.02, (effH - b.sour) / (b.dormant - b.sour));
+  else if (effH < b.dormant) a = lerp(0.08, 0.01, (effH - b.sour) / (b.dormant - b.sour));
   else a = 0.01;
   if (state.reviveProgress === 1) a *= 0.3; // 깨어나는 중 — 희미한 생기만
   return a;
@@ -166,13 +178,13 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
   // now로 읽으면 생후 24h·48h·단계 일수 게이트를 지나는 순간 밥 없이 반죽 높이가 계단처럼 튄다.
   // 밥 직후 maturity가 이미 반영돼 있으므로 stageOf(state, lastFedAt) = 그 밥 직후의 단계다
   const stageAtFeed = stageOf(state, state.lastFedAt);
-  const sf = stageFillFactor(state, state.lastFedAt, stageAtFeed)
-    // 부활 의식 중엔 activity가 ×0.3이다 — 피크 높이도 같이 눌러야 유효 피크 끝에서 안 튄다(A2-01)
-    * (state.reviveProgress === 1 ? 0.3 : 1);
+  const sf = stageFillFactor(state, state.lastFedAt, stageAtFeed);
 
   // riseFill: 급여 시점 = 1.0 기준, 피크에서 넘고 지치면 그 아래로 꺼진다(질량 무관 곡선)
   let riseFill: number;
-  const peakFill = 1.0 + FILL_PEAK_RISE * sf;
+  // 부활 의식 중 activity는 ×0.3이라 상승·피크 구간(activity 곱)은 이미 눌려 있다. 피크 끝 이후(하강)가 쓰는
+  // peakFill에만 같은 ×0.3을 곱해야 유효 피크 끝에서 안 튄다(A2-01 — 기반 커밋은 sf에 곱해 두 번 눌렀다)
+  const peakFill = 1.0 + FILL_PEAK_RISE * sf * (state.reviveProgress === 1 ? 0.3 : 1);
   if (effH < b.peakEnd) riseFill = 1.0 + FILL_PEAK_RISE * sf * activity;
   else if (effH < b.hungry) riseFill = lerp(peakFill, FILL_HUNGRY, smoothstep(b.peakEnd, b.hungry, effH));
   else if (effH < b.sour) riseFill = lerp(FILL_HUNGRY, FILL_SOUR, (effH - b.hungry) / (b.sour - b.hungry));
