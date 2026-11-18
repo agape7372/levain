@@ -3,7 +3,7 @@
 // 앱 아이콘용은 ?icon=1 — 병+도우 히어로 구도 대신 GLB 단독 구도만 v1 지원.
 // 검수용(기본값이면 썸네일과 같은 그림): ?az=<도> 빵을 세로축으로 돌림(턴테이블 게이트) · ?size=<px> 캔버스.
 // 빵은 기본이 툰(src/render/toonMaterial.ts). 검수용: ?glb=<루트 기준 URL 경로> GLB 위치 대체
-//   · ?style=toon|pbr 강제 · ?line=1.2 외곽선 px(512 캔버스 기준)
+//   · ?style=toon|pbr 강제 · ?line=0.6 외곽선 px(512 캔버스 기준)
 // 재질 정책은 앱 쇼케이스와 같은 src/render/breadMaterial.ts(PBR 자산 = Standard + 환경맵).
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';

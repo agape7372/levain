@@ -1,13 +1,13 @@
 // 툰 스타일 빵 — 쇼케이스(breadShowcase.ts)와 썸네일 하네스(scripts/thumbsHarness.ts)가 공유.
-// 빵 전부(재료는 아님). 2026-11-17 스타일 시험에서 채택(팬케이크 → 같은 날 전 레시피): 색 맵은 GLB 그대로 · 본체 = MeshToonMaterial 3단 · 가는 외곽선(썸네일 512px에서 1.2px).
+// 빵 전부(재료는 아님). 2026-11-17 스타일 시험에서 채택(팬케이크 → 같은 날 전 레시피): 색 맵은 GLB 그대로 · 본체 = MeshToonMaterial 3단 · 가는 외곽선(썸네일 512px에서 0.6px — 11-18 1.2에서 절반으로).
 // 외곽선 = 정점을 붙인 사본을 뒤집어(BackSide) 뷰 공간에서 법선 쪽으로 민다. 두 카메라가 다 직교라 뷰 공간 두께 = 화면 두께.
 import * as THREE from 'three';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 /** 세 단 그늘(어두운 단 → 밝은 단) */
 const RAMP = [0.35, 0.65, 1];
-/** 외곽선 두께(씬 단위, 빵 최장 변 1.6 기준) — 썸네일(직교 높이 2.2 · 512px)에서 1.2px */
-export const TOON_LINE = (1.2 * 2.2) / 512;
+/** 외곽선 두께(씬 단위, 빵 최장 변 1.6 기준) — 썸네일(직교 높이 2.2 · 512px)에서 0.6px */
+export const TOON_LINE = (0.6 * 2.2) / 512;
 const LINE_COLOR = 0x3a2416;
 /** 잔 덩이 외곽선 가늘게: 덩이 대각선 ÷ 전체 최장 변이 문턱 아래면 비례로 줄임(바닥 배율까지) */
 const SMALL: [number, number] = [0.3, 0.2];
