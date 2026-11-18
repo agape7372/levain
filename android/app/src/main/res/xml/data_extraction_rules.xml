@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Android 12(API 31) 이상 클라우드 백업·기기 간 이전. 규칙은 backup_rules.xml과 같다(제외만). -->
+<!-- Android 12(API 31) 이상 클라우드 백업·기기 간 이전. 규칙은 backup_rules.xml과 같다(제외만).
+     GLB 캐시(app_webview/Default/Service Worker/)는 25MB 상한이 걸리는 클라우드 백업에서만 뺀다. 기기 간 이전은 그 상한이 없어 그대로 옮긴다. -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="file" path="versions/" />
+        <exclude domain="root" path="app_webview/Default/Service Worker/" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="file" path="versions/" />

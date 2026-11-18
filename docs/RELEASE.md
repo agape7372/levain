@@ -261,6 +261,7 @@ manifest와 zip을 같이 바꾸면 모든 폰이 그 JS를 받던 길을 막는
 
 **기록 복구 지원**(2026-11-12): 저장을 못 읽어 새로 시작한 기기는 원문을 `levain:save:broken`(localStorage + Preferences)에 남긴다.
 백업 규칙(`res/xml/backup_rules.xml`·`data_extraction_rules.xml`)은 OTA 번들 폴더 `versions/`를 빼고 나머지를 백업한다.
+GLB 캐시 `app_webview/Default/Service Worker/`도 클라우드 백업에서 뺀다(다 보면 약 36MB라 25MB 상한을 넘겨 백업이 통째로 빠짐). 고침 · 미합침(`fix/abuse-1118`). 네이티브 리소스라 OTA로는 안 가고 **다음 AAB(vc5)부터** 실린다.
 
 **Play 정책**: 웹 자산(JS/HTML/CSS 등) 무선 갱신은 허용 범위. 네이티브 코드·권한 교체는 금지 —
 이 구조는 전자만 다루므로 해당 없음. 위 표의 "안 되는 것"이 필요해지면 통상 절차(§2~§6)로 AAB 재배포.
