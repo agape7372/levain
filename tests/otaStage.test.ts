@@ -31,7 +31,22 @@ vi.mock('@capacitor/preferences', () => ({
 }));
 vi.mock('../src/platform/native', () => ({ isNative: () => true }));
 
-import { initOta, markOtaReady } from '../src/platform/ota';
+import { initOta, markOtaReady, otaKey } from '../src/platform/ota';
+import { signManifest, type SignedFields } from '../scripts/ota-sign.mjs';
+
+// 시험용 키 쌍(웹 crypto → PEM): 게시 스크립트(scripts/ota-sign.mjs)로 서명하고 앱(src/platform/ota.ts)이 확인한다
+// = 두 쪽의 서명 글 형식이 맞는지도 본다. 진짜 개인 키는 레포 밖이라 시험은 키를 갈아 끼운다.
+const b64 = (b: ArrayBuffer): string => btoa(String.fromCharCode(...new Uint8Array(b)));
+async function pair(): Promise<{ pem: string; spki: string }> {
+  const k = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
+  const body = b64(await crypto.subtle.exportKey('pkcs8', k.privateKey)).match(/.{1,64}/g)!.join('\n');
+  return { pem: `-----BEGIN PRIVATE KEY-----\n${body}\n-----END PRIVATE KEY-----\n`, spki: b64(await crypto.subtle.exportKey('spki', k.publicKey)) };
+}
+const shipped = otaKey.spki; // 앱에 박힌 진짜 공개 키
+const mine = await pair();
+const theirs = await pair();
+otaKey.spki = mine.spki;
+const sign = <T extends SignedFields>(m: T, pem = mine.pem): T & { sig: string } => signManifest(m, pem);
 
 const SUM = 'a'.repeat(64);
 /** APP_VERSION의 patch를 n만큼 올린 버전 — package.json이 바뀌어도 테스트가 버틴다 */
@@ -39,8 +54,9 @@ function bump(n: number): string {
   const [a, b, c] = APP_VERSION.split('.').map(Number);
   return `${a}.${b}.${c + n}`;
 }
+/** 서명된 manifest. over는 서명 뒤에 덮는다(= 서명 뒤 바꿈) */
 function man(version: string, over: Record<string, unknown> = {}): Record<string, unknown> {
-  return { version, url: `https://levain-ota.vercel.app/bundles/${version}.zip`, checksum: SUM, ...over };
+  return { ...sign({ version, url: `https://levain-ota.vercel.app/bundles/${version}.zip`, checksum: SUM }), ...over };
 }
 function downloads(): string[] {
   return h.calls.filter((c) => c.startsWith('download'));
@@ -112,10 +128,48 @@ describe('T2-20 매니페스트 방어', () => {
   it('발행된 manifest·history의 url·checksum은 전부 가드를 통과한다(라이브 OTA가 끊기지 않음)', async () => {
     for (const entry of [liveManifest, ...liveHistory]) {
       h.calls.length = 0;
-      h.manifest = { ...entry, version: bump(1), minNative: undefined };
+      h.manifest = sign({ ...entry, version: bump(1), minNative: undefined });
       await boot();
       expect(downloads()).toEqual([`download ${bump(1)} ${entry.url}`]);
     }
+  });
+});
+
+// 2026-11-18 어뷰징 점검: Vercel이 털려 manifest·zip을 같이 바꿔도 개인 키(레포 밖)가 없으면 앱이 안 받는다
+describe('판 목록 서명', () => {
+  const v = (): string => bump(1);
+  const plain = (): Record<string, unknown> => ({ version: v(), url: `https://levain-ota.vercel.app/bundles/${v()}.zip`, checksum: SUM });
+
+  it('정상 서명 판은 받고 다음 시작에 예약한다', async () => {
+    h.manifest = man(v());
+    await boot();
+    expect(downloads()).toEqual([`download ${v()} https://levain-ota.vercel.app/bundles/${v()}.zip`]);
+    expect(h.calls).toContain(`next id-${v()}`);
+  });
+
+  it('서명 없음 · 빈 서명 · 문자열 아닌 서명 · 다른 키 서명이면 받지도 예약하지도 않는다', async () => {
+    for (const m of [plain(), { ...plain(), sig: '' }, { ...plain(), sig: 1 }, sign(plain() as SignedFields, theirs.pem)]) {
+      h.calls.length = 0;
+      h.manifest = m;
+      await boot();
+      expect(h.calls.filter((c) => c !== 'notifyAppReady')).toEqual([]);
+    }
+  });
+
+  it('서명 뒤 묶음 바꿔치기(체크섬) · 같은 호스트 다른 zip(주소) · 판 번호를 바꾸면 안 받는다', async () => {
+    const other = `https://levain-ota.vercel.app/bundles/${bump(9)}.zip`;
+    for (const over of [{ checksum: 'b'.repeat(64) }, { url: other }, { version: bump(2) }]) {
+      h.calls.length = 0;
+      h.manifest = man(v(), over);
+      await boot();
+      expect(h.calls.filter((c) => c !== 'notifyAppReady')).toEqual([]);
+    }
+  });
+
+  it('앱에 박힌 공개 키는 웹 crypto가 읽는 P-256 SPKI(개인 키와의 짝은 ota-release가 빌드 전에 맞대 본다)', async () => {
+    const raw = Uint8Array.from(atob(shipped), (c) => c.charCodeAt(0));
+    const key = await crypto.subtle.importKey('spki', raw, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+    expect((key.algorithm as EcKeyAlgorithm).namedCurve).toBe('P-256');
   });
 });
 

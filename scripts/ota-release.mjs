@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { collectFiles, makeZip } from './lib/zip.mjs';
 import { hashedPath } from './lib/families.mjs';
+import { OTA_KEY, signManifest, verifyManifest } from './ota-sign.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_BASE = 'https://levain-ota.vercel.app';
@@ -45,6 +46,26 @@ if (!/^\d+\.\d+\.\d+$/.test(version)) {
   console.error(`버전 형식이 잘못됐습니다: "${version}" (semver 예: 1.1.0)`);
   process.exit(1);
 }
+
+// 판 목록 서명(scripts/ota-sign.mjs, 2026-11-18): 키가 없으면 판을 못 낸다 — 서명 없는 판은 서명을 보는 앱이 안 받는다.
+// 앱에 박힌 공개 키(src/platform/ota.ts otaKey)와 짝인지 빌드 전에 맞대 본다. 어긋난 판이 나가면 모든 앱이 OTA를 못 받고
+// 새 AAB로만 고친다. 이 트리의 ota.ts에 공개 키가 없으면(= 서명 확인이 없는 옛 코드) 여기서 멈춘다 → 서명 바닥 판보다
+// 옛 코드를 「더 높은 버전 재발행」으로 되돌려 내보내는 길이 막힌다(냥수제비 FLOOR와 같은 몫, docs/RELEASE.md §8).
+if (!existsSync(OTA_KEY)) {
+  console.error(`OTA 서명 키 없음: ${OTA_KEY} → 백업(D:\\keys\\backup-keys.ps1)에서 되살린다. 잃었으면 새 키 + 새 AAB`);
+  process.exit(1);
+}
+const otaPem = readFileSync(OTA_KEY, 'utf8');
+const appKey = /spki: '([^']+)'/.exec(readFileSync(path.join(root, 'src', 'platform', 'ota.ts'), 'utf8'))?.[1] ?? '';
+function signed(m) {
+  const s = signManifest(m, otaPem);
+  if (!verifyManifest(s, appKey)) {
+    console.error('OTA 서명이 앱 공개 키(src/platform/ota.ts otaKey)와 짝이 안 맞는다 → 멈춤');
+    process.exit(1);
+  }
+  return s;
+}
+signed({ version, url: 'pair-check', checksum: '0'.repeat(64) }); // 빌드 전에 짝부터
 
 const historyPath = path.join(root, 'ota', 'history.json');
 let history = [];
@@ -213,16 +234,23 @@ if (dryRun) {
 }
 
 const base = process.env.LEVAIN_OTA_BASE || DEFAULT_BASE;
-const manifest = {
+const manifest = signed({
   version,
   url: `${base}/bundles/${version}.zip`,
   checksum,
   size,
   releasedAt: new Date().toISOString(),
   minNative,
-};
+});
 
 const otaDir = path.join(root, 'ota');
+// 지금 manifest에 sig가 없으면 이번이 첫 서명 판 — 그보다 옛 코드엔 서명 확인이 없다
+let firstSigned = true;
+try {
+  firstSigned = typeof JSON.parse(readFileSync(path.join(otaDir, 'manifest.json'), 'utf8')).sig !== 'string';
+} catch {
+  /* manifest 없음 = 처음 */
+}
 const bundlesDir = path.join(otaDir, 'bundles');
 mkdirSync(bundlesDir, { recursive: true });
 
@@ -247,5 +275,8 @@ if (zips.length > KEEP) {
 }
 
 console.log('');
+if (firstSigned) {
+  console.log(`첫 서명 판 ${version}: docs/RELEASE.md §8 「서명 바닥 판」을 ${version}으로 적어 커밋한다(그 전 묶음엔 서명 확인이 없다).`);
+}
 console.log('다음: cd ota && npx vercel --prod --scope jirings-projects');
 console.log('배포 뒤: node scripts/check-remote-assets.mjs   (원격 빵 파일이 다 떴는지 — 404면 앱은 조용히 베이스로 물러난다)');

@@ -17,6 +17,9 @@ import {
   emptyLots,
 } from '../src/store/persistence';
 import { emptyEconomy } from '../src/store/economy';
+import { FakeClock } from '../src/platform/clock';
+import { createGameStore, initGameStore } from '../src/store/gameStore';
+import { INGREDIENTS } from '../src/sim/ingredients';
 
 const T0 = 1_700_000_000_000;
 
@@ -447,6 +450,54 @@ describe('복구 사다리', () => {
 
     const result = await load(store.adapter);
     expect(result?.source).toBe('mirror');
+  });
+
+  // 2026-11-18 어뷰징 점검: localStorage가 늦게 내려가 주가 옛 판으로 남으면 미러의 새 판을 읽는다
+  it('둘 다 읽히면 savedAt 큰 쪽 — 미러가 더 새로우면 미러', async () => {
+    const old = envelopeAt(T0);
+    const fresh: SaveEnvelope = { ...old, savedAt: T0 + 60_000, shared: { ...old.shared, economy: { ...old.shared.economy, bakes: 3 } } };
+    const r = await load(memStorage({ primary: JSON.stringify(old), mirror: JSON.stringify(fresh) }).adapter);
+    expect(r?.source).toBe('mirror');
+    expect(r?.envelope.shared.economy.bakes).toBe(3);
+  });
+
+  it('주가 더 새롭거나 같거나 미러가 깨졌으면 주(지금 동작 그대로)', async () => {
+    const a = envelopeAt(T0);
+    const b = { ...a, savedAt: T0 + 1 };
+    expect((await load(memStorage({ primary: JSON.stringify(b), mirror: JSON.stringify(a) }).adapter))?.source).toBe('primary');
+    expect((await load(memStorage({ primary: JSON.stringify(a), mirror: JSON.stringify(a) }).adapter))?.source).toBe('primary');
+    expect((await load(memStorage({ primary: JSON.stringify(a), mirror: '{깨진' }).adapter))?.source).toBe('primary');
+  });
+
+  it('시나리오: 재료를 받고 1분 안에 앱이 죽어 주가 옛 판으로 남아도 다시 켜면 재료가 있다 · 시계를 되돌려도 저장 도장은 준다', async () => {
+    const clock = new FakeClock(T0);
+    let disk: string | null = null; // localStorage가 디스크에 내린 판
+    let pending: string | null = null; // 아직 메모리에만 있는 판
+    let mirror: string | null = null; // Preferences(apply) — 바로 내려간 것으로 본다
+    const adapter: StorageAdapter = {
+      loadRaw: () => disk,
+      saveRaw: (j) => { pending = j; return true; },
+      mirror: (j) => { mirror = j; },
+      loadMirror: async () => mirror,
+    };
+    const flush = (): void => { disk = pending; };
+    const id = INGREDIENTS[0].id;
+
+    const first = createGameStore({ clock, storage: adapter });
+    first.saveNow();
+    flush();
+    clock.advance(60_000);
+    first.grantIngredient(id, 1); // 저장은 했지만 디스크엔 아직 옛 판 — 여기서 밀어 닫힘
+    first.stopTicking();
+
+    const { store } = await initGameStore({ clock, storage: adapter });
+    expect(store.getInventory()[id]).toBe(1);
+    const before = store.getEnvelope().savedAt;
+
+    clock.set(T0 - 86_400_000); // 하루 되돌림
+    store.saveNow();
+    expect(store.getEnvelope().savedAt).toBeGreaterThan(before);
+    store.stopTicking();
   });
 
   it('주도 미러도 못 읽으면 null — 호출자가 새 게임을 연다', async () => {

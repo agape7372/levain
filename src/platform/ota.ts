@@ -18,6 +18,31 @@ const FETCH_TIMEOUT_MS = 6000;
 /** 부팅 실패로 롤백된 번들 버전 — 플러그인 getFailedUpdate()는 한 번 읽으면 비워지므로 옮겨 적어 둔다 */
 const BAD_KEY = 'levain:ota:bad';
 
+/**
+ * 판 목록 서명 (2026-11-18 어뷰징 점검, 냥수제비 S5 이식). Vercel 계정이 털려 manifest·zip을 같이 바꿔도
+ * 이 공개 키의 짝(개인 키, 레포 밖 D:\keys\levain\ota-sign.pem)이 없으면 서명을 못 만든다 → 받지 않는다.
+ * 묶음 체크섬이 서명 글 안에 있어 zip을 바꾸려면 서명도 다시 만들어야 한다(체크섬 대조는 플러그인 몫).
+ * 확인은 지금 돌고 있는(믿는) 번들이 하므로 AAB 없이 OTA로 걸린다. 서명 = scripts/ota-sign.mjs(같은 글 형식).
+ * 시험은 spki를 갈아 끼운다.
+ */
+export const otaKey = {
+  spki: 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1O7G/HV4loV/yjLY1Saho3dD82Qf5n1LOT+jFVMHL7ANgmTGJNKRXrhRE769pqvd4trQVi01jE/y3Rplk7lmFg==',
+};
+type Signed = { version: string; url: string; checksum: string; sig?: unknown };
+export const otaMessage = (m: Signed): string => `levain-ota\n${m.version}\n${m.url}\n${m.checksum}`;
+const bytes = (b64: string): Uint8Array<ArrayBuffer> => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+
+/** 서명이 맞나. 없음 · 틀림 · 웹 crypto 없음 = false(받지 않는다) */
+export async function signedOk(m: Signed): Promise<boolean> {
+  if (typeof m.sig !== 'string') return false;
+  try {
+    const key = await crypto.subtle.importKey('spki', bytes(otaKey.spki), { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+    return await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, bytes(m.sig), new TextEncoder().encode(otaMessage(m)));
+  } catch {
+    return false;
+  }
+}
+
 interface OtaManifest {
   version: string;
   url: string;
@@ -51,6 +76,8 @@ async function fetchManifest(): Promise<OtaManifest | null> {
     if (typeof m.version !== 'string' || typeof m.url !== 'string' || typeof m.checksum !== 'string') return null;
     // 출처·체크섬 가드 — 빈 checksum이면 플러그인이 검증을 건너뛴다(감사 T2-20)
     if (!m.url.startsWith(`${OTA_BASE}/bundles/`) || !/^[0-9a-f]{64}$/.test(m.checksum)) return null;
+    // 서명 없음 · 틀림 = 남이 만든 판일 수 있다 → 받지도 예약하지도 않는다
+    if (!(await signedOk({ version: m.version, url: m.url, checksum: m.checksum, sig: m.sig }))) return null;
     return {
       version: m.version,
       url: m.url,

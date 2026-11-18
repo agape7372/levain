@@ -191,9 +191,25 @@ node scripts/check-remote-assets.mjs                   # 배포 뒤 — 원격 �
 - **발행 전 필수**: 개인정보처리방침 두 곳(`docs/PRIVACY.md` · `ota/privacy.html`)에 「빵 그림 파일을 같은 곳에서 받는다」 문장이
   들어 있어야 한다(2026-11-16 개정). 이 기능을 처음 내보내는 판부터 해당한다.
 
+**판 목록 서명**(2026-11-18 어뷰징 점검 · 고침 · 미합침 `fix/abuse-1118`, 냥수제비 S5 이식): Vercel 계정을 쥔 사람이
+manifest와 zip을 같이 바꾸면 모든 폰이 그 JS를 받던 길을 막는다.
+- `ota-release`가 `levain-ota\n판\n주소\n체크섬`을 레포 밖 개인 키 `D:\keys\levain\ota-sign.pem`(ECDSA P-256)으로 서명해 manifest에
+  `sig`(r‖s base64)를 넣는다(`scripts/ota-sign.mjs`). 다른 키 자리는 환경 변수 `LEVAIN_OTA_KEY`.
+- 앱(`src/platform/ota.ts` `otaKey` · `signedOk`)은 박힌 공개 키로 `crypto.subtle.verify`를 통과한 manifest만 받는다.
+  묶음 체크섬이 서명 글 안에 있어 zip만 바꾸면 플러그인 체크섬 대조에서, 체크섬까지 바꾸면 서명에서 걸린다.
+- 확인은 돌고 있는 번들이 하므로 AAB 없이 OTA로 걸린다. 지금 폰(1.6.12 이하)은 첫 서명 판을 옛 길로 받고, 그 판부터 확인한다.
+  다음 AAB(vc5)를 이 코드로 구우면 내장 번들도 처음부터 확인한다.
+- 키가 없거나 앱 공개 키와 짝이 안 맞으면 `ota-release`가 빌드 전에 멈춘다. 잃으면 OTA가 멈추고 새 키 + 새 AAB로만 고친다
+  → `D:\keys\backup-keys.ps1`로 백업(그 스크립트가 `D:\keys` 전체를 담는다).
+- **서명 바닥 판**(냥수제비 FLOOR와 같은 몫): 아직 없음. 첫 서명 판을 내면 `ota-release`가 알려 준다 → 그 판 번호를 여기 적어 커밋.
+  그보다 옛 코드로는 되돌리지 않는다(확인이 없는 코드라 그 폰은 다음 판의 서명을 안 본다). 막힘: 옛 커밋의 `ota-release`는
+  서명을 못 해 새 앱이 안 받고, 새 `ota-release`는 트리의 `ota.ts`에 공개 키가 없으면 짝 확인에서 멈춘다.
+  `ota/bundles`의 옛 zip을 손으로 manifest에 가리키지 않는다.
+
 **롤백**(2026-11-12 다시 씀, 감사 T2-06): 옛 항목을 manifest에 덮어쓰는 방법은 **안 먹는다**.
 기기는 지금 버전 이하의 매니페스트를 무시한다(다운그레이드 거부). `ota-release`도 최신 이하 버전 발행을 거부한다.
 쓸 수 있는 롤백은 하나다: 되돌릴 커밋을 체크아웃하고 `npm run ota:release -- <현행보다 높은 버전>`으로 재발행한 뒤 배포한다.
+되돌릴 커밋은 서명 바닥 판(위) 이후여야 한다.
 - 부팅에 실패해 플러그인이 되돌린 버전은 `levain:ota:bad`에 남아 다시 받지 않는다. 고친 코드는 새 버전 번호로 낸다.
 - 매니페스트 url은 앱에 박힌 `https://levain-ota.vercel.app/bundles/` 아래여야 하고 checksum은 64자 hex여야 한다.
   릴리스 때 `LEVAIN_OTA_BASE`로 다른 주소를 쓰면 앱이 그 매니페스트를 무시한다.

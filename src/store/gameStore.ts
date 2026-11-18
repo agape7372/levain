@@ -171,6 +171,11 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
   const { clock, storage } = deps;
 
   let env: SaveEnvelope = envelope ?? newEnvelope(clock.now());
+  /**
+   * 저장 도장 — 시계를 되돌려도 줄지 않는다(새 게임 포함). 부팅이 주·미러 중 savedAt 큰 쪽을 읽으므로
+   * (persistence.loadDetailed) 되돌린 시계로 찍은 새 저장이 옛 저장에 지면 안 된다. 그래서 재정박 목록에 넣지 않는다.
+   */
+  let lastSavedAt = env.savedAt;
 
   // 불변식: activeStarterId는 항상 starters 안에 있다 (validateAndClamp·starter API가 보증)
   const activeRecord = (): StarterRecord =>
@@ -436,7 +441,8 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
   }
 
   function persist(now: number): boolean {
-    env = { ...env, savedAt: now };
+    lastSavedAt = Math.max(now, lastSavedAt + 1);
+    env = { ...env, savedAt: lastSavedAt };
     const ok = save(env, storage);
     // 실패를 조용히 삼키지 않는다 — copy.save.writeFailed가 정의만 되고 배선 0이었다(2026-08-30).
     if (!ok) deps.onSaveFailed?.();

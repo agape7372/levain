@@ -267,8 +267,11 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
         // 마이그레이션 먼저 — 검증은 현행 스키마만 안다 (persistence.parseEnvelope와 동일 순서)
         const migrated = migrate(JSON.parse(text));
         if (!migrated) return false;
-        const env = validateAndClamp(migrated);
-        if (!env) return false;
+        const read = validateAndClamp(migrated);
+        if (!read) return false;
+        // 지금 기록보다 새 도장으로 찍는다 — 부팅은 주·미러 중 savedAt 큰 쪽을 읽는다(persistence.loadDetailed). 파일의 옛
+        // savedAt을 두면 미러 쓰기(비동기)가 reload 전에 안 끝났을 때 지금 기록(미러)이 이겨 불러오기가 조용히 무르게 된다
+        const env = { ...read, savedAt: Math.max(clock.now(), store.getEnvelope().savedAt + 1) };
         // 언로드의 hidden 저장이 옛 메모리 env로 새 기록을 덮지 않게 먼저 막는다 (T2-01)
         reloading = true;
         store.stopTicking();

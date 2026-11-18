@@ -545,7 +545,6 @@ export async function loadDetailed(
     primaryRaw = null;
   }
   const primary = parseEnvelope(primaryRaw);
-  if (primary) return { result: { envelope: primary, source: 'primary' }, broken: false };
 
   let mirrorRaw: string | null = null;
   try {
@@ -554,6 +553,12 @@ export async function loadDetailed(
     mirrorRaw = null;
   }
   const mirror = parseEnvelope(mirrorRaw);
+  // 둘 다 읽히면 더 새 판(savedAt 큰 쪽). WebView localStorage는 5초~1분 뒤에야 디스크에 내려가고
+  // Preferences(apply)는 그보다 빨리 내려간다 — 굽기 직후 밀어 닫으면 주는 옛 판, 미러는 새 판으로 남는다
+  // (2026-11-18 어뷰징 점검: 주가 읽히기만 하면 미러를 안 봐서 마지막 진행이 사라졌다). 같으면 주.
+  if (primary && (!mirror || mirror.savedAt <= primary.savedAt)) {
+    return { result: { envelope: primary, source: 'primary' }, broken: false };
+  }
   if (mirror) return { result: { envelope: mirror, source: 'mirror' }, broken: false };
 
   const raw = primaryRaw ?? mirrorRaw;
