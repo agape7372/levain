@@ -177,6 +177,7 @@ export class SceneHost {
     this.homeGroup = [jar.group, this.dough.mesh, this.cloth.mesh];
 
     this.detachInput = attachInput(this.canvas, this.camera, this.dough, {
+      isBlocked: () => this.isShowcasing(), // 쇼케이스 위에서 젓기 소리·햅틱·천 걷기가 나면 안 된다
       isCovered: () => this.cloth?.covering ?? false,
       onUncover: () => this.uncover(),
       onStirStart: () => this.onStirStart?.(),
@@ -396,6 +397,7 @@ export class SceneHost {
     this.showcase?.hide();
     for (const o of this.homeGroup) o.visible = true;
     // 덮개는 걷힌 상태가 기본 — cover()가 아닌 한 다시 나타나지 않게
+    this.cloth?.finishOpen(); // 걷는 도중 숨겨졌다면 여기서 마무리(밀가루 모트 콜백 포함)
     if (this.cloth && !this.cloth.covering) this.cloth.mesh.visible = false;
     this.applyLightRig(HOME_LIGHT); // 조명 원복 — 홈 씬은 항상 HOME_LIGHT
   }
