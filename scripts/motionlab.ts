@@ -2,9 +2,11 @@
 // 프로덕션 SceneHost·DoughMesh·input을 그대로 물려 씬·조명·카메라·제스처 파리티 보장.
 //
 // URL 파라미터가 전체 상태(HMR 리로드 안전, breadlab 패턴):
-//   ?preset=justfed|rising|peak|falling|hungry|sour|dormant|moldy   상태 프리셋 (기본 peak)
+//   ?preset=justfed|rising|peak|falling|hungry|sour|dormant|moldy|split|fridge|stage0|stage1|rye   상태 프리셋 (기본 peak)
 //   ?grabMax=&creepGain=&zeta=&elasticTau=&creepDelay=&creepTau=&releaseTau=&omega=
 //     — grab 물성 오버라이드 (비우면 프리셋 상태의 RenderParams 매핑값 사용)
+//   ?stage=0..5&fakeRise=1&flour=white|wholewheat|rye&loc=room|window|fridge&massRatio=&hooch=
+//     — 프리셋 Snapshot 덮어쓰기(2026-11-19 반죽 모델 v2). ?cam=도 = 카메라 고도 비교
 // 완료 기준(§15 Phase 1): 이 하네스에서 목표 장면(§4-1)을 실기기 촬영과 비교.
 import { SceneHost } from '../src/render/SceneHost';
 import { toRenderParams } from '../src/render/renderParams';
@@ -21,15 +23,21 @@ const base: Snapshot = {
   hooch: 0, smell: 'flour', stage: 3, mass: 180, nextFeedAt: NOW, peakAt: NOW, peakEndAt: NOW,
   effSinceFeedMs: 0, moldStage: 'none', mold01: 0, moldDeadAt: NOW, kahm: false, hasFlake: false,
 };
+// riseFill = sim 실제값(피크 1.6 = 1 + FILL_PEAK_RISE × 단계 계수 1.0). fill = riseFill × massRatio
 const PRESETS: Record<string, { label: string; snap: Snapshot }> = {
-  justfed: { label: '갓 밥준', snap: { ...base, activity: 0.15, fill: 1.0, sourness: 0.05 } },
-  rising:  { label: '차오르는', snap: { ...base, activity: 0.55, fill: 1.25 } },
-  peak:    { label: '피크', snap: { ...base, activity: 1.0, fill: 1.5, smell: 'yogurt' } },
-  falling: { label: '내려앉는', snap: { ...base, activity: 0.6, fill: 1.2, hunger: 0.3 } },
-  hungry:  { label: '배고픔', snap: { ...base, activity: 0.25, fill: 0.8, hunger: 1, sourness: 0.35 } },
-  sour:    { label: '시큼', snap: { ...base, activity: 0.15, fill: 0.7, hunger: 1, sourness: 0.7, phase: 'sour', smell: 'vinegar', hooch: 0.5 } },
-  dormant: { label: '휴면', snap: { ...base, activity: 0.02, fill: 0.65, hunger: 1, sourness: 0.8, dormancy: 1, phase: 'dormant', smell: 'sharp' } },
-  moldy:   { label: '곰팡이', snap: { ...base, activity: 0, fill: 0.65, dormancy: 1, phase: 'moldy', moldStage: 'spread', mold01: 0.6, smell: 'acetone' } },
+  justfed: { label: '갓 밥준', snap: { ...base, activity: 0.15, fill: 1.0, riseFill: 1.0, sourness: 0.05 } },
+  rising:  { label: '차오르는', snap: { ...base, activity: 0.55, fill: 1.25, riseFill: 1.25 } },
+  peak:    { label: '피크', snap: { ...base, activity: 1.0, fill: 1.6, riseFill: 1.6, smell: 'yogurt' } },
+  falling: { label: '내려앉는', snap: { ...base, activity: 0.6, fill: 1.2, riseFill: 1.2, hunger: 0.3 } },
+  hungry:  { label: '배고픔', snap: { ...base, activity: 0.25, fill: 0.8, riseFill: 0.8, hunger: 1, sourness: 0.35 } },
+  sour:    { label: '시큼', snap: { ...base, activity: 0.15, fill: 0.7, riseFill: 0.7, hunger: 1, sourness: 0.7, phase: 'sour', smell: 'vinegar', hooch: 0.5 } },
+  dormant: { label: '휴면', snap: { ...base, activity: 0.02, fill: 0.65, riseFill: 0.65, hunger: 1, sourness: 0.8, dormancy: 1, phase: 'dormant', smell: 'sharp' } },
+  moldy:   { label: '곰팡이', snap: { ...base, activity: 0, fill: 0.65, riseFill: 0.65, dormancy: 1, phase: 'moldy', moldStage: 'spread', mold01: 0.6, smell: 'acetone' } },
+  split:   { label: '떼어낸 뒤', snap: { ...base, activity: 0.55, fill: 0.6, riseFill: 1.25, massRatio: 0.33 } },
+  fridge:  { label: '냉장', snap: { ...base, activity: 0.1, fill: 1.0, riseFill: 1.0, location: 'fridge' } },
+  stage0:  { label: '0단계 한창', snap: { ...base, stage: 0, activity: 1.0, fill: 1.3, riseFill: 1.3, peakFill: 1.3 } },
+  stage1:  { label: '잠잠기 한창', snap: { ...base, stage: 1, activity: 1.0, fill: 1.18, riseFill: 1.18, peakFill: 1.18 } },
+  rye:     { label: '호밀 피크', snap: { ...base, activity: 1.0, fill: 1.6, riseFill: 1.6, flour: 'rye', smell: 'yogurt' } },
 };
 
 // ── 튜닝 노브 — [key, 라벨, min, max, step] ──
@@ -56,6 +64,31 @@ const TUNE_KEY: Record<KnobKey, string> = {
 const params = new URLSearchParams(location.search);
 let preset = params.get('preset') ?? 'peak';
 if (!(preset in PRESETS)) preset = 'peak';
+
+// Snapshot 덮어쓰기 — 단계·가짜 부풀기·밀가루·위치·질량비·hooch를 프리셋 위에 얹는다
+const SNAP_KEYS = ['stage', 'fakeRise', 'flour', 'loc', 'massRatio', 'hooch'] as const;
+function snapOf(id: string): Snapshot {
+  const s: Snapshot = { ...PRESETS[id].snap };
+  const num = (k: string): number | null => {
+    const v = params.get(k);
+    return v !== null && Number.isFinite(Number(v)) ? Number(v) : null;
+  };
+  const stage = num('stage');
+  if (stage !== null) s.stage = Math.max(0, Math.min(5, Math.round(stage)));
+  if (params.get('fakeRise') === '1') s.fakeRise = true;
+  const flour = params.get('flour');
+  if (flour === 'white' || flour === 'wholewheat' || flour === 'rye') s.flour = flour;
+  const loc = params.get('loc');
+  if (loc === 'room' || loc === 'window' || loc === 'fridge') s.location = loc;
+  const mr = num('massRatio');
+  if (mr !== null) {
+    s.massRatio = mr;
+    s.fill = Math.max(0.6, Math.min(1.6, s.riseFill * mr));
+  }
+  const hooch = num('hooch');
+  if (hooch !== null) s.hooch = hooch;
+  return s;
+}
 const overrides = new Map<KnobKey, number>();
 for (const [key] of KNOBS) {
   const v = params.get(key);
@@ -71,7 +104,8 @@ const VIS_KNOBS = [
   ['levelness', '평평함', 0, 1, 0.02],
   ['fluidity', '흐름', 0, 1, 0.02],
   ['cohesion', '응집', 0, 1, 0.02],
-  ['wallFill', '유리 접촉', 1, 1.15, 0.005],
+  ['pull', '윗가 물러남', 0, 0.04, 0.002],
+  ['height', '수위', 0.2, 1.7, 0.01],
   ['residue', '유리 자국', 0, 1, 0.02],
 ] as const;
 type VisKey = (typeof VIS_KNOBS)[number][0];
@@ -92,6 +126,8 @@ declare global {
 // ── 씬 — 프로덕션 그대로 ──
 const scene = new SceneHost(canvas, stage);
 scene.mount();
+const camDeg = Number(params.get('cam'));
+if (params.get('cam') !== null && Number.isFinite(camDeg)) scene.setCameraElevation(camDeg);
 const dough = scene.dough!;
 // applyState()·start()는 UI 요소 선언 뒤(파일 하단)에서 — TDZ 회피
 
@@ -102,7 +138,7 @@ function currentTuning(): Record<string, number> {
 }
 
 function applyState(): void {
-  const mapped = toRenderParams(PRESETS[preset].snap);
+  const mapped = toRenderParams(snapOf(preset));
   // 시각 축은 매핑 결과를 덮어써서 주입 — 프리셋 물성은 그대로 두고 한 축만 흔들어 볼 수 있다
   const vis: Record<string, number> = {};
   for (const [key, v] of visOverrides) vis[key] = v;
@@ -118,6 +154,10 @@ function syncUrl(): void {
   q.set('preset', preset);
   for (const [key, v] of overrides) q.set(key, String(v));
   for (const [key, v] of visOverrides) q.set(key, String(v));
+  for (const key of [...SNAP_KEYS, 'cam']) {
+    const v = params.get(key);
+    if (v !== null) q.set(key, v);
+  }
   if (shotMode) q.set('shot', '1');
   history.replaceState(null, '', `?${q.toString()}`);
 }
@@ -142,7 +182,7 @@ const slidersEl = document.getElementById('sliders')!;
 function renderSliders(): void {
   // legend만 남기고 재구성
   [...slidersEl.querySelectorAll('.row')].forEach((r) => r.remove());
-  const mapped = toRenderParams(PRESETS[preset].snap);
+  const mapped = toRenderParams(snapOf(preset));
   const presetDefault: Record<string, number> = {
     grabMax: mapped.grabMax, creepGain: mapped.grabCreepGain, zeta: mapped.grabReturnZeta,
     // GRAB_DEFAULTS와 동기 (사용자 확정 2026-08-24 저녁)
@@ -194,7 +234,7 @@ function renderSliders(): void {
       out.textContent = v.toFixed(2);
       const next: Record<string, number> = {};
       for (const [k, vv] of visOverrides) next[k] = vv;
-      scene.snapParams({ ...toRenderParams(PRESETS[preset].snap), ...next });
+      scene.snapParams({ ...toRenderParams(snapOf(preset)), ...next });
       syncUrl();
     });
     row.append(name, input, out);

@@ -3,6 +3,7 @@
 //   예: node scripts/motionlab-shot.mjs "preset=peak" work/peak.png
 //       node scripts/motionlab-shot.mjs "preset=justfed&wallCells=0.6" work/jf.png
 // 여러 프리셋을 한 번에: node scripts/motionlab-shot.mjs --all <out-dir>
+// 이름 붙인 쿼리 여러 장: node scripts/motionlab-shot.mjs --queries <out-dir> j42="preset=justfed&cam=42" ...
 // 콘솔 오류(셰이더 컴파일 실패 포함)를 stdout에 그대로 뱉는다 — GLSL은 런타임에만 터지므로
 // 이 스크립트가 사실상 셰이더 컴파일 게이트다.
 import { spawn, execFileSync } from 'node:child_process';
@@ -12,7 +13,11 @@ import path from 'node:path';
 import { launchBrowser } from './lib/launch-browser.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PRESETS = ['justfed', 'rising', 'peak', 'falling', 'hungry', 'sour', 'dormant', 'moldy'];
+const PRESETS = [
+  'justfed', 'rising', 'peak', 'falling', 'hungry', 'sour', 'dormant', 'moldy',
+  // 반죽 모델 v2(2026-11-19) — 떼어낸 뒤 · 냉장 · 어린 단계 둘 · 호밀
+  'split', 'fridge', 'stage0', 'stage1', 'rye',
+];
 
 const [arg1, arg2] = process.argv.slice(2);
 if (!arg1 || !arg2) {
@@ -21,9 +26,16 @@ if (!arg1 || !arg2) {
   process.exit(1);
 }
 const all = arg1 === '--all';
+// --queries <out-dir> 이름=쿼리 ... — 카메라 고도 비교처럼 여러 장을 vite 한 번에 (예: j52="preset=justfed&cam=52")
+const many = arg1 === '--queries';
 const jobs = all
   ? PRESETS.map((p) => ({ query: `preset=${p}`, out: path.join(arg2, `${p}.png`) }))
-  : [{ query: arg1, out: arg2 }];
+  : many
+    ? process.argv.slice(4).map((a) => {
+        const i = a.indexOf('=');
+        return { query: a.slice(i + 1), out: path.join(arg2, `${a.slice(0, i)}.png`) };
+      })
+    : [{ query: arg1, out: arg2 }];
 
 async function main() {
   const puppeteer = (await import('puppeteer')).default;
