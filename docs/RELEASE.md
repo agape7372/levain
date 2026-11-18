@@ -191,7 +191,7 @@ node scripts/check-remote-assets.mjs                   # 배포 뒤 — 원격 �
 - **발행 전 필수**: 개인정보처리방침 두 곳(`docs/PRIVACY.md` · `ota/privacy.html`)에 「빵 그림 파일을 같은 곳에서 받는다」 문장이
   들어 있어야 한다(2026-11-16 개정). 이 기능을 처음 내보내는 판부터 해당한다.
 
-**판 목록 서명**(2026-11-18 어뷰징 점검 · 고침 · 미합침 `fix/abuse-1118`, 냥수제비 S5 이식): Vercel 계정을 쥔 사람이
+**판 목록 서명**(2026-11-18 어뷰징 점검 · 11-19 첫 서명 판 1.6.14 게시, 냥수제비 S5 이식): Vercel 계정을 쥔 사람이
 manifest와 zip을 같이 바꾸면 모든 폰이 그 JS를 받던 길을 막는다.
 - `ota-release`가 `levain-ota\n판\n주소\n체크섬`을 레포 밖 개인 키 `D:\keys\levain\ota-sign.pem`(ECDSA P-256)으로 서명해 manifest에
   `sig`(r‖s base64)를 넣는다(`scripts/ota-sign.mjs`). 다른 키 자리는 환경 변수 `LEVAIN_OTA_KEY`.
@@ -201,7 +201,7 @@ manifest와 zip을 같이 바꾸면 모든 폰이 그 JS를 받던 길을 막는
   다음 AAB(vc5)를 이 코드로 구우면 내장 번들도 처음부터 확인한다.
 - 키가 없거나 앱 공개 키와 짝이 안 맞으면 `ota-release`가 빌드 전에 멈춘다. 잃으면 OTA가 멈추고 새 키 + 새 AAB로만 고친다
   → `D:\keys\backup-keys.ps1`로 백업(그 스크립트가 `D:\keys` 전체를 담는다).
-- **서명 바닥 판**(냥수제비 FLOOR와 같은 몫): 아직 없음. 첫 서명 판을 내면 `ota-release`가 알려 준다 → 그 판 번호를 여기 적어 커밋.
+- **서명 바닥 판**(냥수제비 FLOOR와 같은 몫): **1.6.14**(2026-11-19 첫 서명 판).
   그보다 옛 코드로는 되돌리지 않는다(확인이 없는 코드라 그 폰은 다음 판의 서명을 안 본다). 막힘: 옛 커밋의 `ota-release`는
   서명을 못 해 새 앱이 안 받고, 새 `ota-release`는 트리의 `ota.ts`에 공개 키가 없으면 짝 확인에서 멈춘다.
   `ota/bundles`의 옛 zip을 손으로 manifest에 가리키지 않는다.
@@ -261,7 +261,7 @@ manifest와 zip을 같이 바꾸면 모든 폰이 그 JS를 받던 길을 막는
 
 **기록 복구 지원**(2026-11-12): 저장을 못 읽어 새로 시작한 기기는 원문을 `levain:save:broken`(localStorage + Preferences)에 남긴다.
 백업 규칙(`res/xml/backup_rules.xml`·`data_extraction_rules.xml`)은 OTA 번들 폴더 `versions/`를 빼고 나머지를 백업한다.
-GLB 캐시 `app_webview/Default/Service Worker/`도 클라우드 백업에서 뺀다(다 보면 약 36MB라 25MB 상한을 넘겨 백업이 통째로 빠짐). 고침 · 미합침(`fix/abuse-1118`). 네이티브 리소스라 OTA로는 안 가고 **다음 AAB(vc5)부터** 실린다.
+GLB 캐시 `app_webview/Default/Service Worker/`도 클라우드 백업에서 뺀다(다 보면 약 36MB라 25MB 상한을 넘겨 백업이 통째로 빠짐). main 합침(11-19). 네이티브 리소스라 OTA로는 안 가고 **다음 AAB(vc5)부터** 실린다.
 
 **Play 정책**: 웹 자산(JS/HTML/CSS 등) 무선 갱신은 허용 범위. 네이티브 코드·권한 교체는 금지 —
 이 구조는 전자만 다루므로 해당 없음. 위 표의 "안 되는 것"이 필요해지면 통상 절차(§2~§6)로 AAB 재배포.
