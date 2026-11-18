@@ -1,28 +1,45 @@
 // 한국어 시간·수치 포맷 — copy.ts와 짝. 내부 용어 노출 금지.
 import { copy } from './copy';
-import { FLOAT_OK_ACTIVITY } from '../sim';
-import type { DoughQuality } from '../sim';
+import { FLOAT_OK_ACTIVITY, RECIPES } from '../sim';
+import type { DoughQuality, SmellBand } from '../sim';
+
+/** 통의 반죽을 쓰는 첫 빵이 열리는 단계 — 그 전엔 떼어 둬도 쓸 곳이 없어 떼기를 권하지 않는다 */
+export const FIRST_BREAD_STAGE = Math.min(...RECIPES.filter((r) => r.kind === 'bread').map((r) => r.stage));
+
+/** 떼기 권유(「떼어 두기 좋아요」)를 말해도 되는 집인가 — 홈·관찰 카드·알림이 같은 기준을 쓴다 (A3-07) */
+export function splitAdvised(houseStage: number): boolean {
+  return houseStage >= FIRST_BREAD_STAGE;
+}
+
+/** 시큼 단계의 홈 머리 문구 키 — 냄새가 찡하거나 아세톤이면 「많이」 쪽 (A3-08) */
+export function sourPhaseKey(smell: SmellBand): 'sour' | 'sourStrong' {
+  return smell === 'sharp' || smell === 'acetone' ? 'sourStrong' : 'sour';
+}
+
+/** 시간 길이 말하기 — 실제보다 길게 말하지 않는다(내림). 1시간 아래 분, 10시간 아래 30분 단위, 이틀 아래 시간, 그 위 반일 단위 */
+function spanText(diffMs: number): string {
+  const min = Math.floor(diffMs / 60_000 + 1e-6);
+  if (min < 2) return copy.time.justNow;
+  if (min < 60) return copy.time.minutes(Math.round(diffMs / 60_000));
+  const h = min / 60;
+  if (h < 10) {
+    const halves = Math.floor(min / 30);
+    return halves % 2 ? copy.time.hoursHalf(Math.floor(halves / 2)) : copy.time.hours(halves / 2);
+  }
+  if (h < 48) return copy.time.hours(Math.floor(h));
+  const halfDays = Math.floor(h / 12);
+  return halfDays % 2 ? copy.time.daysHalf(Math.floor(halfDays / 2)) : copy.time.days(halfDays / 2);
+}
 
 /** "11시간" / "40분" / "방금" — 상대 경과 */
 export function agoText(fromMs: number, nowMs: number): string {
-  const diff = Math.max(0, nowMs - fromMs);
-  const min = Math.round(diff / 60_000);
-  if (min < 2) return copy.time.justNow;
-  if (min < 60) return copy.time.minutes(min);
-  const h = Math.round(min / 60);
-  if (h < 48) return copy.time.hours(h);
-  return copy.time.days(Math.round(h / 24));
+  return spanText(Math.max(0, nowMs - fromMs));
 }
 
 /** 미래 시각 안내 — "오늘 저녁 7시쯤" 수준의 담백함 대신 v1은 "N시간 뒤" */
 export function untilText(atMs: number, nowMs: number): string {
   const diff = atMs - nowMs;
-  if (diff <= 0) return copy.time.justNow;
-  const min = Math.round(diff / 60_000);
-  if (min < 60) return copy.time.minutes(min);
-  const h = Math.round(min / 60);
-  if (h < 48) return copy.time.hours(h);
-  return copy.time.days(Math.round(h / 24));
+  return diff <= 0 ? copy.time.justNow : spanText(diff);
 }
 
 /** 절대 날짜 — '8월 26일'. 선반 타일·결과 카드의 "처음 구운 날"(연도는 말하지 않는다) */

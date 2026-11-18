@@ -71,6 +71,7 @@ export const copy = {
     peak: '한창 부풀어 있어요',
     hungry: '밥 먹을 시간이에요',
     sour: '조금 시큼해졌어요',
+    sourStrong: '많이 시큼해졌어요',
     dormant: '깊이 잠들어 있어요',
     reviving: '천천히 깨어나는 중이에요',
     moldy: '곰팡이가 피었어요',
@@ -186,7 +187,7 @@ export const copy = {
     ratioTitle: '밥 주기',
     ratioHint: {
       '1:1:1': '반나절이면 부풀어요',
-      '1:2:2': '하루짜리 든든한 밥이에요',
+      '1:2:2': '하루 가까이 든든해요',
       '1:5:5': '밤새 천천히 자라요',
     },
     // 묶음 프리셋 — 밥 + 냉장 이동을 1탭으로 (§7-1 "냉장 갈 준비". 3단계 해금과 동행)
@@ -467,6 +468,8 @@ export const copy = {
     moreBreads: (n: number) => `외 ${n}종`,
     fridgeUnlocked: '이제 냉장고에 넣을 수 있어요',
     ratioUnlocked: (ratio: string) => `${ratio} 밥을 줄 수 있어요`,
+    flakeUnlocked: '르방을 말려 둘 수 있어요',
+    flourUnlocked: '밥에 쓸 가루를 고를 수 있어요',
     dismissHint: '눌러서 닫기',
   },
 
@@ -477,12 +480,13 @@ export const copy = {
     dormant: '르방이 깊이 잠들었어요. 깨워 주세요',
     reviveSecond: '다시 밥 줄 시간이에요',
     moldWarn: '르방이 표면에 반점이 보여요. 아직 늦지 않았어요',
-    peak: '한창 부풀어 있어요. 지금 떼어 두기 좋아요',
-    // 확장 슬롯 3종(2026-09-03). firstWeek은 stage.fakeRise와 같은 문장 — 같은 현상을
-    // 앱 안(카드)과 앱 밖(알림)에서 말할 뿐이라 문장을 둘로 갈라 두지 않는다.
+    // 단계를 가리지 않고 같은 말 — 떼기 권유는 집 단계에 따라 화면이 다르게 말하지만 알림은 단계를 모른다 (A3-07)
+    peak: '한창 부풀어 있어요',
+    // 확장 슬롯 3종(2026-09-03). firstWeek은 큰 부풀기 **앞**에 오는 알림이라 미래형이다
+    // (탄생 +24h에 울리고 큰 부풀기는 그 뒤 — 과거형이면 일어나기 전에 말한 셈).
     sour: '조금 시큼해졌어요. 밥을 주면 금방 돌아와요',
     stageUp: (name: string) => `${name} 단계가 되었어요`,
-    firstWeek: '크게 부풀었어요. 곧 조용해져요. 정상이에요',
+    firstWeek: '오늘 크게 부풀 거예요. 곧 조용해져요. 정상이에요',
     channelWarn: '중요 알림', // Android 채널명 — 놓치면 잃는 신호(반점·깊은 잠) 전용
     permissionHint: '밥 시간을 알려줄까요',
     permissionSettings: '알림은 시스템 설정에서 켤 수 있어요',
@@ -567,7 +571,9 @@ export const copy = {
     justNow: '방금',
     minutes: (n: number) => `${n}분`,
     hours: (n: number) => `${n}시간`,
+    hoursHalf: (n: number) => `${n}시간 반`,
     days: (n: number) => `${n}일`,
+    daysHalf: (n: number) => `${n}일 반`,
     /** 절대 날짜 — 선반·결과 카드의 "처음 구운 날". 연도는 붙이지 않는다(한 해를 넘겨도 날짜만 말한다) */
     monthDay: (month: number, day: number) => `${month}월 ${day}일`,
   },

@@ -4,7 +4,7 @@
 //   ② 활성 밴드의 상한 경계는 sim의 FLOAT_OK_ACTIVITY와 같은 선이다(띄워보기와 상태 줄이 어긋나면 안 된다)
 //   ③ 통이 비면(null) 품질을 지어내지 않고 "여기 모여요" 안내로 답한다
 import { describe, it, expect } from 'vitest';
-import { acidityBand, activityBand, dateText, pantryQualityText } from '../src/ui/format';
+import { acidityBand, activityBand, agoText, dateText, FIRST_BREAD_STAGE, pantryQualityText, sourPhaseKey, splitAdvised, untilText } from '../src/ui/format';
 import { copy } from '../src/ui/copy';
 import { FLOAT_OK_ACTIVITY } from '../src/sim';
 import type { DoughQuality } from '../src/sim';
@@ -86,5 +86,49 @@ describe('pantryQualityText', () => {
   it('copy 테이블에서 문구를 가져온다 (문구 정본은 copy.ts 한 파일)', () => {
     expect(pantryQualityText(quality(0.8, 20)))
       .toBe(`${copy.pantry.quality.activity.high} · ${copy.pantry.quality.acidity.mild}`);
+  });
+});
+
+// A3-14 시간 말하기 — 실제보다 길게 말하지 않는다
+describe('agoText · untilText', () => {
+  const H = 3_600_000;
+  const MIN = 60_000;
+  it('10시간 아래는 30분 단위로 말한다 (4.5h → 4시간 반)', () => {
+    expect(untilText(4.5 * H, 0)).toBe('4시간 반');
+    expect(untilText(6 * H, 0)).toBe('6시간');
+    expect(agoText(0, 2.4 * H)).toBe('2시간');
+  });
+  it('10시간 이상 이틀 아래는 내림 시간', () => {
+    expect(agoText(0, 11.9 * H)).toBe('11시간');
+  });
+  it('이틀 이상은 반일 단위 내림 — 60h는 2일 반, 3일로 올리지 않는다', () => {
+    expect(agoText(0, 60 * H)).toBe('2일 반');
+    expect(agoText(0, 72 * H)).toBe('3일');
+    expect(agoText(0, 59 * H)).toBe('2일');
+  });
+  it('분 단위와 방금은 그대로', () => {
+    expect(agoText(0, 1 * MIN)).toBe(copy.time.justNow);
+    expect(agoText(0, 40 * MIN)).toBe('40분');
+    expect(untilText(0, 5)).toBe(copy.time.justNow);
+  });
+});
+
+describe('떼기 권유 게이트 · 시큼 머리 문구 (A3-07 · A3-08)', () => {
+  it('첫 빵 단계 전에는 떼기를 권하지 않는다', () => {
+    expect(splitAdvised(FIRST_BREAD_STAGE - 1)).toBe(false);
+    expect(splitAdvised(FIRST_BREAD_STAGE)).toBe(true);
+  });
+  it('찡하거나 아세톤 냄새면 「많이 시큼」', () => {
+    expect(sourPhaseKey('vinegar')).toBe('sour');
+    expect(sourPhaseKey('sharp')).toBe('sourStrong');
+    expect(sourPhaseKey('acetone')).toBe('sourStrong');
+    expect(copy.phase.sourStrong).toBe('많이 시큼해졌어요');
+  });
+  it('알림은 단계와 무관하게 떼기를 권하지 않고, 첫 주 알림은 미래형이다', () => {
+    expect(copy.notify.peak).not.toContain('떼어');
+    expect(copy.notify.firstWeek).not.toContain('부풀었어요');
+  });
+  it('1:2:2 힌트는 시간을 단정하지 않는다 (배고픔 20h)', () => {
+    expect(copy.feed.ratioHint['1:2:2']).not.toContain('하루짜리');
   });
 });
