@@ -63,6 +63,8 @@ const TOON_SHOWCASE_LIGHT: LightRig = {
   fill: { color: 0xffffff, intensity: 0.3 },
 };
 const KEY_POS: [number, number, number] = [-2, 6, 2];
+/** 밥 주기 끝에 남기는 줄무늬 세기 — 뒤는 혼자 τ6s · 손으로 저으면 빨리(DoughMesh) */
+const FEED_MARBLE_END = 0.35;
 
 export class SceneHost {
   private renderer: THREE.WebGLRenderer | null = null;
@@ -94,6 +96,8 @@ export class SceneHost {
   onGrabStart: (() => void) | null = null;
   onGrabMove: ((stretch01: number) => void) | null = null;
   onGrabEnd: (() => void) | null = null;
+  /** 다 섞임 — 손으로 저어 밥 주기 줄무늬를 0.05 아래로 떨어뜨린 순간 한 번(혼자 옅어지면 안 부른다). 배선은 app.ts */
+  onMixed: (() => void) | null = null;
   /** 배경 좌우 스와이프 = 르방 전환 (§5-5). 허용 여부·처리 모두 배선은 app.ts.
    *  필드 위임인 이유: 컨텍스트 유실 복구가 dispose→mount로 attachInput을 다시 부른다 */
   canSwipe: (() => boolean) | null = null;
@@ -121,7 +125,7 @@ export class SceneHost {
   private lastT = 0;
   private particles: ParticlePool | null = null;
   /** 밥주기 연출 (VISUAL §4-1) — pour=부활 따라내기 선행 */
-  private feedSeq: { t0: number; pour: boolean; flourDone: boolean; bubblesDone: boolean } | null = null;
+  private feedSeq: { t0: number; pour: boolean; flourDone: boolean; bubblesDone: boolean; marbleOn: boolean; phase0: number } | null = null;
   /** 부활 2회차 "지켜보기" — 12% 줌인 (VISUAL §4-3) */
   private watchSeq: { t0: number } | null = null;
 
@@ -244,6 +248,9 @@ export class SceneHost {
     this.current = p;
     this.target = p;
     this.dough?.applyParams(p);
+    // 지난 르방의 젓기 꺼짐 · 줄무늬 · 탁해짐 · 고랑을 넘기지 않는다(R1). 스와이프는 skipSequence → endFeedSeq 뒤라 연출 끝 줄무늬도 지운다.
+    // jar 탁해짐은 다음 프레임 loop가 dough.murk(0)를 setMurk로 넘긴다
+    this.dough?.resetTransient();
   }
 
   /**
@@ -299,6 +306,8 @@ export class SceneHost {
       pour,
       flourDone: false,
       bubblesDone: false,
+      marbleOn: false,
+      phase0: this.dough?.marblePhase ?? 0, // 덮개 소용돌이 기준 — 지난 젓기 위상이 쌓여 있어도 시작은 0
     };
   }
 
@@ -438,9 +447,14 @@ export class SceneHost {
 
   private endFeedSeq(): void {
     if (!this.feedSeq) return;
+    const s = this.feedSeq;
     this.feedSeq = null;
     if (this.dough) {
-      this.dough.material.uniforms.uFlourDust.value = 0;
+      const u = this.dough.material.uniforms;
+      u.uFlourDust.value = 0;
+      // 끝 상태 = 줄무늬 0.35(스킵해도 같은 자리로). 손이 이미 더 섞었으면 그대로
+      if (!s.marbleOn || this.dough.marble > FEED_MARBLE_END) this.dough.setMarble(FEED_MARBLE_END);
+      if (this.current) u.uSpecStr.value = this.current.specStr; // 물기 광 램프 원복
       // 젓기 시어장은 입력이 끊기면 스스로 damped spring 복귀 — 강제 리셋 불필요
     }
     if (this.jar) this.jar.group.rotation.z = 0;
@@ -476,12 +490,23 @@ export class SceneHost {
           s.flourDone = true;
           this.particles?.spawnFlour(80, dough.topY());
         }
-        // 밀가루 덮임: 0~0.6 상승, 1.2~2.4 젓기로 소멸
+        // 마른 가루 덮개(윗면만): 0~0.6 상승, 1.2~2.4 젓기가 줄무늬로 바꾼다
         u.uFlourDust.value = fs < 0.6 ? fs / 0.6 : fs < 1.2 ? 1 : fs < 2.4 ? Math.max(0, 1 - (fs - 1.2) / 1.2) : 0;
-        // 물기 — 광 상승 (물 리본 컷 — VISUAL §4-1)
-        if (fs > 0.5 && fs < 1.4) u.uSpecStr.value = Math.min(1.2, (u.uSpecStr.value as number) + 0.5 * Math.sin(Math.PI * (fs - 0.5) / 0.9));
-        // 젓기 — 나무 숟가락이 원을 그리듯 시어장을 원형 구동 + 원형 wobble
-        if (fs >= 1.2 && fs < 2.4) {
+        u.uFlourSwirl.value = dough.marblePhase - s.phase0; // 덮개가 젓는 방향으로 나선을 그리며 늘어난다(F2)
+        // 물기 — 광 상승 (물 리본 컷 — VISUAL §4-1). 상태 광에서 잰다 — 옛 식은 프레임마다 누적돼 1.2에 붙어 남았다
+        const spec0 = this.current?.specStr ?? 0.5;
+        u.uSpecStr.value = fs > 0.5 && fs < 1.4 ? Math.min(1.2, spec0 + 0.5 * Math.sin(Math.PI * (fs - 0.5) / 0.9)) : spec0;
+        // 줄무늬 — 덮개가 걷히는 만큼 1 → 0.35. 손이 더 섞었으면 그 값을 지킨다(min)
+        if (fs >= 1.2) {
+          if (!s.marbleOn) {
+            s.marbleOn = true;
+            dough.setMarble(1);
+          }
+          const target = 1 - (1 - FEED_MARBLE_END) * Math.min(1, (fs - 1.2) / 1.2);
+          dough.setMarble(Math.min(dough.marble, target));
+        }
+        // 젓기 — 나무 숟가락이 원을 그리듯 시어장을 원형 구동 + 원형 wobble. 손이 젓고 있으면 손이 이긴다
+        if (fs >= 1.2 && fs < 2.4 && !dough.isHandStirring()) {
           const sp = (fs - 1.2) / 1.2;
           const env = Math.sin(Math.PI * sp); // 시작·끝은 부드럽게
           const ang = sp * Math.PI * 2 * 1.5; // 한 바퀴 반
@@ -491,8 +516,11 @@ export class SceneHost {
             -Math.sin(ang) * 2.2 * env,
             Math.cos(ang) * 2.2 * env,
             false, // wobble은 아래에서 직접 연출 — tick의 속도 유래 구동과 충돌 방지
+            false, // 손 아님 — 줄무늬를 손처럼 지우지 않고 다 섞임 신호도 없다
           );
-          dough.wobble.set(Math.cos(ang) * 0.06, Math.sin(ang) * 0.06);
+          // 되직한 반죽은 판째 돌지 않는다 — 젓기 출렁과 같은 배율(테두리는 버텍스가 고정)
+          const g = 0.06 * dough.sloshGain();
+          dough.wobble.set(Math.cos(ang) * g, Math.sin(ang) * g);
         }
         // 정착 — 눌림 스프링 + 기포 + 밀가루 퍼프
         if (fs >= 2.4) {
@@ -570,12 +598,14 @@ export class SceneHost {
       this.particles?.update(dt);
       // 쇼케이스 중엔 반죽이 숨어 있다 — 안 보이는 기포 소리를 내지 않는다 (T4-4)
       if (this.dough && this.dough.bubbles.popsThisFrame > 0 && !this.isShowcasing()) this.onBubblePop?.();
+      if (this.dough?.mixedThisFrame) this.onMixed?.();
       if (this.dough && this.jar && this.current) {
         // 테두리 높이를 한 번만 뽑아 둘에 공급 — hooch 층과 유리 자국이 같은 수면 좌표계를 쓴다
         const level = this.dough.levelY();
         this.jar.setHooch(this.current.hoochAmt, level, this.current.height, ts);
         this.jar.setLevel(level, Math.max(level, this.current.markHeight), this.current.residue, this.current.wet);
         this.jar.setClimate(this.current.chill, this.current.warm);
+        this.jar.setMurk(this.dough.murk, this.dough.marblePhase, this.current.color);
       }
       this.renderer.render(this.scene, this.camera);
       this.raf = requestAnimationFrame(loop);

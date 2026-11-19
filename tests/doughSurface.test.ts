@@ -201,13 +201,17 @@ describe('셰이더 — 해시 · 줄무늬 필드 회귀 방지(R2-04 · A1-06 
     expect(frag).toContain(`const float XZ_W = ${XZ_SCALE};`);
     expect(frag).toContain(`const float SCAR_AMP = ${SCAR_AMP};`);
   });
-  it('범프 · 실 능선 · 곰팡이 배열 길이와 루프 상한이 TS 상수와 같다(규칙 8 · R-L3)', () => {
-    for (const s of [vert, frag]) {
+  it('범프 · 고랑 자취 · 곰팡이 배열 길이와 루프 상한이 TS 상수와 같다(규칙 8 · R-L3)', () => {
+    // 고랑 함수(trailGroove)는 DoughMesh가 두 셰이더에 끼워 넣는다 — 끼운 뒤의 소스를 본다
+    const m = new DoughMesh().material;
+    expect(vert).toContain('// #trailGroove');
+    for (const s of [m.vertexShader, m.fragmentShader]) {
       for (const n of ['vec2 uBumpPos', 'float uBumpAmp', 'float uBumpK']) expect(s).toContain(`uniform ${n}[${DYN_SLOTS}];`);
       for (const n of ['vec2 uTrailPos', 'float uTrailAmp', 'float uTrailK']) expect(s).toContain(`uniform ${n}[${TRAIL_N}];`);
       expect(s).toContain(`uniform vec4 uMoldA[${MOLD_N}];`);
       // 루프마다 본문이 읽는 배열의 상수와 짝짓는다 — 소속 검사만 하면 범프 루프가 TRAIL_N 값이어도 통과한다(RV-L2)
-      const want = { Bump: DYN_SLOTS, Trail: TRAIL_N, Mold: MOLD_N } as const;
+      // 자취 루프는 선분을 돈다 — 점 TRAIL_N개 · 선분 TRAIL_N − 1개(i와 i + 1을 잇는다)
+      const want = { Bump: DYN_SLOTS, Trail: TRAIL_N - 1, Mold: MOLD_N } as const;
       const seen = new Set<string>();
       for (const m of s.matchAll(/for \(int i = 0; i < (\d+); i\+\+\) \{([\s\S]*?)\n\s*\}/g)) {
         const arr = /u(Bump|Trail|Mold)\w*\[i\]/.exec(m[2])?.[1] as keyof typeof want | undefined;

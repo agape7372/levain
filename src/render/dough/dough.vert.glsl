@@ -7,6 +7,8 @@
 //   마름·배고픔은 윗가장자리만 유리에서 물러난다(uPull, 위 12% 높이 · A1-02).
 //   오브젝트 공간: 월드 XZ = 오브젝트 XZ × XZ_SCALE, 월드 y = 오브젝트 y × 숨쉬기(바닥 y = 0 고정).
 // 버텍스 첨도 = uBumpK, 프래그 첨도 = uBumpK×1.6 — 한 소스 구동 (VISUAL §0 함정 노트).
+// 2026-11-19 섞는 맛(M2): 손끝 밑 섬(|uStirVec|·0.35·sfall)과 실 능선 4점 솟음을 지우고 고랑 자취(trailGroove, 8점 · 선분 7개)로.
+//   시어 끌림 · grab xz · 슬로싱 강체 xz는 테두리(r/R 0.8→1.0)에서 0 — 옆면은 유리에서 뜨거나 밀리지 않는다(pin).
 // 2026-11-19 P1b: 피크 크래그(fbm·0.030·uRipe)를 지웠다 — 회색 FBM 덩어리의 한 축이었다(R2-07). 그 자리(같은 fbm 도메인 5.0)는
 //   하강 주름(uSink)이 쓴다. 곰팡이 군락은 살짝 솟는다(uMoldA, R2-10). 옆벽 기공 도메인은 프래그가 원통 매개로 푼다(vY).
 uniform float uTime;
@@ -25,9 +27,9 @@ uniform vec2 uGrabDisp;
 uniform vec2 uGrabDispLag; // 하층 지연 위상(τ≈0.12s) — 층별 출렁임
 uniform vec2 uGrabShape;   // x = 커널 첨도 k(릴리즈 후 퍼짐), y = 수직 리프트(릴리즈 후 τ0.35 감쇠)
 uniform float uGrabWrinkle; // 리본 주름 게이트 — 놓으면 τ0.25로 먼저 소멸
-uniform vec2 uTrailPos[4];
-uniform float uTrailAmp[4];
-uniform float uTrailK[4];  // 실 능선 첨도 — 나이 들수록 퍼진다(점성 기억)
+uniform vec2 uTrailPos[8];
+uniform float uTrailAmp[8];
+uniform float uTrailK[8];  // 고랑 첨도 — 나이 들수록 넓어진다. 음수 = 새 획 첫 점(앞 점과 안 잇는다)
 uniform float uRipe;
 uniform float uCollapse;
 uniform float uLevel;      // 0=돔(고체·마름) ~ 1=수평면 — 슬로싱 기울기·메니스커스 배분
@@ -59,10 +61,15 @@ float fbm(vec2 p) {
   return v;
 }
 
+// 고랑 자취 — DoughMesh가 TRAIL_GROOVE(프래그와 같은 소스)를 여기 끼운다
+// #trailGroove
+
 // 윗면 한 점의 변형 — xz0 = 휴지 자리(오브젝트), layer = 1(윗면) ~ 0(바닥 쪽 층, grab 지연 위상 배분)
 vec3 topPoint(vec2 xz0, float layer, out float stretch) {
   vec3 p = vec3(xz0.x, uHeight, xz0.y);
   stretch = 0.0;
+  // 테두리 고정 — 옆면은 유리에 붙어 있다. xz로 미는 변형장(grab · 시어 · 슬로싱 강체)은 r/R 0.8→1.0에서 0
+  float pin = 1.0 - smoothstep(0.8, 1.0, length(xz0) / uRBody);
 
   // ── grab 점탄성 변위 (확장기획 §4-2 A안) — 가장 먼저: 이후의 모든 변형장이 함께 끌린다 ──
   if (dot(uGrabDisp, uGrabDisp) + dot(uGrabDispLag, uGrabDispLag) > 1e-6) {
@@ -70,6 +77,7 @@ vec3 topPoint(vec2 xz0, float layer, out float stretch) {
     vec2 eff = mix(uGrabDispLag, uGrabDisp, layer);
     float elen = length(eff);
     if (elen > 1e-4) {
+      vec2 grabXZ = p.xz;
       vec2 gdir = eff / elen;
       vec2 gperp = vec2(-gdir.y, gdir.x);
       vec2 gd = p.xz - uGrabPos;
@@ -89,6 +97,7 @@ vec3 topPoint(vec2 xz0, float layer, out float stretch) {
       p.y += elen * uGrabShape.y * layer * wN * 1.7;
       // 리본 주름 — 놓으면 τ0.25로 먼저 소멸(주름 남은 리본 = 고체 문법)
       p.xz += gperp * (sin(along * 24.0 + p.y * 8.0) * 0.05 * min(s, 0.7) * layer * uGrabWrinkle);
+      p.xz = grabXZ + (p.xz - grabXZ) * pin;
       stretch = s;
     }
   }
@@ -96,14 +105,14 @@ vec3 topPoint(vec2 xz0, float layer, out float stretch) {
   // 손가락 추종 점성 시어장 — 범프 평가 전 적용(기포가 반죽과 함께 끌려간다) + 약한 컬
   vec2 sd = p.xz - uStirPos;
   float sfall = exp(-dot(sd, sd) * 3.5);
-  p.xz += uStirVec * sfall;
-  p.xz += vec2(-uStirVec.y, uStirVec.x) * sfall * 0.35;
+  p.xz += uStirVec * sfall * pin;
+  p.xz += vec2(-uStirVec.y, uStirVec.x) * sfall * 0.35 * pin;
 
   // ── 슬로싱 — 액체는 수면이 기울고, 고체는 몸이 밀린다. 진동은 CPU 진동자 소관 ──
   // ⚠ 아래 계수는 frag의 조명 기울기 짝과 반드시 같아야 한다 (dough.frag.glsl 슬로싱 항)
   float rigid = (1.0 - 0.7 * uLevel) * (0.4 + 0.6 * layer);
-  p.x += uWobble.x * (0.12 + p.z * 0.04) * rigid;
-  p.z += uWobble.y * (0.12 + p.x * 0.04) * rigid;
+  p.x += uWobble.x * (0.12 + p.z * 0.04) * rigid * pin;
+  p.z += uWobble.y * (0.12 + p.x * 0.04) * rigid * pin;
   p.y += dot(p.xz, uWobble) * 0.14 * uLevel * (0.5 + 0.5 * uFluid);
 
   // 정지 혹 — 평평할수록·흐를수록 영구 혹을 못 가진다. 피크에선 눌러 준다(소프트아이스크림 꼭지 방지)
@@ -117,12 +126,8 @@ vec3 topPoint(vec2 xz0, float layer, out float stretch) {
     vec2 d = p.xz - uBumpPos[i];
     disp += uBumpAmp[i] * exp(-dot(d, d) * uBumpK[i]);
   }
-  // 끈적한 실 — 드래그 경로 능선(링버퍼 4점) — 옅어지며 퍼진다(uTrailK)
-  for (int i = 0; i < 4; i++) {
-    vec2 td = p.xz - uTrailPos[i];
-    disp += uTrailAmp[i] * exp(-dot(td, td) * uTrailK[i]);
-  }
-  disp += length(uStirVec) * 0.35 * sfall;
+  // 고랑 자취 — 손끝 뒤로 패인 골 + 양옆 둔덕, 묽기만큼 메워진다(CPU τ). 손끝 밑 = 고랑 끝의 둥근 패임
+  disp += trailGroove(p.xz).x;
 
   // 피크 돔(uRipe) / 과숙 크레이터(uCollapse) — 중심 광폭 가우시안, 윗면 전용(바닥 극 없음).
   // ⚠ frag의 돔/크레이터 짝(계수 4.0 / 3.2)도 같은 kR을 곱해야 한다 (0.3844 = 구 R²)

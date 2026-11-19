@@ -178,6 +178,8 @@ export interface Jar {
   setLevel(massY: number, markY: number, residue: number, wet: number): void;
   /** 위치 톤 — 냉장 김서림(chill) · 창가 따뜻함(warm), 둘 다 0~1 */
   setClimate(chill: number, warm: number): void;
+  /** 젓는 동안 hooch 탁해짐 0~1 · 줄무늬 위상 · 반죽 색(sRGB 0~1) — DoughMesh.murk · marblePhase */
+  setMurk(murk: number, phase: number, color: readonly [number, number, number]): void;
 }
 
 /**
@@ -191,6 +193,27 @@ float hoochCover(float rN, float ang, float amt) {
   float spread = smoothstep(0.30, 0.80, amt);
   float ringW = mix(0.10, 1.25, spread) + spread * (1.0 - spread) * (0.24 * sin(3.0 * ang + 1.3) + 0.14 * sin(5.0 * ang - 0.7));
   return smoothstep(1.0 - ringW, 1.0 - ringW + mix(0.10, 0.25, spread), rN) * smoothstep(0.0, 0.05, amt);
+}
+`;
+
+/**
+ * 줄무늬 띠 0~1 — 가운데 둘레 3갈래 나선 띠(반경 방향 3줄, 반 바퀴마다 끊긴 결). 밥 주기 가루가 저어지며
+ * 남는 흰 줄(반죽)과 젓는 동안 탁해지는 hooch가 같은 소스를 쓴다(2026-11-19 섞는 맛 M3). n = 테두리 1로 맞춘 xz,
+ * w = 세기(줄면 띠가 가늘고 옅어진다), warp = 휨(반죽은 fbm 모틀을 넘긴다). 각도 배수가 정수라 atan 이음매가 없다.
+ * 지렁이 · 격자 · 점 무늬 금지 — 띠는 길고, 고주파 흔들림을 넣지 않는다.
+ */
+export const MARBLE_GLSL = /* glsl */ `
+float marbleBand(vec2 n, float phase, float w, float warp) {
+  if (w < 0.004) return 0.0;
+  float r = length(n);
+  float a = atan(n.y, n.x) - phase;
+  float u = r * 3.0 - a * 0.47746 + 0.09 * sin(a * 2.0 + r * 5.0) + warp; // 3갈래 — 한 갈래 4줄 나선은 과녁 · 레코드판으로 읽혔다
+  float d = abs(fract(u) - 0.5) * 2.0;
+  float wid = mix(0.12, 0.34, w);
+  float line = 1.0 - smoothstep(wid * 0.35, wid, d);
+  // 띠가 한 바퀴 내내 이어지면 모기향 · 과녁 — 반 바퀴마다 끊어 길쭉한 결 몇 가닥으로
+  float arc = smoothstep(-0.35, 0.75, sin(a * 2.0 + r * 4.0 + 1.0));
+  return line * arc * w * smoothstep(0.06, 0.22, r) * (1.0 - smoothstep(0.86, 0.98, r));
 }
 `;
 
@@ -213,9 +236,13 @@ const hoochFrag = /* glsl */ `
   precision highp float; // R-M1 — 유리와 같은 판정(fp16 실폰에서 흐름 · 광 무늬가 뭉개지지 않게)
   uniform float uAmt;
   uniform float uTime;
+  uniform float uMurk;      // 젓는 동안 탁해짐 0~1 — 반죽 색 쪽으로 0.6까지 + 나선 띠(sim hooch 값과 무관)
+  uniform float uMurkPhase; // 반죽 줄무늬와 같은 소용돌이 위상
+  uniform vec3 uDoughCol;
   varying vec3 vP;
   varying vec3 vWorld;
   ${HOOCH_COVER}
+  ${MARBLE_GLSL}
   void main() {
     float rN = length(vP.xz);
     float spread = smoothstep(0.30, 0.80, uAmt);          // 고리 → 전면
@@ -226,6 +253,7 @@ const hoochFrag = /* glsl */ `
       float topLine = smoothstep(0.80, 0.97, vP.y);
       c = mix(c, vec3(0.80, 0.74, 0.62), topLine * 0.6);
       float a = (0.55 + 0.12 * spread) * show + 0.2 * smoothstep(0.0, 0.08, vP.y) * (1.0 - smoothstep(0.08, 0.2, vP.y)) * show;
+      c = mix(c, uDoughCol, 0.6 * uMurk);
       gl_FragColor = vec4(c, a);
       return;
     }
@@ -234,6 +262,10 @@ const hoochFrag = /* glsl */ `
     vec3 c = mix(vec3(0.64, 0.60, 0.51), vec3(0.624, 0.592, 0.498), smoothstep(0.6, 1.0, rN)); // 가장자리 #9f977f
     float flow = 0.5 + 0.5 * sin(vP.x * 9.0 + uTime * 0.3) * sin(vP.z * 8.0 - uTime * 0.22);
     float a = cover * (0.34 + 0.20 * smoothstep(0.55, 1.0, rN) + 0.05 * flow);
+    // 탁해짐 — 반죽이 풀려 옅은 베이지로(불투명 갈색 금지: 반죽 색 쪽이라 밝아진다). 같은 나선 띠가 비친다
+    float mb = marbleBand(vP.xz, uMurkPhase, uMurk, 0.0);
+    c = mix(c, uDoughCol, 0.6 * uMurk + 0.25 * mb);
+    a = mix(a, cover * 0.62, 0.5 * uMurk);
     // 광 — 안쪽 뒤 왼편에 치우친 넓고 흐린 길쭉한 얼룩 하나(소프트박스가 비친 액면). 옛 평행 대각선 두 줄은
     // 유리판 · 뚜껑으로 읽혔다(2026-11-19 다듬기). 대비는 낮게, 가장자리는 흐름으로 살짝 흔들린다
     vec2 q = mat2(0.91, 0.42, -0.42, 0.91) * (vP.xz - vec2(-0.34, -0.12));
@@ -337,7 +369,13 @@ export function createJar(): Jar {
   const hoochMat = new THREE.ShaderMaterial({
     vertexShader: hoochVert,
     fragmentShader: hoochFrag,
-    uniforms: { uAmt: { value: 0 }, uTime: { value: 0 } },
+    uniforms: {
+      uAmt: { value: 0 },
+      uTime: { value: 0 },
+      uMurk: { value: 0 },
+      uMurkPhase: { value: 0 },
+      uDoughCol: { value: new THREE.Color(0xf4ead4) },
+    },
     transparent: true,
     depthWrite: false,
     side: THREE.DoubleSide,
@@ -374,5 +412,11 @@ export function createJar(): Jar {
       u.uWarm.value = warm;
     });
 
-  return { group, hooch, setHooch, setLevel, setClimate };
+  const setMurk = (murk: number, phase: number, color: readonly [number, number, number]): void => {
+    hoochMat.uniforms.uMurk.value = murk;
+    hoochMat.uniforms.uMurkPhase.value = phase;
+    (hoochMat.uniforms.uDoughCol.value as THREE.Color).setRGB(color[0], color[1], color[2]);
+  };
+
+  return { group, hooch, setHooch, setLevel, setClimate, setMurk };
 }

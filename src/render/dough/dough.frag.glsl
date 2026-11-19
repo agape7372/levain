@@ -14,7 +14,10 @@ uniform float uTime;
 uniform vec3 uColor;
 uniform float uSpecStr;
 uniform float uCrust;
-uniform float uFlourDust;
+uniform float uFlourDust;  // 밥 주기 마른 가루 덮개 0~1 — 윗면만(옆벽 X), fbm 덩어리 가장자리
+uniform float uFlourSwirl; // 덮개 소용돌이 각(rad) — 밥 주기 시작 뒤 젓는 위상(SceneHost)
+uniform float uMarble;     // 밥 주기 줄무늬 세기 0~1 — 저을수록 가늘고 옅어진다
+uniform float uMarblePhase; // 줄무늬 소용돌이 위상(rad) — 젓는 각도를 따라 돈다
 uniform float uWet;
 uniform float uRipe;
 uniform float uCollapse;
@@ -37,9 +40,9 @@ uniform vec2 uWobble;
 uniform vec2 uBumpPos[4];
 uniform float uBumpAmp[4];
 uniform float uBumpK[4];
-uniform vec2 uTrailPos[4];
-uniform float uTrailAmp[4];
-uniform float uTrailK[4];
+uniform vec2 uTrailPos[8];
+uniform float uTrailAmp[8];
+uniform float uTrailK[8];
 uniform vec2 uPokePos;
 uniform float uPokeAmt;
 uniform float uPokeK;
@@ -83,6 +86,9 @@ vec2 fbmG(vec2 p0) {
 
 // 아래 표지 줄은 DoughMesh가 jar.ts HOOCH_COVER로 바꿔 끼운다(hooch 윗면과 같은 소스)
 // #hoochCover
+// 고랑 자취(버텍스와 같은 소스, DoughMesh TRAIL_GROOVE) · 줄무늬 띠(hooch와 같은 소스, jar.ts MARBLE_GLSL)
+// #trailGroove
+// #marble
 
 // 칸 해시 — 칸 번호를 37로 접어(정수라 fp16에서도 정확) 중간값을 16 아래로 묶는다. 반죽은 늘 highp(WebGL2, 위 머리 주석)라
 // 정밀도 이득은 없고, 접기는 mediump로 도는 경우를 위한 예비책이다(그때도 소수 7비트가 남는다). 대가로 37칸마다 배치가
@@ -127,6 +133,28 @@ void main() {
   vec3 base = uColor * (1.0 + mott * 0.03);
   base *= mix(1.0, 0.93, uWet); // 젖으면 조금 진해진다(R2-12: 0.90 → 0.93, 젖은 광과 같이 다시 봄)
 
+  // ── 밥 주기 가루 · 줄무늬(2026-11-19 섞는 맛 M3, S4) — 알베도에 섞어 조명이 그대로 먹는다. 둘 다 무광(아래 광택에서 뺀다).
+  //    옛 덮개는 sin×sin 체크무늬를 조명 뒤 상수 색으로 덮어 옆벽까지 하얀 세로줄 컵이 됐다 ──
+  float matte = 0.0;
+  if (uMarble > 0.004 && vTop > 0.5) {
+    float mb = marbleBand(vXZ / uRBody, uMarblePhase, uMarble, mott * 0.35);
+    base = mix(base, vec3(0.99, 0.975, 0.945), mb * 0.6);
+    matte = max(matte, mb * 0.8);
+  }
+  float cover = 0.0;
+  if (uFlourDust > 0.001) {
+    // 덩어리 가장자리 — 덮개가 fbm 낮은 데부터 차오른다. 옆벽은 vTop이 0이라 하얘지지 않는다.
+    // 소용돌이(F2) — 표본 좌표를 젓는 위상만큼 가운데 둘레로 돌린다(가운데 많이 · 테두리 0) → 덮개가 나선 팔로 늘어난다
+    float sw = uFlourSwirl * 0.45 * (1.0 - smoothstep(0.0, 1.0, length(vXZ) / uRBody));
+    vec2 sq = mat2(cos(sw), sin(sw), -sin(sw), cos(sw)) * vXZ;
+    // 고르게 걷힘(F2) — fbm을 0~1로 펴고(이 배율에서 10~90% ≈ −0.5~0.45) 넓은 문턱 ±0.2로 1.2s부터 바로 옅어진다.
+    // 옛 uFlourDust·1.3 문턱은 0.77 밑에서야 구멍이 나 0.4s에 몰려 사라졌다(덩어리 얼룩)
+    float e = clamp(fbm(sq * 3.3 + 7.0) / 1.2 + 0.5, 0.0, 1.0);
+    cover = smoothstep(e - 0.2, e + 0.2, uFlourDust * 1.4 - 0.2) * vTop;
+    base = mix(base, vec3(1.0, 0.985, 0.955) * (0.975 + 0.025 * mott), cover * 0.92);
+    matte = max(matte, cover);
+  }
+
   // ── 하이트필드 그라디언트 합성: 범프4 + 트레일4 + poke + 돔/크레이터/꺼짐 + 기울기 + 파동 + 물결 + FBM ──
   vec2 dBs = vec2(0.0);
   float scar = 0.0; // 터진 기포 바늘구멍 — 음수 슬롯을 같은 루프에서 읽는다(exp 추가 0)
@@ -137,10 +165,12 @@ void main() {
     dBs += a * exp(-dot(d, d) * k) * (-2.0 * k) * d;
     if (a < 0.0) scar += min(-a / SCAR_AMP, 1.0) * (1.0 - smoothstep(0.04, 0.28, dot(d, d) * uBumpK[i]));
   }
-  for (int i = 0; i < 4; i++) {
-    float k = uTrailK[i] * 1.6;
-    vec2 d = vXZ - uTrailPos[i];
-    dBs += uTrailAmp[i] * exp(-dot(d, d) * k) * (-2.0 * k) * d;
+  // 고랑 자취 — 버텍스와 같은 함수의 기울기(첨도 배율 없음). 비용 때문에 윗면에서만 — 옆벽은 테두리 높이만 따른다
+  float trailWet = 0.0;
+  if (vTop > 0.5) {
+    vec4 tg = trailGroove(vXZ);
+    dBs += tg.yz;
+    trailWet = tg.w;
   }
   { // 탭 자국 — 조명이 봐야 "자국이 남았다 아문다"가 읽힌다 (§0-B)
     vec2 d = vXZ - uPokePos;
@@ -186,7 +216,8 @@ void main() {
   dBs *= 1.0 - 0.75 * wallM;
 
   // ── 노멀·확산 — 몸통(vBaseN) 위에 하이트필드 기울기 (§0-B: 형태 음영 복구) ──
-  vec3 nrm = normalize(vBaseN + vec3(dBs.x, 0.0, dBs.y) * uSlopeAspect);
+  // 마른 가루 · 흰 줄은 빛을 흩어 굴곡 그늘이 옅다 — 흰 덮개 위 고랑 그늘이 회색 얼룩으로 읽혔다(S4)
+  vec3 nrm = normalize(vBaseN + vec3(dBs.x, 0.0, dBs.y) * (uSlopeAspect * (1.0 - 0.7 * matte)));
   // 반죽 전용 키 — 씬 KEY_POS보다 낮다(고도 28.6°). 얼룩 증폭은 노이즈 원천(fbmG · 기공)을 지워 해결했고,
   // 높이를 올리면 하강 주름 · 젓은 물결 · 돔의 결이 함께 죽어 그대로 둔다(A1-05 검토, VISUAL §1-3)
   vec3 L = normalize(vec3(-0.7, 0.45, 0.45));
@@ -201,13 +232,15 @@ void main() {
   //    갓 밥준 넓은 젖은 광 · 피크 새틴 · 배고픔 얇은 막 · 휴면 매트 ──
   {
     vec3 HS = normalize(vec3(-0.30, 1.0, 0.22));
-    float sheet = pow(max(dot(nrm, HS), 0.0), mix(16.0, 9.0, uWet));
+    // 갓 저은 자취는 반들하다 — 자리 젖음은 고랑이 메워지며 사라진다
+    float wetL = min(1.0, uWet + 0.4 * trailWet);
+    float sheet = pow(max(dot(nrm, HS), 0.0), mix(16.0, 9.0, wetL));
     // 균일 밝힘은 '반사'로 안 읽힌다 — 완만한 띠로 잘라 창 모양을 준다
     float band = 0.45 + 0.55 * smoothstep(-0.55, 0.30, dot(vXZ, vec2(-0.62, 0.78)));
     // normalize(L+V) — 직교 카메라라 V는 화면 전체에서 같다. viewMatrix 3행 = 카메라 +Z(월드)
     vec3 HC = normalize(L + vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]));
-    float spec = sheet * band * (0.30 + 0.45 * uWet) + pow(max(dot(nrm, HC), 0.0), 5.0) * 0.05;
-    col += vec3(0.28, 0.16, 0.08) * spec * uSpecStr;
+    float spec = sheet * band * (0.30 + 0.45 * wetL) + pow(max(dot(nrm, HC), 0.0), 5.0) * 0.05;
+    col += vec3(0.28, 0.16, 0.08) * spec * uSpecStr * (1.0 - matte);
   }
   // 경사 페널티 최소화 — 입체감은 ndl·반구가 담당
   col -= vec3(0.03, 0.022, 0.015) * slope;
@@ -221,14 +254,15 @@ void main() {
     vec4 pin = cellBubble(ut, vec2(0.07), uPin * 0.7,
                           mix(0.007, 0.005, uRipe), mix(0.011, 0.022, uRipe), 1.0, 1.0);
     float rr = length(vXZ) / uRBody;
+    float calm = 1.0 - 0.8 * trailWet; // 저은 자리는 바늘구멍 · 거품이 잔잔하다(피크 젓기 꺼짐)
     // 유리에 올라붙은 메니스커스 끝(rr 0.94~)은 거의 수직이라 xz 칸이 화면에서 1px 폭 세로 실선으로 늘어난다 —
     // 테 바로 아래 매달린 실선(판정 L2)의 원인. 벽 기포를 꺼도 남았다(wallCells=0 캡처). 구멍 · 거품 점만 거기서 끊는다
     float flatTop = 1.0 - smoothstep(0.93, 0.985, rr);
     float crater = pin.y * pin.w * pin.w * uRipe * flatTop; // 큰 구멍만 테가 밝다
     // 따뜻한 그늘(실물 07) — 회색 점은 후추 · 먼지로 읽힌다. 피크(uRipe)는 2배로 짙게(판정 M5 — 실물 sdL 6.5~14 대 렌더 1.9)
-    col *= 1.0 - vec3(0.055, 0.068, 0.09) * pin.x * (1.0 + uRipe) * flatTop;
-    col += vec3(0.05, 0.042, 0.03) * crater * (0.6 + 0.6 * uSpecStr);
-    float edge = smoothstep(0.80, 0.97, rr) * uFoam;
+    col *= 1.0 - vec3(0.055, 0.068, 0.09) * pin.x * (1.0 + uRipe) * flatTop * calm * (1.0 - cover); // 덮개 위 회색 점 금지(F4)
+    col += vec3(0.05, 0.042, 0.03) * crater * (0.6 + 0.6 * uSpecStr) * calm;
+    float edge = smoothstep(0.80, 0.97, rr) * uFoam * calm;
     if (edge > 0.01) {
       vec4 fb = cellBubble(tw / 0.032, vec2(0.032), 0.85 * edge, 0.003, 0.008, 1.0, 1.0);
       col = mix(col, col * vec3(1.025, 1.03, 1.04), edge * 0.45); // 거품은 살짝 밝고 차갑다(R1 #dedfdc)
@@ -236,7 +270,7 @@ void main() {
     }
   }
   // 터진 기포가 남긴 바늘구멍 — 몇 초에 걸쳐 옅어진다(bubbles.ts SCAR_SEC)
-  col *= 1.0 - 0.08 * min(scar, 1.0) * vTop;
+  col *= 1.0 - 0.08 * min(scar, 1.0) * vTop * (1.0 - 0.8 * trailWet) * (1.0 - cover); // 가루 덮개 아래에선 안 비친다(F4)
 
   // ── 유리 너머 기포 단면(R2-04 · A1-06) — 「반죽이 아니라 르방」의 단일 최강 단서. 원통 매개(호 길이 × 높이, 월드)라
   //    유리에 붙은 기포가 화면 가장자리에서 자연스럽게 눌려 보인다. atan 분기컷은 병 뒤쪽(보이지 않는 옆벽)이다.
@@ -316,12 +350,6 @@ void main() {
     float dry = 1.0 - hoochCover(length(vXZ) / uRBody, atan(vXZ.y, vXZ.x), uHooch);
     col = mix(col, col * vec3(0.995, 0.975, 0.945), uCrust);
     col -= vec3(0.034, 0.03, 0.026) * line * uCrust * centerFade * dry * vTop;
-  }
-
-  // 밥주기 밀가루 덮임 (M5 연출)
-  if (uFlourDust > 0.001) {
-    float f = 0.5 + 0.5 * sin(vXZ.x * 47.0) * sin(vXZ.y * 43.0);
-    col = mix(col, vec3(0.985, 0.972, 0.945), uFlourDust * (0.55 + 0.35 * f));
   }
 
   // kahm 효모 막 — 수면 전체를 덮는 주름진 흰 막 (초타원 확장 반영 0.52~0.70)

@@ -12,7 +12,7 @@ import vert from './dough.vert.glsl?raw';
 import frag from './dough.frag.glsl?raw';
 import type { RenderParams } from '../renderParams';
 import { BubbleSystem, DYN_SLOTS } from '../bubbles';
-import { createFillGeometry, FILL_RADIUS, HOOCH_COVER, JAR_HEIGHT } from '../jar';
+import { createFillGeometry, FILL_RADIUS, HOOCH_COVER, JAR_HEIGHT, MARBLE_GLSL } from '../jar';
 
 export const XZ_SCALE = 1.3; // 월드→오브젝트 XZ 변환에 입력층이 사용 (월드 XZ = 오브젝트 XZ × XZ_SCALE)
 /** 옆벽 반경(오브젝트) — 유리 안쪽 FILL_RADIUS(0.912 월드) */
@@ -45,15 +45,66 @@ function seededRandom(seed: number): () => number {
   };
 }
 
-/** 실 능선 슬롯 수 — 셰이더 uTrail* 길이와 같다(테스트가 잠근다) */
-export const TRAIL_N = 4;
-const TRAIL_SAMPLE_S = 0.04; // 실 능선 샘플 간격
-// 실 능선 감쇠 — 응집(글루텐 망)이 기억을 붙든다. 피크 0.63/s(수명 1.6s) · 갓밥준 0.89/s ·
-// 시큼 1.45/s(0.7s, 글루텐이 끊겨 자국이 안 남는다). 0.5s는 고무 문법이라 하한을 이보다 위에 둔다
-const TRAIL_DECAY_SLACK = 1.45;
-const TRAIL_DECAY_GAIN = 0.85;
-const TRAIL_K0 = 26;         // 실 능선 첨도 — 나이 들수록 퍼진다 (26 → 하한 9)
+// ── 고랑 자취(2026-11-19 섞는 맛 M2) — 실 능선 4점 가우시안 솟음을 버리고 손끝 자취를 고랑으로 판다.
+//    점 TRAIL_N개를 잇는 선분 TRAIL_N − 1개(캡슐 거리), 단면 f = −A(1−2q)e^(−q), q = r²K — 가운데 고랑 −A · 양옆 둔덕 +0.45A.
+//    맨 끝 점(머리)은 손끝을 따라다니다 TRAIL_STEP만큼 멀어지면 굳고 새 머리가 생긴다 → 손끝 밑 = 고랑 끝의 둥근 패임 ──
+/** 자취 점 수 — 셰이더 uTrail* 길이(선분 루프는 TRAIL_N − 1)와 같다(테스트가 잠근다) */
+export const TRAIL_N = 8;
+/** 갓 판 고랑 깊이(월드) — 셰이더 TRAIL_A와 단일 소스(TRAIL_GROOVE에 끼운다) */
+const TRAIL_A = 0.016;
+const TRAIL_STEP = 0.19;     // 자취 점 간격(오브젝트) — 굳은 6선분 ≈ 손끝 뒤 0.6바퀴(F3: 0.13은 쉼표 한 토막으로 읽혔다)
+const TRAIL_K0 = 90;         // 갓 판 고랑 첨도 — 반폭(q 0.5) ≈ 0.075. 나이 들수록 넓어진다(하한 K0/3)
+const TRAIL_TAU_THICK = 1.6; // 메워짐 τ(s) — 되직(stirThickness 1)
+const TRAIL_TAU_FLUID = 0.3; //                묽음(0)
+const TRAIL_TAU_RIPE = 1.5;  // 피크(ripe 1)는 τ × (1 + 1.5) — 공기가 빠진 자리는 덜 메워진다
 const STIR_IDLE_S = 0.08;    // (stir 전용) 마지막 입력 후 이 시간 지나면 '놓음' — grab은 pointerup 기준
+/** 되기 정규화 — fluidity 0.1 이하 = 되직 1, 0.65 이상 = 묽음 0 (갓 밥준 0.22 → 0.78 · 시큼 0.66 → 0) */
+const THICK_FLUID_LO = 0.1;
+const THICK_FLUID_HI = 0.65;
+/** 피크 젓기 꺼짐 — 젓는 거리(오브젝트) × ripe × 0.1이 쌓이고(상한 0.6) τ20s로 돌아온다. uSink에 더한다 */
+const KNOCK_GAIN = 0.1;
+const KNOCK_MAX = 0.6;
+const KNOCK_TAU = 20;
+/** 줄무늬 — 혼자 τ6s, 손으로 한 바퀴(경로 2π·0.55R)마다 ×0.38. 0.05 아래로 손이 떨어뜨리면 다 섞임 */
+const MARBLE_TAU = 6;
+const MARBLE_LOOP = 2 * Math.PI * 0.55 * R_BODY;
+const MARBLE_PER_LOOP = 0.38;
+const MARBLE_DONE = 0.05;
+const MIX_GLINT = 0.25;      // 다 섞임 젖은 광 +0.25, τ1.5s
+const MIX_GLINT_TAU = 1.5;
+/** hooch 탁해짐 — 젓는 동안 τ0.6s로 오르고 τ5s로 가라앉는다 */
+const MURK_RISE_TAU = 0.6;
+const MURK_FALL_TAU = 5;
+
+/**
+ * 고랑 함수 — 버텍스(높이 x)와 프래그(기울기 yz · 갓 저은 정도 w)가 이 소스 하나를 쓴다(규칙 8).
+ * 가장 가까운 선분 하나만 본다(q 최소) — 이웃 선분을 더하면 이음매마다 두 번 패여 구슬 줄이 된다.
+ * uTrailK 음수 = 그 점이 새 획의 시작이라 앞 점과 잇지 않는다(크기는 절댓값).
+ */
+export const TRAIL_GROOVE = /* glsl */ `
+const float TRAIL_A = ${TRAIL_A};
+vec4 trailGroove(vec2 p) {
+  float bq = 1e9;
+  float bA = 0.0;
+  float bK = 1.0;
+  vec2 bd = vec2(0.0);
+  for (int i = 0; i < ${TRAIL_N - 1}; i++) {
+    float kb = uTrailK[i + 1];
+    if (kb < 0.0 || max(uTrailAmp[i], uTrailAmp[i + 1]) < 1e-5) continue;
+    vec2 a = uTrailPos[i];
+    vec2 ab = uTrailPos[i + 1] - a;
+    float h = clamp(dot(p - a, ab) / max(dot(ab, ab), 1e-8), 0.0, 1.0);
+    vec2 d = p - a - ab * h;
+    float K = mix(abs(uTrailK[i]), kb, h);
+    float q = dot(d, d) * K;
+    if (q < bq) { bq = q; bA = mix(uTrailAmp[i], uTrailAmp[i + 1], h); bK = K; bd = d; }
+  }
+  if (bq > 9.0) return vec4(0.0);
+  float e = exp(-bq);
+  return vec4(-bA * (1.0 - 2.0 * bq) * e, bA * e * (3.0 - 2.0 * bq) * 2.0 * bK * bd,
+              clamp(bA / TRAIL_A, 0.0, 1.0) * exp(-0.7 * bq));
+}
+`;
 const POKE_K0 = 30;          // 탭 덴트 첨도 — 액체일수록 아물며 퍼진다 (하한 k0/3)
 
 // ── grab 2시간척도 점탄성(SLS 근사) 기본값 — 확장기획 §4-2. 전부 튜닝 시작 가설,
@@ -94,14 +145,27 @@ export class DoughMesh {
   private stirVecVel = new THREE.Vector2();   // 놓은 뒤 damped spring 속도항
   private lastStirInputT = -Infinity;
   private stirDrivesWobble = true;
+  private lastHandStirT = -Infinity;
+  private wasStirring = false;
+  private prevStirTarget = new THREE.Vector2();
   /** 슬로싱 진동자 속도항 — wobble은 감쇠 진동(1.5Hz), ζ는 fluidity가 정한다 */
   private wobbleVel = new THREE.Vector2();
   private wobbleTgt = new THREE.Vector2();
-  private trail: Array<{ x: number; z: number; amp: number; bornAt: number }> = [];
-  private trailIdx = 0;
-  private lastTrailT = -Infinity;
+  /** 고랑 자취 링버퍼 — trailHead가 손끝을 따라다니는 머리, brk = 새 획의 첫 점(앞 점과 안 잇는다) */
+  private trail: Array<{ x: number; z: number; amp: number; bornAt: number; brk: boolean }> = [];
+  private trailHead = 0;
   /** 젓는 세기 0~1 — 기포 가속·젖은 광 부스트·사운드 게인의 공통 소스 */
   agitation = 0;
+  /** 피크 젓기 꺼짐 0~0.6 — uSink에 더한다(τ20s 회복) */
+  private knock = 0;
+  /** 밥 주기 줄무늬 세기 0~1 · 소용돌이 위상(rad) — 연출이 setMarble로 넣고, 옅어짐은 tick이 굴린다 */
+  marble = 0;
+  marblePhase = 0;
+  /** 이번 tick에 손 젓기가 줄무늬를 0.05 아래로 떨어뜨렸나 — SceneHost.onMixed가 읽는다 */
+  mixedThisFrame = false;
+  private mixGlint = 0;
+  /** hooch 탁해짐 0~1 — SceneHost가 jar.setMurk로 넘긴다 */
+  murk = 0;
   /** 개체별 호흡 위상 — 두 르방이 같은 박자로 숨쉬지 않게 한다 (setSeed) */
   private seedPhase = 0;
 
@@ -121,7 +185,7 @@ export class DoughMesh {
   constructor() {
     const bumpPos = Array.from({ length: DYN_SLOTS }, () => new THREE.Vector2());
     const trailPos = Array.from({ length: TRAIL_N }, () => new THREE.Vector2(9, 9)); // 화면 밖
-    for (let i = 0; i < TRAIL_N; i++) this.trail.push({ x: 9, z: 9, amp: 0, bornAt: 0 });
+    for (let i = 0; i < TRAIL_N; i++) this.trail.push({ x: 9, z: 9, amp: 0, bornAt: 0, brk: true });
     this.material = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
@@ -131,6 +195,10 @@ export class DoughMesh {
         uSpecStr: { value: 1.0 },
         uCrust: { value: 0 },
         uFlourDust: { value: 0 },
+        uFlourSwirl: { value: 0 },
+        // 밥 주기 줄무늬(2026-11-19 M3) — 세기 0~1 · 소용돌이 위상
+        uMarble: { value: 0 },
+        uMarblePhase: { value: 0 },
         uWet: { value: 0 },
         uRipe: { value: 0 },
         uCollapse: { value: 0 },
@@ -150,7 +218,7 @@ export class DoughMesh {
         uBumpK: { value: new Float32Array(DYN_SLOTS) },
         uTrailPos: { value: trailPos },
         uTrailAmp: { value: new Float32Array(TRAIL_N) },
-        uTrailK: { value: new Float32Array(TRAIL_N).fill(TRAIL_K0) },
+        uTrailK: { value: new Float32Array(TRAIL_N).fill(-TRAIL_K0) },
         uPokePos: { value: new THREE.Vector2() },
         uPokeAmt: { value: 0 },
         uPokeK: { value: POKE_K0 },
@@ -177,8 +245,11 @@ export class DoughMesh {
         uGrabShape: { value: new THREE.Vector2(GRAB_DEFAULTS.kernelK, GRAB_DEFAULTS.lift) },
         uGrabWrinkle: { value: 0 },
       },
-      vertexShader: vert,
-      fragmentShader: frag.replace('// #hoochCover', HOOCH_COVER),
+      vertexShader: vert.replace('// #trailGroove', TRAIL_GROOVE),
+      fragmentShader: frag
+        .replace('// #hoochCover', HOOCH_COVER)
+        .replace('// #trailGroove', TRAIL_GROOVE)
+        .replace('// #marble', MARBLE_GLSL),
     });
     const geo = createFillGeometry(SEG, RINGS, ROWS);
     // 셰이더가 높이를 정하므로 자리 기준 구를 손으로 준다 — 병 전체(바닥~피크 상한)를 덮는다
@@ -316,15 +387,54 @@ export class DoughMesh {
    * tick이 자동으로 '놓음' 처리해 damped spring 복귀를 돌린다.
    * driveWobble=false: 연출(급여 시퀀스)이 wobble을 직접 연출할 때.
    */
-  setStirInput(x: number, z: number, vx: number, vz: number, driveWobble = true): void {
+  setStirInput(x: number, z: number, vx: number, vz: number, driveWobble = true, hand = driveWobble): void {
     this.stirTarget.set(x, z);
     this.stirDrivesWobble = driveWobble;
+    if (hand) this.lastHandStirT = this.lastT;
     // 점성 게인 — 빠른 드래그도 반죽은 반 박자 늦게, 상한으로 찢어짐 방지
     this.stirVecTarget.set(
       THREE.MathUtils.clamp(vx * 0.10, -0.22, 0.22),
       THREE.MathUtils.clamp(vz * 0.10, -0.22, 0.22),
     );
     this.lastStirInputT = this.lastT;
+  }
+
+  /** 손이 젓고 있나 — 밥 주기 자동 젓기가 손에 양보한다(SceneHost) */
+  isHandStirring(): boolean {
+    return this.lastT - this.lastHandStirT < STIR_IDLE_S;
+  }
+
+  /** 되기 0 묽음 ~ 1 되직 — 1 − fluidity 정규화. 젓기 소리 몸통 음높이(app.ts)와 고랑 메워짐이 같이 쓴다 */
+  stirThickness(): number {
+    const f = this.params?.fluidity ?? 0.3;
+    return THREE.MathUtils.clamp((THICK_FLUID_HI - f) / (THICK_FLUID_HI - THICK_FLUID_LO), 0, 1);
+  }
+
+  /** 줄무늬 세기(0~1) · 위상 — 밥 주기 연출이 넣는다. 옅어짐 · 다 섞임은 tick */
+  setMarble(v: number, phase = this.marblePhase): void {
+    this.marble = THREE.MathUtils.clamp(v, 0, 1);
+    this.marblePhase = phase;
+  }
+
+  /** 르방 전환 · 추가 · 버리기 · 앱 열기(SceneHost.snapParams) — 지난 르방의 젓기 · 밥 주기 일시 상태를 새 르방에 넘기지 않는다 */
+  resetTransient(): void {
+    this.knock = 0;
+    this.marble = 0;
+    this.marblePhase = 0;
+    this.murk = 0;
+    this.mixGlint = 0;
+    this.mixedThisFrame = false;
+    this.lastStirInputT = this.lastHandStirT = -Infinity; // 지난 르방의 획을 잇지 않는다
+    for (const s of this.trail) {
+      s.amp = 0;
+      s.brk = true;
+    }
+    this.writeTrail(this.lastT);
+  }
+
+  /** 젓기 · 밥 주기 연출이 만드는 출렁 배율 — 되직 0 ~ 묽음 1 */
+  sloshGain(): number {
+    return THREE.MathUtils.smoothstep(this.params?.fluidity ?? 0.3, 0.3, 0.7);
   }
 
   /** 메니스커스 높이(월드) — 응집이 높고 평평할수록 유리를 타고 오른다. vert uMenH와 단일 소스 */
@@ -354,8 +464,13 @@ export class DoughMesh {
   /** 반죽 가운데 꼭대기 월드 y — 레이캐스트 평면·밀가루 낙하 자리. 피크 돔·과숙 크레이터·숨까지(A1-11) */
   topY(): number {
     const p = this.params;
-    return (this.height() + 0.05 * (p?.ripe ?? 0) - 0.08 * (p?.collapse ?? 0) - SINK_DEPTH * (p?.sink ?? 0))
+    return (this.height() + 0.05 * (p?.ripe ?? 0) - 0.08 * (p?.collapse ?? 0) - SINK_DEPTH * this.sinkNow())
       * this.mesh.scale.y;
+  }
+
+  /** 하강 꺼짐 + 피크 젓기 꺼짐 — uSink · topY 공통 */
+  private sinkNow(): number {
+    return Math.min(1, (this.params?.sink ?? 0) + this.knock);
   }
 
   /** t = 렌더 시계(초, CPU 로직 전부). shaderT = 셰이더 uTime — 생략하면 t. 호출자가 원점을 옮긴 작은 값을 넘겨 float32 해상도를 지킨다 */
@@ -363,7 +478,6 @@ export class DoughMesh {
     const p = this.params;
     const fluid = p?.fluidity ?? 0.3;
     const ela = p?.elasticity ?? 0.5;
-    const coh = p?.cohesion ?? 0.6;
     const amp = p?.breatheAmp ?? 0.006;
     const period = p?.breathePeriod ?? 3.5;
     const breathe = 1 + amp * (0.5 + 0.5 * Math.sin((t * Math.PI * 2) / period + this.seedPhase));
@@ -377,24 +491,32 @@ export class DoughMesh {
     this.lastT = t;
     const u = this.material.uniforms;
 
-    // ── 젓기 스프링·실 감쇠 ──
+    // ── 젓기 스프링 · 고랑 자취 ──
     const stirring = t - this.lastStirInputT < STIR_IDLE_S;
+    const hand = t - this.lastHandStirT < STIR_IDLE_S;
     const stirPos = u.uStirPos.value as THREE.Vector2;
+    this.mixedThisFrame = false;
+    let pathLen = 0;
     if (stirring) {
+      const fresh = !this.wasStirring;
+      if (fresh) {
+        // 새 획 — 손끝 자리로 바로(지난 획 끝에서 끌려오며 고랑을 긋지 않게)
+        stirPos.copy(this.stirTarget);
+        this.prevStirTarget.copy(this.stirTarget);
+      }
       // 손가락 추종 — 빠른 지수 수렴, 놓기 전까지 스프링 비활성
       stirPos.lerp(this.stirTarget, 1 - Math.exp(-14 * dt));
       this.stirVec.lerp(this.stirVecTarget, 1 - Math.exp(-12 * dt));
       this.stirVecVel.set(0, 0);
-      // 실 능선 샘플
-      if (t - this.lastTrailT >= TRAIL_SAMPLE_S) {
-        this.lastTrailT = t;
-        const seg = this.trail[this.trailIdx];
-        seg.x = stirPos.x;
-        seg.z = stirPos.y;
-        seg.amp = 0.035 * Math.min(1, this.stirVec.length() * 8 + 0.3);
-        seg.bornAt = t;
-        this.trailIdx = (this.trailIdx + 1) % TRAIL_N;
+      pathLen = this.stirTarget.distanceTo(this.prevStirTarget);
+      // 소용돌이 위상 — 손끝이 가운데를 도는 각도를 따라간다(손 · 연출 둘 다)
+      if (this.prevStirTarget.lengthSq() > 1e-4 && this.stirTarget.lengthSq() > 1e-4) {
+        const a0 = Math.atan2(this.prevStirTarget.y, this.prevStirTarget.x);
+        const a1 = Math.atan2(this.stirTarget.y, this.stirTarget.x);
+        this.marblePhase += Math.atan2(Math.sin(a1 - a0), Math.cos(a1 - a0));
       }
+      this.prevStirTarget.copy(this.stirTarget);
+      this.pushTrail(t, stirPos, fresh);
     } else if (this.stirVec.lengthSq() > 1e-8) {
       // 놓음 — damped spring e^(-5t)cos(12t) 감각 (ω≈12, 오버슈트 1회)
       const ax = -144 * this.stirVec.x - 10 * this.stirVecVel.x;
@@ -407,8 +529,34 @@ export class DoughMesh {
       this.stirVec.set(0, 0);
       this.stirVecVel.set(0, 0);
     }
+    this.wasStirring = stirring;
     (u.uStirVec.value as THREE.Vector2).copy(this.stirVec);
     this.agitation = Math.min(1, this.stirVec.length() * 6);
+
+    // ── 피크 젓기 꺼짐 — 젓는 거리 × ripe로 쌓이고 τ20s로 돌아온다 ──
+    this.knock = Math.min(KNOCK_MAX, this.knock * Math.exp(-dt / KNOCK_TAU) + pathLen * (p?.ripe ?? 0) * KNOCK_GAIN);
+    if (this.knock < 1e-5) this.knock = 0;
+    u.uSink.value = this.sinkNow();
+
+    // ── 줄무늬 — 손으로 저으면 한 바퀴마다 ×0.38, 아니면 혼자 τ6s. 손이 0.05 아래로 떨어뜨린 순간 = 다 섞임 ──
+    if (this.marble > 0) {
+      const before = this.marble;
+      this.marble *= hand ? Math.pow(MARBLE_PER_LOOP, pathLen / MARBLE_LOOP) : Math.exp(-dt / MARBLE_TAU);
+      if (this.marble < MARBLE_DONE) {
+        if (hand && before >= MARBLE_DONE) {
+          this.mixedThisFrame = true;
+          this.mixGlint = MIX_GLINT;
+        }
+        if (hand || this.marble < 0.005) this.marble = 0;
+      }
+    }
+    u.uMarble.value = this.marble;
+    u.uMarblePhase.value = this.marblePhase;
+    this.mixGlint *= Math.exp(-dt / MIX_GLINT_TAU);
+
+    // ── hooch 탁해짐 — 젓는 동안 오르고 천천히 가라앉는다(sim hooch 값은 그대로) ──
+    this.murk += ((stirring ? 1 : 0) - this.murk) * (1 - Math.exp(-dt / (stirring ? MURK_RISE_TAU : MURK_FALL_TAU)));
+    if (this.murk < 1e-4) this.murk = 0;
 
     // ── grab 2시간척도 (SLS 근사, §4-2-2·3) — 모든 감쇠는 1-exp(-k·dt) 주사율 독립 ──
     const czeta = this.grabTuning.grabReturnZeta ?? p?.grabReturnZeta ?? 0.95;
@@ -463,18 +611,16 @@ export class DoughMesh {
     if (this.grabLag.lengthSq() < 1e-8 && grabDisp.lengthSq() === 0) this.grabLag.set(0, 0);
     (u.uGrabDispLag.value as THREE.Vector2).copy(this.grabLag);
 
-    // ── 실 능선 — 점성 기억: 옅어지며 "퍼진다"(첨도 26→9). 퍼짐이 점탄성의 시각 서명 ──
-    const trailPos = u.uTrailPos.value as THREE.Vector2[];
-    const trailAmp = u.uTrailAmp.value as Float32Array;
-    const trailK = u.uTrailK.value as Float32Array;
-    const decay = Math.exp(-(TRAIL_DECAY_SLACK - TRAIL_DECAY_GAIN * coh) * dt);
+    // ── 고랑 메워짐 — 묽으면 τ0.3s · 되직하면 1.6s, 피크는 덜 메워진다. 메워지며 넓어진다(첨도 K0 → K0/3) ──
+    const tau = (TRAIL_TAU_FLUID + (TRAIL_TAU_THICK - TRAIL_TAU_FLUID) * this.stirThickness())
+      * (1 + TRAIL_TAU_RIPE * (p?.ripe ?? 0));
+    const decay = Math.exp(-dt / tau);
     for (let i = 0; i < TRAIL_N; i++) {
-      this.trail[i].amp *= decay;
-      const age = Math.max(0, t - this.trail[i].bornAt);
-      trailK[i] = Math.max(TRAIL_K0 / (1 + age / 0.8), 9);
-      trailPos[i].set(this.trail[i].x, this.trail[i].z);
-      trailAmp[i] = this.trail[i].amp;
+      const s = this.trail[i];
+      if (!(stirring && i === this.trailHead)) s.amp *= decay; // 머리는 손끝이 계속 판다
+      if (s.amp < 1e-5) s.amp = 0;
     }
+    this.writeTrail(t);
 
     // ── 기포 — 젓는 동안 부상·팝 가속 (agitation) ──
     this.bubbles.update(t, p?.bubbleDensity ?? 0.4, p?.bubbleScale ?? 1, this.agitation);
@@ -484,13 +630,14 @@ export class DoughMesh {
     (u.uBumpK.value as Float32Array).set(this.bubbles.k);
 
     // 젖은 광 — 상태 기본값 + 젓기 부스트
-    u.uWet.value = Math.min(1, (p?.wet ?? 0) + 0.3 * this.agitation);
+    u.uWet.value = Math.min(1, (p?.wet ?? 0) + 0.3 * this.agitation + this.mixGlint);
 
     u.uTime.value = shaderT;
     // ── 슬로싱 — 감쇠 진동자(1.5Hz). 액체일수록 오래 출렁(ζ 0.55→0.10).
     //    셰이더는 이 값을 "수면 기울기"(액체)와 잔여 강체 시프트(고체)로 나눠 그린다 ──
     if (stirring && this.stirDrivesWobble) {
-      this.wobbleTgt.copy(this.stirVec).multiplyScalar(5.0);
+      // 되직한 반죽은 젓는다고 판째 기울지 않는다 — 출렁 목표 × smoothstep(0.3, 0.7, fluidity)
+      this.wobbleTgt.copy(this.stirVec).multiplyScalar(5.0 * this.sloshGain());
       if (this.wobbleTgt.length() > 0.6) this.wobbleTgt.setLength(0.6);
     } else {
       this.wobbleTgt.set(0, 0);
@@ -544,10 +691,51 @@ export class DoughMesh {
     this.recoverNaN();
   }
 
+  /** 자취 머리를 손끝으로 옮기고, 앞 점에서 TRAIL_STEP 멀어지면 굳혀 새 머리를 낸다. fresh = 새 획 */
+  private pushTrail(t: number, at: THREE.Vector2, fresh: boolean): void {
+    const live = TRAIL_A * Math.min(1, 0.35 + (this.stirVec.length() / 0.22) * 0.65);
+    if (fresh || this.headStep() >= TRAIL_STEP) {
+      this.trailHead = (this.trailHead + 1) % TRAIL_N;
+      const next = this.trail[this.trailHead];
+      next.brk = fresh;
+      next.amp = 0;
+    }
+    const head = this.trail[this.trailHead];
+    head.x = at.x;
+    head.z = at.y;
+    head.amp = Math.max(head.amp, live);
+    head.bornAt = t;
+  }
+
+  /** 머리와 바로 앞 점 사이 거리(오브젝트) */
+  private headStep(): number {
+    const head = this.trail[this.trailHead];
+    const prev = this.trail[(this.trailHead + TRAIL_N - 1) % TRAIL_N];
+    return Math.hypot(head.x - prev.x, head.z - prev.z);
+  }
+
+  /** 링버퍼 → uniform(옛 점부터 차례로). 꼬리 두 점은 머리가 나아간 만큼 이어서 가늘어진다 — 덮어쓸 때 툭 끊기지 않게 */
+  private writeTrail(t: number): void {
+    const u = this.material.uniforms;
+    const pos = u.uTrailPos.value as THREE.Vector2[];
+    const amp = u.uTrailAmp.value as Float32Array;
+    const kk = u.uTrailK.value as Float32Array;
+    const N = TRAIL_N;
+    const prog = this.trail[this.trailHead].brk ? 0 : Math.min(1, this.headStep() / TRAIL_STEP);
+    for (let j = 0; j < N; j++) {
+      const s = this.trail[(this.trailHead + 1 + j) % N];
+      const age = Math.max(0, t - s.bornAt);
+      pos[j].set(s.x, s.z);
+      amp[j] = s.amp * THREE.MathUtils.clamp((j - prog) / 2, 0, 1);
+      const k = Math.max(TRAIL_K0 / (1 + age / 0.8), TRAIL_K0 / 3);
+      kk[j] = s.brk ? -k : k;
+    }
+  }
+
   /** 시계 역행 — CPU 시각 기록을 delta만큼 옮긴다(프로덕션 performance.now는 단조라 방어용) */
   private shiftClock(delta: number): void {
     this.lastStirInputT += delta;
-    this.lastTrailT += delta;
+    this.lastHandStirT += delta;
     for (const s of this.trail) s.bornAt += delta;
     this.bubbles.shift(delta);
   }
@@ -570,8 +758,11 @@ export class DoughMesh {
     (u.uStirVec.value as THREE.Vector2).copy(this.stirVec);
     if (!ok(u.uGrabDisp.value as THREE.Vector2)) (u.uGrabDisp.value as THREE.Vector2).set(0, 0);
     (u.uGrabDispLag.value as THREE.Vector2).copy(this.grabLag);
-    const ta = u.uTrailAmp.value as Float32Array;
-    for (let i = 0; i < TRAIL_N; i++) ta[i] = this.trail[i].amp;
+    if (!Number.isFinite(this.knock)) this.knock = 0;
+    if (!Number.isFinite(this.marble)) this.marble = 0;
+    if (!Number.isFinite(this.marblePhase)) this.marblePhase = 0;
+    if (!Number.isFinite(this.murk)) this.murk = 0;
+    this.writeTrail(this.lastT);
     if (!Number.isFinite(u.uPokeAmt.value as number)) u.uPokeAmt.value = 0;
   }
 }
