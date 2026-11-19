@@ -169,6 +169,11 @@ export const REWIND_TOLERANCE_MS = 5 * 60_000; // 5분 이내 역행은 무시(0
  * 상한은 부활+냉장(0.04/h)·restoreFlake 뒤 냉장에서 쪼개기 등가만 깼다.
  */
 
+/** 부활 의식 중 activity 배율 — activityAt과 peakFill(피크 끝 이후 하강 시작값)이 같은 값을 써야 피크 끝에서 안 튄다 (A2-01) */
+export const REVIVE_ACTIVITY_MULT = 0.3;
+/** 피크가 끝나 배고픔 경계에 닿았을 때의 activity — 하강 곡선 1 → 이 값 (GDD §3-2). 브리핑 peaked 시각 역산도 같은 값 */
+export const ACTIVITY_AT_HUNGRY = 0.2;
+
 /** 브리핑 「한껏 부풀었다가 가라앉았어요」 = 피크 뒤 activity가 이 값 아래로 내려간 시각 (감사 A2-03) */
 export const BRIEFING_PEAKED_ACTIVITY = 0.5;
 /** 브리핑 「액체가 고였어요」 = hooch(0~1)가 눈에 보이는 이 양에 닿은 시각 (감사 A3-08) */

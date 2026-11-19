@@ -4,7 +4,9 @@ import type { MoldStage, Phase, SimState, SmellBand, Snapshot } from './types';
 import {
   DAY,
   DORMANT_AFTER_HUNGRY_H,
+  ACTIVITY_AT_HUNGRY,
   FAKE_RISE_FACTOR,
+  REVIVE_ACTIVITY_MULT,
   FILL_DORMANT,
   FILL_HUNGRY,
   FILL_MAX,
@@ -113,11 +115,11 @@ export function activityAt(state: SimState, now: number): number {
   if (effH < b.latent) a = lerp(0, 0.15, effH / b.latent);
   else if (effH < b.peakStart) a = lerp(0.15, 1, smoothstep(b.latent, b.peakStart, effH));
   else if (effH < b.peakEnd) a = 1;
-  else if (effH < b.hungry) a = lerp(1, 0.2, smoothstep(b.peakEnd, b.hungry, effH));
+  else if (effH < b.hungry) a = lerp(1, ACTIVITY_AT_HUNGRY, smoothstep(b.peakEnd, b.hungry, effH));
   else if (effH < b.sour) a = lerp(0.2, 0.08, (effH - b.hungry) / (b.sour - b.hungry));
   else if (effH < b.dormant) a = lerp(0.08, 0.01, (effH - b.sour) / (b.dormant - b.sour));
   else a = 0.01;
-  if (state.reviveProgress === 1) a *= 0.3; // 깨어나는 중 — 희미한 생기만
+  if (state.reviveProgress === 1) a *= REVIVE_ACTIVITY_MULT; // 깨어나는 중 — 희미한 생기만
   return a;
 }
 
@@ -184,7 +186,7 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
   let riseFill: number;
   // 부활 의식 중 activity는 ×0.3이라 상승·피크 구간(activity 곱)은 이미 눌려 있다. 피크 끝 이후(하강)가 쓰는
   // peakFill에만 같은 ×0.3을 곱해야 유효 피크 끝에서 안 튄다(A2-01 — 기반 커밋은 sf에 곱해 두 번 눌렀다)
-  const peakFill = 1.0 + FILL_PEAK_RISE * sf * (state.reviveProgress === 1 ? 0.3 : 1);
+  const peakFill = 1.0 + FILL_PEAK_RISE * sf * (state.reviveProgress === 1 ? REVIVE_ACTIVITY_MULT : 1);
   if (effH < b.peakEnd) riseFill = 1.0 + FILL_PEAK_RISE * sf * activity;
   else if (effH < b.hungry) riseFill = lerp(peakFill, FILL_HUNGRY, smoothstep(b.peakEnd, b.hungry, effH));
   else if (effH < b.sour) riseFill = lerp(FILL_HUNGRY, FILL_SOUR, (effH - b.hungry) / (b.sour - b.hungry));
@@ -239,6 +241,7 @@ export function deriveSnapshot(state: SimState, now: number): Snapshot {
     // recipes.canBakeDiscard의 쿨다운 항과 같은 식
     discardReady: state.lastDiscardBakeAt === null || state.lastDiscardBakeAt < state.lastFedAt,
     nextStage: nextStageOf(state, now, stage),
-    fakeRise: inFakeRise(state, now, stage),
+    // 부피(sf)와 같은 사이클 기준 — 마지막 밥 시점의 나이·단계로 정한다(2026-11-19, R-M1). 카드 행과 반죽이 같은 사이클에 뜬다
+    fakeRise: inFakeRise(state, state.lastFedAt, stageAtFeed),
   };
 }

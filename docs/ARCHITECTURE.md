@@ -47,6 +47,7 @@ levain/
 │  │  └─ input.ts              # poke·wobble·롱프레스(제스처 FSM)
 │  ├─ ui/                      # vanilla TS + DOM 오버레이. sim 직접 접근 금지 — store 경유
 │  │  ├─ router.ts             # 화면 스택 + Android backButton 계약 (§5)
+│  │  ├─ stageQueue.ts         # 승급 연출 대기열 — 천·복귀 브리핑 뒤로 미룬다 (§5)
 │  │  ├─ screens/ home.ts recipes.ts bake.ts onboarding.ts
 │  │  ├─ components/ modal.ts toast.ts observeCard.ts settingsModal.ts
 │  │  ├─ copy.ts               # 전체 한국어 문구 사전 (한 파일 — 전수 감수용)
@@ -254,7 +255,8 @@ SimState → deriveSnapshot(state, now) → Snapshot → toRenderParams(snap) �
   Esc는 맨 위 모달을 닫는다(`closeTopModal`). 열린 동안 뒤는 `inert`. `close()`는 첫머리에 카드를 `pointer-events:none`+`inert`로 막는다. `confirmModal` 확인은 1회만 받는다.
 - **획득 연출 = 비차단 레이어** (`components/celebrate.ts`, 2026-09-03): 모달이 아니라 z 45 오버레이(모달 위·토스트 아래).
   호출 계약은 `celebrateIngredients(api, ids)`·`celebrateStageUp(api, stage, prevHouseStage)` 둘뿐, 열린 빵 계산·병합·퇴장은 내부.
-  열린 빵 수는 집 최고 단계 기준이다(2026-11-12). 천이 덮여 있으면 `app.ts`의 `stageQueue`에 모았다가 `scene.onClothOpen` 때 띄운다.
+  열린 빵 수는 집 최고 단계 기준이다(2026-11-12). 승급 연출 타이밍은 `ui/stageQueue.ts`(`createStageQueue(cheer, isCovered)`)가 맡는다: `offer`(천이 덮였거나 복귀 중이면 쌓고 아니면 바로) · `during`(복귀 catch-up을 감싼다 — 그 안의 승급은 브리핑 뒤로) · `flush`(천이 덮였으면 두고 감) · `drain`(`scene.onClothOpen` — 천을 걷는 순간 비운다).
+  복귀 순서(개정 2026-11-19): 천 덮기(`scene.coverCloth`; 쇼케이스 중이면 상태만 두고 안 보이게, 홈으로 나오면 보인다) → `during`으로 catch-up + 브리핑 → 브리핑·곰팡이 모달 닫힘 뒤 `flush` → 천을 걷을 때 `drain`.
 - **시각 원형은 `components/recipeVisuals.ts`**: 카드·상태 줄·시트 머리·정보 행(`infoRows`)·선반 타일·칩·구분선·형태 행·결과 카드의
   DOM 모양. 화면(`screens/recipes.ts`·`components/breadSheet.ts`·`exchangeModal.ts`)은 데이터·핸들러만 붙인다 — 클래스 이름을 화면
   코드에서 새로 조립하지 말 것. 아트는 `breadThumb(artId, fallbackId)` 폴백 사다리(변형 PNG → 베이스 PNG+재료 → SVG) 하나만.

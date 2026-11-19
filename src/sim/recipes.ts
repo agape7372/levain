@@ -27,6 +27,9 @@ export const RECIPES: readonly RecipeDef[] = [
   { id: 'wholewheat', kind: 'bread', cost: 120, stage: 5, sourRange: [20, 50], slope: STRICT, flourAffinity: 'wholewheat' },
 ];
 
+/** 통의 반죽을 쓰는 첫 빵이 열리는 단계 — 떼기 권유(홈·관찰 카드·한창때 알림)의 기준. ui/format이 다시 내보낸다 */
+export const FIRST_BREAD_STAGE = Math.min(...RECIPES.filter((r) => r.kind === 'bread').map((r) => r.stage));
+
 export const recipeById = (id: string): RecipeDef | undefined => RECIPES.find((r) => r.id === id);
 
 /** 산미 적합도 0~1 — 선호 범위 안 1.0, 벗어난 만큼 기울기 감점. flour 일치 시 가산 (§7-2) */

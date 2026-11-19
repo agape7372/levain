@@ -4,7 +4,7 @@
 //   ② 활성 밴드의 상한 경계는 sim의 FLOAT_OK_ACTIVITY와 같은 선이다(띄워보기와 상태 줄이 어긋나면 안 된다)
 //   ③ 통이 비면(null) 품질을 지어내지 않고 "여기 모여요" 안내로 답한다
 import { describe, it, expect } from 'vitest';
-import { acidityBand, activityBand, agoText, dateText, FIRST_BREAD_STAGE, pantryQualityText, sourPhaseKey, splitAdvised, untilText } from '../src/ui/format';
+import { acidityBand, activityBand, agoText, briefingText, dateText, FIRST_BREAD_STAGE, pantryQualityText, peakUntilText, showFakeRiseRow, sourPhaseKey, splitAdvised, untilText } from '../src/ui/format';
 import { copy } from '../src/ui/copy';
 import { FLOAT_OK_ACTIVITY } from '../src/sim';
 import type { DoughQuality } from '../src/sim';
@@ -106,10 +106,33 @@ describe('agoText · untilText', () => {
     expect(agoText(0, 72 * H)).toBe('3일');
     expect(agoText(0, 59 * H)).toBe('2일');
   });
+  it('1시간 아래 분은 내림값 그대로 — 59.9분은 「60분」이 아니라 59분 (R-05)', () => {
+    expect(agoText(0, 59.9 * MIN)).toBe('59분');
+    expect(agoText(0, 4.6 * MIN)).toBe('4분');
+  });
+  it('피크 범위는 30분 반올림 — 밥 직후 10초 뒤에도 「4시간 반~6시간」 (R-04)', () => {
+    const fedAt = 0;
+    const now = fedAt + 10_000;
+    expect(peakUntilText(fedAt + 4.5 * H, now)).toBe('4시간 반');
+    expect(peakUntilText(fedAt + 6 * H, now)).toBe('6시간');
+    expect(peakUntilText(fedAt + 6 * H, fedAt + 29 * MIN)).toBe('5시간 반');
+    expect(peakUntilText(20 * MIN, 0)).toBe('30분');
+    expect(peakUntilText(10 * MIN, 0)).toBe('10분');
+    expect(peakUntilText(0, 5)).toBe(copy.time.justNow);
+  });
   it('분 단위와 방금은 그대로', () => {
     expect(agoText(0, 1 * MIN)).toBe(copy.time.justNow);
     expect(agoText(0, 40 * MIN)).toBe('40분');
     expect(untilText(0, 5)).toBe(copy.time.justNow);
+  });
+});
+
+describe('복귀 브리핑 시큼해짐 — 홈 머리와 같은 세기 (R-03)', () => {
+  it('찡하거나 아세톤이면 「많이」, 그 밑이면 「조금」 · 다른 키는 그대로', () => {
+    expect(briefingText('becameSour', 'vinegar')).toBe(copy.briefing.becameSour);
+    expect(briefingText('becameSour', 'sharp')).toBe(copy.briefing.becameSourStrong);
+    expect(briefingText('becameSour', 'acetone')).toBe(copy.briefing.becameSourStrong);
+    expect(briefingText('becameHungry', 'acetone')).toBe(copy.briefing.becameHungry);
   });
 });
 
@@ -130,5 +153,17 @@ describe('떼기 권유 게이트 · 시큼 머리 문구 (A3-07 · A3-08)', () 
   });
   it('1:2:2 힌트는 시간을 단정하지 않는다 (배고픔 20h)', () => {
     expect(copy.feed.ratioHint['1:2:2']).not.toContain('하루짜리');
+  });
+});
+
+describe('showFakeRiseRow — 관찰 카드 「정상이에요」는 활발 · 배고픔 구간만 (B-H1)', () => {
+  it('휴면 · 시큼 · 반점이 겹치면 가짜 부풀기여도 말하지 않는다', () => {
+    const base = { fakeRise: true, phase: 'active', moldStage: 'none' } as const;
+    expect(showFakeRiseRow(base)).toBe(true);
+    expect(showFakeRiseRow({ ...base, phase: 'hungry' })).toBe(true);
+    expect(showFakeRiseRow({ ...base, phase: 'dormant' })).toBe(false);
+    expect(showFakeRiseRow({ ...base, phase: 'sour' })).toBe(false);
+    expect(showFakeRiseRow({ ...base, moldStage: 'spot' })).toBe(false);
+    expect(showFakeRiseRow({ ...base, fakeRise: false })).toBe(false);
   });
 });

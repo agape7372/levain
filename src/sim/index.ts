@@ -11,7 +11,7 @@ export * from './ingredients';
 export { lotsSum, pantryQualityOf, pickDough, consumeLots, trimOldest, capLots, pushLot } from './pantry';
 export type { DoughPick } from './pantry';
 export {
-  RECIPES, recipeById, sourFit, bakeScore, gradeOf, betterGrade, breadSkill, canBakeBread, canBakeDiscard,
+  RECIPES, FIRST_BREAD_STAGE, recipeById, sourFit, bakeScore, gradeOf, betterGrade, breadSkill, canBakeBread, canBakeDiscard,
 } from './recipes';
 export {
   RATIOS, TEMP_MULT, STAGES, FRIDGE_STAGE, FLOAT_OK_ACTIVITY, SEED_G, HOUR, DAY,

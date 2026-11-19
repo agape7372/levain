@@ -168,6 +168,7 @@ export const copy = {
     peaked: '한껏 부풀었다가 가라앉았어요',
     becameHungry: '배가 고파졌어요',
     becameSour: '조금 시큼해졌어요',
+    becameSourStrong: '많이 시큼해졌어요', // 지금 냄새가 찡하거나 아세톤일 때 — 홈 머리(phase.sourStrong)와 같은 기준 (R-03)
     hoochAppeared: '표면에 액체가 고였어요. 배고픔의 신호예요',
     wentDormant: '깊이 잠들었어요',
     moldSpotted: '표면에 반점이 생겼어요',
@@ -480,13 +481,14 @@ export const copy = {
     dormant: '르방이 깊이 잠들었어요. 깨워 주세요',
     reviveSecond: '다시 밥 줄 시간이에요',
     moldWarn: '르방이 표면에 반점이 보여요. 아직 늦지 않았어요',
-    // 단계를 가리지 않고 같은 말 — 떼기 권유는 집 단계에 따라 화면이 다르게 말하지만 알림은 단계를 모른다 (A3-07)
+    // 떼기 권유는 집 단계가 첫 빵 단계 이상일 때만(peakSplit) — 홈 머리와 같은 기준 (A3-07 · R-02)
     peak: '한창 부풀어 있어요',
+    peakSplit: '한창 부풀어 있어요. 지금 떼어 두기 좋아요',
     // 확장 슬롯 3종(2026-09-03). firstWeek은 큰 부풀기 **앞**에 오는 알림이라 미래형이다
-    // (탄생 +24h에 울리고 큰 부풀기는 그 뒤 — 과거형이면 일어나기 전에 말한 셈).
+    // (탄생 +24h에 울리고 큰 부풀기는 그 뒤에 주는 밥의 사이클 — 과거형이면 일어나기 전에 말한 셈).
     sour: '조금 시큼해졌어요. 밥을 주면 금방 돌아와요',
     stageUp: (name: string) => `${name} 단계가 되었어요`,
-    firstWeek: '오늘 크게 부풀 거예요. 곧 조용해져요. 정상이에요',
+    firstWeek: '지금 밥을 주면 크게 부풀 거예요. 곧 조용해져요. 정상이에요',
     channelWarn: '중요 알림', // Android 채널명 — 놓치면 잃는 신호(반점·깊은 잠) 전용
     permissionHint: '밥 시간을 알려줄까요',
     permissionSettings: '알림은 시스템 설정에서 켤 수 있어요',
@@ -501,9 +503,10 @@ export const copy = {
     reviveSecond: (_n: number) => '다시 밥 줄 시간이에요',
     moldWarn: (_n: number) => '표면에 반점이 보이는 르방이가 있어요. 아직 늦지 않았어요',
     peak: (_n: number) => '한창 부풀어 있는 르방이가 있어요',
+    peakSplit: (_n: number) => '한창 부풀어 있는 르방이가 있어요. 지금 떼어 두기 좋아요',
     sour: (_n: number) => '조금 시큼해진 르방이가 있어요. 밥을 주면 돌아와요',
     stageUp: (_n: number) => '단계가 오른 르방이가 있어요',
-    firstWeek: (_n: number) => '크게 부푼 르방이가 있어요. 곧 조용해져요. 정상이에요',
+    firstWeek: (_n: number) => '지금 밥을 주면 크게 부푸는 르방이가 있어요. 곧 조용해져요. 정상이에요',
   } as Record<string, (n: number) => string>,
 
   settings: {

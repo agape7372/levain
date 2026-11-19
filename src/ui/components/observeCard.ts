@@ -3,7 +3,7 @@
 // 말려두기가 여기 있는 이유 = 이 카드가 "잃을 수도 있다"를 말하는 유일한 화면이고,
 // 말려두기는 그에 대한 유일한 응답이기 때문이다. 다른 액션은 자기 자리를 따로 찾을 것.
 import { copy } from '../copy';
-import { agoText, splitAdvised, untilText } from '../format';
+import { agoText, showFakeRiseRow, splitAdvised, peakUntilText, untilText } from '../format';
 import { confirmModal, openModal } from './modal';
 import { FLAKE_COST_G, FLAKE_STAGE, FLOAT_OK_ACTIVITY, SEED_G, SPLIT_MIN_G } from '../../sim';
 import type { GameApi } from '../gameApi';
@@ -23,7 +23,7 @@ export function openObserveCard(api: GameApi): void {
   if (snap.phase === 'active') {
     // 피크는 구간 — 단정 대신 범위 (§19-1). 구간 안이면 "한창때"
     if (now < snap.peakAt) {
-      rows.push([label.rise, copy.observe.peak(untilText(snap.peakAt, now), untilText(snap.peakEndAt, now))]);
+      rows.push([label.rise, copy.observe.peak(peakUntilText(snap.peakAt, now), peakUntilText(snap.peakEndAt, now))]);
     } else if (now < snap.peakEndAt) {
       rows.push([label.rise, copy.observe.peakNow]);
     }
@@ -60,7 +60,7 @@ export function openObserveCard(api: GameApi): void {
   // 첫 주의 두 고비를 그 자리에서 말한다 — 둘째 날 크게 부풀었다 꺼지는 것, 잠잠기에 부피가 주는 것은
   // 설명이 없으면 퇴보로 읽힌다(감사 T8-06). STAGE_FILL_FACTOR가 부피를 줄이는 단계가 1(잠잠기)이다
   if (snap.phase !== 'moldy') {
-    if (snap.fakeRise) rows.push([label.season, copy.stage.fakeRise]);
+    if (showFakeRiseRow(snap)) rows.push([label.season, copy.stage.fakeRise]);
     else if (snap.stage === 1) rows.push([label.season, copy.stage.quiet]);
     // 다음 단계까지 — 며칠 뒤의 목표가 화면 어디에도 없었다
     const next = snap.nextStage;

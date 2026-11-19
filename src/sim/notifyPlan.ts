@@ -28,6 +28,8 @@ import { boundariesH, phaseAt, rateMult, stageOf } from './derive';
 export interface NotifyOpts {
   /** "한창때" 옵트인 슬롯 (settings.notifyPeak) */
   peakOptIn?: boolean;
+  /** 한창때 알림에 떼기 권유를 싣는가 — 홈과 같은 기준(집 단계 ≥ 첫 빵 단계). store가 houseStage() >= FIRST_BREAD_STAGE로 정해 넘긴다(format.splitAdvised와 같은 식)(sim은 ui를 모른다) */
+  splitAdvised?: boolean;
   /** "시큼해질 때" 옵트인 슬롯 (settings.notifySour) */
   sourOptIn?: boolean;
   /** "단계가 오를 때" 옵트인 슬롯 (settings.notifyStage) */
@@ -51,6 +53,7 @@ const DROP_ORDER: Record<NotifySlot['copyKey'], number> = {
   fridgeWeek: 3,
   sour: 4,
   peak: 5,
+  peakSplit: 5,
   stageUp: 6,
   firstWeek: 7,
 };
@@ -145,7 +148,7 @@ export function planNotifications(state: SimState, now: number, opts?: NotifyOpt
   if (opts?.peakOptIn) {
     const at = cq(wallFor(b.peakStart));
     if (at > now && at < wallFor(b.peakEnd)) {
-      slots.push({ id: NOTIFY_SLOT_PEAK, at, copyKey: 'peak', weekly: false });
+      slots.push({ id: NOTIFY_SLOT_PEAK, at, copyKey: opts.splitAdvised ? 'peakSplit' : 'peak', weekly: false });
     }
   }
 
