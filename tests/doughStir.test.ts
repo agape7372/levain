@@ -5,7 +5,8 @@
 import { describe, it, expect } from 'vitest';
 import * as THREE from 'three';
 import { toRenderParams } from '../src/render/renderParams';
-import { DoughMesh, GRAB_FIELD, R_BODY, STIR_FIELD, STIR_SPIRAL, SWIRL_N } from '../src/render/dough/DoughMesh';
+import { DoughMesh, GRAB_FIELD, MEM_NA, MEM_NR, R_BODY, STIR_FIELD, STIR_FOLD, SWIRL_N } from '../src/render/dough/DoughMesh';
+import { BubbleSystem } from '../src/render/bubbles';
 import { createJar, HOOCH_COVER, MARBLE_GLSL, SURF_TILT } from '../src/render/jar';
 import { SceneHost } from '../src/render/SceneHost';
 import { simSnap, STATE_HOURS } from '../scripts/lib/simSnap';
@@ -34,6 +35,9 @@ const idle = (d: DoughMesh, t0: number, sec: number): number => {
 const tipOf = (d: DoughMesh) => d.material.uniforms.uTip.value as THREE.Vector4;
 const tipBOf = (d: DoughMesh) => d.material.uniforms.uTipB.value as THREE.Vector4;
 const swirlOf = (d: DoughMesh) => d.material.uniforms.uSwirl.value as THREE.Vector2[];
+/** 저은 자리 기억 칸(재료 좌표 극좌표, 반경 i × 각 j) — uMem vec4 묶음을 편다 */
+const memOf = (d: DoughMesh): number[] =>
+  (d.material.uniforms.uMem.value as THREE.Vector4[]).flatMap((v) => [v.x, v.y, v.z, v.w]);
 
 describe('되기 — stirThickness 0 묽음 · 1 되직', () => {
   it('갓 밥준(되직)이 시큼(묽음)보다 크고 0~1 안', () => {
@@ -298,11 +302,11 @@ describe('윗물 섬 고침(S7 · §6-9) — 반죽 기울기는 덮이면 끄�
     expect(HOOCH_COVER).toContain('smoothstep(0.30, 0.80, amt)');
     expect(hv).toContain('clamp(tilt, -0.6 * uThick, 0.6 * uThick)');
   });
-  it('솟는 항(앞 둔덕 · 나선 마루 · 밑동 둔덕 · 더미) × (1 − 0.85·덮임)', () => {
+  it('솟는 항(앞 둔덕 · 접힌 주름 마루 · 밑동 둔덕 · 더미) × (1 − 0.85·덮임)', () => {
     expect(STIR_FIELD).toContain('return 1.0 - 0.85 * hoochSpread(uHooch);');
     // 젓기 v3: 패임은 그대로, 솟는 앞 둔덕 · 나선 마루만 누른다
     expect(STIR_FIELD).toContain('float eb = uTip.w * riseK() *');
-    expect(STIR_FIELD).toContain('(sn > 0.0 ? riseK() : 1.0)');
+    expect(STIR_FIELD).toContain('(prof > 0.0 ? riseK() : 1.0)');
     expect(GRAB_FIELD).toContain('return o * riseK();');
   });
   it('surfaceY(CPU)도 덮이면 기울기가 없다', () => {
@@ -376,20 +380,22 @@ describe('젓기 v3 — 손끝 패임 · 앞 둔덕(닫힌 식, 루프 0)', () =
     idle(d, 20 / 60, 0.75);
     expect(tipOf(d).z).toBeLessThan(1e-4);
     expect(tipOf(d).w).toBeLessThan(1e-4);
-    expect(Math.max(...swirlOf(d).map((v) => v.y))).toBeLessThan(1e-3);
+    expect(Math.max(...memOf(d))).toBeLessThan(1e-3);
   });
   it('셰이더: vert · frag가 같은 STIR_FIELD 문자열 · 반경 칸 uSwirl 길이 SWIRL_N · 루프 없음', () => {
     const d = new DoughMesh();
     for (const s of [d.material.vertexShader, d.material.fragmentShader]) {
       expect(s).toContain(STIR_FIELD);
       expect(s).toContain(`uniform vec2 uSwirl[${SWIRL_N}];`);
+      expect(s).toContain(`uniform vec4 uMem[${(MEM_NR * MEM_NA) / 4}];`); // 텍스처 fetch 없이 uniform 배열
       expect(s).not.toMatch(/uTrail|trailGroove/);
     }
     expect(STIR_FIELD).not.toMatch(/\bfor\s*\(/);
     // frag는 fbmG를 따로 두지 않는다(STIR_FIELD 하나)
     expect(d.material.fragmentShader.split('vec2 fbmG(vec2 p0)').length - 1).toBe(1);
-    expect(d.material.vertexShader).toContain('disp += stirField(p.xz, sw, q).x;');
-    expect(d.material.fragmentShader).toMatch(/vec4 sf = stirField\(vXZ, sw, q\);\s*dBs \+= sf\.yz;/);
+    expect(d.material.vertexShader).toContain('disp += stirField(p.xz, sw, q, memAt(length(p.xz), q)).x;');
+    expect(d.material.fragmentShader).toMatch(/vec4 sf = stirField\(vXZ, sw, q, mem\);\s*dBs \+= sf\.yz;/);
+    for (const s of [d.material.vertexShader, d.material.fragmentShader]) expect(s).not.toMatch(/texture\(uMem/);
   });
   it('높이 · 기울기는 같은 식 — 기울기 = 높이의 수치 미분(패임 캡슐 · 앞 둔덕)', () => {
     // STIR_FIELD 패임 · 둔덕 부분을 JS로 옮긴 참조(문자열과 같은 상수) — 해석적 미분이 맞는지만 본다
@@ -466,26 +472,60 @@ describe('젓기 v3 — 소용돌이 Θ(반경 칸) · 저은 넓이 M', () => {
     };
     expect(spinOn('sour')).toBeGreaterThan(spinOn('justfed') * 2);
   });
-  it('반경 0.55R 한 바퀴면 저은 넓이가 윗면 60% 넘게 차고, 10~30초에 걸쳐 돌아온다(피크 기포가 다시 올라옴)', () => {
-    const d = new DoughMesh();
-    d.applyParams(RP('peak'));
-    let t = stirCircle(d, 0, 1);
-    const sw = swirlOf(d);
-    // 노드 i는 r = i/8·R — M ≥ 0.6인 노드 사이 넓이 비율
-    const on = sw.map((v, i) => [i / (SWIRL_N - 1), v.y] as const).filter(([, m]) => m >= 0.6).map(([r]) => r);
-    const area = Math.max(...on) ** 2 - Math.min(...on) ** 2;
-    expect(area).toBeGreaterThan(0.6);
-    const peakM = Math.max(...sw.map((v) => v.y));
-    t = idle(d, t, 8);
-    expect(Math.max(...swirlOf(d).map((v) => v.y))).toBeGreaterThan(peakM * 0.2);
-    idle(d, t, 25);
-    expect(Math.max(...swirlOf(d).map((v) => v.y))).toBeLessThan(peakM * 0.1);
+  it('저은 자리는 각도까지 기억한다 — 반 바퀴면 손 반경 고리의 절반 남짓, 1바퀴 반이면 거의 다', () => {
+    const ringFill = (loops: number): number => {
+      const d = new DoughMesh();
+      d.applyParams(RP('peak'));
+      stirCircle(d, 0, loops);
+      const m = memOf(d);
+      const i = Math.round(0.55 * (MEM_NR - 1)); // 손 반경 0.55R에 가장 가까운 고리
+      return m.slice(i * MEM_NA, (i + 1) * MEM_NA).filter((v) => v > 0.5).length / MEM_NA;
+    };
+    const half = ringFill(0.5);
+    expect(half).toBeGreaterThan(0.3);
+    expect(half).toBeLessThan(0.8);
+    expect(ringFill(1.5)).toBeGreaterThan(0.9);
   });
-  it('나선 굴곡 높이 = STIR_SPIRAL × 0.007 × (0.5 + 0.5·되기) — 켜고 끄는 상수', () => {
-    const d = new DoughMesh();
-    d.applyParams(RP('justfed'));
-    idle(d, 0, 0.1);
-    expect(d.material.uniforms.uSpiralA.value as number).toBeCloseTo(STIR_SPIRAL * 0.007 * (0.5 + 0.5 * d.stirThickness()), 6);
+  it('기억은 되기별로 옅어진다 — 피크 8초 뒤 20% 넘게 남고 30초 넘으면 10% 밑, 되직은 더 오래', () => {
+    const left = (k: keyof typeof STATE_HOURS, sec: number): number => {
+      const d = new DoughMesh();
+      d.applyParams(RP(k));
+      idle(d, stirCircle(d, 0, 1), sec);
+      return Math.max(...memOf(d));
+    };
+    expect(left('peak', 8)).toBeGreaterThan(0.2);
+    expect(left('peak', 33)).toBeLessThan(0.1);
+    expect(left('justfed', 20)).toBeGreaterThan(left('peak', 20));
+  });
+  it('접힌 주름 높이 · 저은 자리 광은 되기별 — 되직 굵고 무광 · 피크 중간 반들 · 묽음 거의 없음(STIR_FOLD로 켜고 끔)', () => {
+    const k = (st: keyof typeof STATE_HOURS) => {
+      const d = new DoughMesh();
+      d.applyParams(RP(st));
+      idle(d, 0, 0.1);
+      return d.material.uniforms.uStirK.value as THREE.Vector4;
+    };
+    const [jf, pk, so] = [k('justfed'), k('peak'), k('sour')];
+    expect(STIR_FOLD).toBe(1);
+    expect(jf.x).toBeGreaterThan(pk.x);
+    expect(pk.x).toBeGreaterThan(so.x * 4);
+    expect(jf.y).toBeLessThan(pk.y); // 되직 무광 < 피크 반들
+    expect(so.z).toBeGreaterThan(jf.z); // 광 흐름은 묽을 때만
+  });
+});
+
+describe('젓기 v3 — 동적 기포도 소용돌이를 따라 돈다', () => {
+  it('BubbleSystem.swirl은 반경을 지키며 제 반경의 각만큼 돌린다', () => {
+    const b = new BubbleSystem();
+    b.update(0, 1, 1);
+    const i = b.amp.findIndex((_, k) => b.pos[k * 2] !== 0 || b.pos[k * 2 + 1] !== 0);
+    expect(i).toBeGreaterThanOrEqual(0);
+    const [x0, z0] = [b.pos[i * 2], b.pos[i * 2 + 1]];
+    b.swirl(() => Math.PI / 2);
+    b.update(0.01, 0, 1);
+    const [x1, z1] = [b.pos[i * 2], b.pos[i * 2 + 1]];
+    expect(Math.hypot(x1, z1)).toBeCloseTo(Math.hypot(x0, z0), 6);
+    expect(x1).toBeCloseTo(-z0, 6);
+    expect(z1).toBeCloseTo(x0, 6);
   });
 });
 

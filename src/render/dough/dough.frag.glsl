@@ -42,8 +42,9 @@ uniform float uBumpAmp[4];
 uniform float uBumpK[4];
 uniform vec4 uTip;         // 손끝 (머리 x, z, 패임 깊이, 앞 둔덕 높이) — vert와 같은 소스(STIR_FIELD)
 uniform vec4 uTipB;        // (진행 방향 x, z, 꼬리 x, z)
-uniform vec2 uSwirl[9];    // 반경 칸 노드 (Θ 누적 각, M 저은 넓이) — 무늬 도메인 회전 · 저은 넓이 기억
-uniform float uSpiralA;    // 나선 굴곡 높이(월드)
+uniform vec2 uSwirl[9];    // 반경 칸 노드 (Θ 누적 각, ω 각속도) — r = i/8 · uRBody
+uniform vec4 uMem[28];     // 저은 자리 기억 — 재료 좌표 극좌표 7 × 16칸을 vec4로 묶음(DoughMesh MEM_NR · MEM_NA)
+uniform vec4 uStirK;       // (접힌 주름 높이, 저은 자리 광, 시큼 광 흐름, 0) — 되기 · 숙성별(CPU)
 uniform vec2 uPokePos;
 uniform float uPokeAmt;
 uniform float uPokeK;
@@ -127,15 +128,26 @@ void main() {
   // 젓기 v3 — 손끝 패임 · 앞 둔덕 · 나선 굴곡(버텍스와 같은 함수의 기울기). 비용 때문에 윗면에서만 — 옆벽은 테두리 높이만 따른다
   float tipWet = 0.0;      // 갓 판 손끝 패임 몫 — 젖은 광 · 바늘구멍 지움 · 따뜻한 그늘
   float stirM = 0.0;       // 저은 넓이(S1) — 지나간 넓은 자리. 바늘구멍 지움 · 반들 · 밝은 흰 결
+  float foldH = 0.0;       // 패임 · 둔덕 · 접힌 주름 높이(월드) — 마루 밝게 · 골 그늘
   if (vTop > 0.5) {
-    vec4 sf = stirField(vXZ, sw, q);
+    float mem = memAt(length(vXZ), q);
+    vec4 sf = stirField(vXZ, sw, q, mem);
     dBs += sf.yz;
+    foldH = sf.x;
     tipWet = sf.w * clamp(uTip.z / 0.02, 0.0, 1.0);
-    stirM = sw.y * (1.0 - smoothstep(0.85, 1.0, length(vXZ) / uRBody));
+    stirM = mem * (1.0 - smoothstep(0.85, 1.0, length(vXZ) / uRBody));
+    // 시큼 광 흐름(fGJz 55~60s) — 돌아간 q의 잔 광택이 각속도 · 저은 자리만큼 세져 수면 위를 흘러간다(묽을 때만, uStirK.z)
+    if (uStirK.z > 1e-4) {
+      vec2 gl = fbmG(q * 3.2 + 7.0);
+      float cs = cos(sw.x), si = sin(sw.x);
+      dBs += vec2(cs * gl.x - si * gl.y, si * gl.x + cs * gl.y) * (uStirK.z * max(clamp(abs(sw.y) / 2.0, 0.0, 1.0), stirM));
+    }
   }
   // 저은 자리는 조금 밝은 흰 결 — 같은 Θ로 돌아 늘어난 모틀(q)의 밝은 쪽이 결로 남는다(UPQ94 2s→3s 기포 무광 → 매끈한 흰 결).
   // 0.08 + 0.17은 추정 — 실측 없음
   base = mix(base, vec3(0.99, 0.975, 0.945), stirM * (0.08 + 0.17 * smoothstep(-0.1, 0.35, mott)));
+  // 마루는 밝고 골은 그늘(빛 각도와 무관한 틈 그늘) — 낮은 빛만으론 1배에서 주름이 흐렸다(r5). ±9%는 추정 — 실측 없음
+  base *= 1.0 + 0.09 * clamp(foldH / 0.03, -1.0, 1.0);
   // 당기기 밑동 둔덕 · 더미(L2a · L6) — 버텍스와 같은 함수(GRAB_FIELD)의 기울기
   if (uGrab.x + uPile.z > 1e-5) dBs += grabField(vXZ).yz * vTop;
   // 더미는 갓 떨어진 매끈한 반죽 — 반들하고(젖은 광) 조금 밝다. 낮은 키 빛(28.6°)에 먼 쪽 비탈만 그늘이면 짙은 얼룩으로 읽혔다(시각 고침 1차 A-4).
@@ -210,9 +222,9 @@ void main() {
   vec3 nrm = normalize(vBaseN - vec3(dBs.x, 0.0, dBs.y) * (uSlopeAspect * (1.0 - 0.7 * matte)));
   // 음영(반구 앰비언트 · wrap diffuse · 소프트박스 광 · 경사 페널티) = DOUGH_SHADE — 가닥 셰이더와 같은 함수.
   // 갓 판 패임 · 저은 넓은 자리는 반들하다(S1 · S8 oelv 214+3-5). 옛 marbleBand 감긴 결 광은 뺐다 — 이제 모틀 · 광택 도메인이 직접 돈다.
-  // 저은 넓이 광 0.6은 추정 — 실측 없음(1.6.16 띠 0.5보다 조금 위)
+  // 저은 자리 광 = uStirK.y(되직 무광 0.15 · 피크 반들 0.7 · 묽음 0.6) — 추정 — 실측 없음
   float ndl;
-  vec3 col = doughShade(nrm, base, vXZ, min(1.0, uWet + 0.4 * tipWet + 0.6 * stirM + 0.5 * pileM), matte, ndl);
+  vec3 col = doughShade(nrm, base, vXZ, min(1.0, uWet + 0.4 * tipWet + uStirK.y * stirM + 0.5 * pileM), matte, ndl);
   // 고랑 그늘을 따뜻하게(시각 고침 2차 B-5) — 밝기는 두고 그늘 쪽(ndl 낮음)만 채도를 반죽 쪽으로 1.3배(반투명 반죽 속 산란).
   // 같은 채도로 어두워지기만 하면 갓 밥준 고랑이 회색 기로 탁했다(hi1_stir). 1.3 · 문턱 0.3~0.6은 추정 — 실측 없음
   {

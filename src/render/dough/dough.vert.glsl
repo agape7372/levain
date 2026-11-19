@@ -28,8 +28,9 @@ uniform vec4 uGrab;        // x = 밑동 둔덕 높이(월드), y = 끌려 모�
 uniform vec4 uPile;        // 더미 (x, z, 높이, 반경) — 떨어진 가닥이 닿은 자리, τ_pile로 가라앉는다
 uniform vec4 uTip;         // 손끝 (머리 x, z, 패임 깊이, 앞 둔덕 높이) — 젓기 v3(DoughMesh STIR_FIELD)
 uniform vec4 uTipB;        // (진행 방향 x, z, 꼬리 x, z) — 꼬리 = τ초 전 손끝
-uniform vec2 uSwirl[9];    // 반경 칸 노드 (Θ 누적 각, M 저은 넓이) — r = i/8 · uRBody
-uniform float uSpiralA;    // 나선 굴곡 높이(월드) — STIR_SPIRAL 0이면 0
+uniform vec2 uSwirl[9];    // 반경 칸 노드 (Θ 누적 각, ω 각속도) — r = i/8 · uRBody
+uniform vec4 uMem[28];     // 저은 자리 기억 — 재료 좌표 극좌표 7 × 16칸을 vec4로 묶음(DoughMesh MEM_NR · MEM_NA)
+uniform vec4 uStirK;       // (접힌 주름 높이, 저은 자리 광, 시큼 광 흐름, 0) — 되기 · 숙성별(CPU)
 uniform float uHooch;      // 윗물 양 — 덮이면 수면 기울기를 끄고 솟는 항을 누른다(§6-9, SURF_TILT)
 uniform float uRipe;
 uniform float uCollapse;
@@ -100,7 +101,7 @@ vec3 topPoint(vec2 xz0, float layer) {
     disp += uBumpAmp[i] * exp(-dot(d, d) * uBumpK[i]);
   }
   // 젓기 v3 — 손끝 패임 · 앞 둔덕 · 나선 굴곡의 실제 높이(배율 없음 — 가우스 반경이 칸 5개 넘게 넓어 옛 U자 벽 톱니가 없다)
-  disp += stirField(p.xz, sw, q).x;
+  disp += stirField(p.xz, sw, q, memAt(length(p.xz), q)).x;
   // 밑동 둔덕 · 더미(L2a · L6) — 프래그가 같은 함수의 기울기를 쓴다
   if (uGrab.x + uPile.z > 1e-5) disp += grabField(p.xz).x;
 

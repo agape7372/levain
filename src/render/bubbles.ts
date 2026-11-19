@@ -92,6 +92,19 @@ export class BubbleSystem {
   }
 
   /** t: 렌더 시계(초). density·scale: RenderParams. agitation: 젓는 세기 0~1 */
+  /** 소용돌이 — 살아 있는 기포를 제 반경의 각(dTheta(r), rad)만큼 가운데 둘레로 돌린다(젓는 손을 따라 돈다, DoughMesh 젓기 v3) */
+  swirl(dTheta: (r: number) => number): void {
+    for (const b of this.bubbles) {
+      if (!b.active) continue;
+      const a = dTheta(Math.hypot(b.x, b.z));
+      if (a === 0) continue;
+      const c = Math.cos(a), s = Math.sin(a);
+      const x = b.x;
+      b.x = c * x - s * b.z;
+      b.z = s * x + c * b.z;
+    }
+  }
+
   update(t: number, density: number, scale: number, agitation = 0): void {
     this.popsThisFrame = 0;
 

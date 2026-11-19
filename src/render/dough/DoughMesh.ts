@@ -55,8 +55,11 @@ function seededRandom(seed: number): () => number {
 //    이제 닫힌 식 셋: 손끝 패임(캡슐 하나) + 앞 둔덕(초승달 하나) + 반경 칸 소용돌이 상태(누적 각 Θ · 저은 넓이 M) ──
 /** 반지름 칸 노드 수 — r = i/8 · R (i 0~8). 셰이더 uSwirl 길이와 같다(테스트가 잠근다) */
 export const SWIRL_N = 9;
-/** 나선 굴곡 켬(1) · 끔(0) — 시안 비교용. 켜면 저은 넓이(M) 안에 Θ를 따라 감긴 낮은 굴곡이 선다 */
-export const STIR_SPIRAL: number = 1;
+/** 접힌 주름 켬(1) · 끔(0) — 시안 비교용(2차: 1차 나선 굴곡 자리) */
+export const STIR_FOLD: number = 1;
+/** 저은 자리 기억 칸 — 무늬 도메인(q) 극좌표 반경 MEM_NR(r = i/6 · R) × 각 MEM_NA. uMem은 vec4 묶음(셰이더 배열 길이 = 칸 ÷ 4, 테스트가 잠근다) */
+export const MEM_NR = 7;
+export const MEM_NA = 16;
 /** 오브젝트 단위 반죽 지름 D — 아래 크기는 전부 D 배수(폰 D ≈ 216 CSS px, 손가락 ≈ 0.4D) */
 const D_O = D_W / XZ_SCALE;
 /** 손끝 패임 깊이(월드) — 손끝(머리)에서 최대, 꼬리(τ 전 자리)로 갈수록 0.35배. 1.6.16 고랑 실제 높이 0.012의 약 3.5배 —
@@ -70,11 +73,12 @@ const TIP_TAU_PEAK = 0.18;
 const TIP_TAU_FLUID = 0.1;
 /** 앞 둔덕(S2 · UPQ94 4s 숟가락 앞 둔덕 0.4~0.5D) — 머리 앞 0.2D에 초승달(옆으로 0.22D 반경 → 보이는 지름 ≈ 0.45D, 양끝이 뒤로 휜다).
  *  손가락(0.4D) 옆 · 앞으로 삐져나와 보이게. 높이 = 패임 × 1.25 × (0.4 + 0.6·되기). 추정 — 실측 없음(높이를 못 잰다) */
-const BOW_AHEAD = 0.2 * D_O;
-const BOW_LA = 0.09 * D_O;
-const BOW_LC = 0.22 * D_O;
-const BOW_CURVE = 1.1 / D_O;
-const BOW_GAIN = 1.25;
+const BOW_AHEAD = 0.25 * D_O;
+const BOW_LA = 0.12 * D_O;
+const BOW_LC = 0.3 * D_O;
+const BOW_CURVE = 0.9 / D_O;
+/** 2차 1.25 → 1.9 · 폭 0.22D → 0.3D — 1차는 1배에서 손가락 옆으로 또렷하지 않았다 */
+const BOW_GAIN = 1.9;
 /** 되기별 패임 · 둔덕 몫 — 묽음(시큼)은 거의 없이 광 흐름 + 출렁(f). 0.12는 추정 */
 const DENT_FLUID_K = 0.12;
 /** 메워짐 τ(s) — 묽으면 빨리, 되직하면 늦게, 피크는 덜 메워진다(1.6.16 값 그대로) */
@@ -94,14 +98,29 @@ const SPIN_RISE_TAU = 0.15;
 const SHEAR_MAX = 0.45;
 /** 저은 넓이 기억(S1) — 손끝 반경 ± 0.4R(손가락 반폭 0.2D)은 다 차고 0.6R에서 0. 반경 0.55R 한 바퀴 = 1(윗면 60% 넘게).
  *  τ = 6s(묽음) ~ 10s(되직) → 10~30초에 돌아온다(피크는 기포가 다시 올라옴). 추정 — 실측 없음(UPQ94 2s→3s · 8-13s만 봤다) */
-const MEM_FULL = 0.4;
-const MEM_EDGE = 0.6;
-const MEM_PER_TURN = 1.2;
-const MEM_TAU_FLUID = 6;
-const MEM_TAU_THICK = 10;
+/** 2차: 각도까지 기억 — 손끝(재료 좌표 q)에서 0.22D 안은 다 차고 0.36D에서 0(손가락 0.4D 폭 + 밀린 자리). 반 바퀴면 반 고리만.
+ *  τ 5s(묽음) ~ 12s(되직, 주름이 20~30초 남음) · 피크 8s(기포가 다시 올라옴). 추정 — 실측 없음 */
+const MEM_IN = 0.22 * D_O;
+const MEM_OUT = 0.36 * D_O;
+const MEM_TAU_FLUID = 5;
+const MEM_TAU_THICK = 12;
+const MEM_TAU_PEAK = 8;
 /** 나선 굴곡(d) — 높이(월드) × (0.5 + 0.5·되기) · 파장 0.25D. 낮게 — 그늘보다 광의 결로 읽히는 값. 추정 — 실측 없음 */
-const SPIRAL_A = 0.007;
-const SPIRAL_L = 0.25 * D_O;
+/** 접힌 주름(2차) — 높이(월드) 되직 0.045 · 피크 0.026 · 묽음 0.002, 간격(= 주름 하나 굵기) 0.11D, 휨 0.25D(±1줄 넘게).
+ *  폰 1배(윗면 ≈ 146px)에서 주름 하나 ≈ 16px — 손가락 옆 · 뒤로 읽히는 굵기. 추정 — 실측 없음 */
+const FOLD_A_THICK = 0.045;
+const FOLD_A_PEAK = 0.026;
+const FOLD_A_FLUID = 0.002;
+const FOLD_L = 0.11 * D_O;
+const FOLD_WARP = 0.25 * D_O;
+/** 저은 자리 광 — 되직은 무광(0.15) · 피크 반들(0.7) · 묽음 0.6. 시큼 광 흐름(돌아간 q의 잔 광택 세기) 0.16. 추정 */
+const MEM_GLOSS_THICK = 0.15;
+const MEM_GLOSS_PEAK = 0.7;
+const MEM_GLOSS_FLUID = 0.6;
+const FLOW_GLINT = 0.45;
+/** 시큼 출렁 — 젓기 출렁 목표 배율 · 상한(1차 5 · 0.6). fGJz 55~60s 수면이 크게 기울며 광이 흐른다. 추정 */
+const SLOSH_GAIN = 9;
+const SLOSH_MAX = 0.95;
 /** 피크 꺼짐 보이기(e) — knock(0~KNOCK_MAX)가 꽉 차면 반죽 높이 7% ↓(렌더만 · 옆벽 수위선도 같이). τ20s라 30~60초에 돌아온다 */
 const KNOCK_DROP = 0.07;
 /** 손끝 지연 기록 길이 — 0.25s × 60Hz 넘게 */
@@ -128,7 +147,8 @@ const MURK_FALL_TAU = 5;
 /**
  * 젓기 v3 함수 — 버텍스(높이 x)와 프래그(기울기 yz · 손끝 젖음 w)가 이 소스 하나를 쓴다(규칙 8). 루프 0.
  * swirlAt = 반경 칸 노드(uSwirl: Θ 누적 각 · M 저은 넓이) 선형 보간 + 반경 미분. swirlQ = 무늬 도메인(반죽이 Θ만큼 돌았으니 거꾸로 돌려 읽는다).
- * stirField = 손끝 패임(꼬리 → 머리 캡슐) + 앞 둔덕(초승달) + 나선 굴곡(uSpiralA > 0일 때, M 안에서 Θ를 따라 감김).
+ * stirField = 손끝 패임(꼬리 → 머리 캡슐) + 앞 둔덕(초승달) + 접힌 주름(저은 자리 기억 memAt 안에서만).
+ * memAt = 재료 좌표 q의 극좌표 칸(uMem, 각도까지) 쌍선형 — 기억이 반죽과 같이 돈다.
  * 솟는 항(앞 둔덕 · 나선 마루)은 윗물 아래서 riseK()만큼 눌린다(§6-9). fbmG(해석적 FBM 기울기)도 여기 — vert는 높이만 써서 컴파일러가 버린다.
  * 앞에 SURF_TILT(hoochSpread) · FBM_GLSL(fbm)이 끼워져 있어야 한다.
  */
@@ -139,7 +159,10 @@ const float BOW_AHEAD = ${BOW_AHEAD};
 const float BOW_LA = ${BOW_LA};
 const float BOW_LC = ${BOW_LC};
 const float BOW_CURVE = ${BOW_CURVE};
-const float SPIRAL_L = ${SPIRAL_L};
+const float FOLD_L = ${FOLD_L};
+const float FOLD_WARP = ${FOLD_WARP};
+const int MEM_NR = ${MEM_NR};
+const int MEM_NA = ${MEM_NA};
 // 솟는 항 배율 — 윗물 덮인 반죽은 덜 솟는다(§6-9). 앞 둔덕 · 나선 마루 · 밑동 둔덕 · 더미가 같이 쓴다
 float riseK() { return 1.0 - 0.85 * hoochSpread(uHooch); }
 // 해석적 FBM 그라디언트 — sin·cos 도함수 체인 (유한차분 편향·매직 e 제거, §예산)
@@ -166,8 +189,27 @@ vec2 swirlQ(vec2 p, float th) {
   float c = cos(th), s = sin(th);
   return vec2(c * p.x + s * p.y, -s * p.x + c * p.y);
 }
-// (높이 월드, 기울기 xz, 손끝 젖음 0~1). sw = swirlAt(|p|), q = swirlQ(p, sw.x)
-vec4 stirField(vec2 p, vec4 sw, vec2 q) {
+// 저은 자리 기억 칸 하나 — vec4 묶음에서 꺼낸다(동적 첨자, 텍스처 fetch 0)
+float memNode(int i, int j) {
+  int k = i * MEM_NA + j;
+  vec4 v = uMem[k / 4];
+  int c = k - (k / 4) * 4;
+  return c == 0 ? v.x : (c == 1 ? v.y : (c == 2 ? v.z : v.w));
+}
+// 재료 좌표 q의 기억 0~1 — 반경 노드 i = r/R · (MEM_NR − 1), 각 노드 j = (atan/2π + 0.5) · MEM_NA(한 바퀴 돌아 이어진다)
+float memAt(float r, vec2 q) {
+  float x = clamp(r / uRBody, 0.0, 1.0) * float(MEM_NR - 1);
+  int i = min(int(x), MEM_NR - 2);
+  float y = (atan(q.y, q.x) * 0.159155 + 0.5) * float(MEM_NA);
+  float fy = floor(y);
+  int j = int(fy) - (int(fy) / MEM_NA) * MEM_NA;
+  int j1 = j + 1 == MEM_NA ? 0 : j + 1;
+  float tx = x - float(i);
+  float ty = y - fy;
+  return mix(mix(memNode(i, j), memNode(i, j1), ty), mix(memNode(i + 1, j), memNode(i + 1, j1), ty), tx);
+}
+// (높이 월드, 기울기 xz, 손끝 젖음 0~1). sw = swirlAt(|p|), q = swirlQ(p, sw.x), mem = memAt(|p|, q)
+vec4 stirField(vec2 p, vec4 sw, vec2 q, float mem) {
   vec4 o = vec4(0.0);
   if (uTip.z + uTip.w > 1e-5) {
     // 손끝 패임 — 꼬리(τ초 전 손끝)에서 머리(지금 손끝)까지 캡슐. 머리 쪽이 깊고 꼬리 쪽이 얕다(손끝 뒤 패임이 조금 남는다, 8uAT 46~49s)
@@ -191,29 +233,35 @@ vec4 stirField(vec2 p, vec4 sw, vec2 q) {
     float b = dot(h, t) - BOW_AHEAD + BOW_CURVE * c * c;
     float eb = uTip.w * riseK() * exp(-b * b / (BOW_LA * BOW_LA) - c * c / (BOW_LC * BOW_LC));
     o.x += eb;
+    // 갓 밀린 둔덕도 젖어 반들하다 — 밝은 마루(프래그 광 · 바늘구멍 지움)
+    o.w = max(o.w, 0.8 * eb / max(uTip.w, 1e-5));
     o.yz -= eb * 2.0 * ((t + 2.0 * BOW_CURVE * c * n) * (b / (BOW_LA * BOW_LA)) + n * (c / (BOW_LC * BOW_LC)));
   }
-  // 나선 굴곡 — 반경 파장 SPIRAL_L의 결을 돌아간 도메인(q)의 fbm으로 크게(1.2파장) 휘고, 다른 fbm으로 군데군데 끊어 짧은 밧줄 주름 토막만 남긴다.
-  // 1회전: 한 갈래 아르키메데스 나선(ψ에 각 항)은 반경 사이 Θ 차(전단)만큼 감겨 3바퀴 만에 과녁 · 레코드판 동심원이 됐다(.work/r1).
-  // 각 항을 빼면 결은 회전에 불변이고, 휨 · 끊김 fbm만 q에서 읽혀 주름 토막이 손을 따라 돈다. M 안에서만 · 가운데 · 테두리는 끈다
-  if (uSpiralA > 1e-5 && sw.y > 0.004) {
+  // 접힌 주름(2차, 8uAT 44~50s · UPQ94 2~6s) — 손이 지나간 자리(mem)에만 밧줄 같은 주름이 실제 높이로 남는다.
+  // 단면 |sin| − 0.55 = 둥근 마루 · 날카로운 골(접힌 자국). 결은 반경 방향 간격 FOLD_L(0.11D)인데 돌아간 도메인 q의 fbm으로
+  // ±1줄 넘게 휘고(과녁 · 레코드 동심원 금지) 다른 fbm으로 끊어 길이 · 굵기가 제각각인 토막만 남긴다. 휨 · 끊김이 q에서 읽혀 손을 따라 돈다.
+  // 1차 나선(각 항)은 전단에 감겨 동심원이 됐고, 반경 고리 기억은 반 바퀴에도 고리 전체에 깔렸다 — 이제 각도까지 기억(uMem)
+  if (uStirK.x > 1e-5 && mem > 0.004) {
     float r = max(length(p), 1e-4);
     float rq = r / uRBody;
-    float m = uSpiralA * sw.y * smoothstep(0.2, 0.4, rq) * (1.0 - smoothstep(0.8, 0.95, rq));
-    vec2 qk = q * 1.6;
+    float m = uStirK.x * mem * smoothstep(0.12, 0.3, rq) * (1.0 - smoothstep(0.82, 0.96, rq));
+    vec2 qk = q * 1.7;
     float f = fbm(qk);
-    float brk = smoothstep(-0.05, 0.4, fbm(q * 1.3 + 4.0));
-    float psi = r / SPIRAL_L + 1.2 * f;
-    float sn = sin(6.2832 * psi);
-    // 마루만 riseK — 윗물 아래선 덜 솟는다
-    float amp = m * brk * (sn > 0.0 ? riseK() : 1.0);
-    o.x += amp * sn;
-    // ∇_q ψ → ∇_p ψ = Rot(Θ)·∇_q ψ − (∇_q ψ · ⊥q)·Θ'(r)·p/r (q = Rot(−Θ(r))·p의 연쇄 법칙)
-    vec2 pq = vec2(-q.y, q.x);
-    vec2 gq = q / (r * SPIRAL_L) + 1.2 * 1.6 * fbmG(qk);
+    // r4: 휨 하나로는 뒤쪽에 긴 동심 호가 줄지었다 → 잔 휨(q·3.4, 0.45줄)을 더하고 끊김을 촘촘히(q·3.6)
+    vec2 qj = q * 3.4 + 2.0;
+    float f2 = fbm(qj);
+    float brk = smoothstep(-0.05, 0.3, fbm(q * 3.6 + 9.0)) * (0.6 + 0.4 * smoothstep(-0.3, 0.3, f));
+    float psi = (r + FOLD_WARP * f) / FOLD_L + 0.45 * f2;
+    float sn = sin(3.14159 * psi);
+    float prof = abs(sn) - 0.55;
+    float amp = m * brk * (prof > 0.0 ? riseK() : 1.0); // 마루만 riseK — 윗물 아래선 덜 솟는다
+    o.x += amp * prof;
+    // ∇ψ = (p/r + WARP·∇f)/L, ∇f = Rot(Θ)·∇_q f(전단 항은 SHEAR_MAX 안이라 뺐다) · 끊김 fbm 기울기는 뺀다(부드러운 몫)
+    vec2 g = fbmG(qk) * 1.7;
     float cs = cos(sw.x), si = sin(sw.x);
-    vec2 gp = vec2(cs * gq.x - si * gq.y, si * gq.x + cs * gq.y) - dot(gq, pq) * sw.z * p / r;
-    o.yz += amp * 6.2832 * cos(6.2832 * psi) * gp;
+    vec2 gw = FOLD_WARP * g / FOLD_L + 0.45 * 3.4 * fbmG(qj);
+    vec2 gp = p / (r * FOLD_L) + vec2(cs * gw.x - si * gw.y, si * gw.x + cs * gw.y);
+    o.yz += amp * sign(sn) * 3.14159 * cos(3.14159 * psi) * gp;
   }
   return o;
 }
@@ -325,8 +373,9 @@ export class DoughMesh {
   /** 소용돌이 노드(r = i/8 · R) — Θ 누적 각(rad, 풀리지 않는다) · 각속도 · 저은 넓이 M 0~1 · 이번 획이 쌓은 M(잡기 확정 때 뺀다) */
   private swTheta = new Float32Array(SWIRL_N);
   private swOmega = new Float32Array(SWIRL_N);
-  private swMem = new Float32Array(SWIRL_N);
-  private swStroke = new Float32Array(SWIRL_N);
+  /** 저은 자리 기억(재료 좌표 극좌표 칸) · 이번 획 시작 때 사본(잡기 확정 때 되돌린다, §6-12) */
+  private mem = new Float32Array(MEM_NR * MEM_NA);
+  private memSnap = new Float32Array(MEM_NR * MEM_NA);
   private prevTipAng = NaN;
   private tailTmp = new THREE.Vector2();
   /** 젓는 세기 0~1 — 기포 가속·젖은 광 부스트·사운드 게인의 공통 소스 */
@@ -403,11 +452,13 @@ export class DoughMesh {
         uBumpAmp: { value: new Float32Array(DYN_SLOTS) },
         uBumpK: { value: new Float32Array(DYN_SLOTS) },
         // 젓기 v3(2026-11-19 손맛 3차) — 손끝 (머리 x, z, 패임 깊이, 앞 둔덕 높이) · (진행 방향 x, z, 꼬리 x, z) ·
-        // 소용돌이 노드 (Θ, M) × SWIRL_N · 나선 굴곡 높이(STIR_SPIRAL 0이면 0)
+        // 소용돌이 노드 (Θ, ω 각속도) × SWIRL_N · 저은 자리 기억 칸(재료 좌표 극좌표, vec4 묶음) ·
+        // 세기 (접힌 주름 높이, 저은 자리 광, 시큼 광 흐름, 0)
         uTip: { value: new THREE.Vector4() },
         uTipB: { value: new THREE.Vector4(1, 0, 0, 0) },
         uSwirl: { value: Array.from({ length: SWIRL_N }, () => new THREE.Vector2()) },
-        uSpiralA: { value: 0 },
+        uMem: { value: Array.from({ length: (MEM_NR * MEM_NA) / 4 }, () => new THREE.Vector4()) },
+        uStirK: { value: new THREE.Vector4() },
         uPokePos: { value: new THREE.Vector2() },
         uPokeAmt: { value: 0 },
         uPokeK: { value: POKE_K0 },
@@ -557,10 +608,7 @@ export class DoughMesh {
     // 패임 · 앞 둔덕은 τ0.1s로 지우고, 이 획이 쌓은 저은 넓이는 M에서 뺀다(§6-12 — 들기 전 32px가 저은 자리로 남지 않게).
     // Θ는 32px 몫이라 작아 그대로 둔다(되감기면 무늬가 거꾸로 도는 게 보인다)
     this.tipFast = true;
-    for (let i = 0; i < SWIRL_N; i++) {
-      this.swMem[i] = Math.max(0, this.swMem[i] - this.swStroke[i]);
-      this.swStroke[i] = 0;
-    }
+    for (let k = 0; k < this.mem.length; k++) this.mem[k] = Math.min(this.mem[k], this.memSnap[k]);
     // 젓기 획은 여기서 끝 — 머리가 계속 파지 않게
     this.lastStirInputT = this.lastHandStirT = -Infinity;
     this.grabbing = true;
@@ -645,7 +693,7 @@ export class DoughMesh {
     this.tipFast = false;
     this.tipHistN = 0;
     this.prevTipAng = NaN;
-    for (const a of [this.swTheta, this.swOmega, this.swMem, this.swStroke]) a.fill(0);
+    for (const a of [this.swTheta, this.swOmega, this.mem, this.memSnap]) a.fill(0);
     this.writeStir();
     // 당기기 — 가닥 · 더미 · 밑동 둔덕도 넘기지 않는다
     this.grabbing = false;
@@ -790,7 +838,7 @@ export class DoughMesh {
         stirPos.copy(this.stirTarget);
         this.prevStirTarget.copy(this.stirTarget);
         this.tipFast = false;
-        this.swStroke.fill(0);
+        this.memSnap.set(this.mem);
         this.tipHistN = 0;
         this.prevTipAng = NaN;
       }
@@ -829,7 +877,7 @@ export class DoughMesh {
     this.wasStirring = stirring;
     (u.uStirVec.value as THREE.Vector2).copy(this.stirVec);
     this.agitation = Math.min(1, this.stirVec.length() * 6);
-    this.stepSwirl(dt, stirring, handDa, stirPos.length(), thick);
+    this.stepSwirl(dt, stirring, handDa, stirPos, thick, p?.ripe ?? 0);
 
     // ── 피크 젓기 꺼짐 — 젓는 거리 × ripe로 쌓이고 τ20s로 돌아온다 ──
     this.knock = Math.min(KNOCK_MAX, this.knock * Math.exp(-dt / KNOCK_TAU) + pathLen * (p?.ripe ?? 0) * KNOCK_GAIN);
@@ -931,7 +979,12 @@ export class DoughMesh {
     if (this.bowH < 1e-5) this.bowH = 0;
     tip.z = this.dentH;
     tip.w = this.bowH;
-    u.uSpiralA.value = STIR_SPIRAL * SPIRAL_A * (0.5 + 0.5 * thick);
+    // 되기 · 숙성별 세기 — 되직은 굵고 무광, 피크는 중간 · 반들, 묽음은 주름 없이 광 흐름
+    const byState = (fl: number, th: number, pk: number): number => THREE.MathUtils.lerp(THREE.MathUtils.lerp(fl, th, thick), pk, ripe);
+    (u.uStirK.value as THREE.Vector4).set(
+      STIR_FOLD * byState(FOLD_A_FLUID, FOLD_A_THICK, FOLD_A_PEAK),
+      byState(MEM_GLOSS_FLUID, MEM_GLOSS_THICK, MEM_GLOSS_PEAK),
+      FLOW_GLINT * (1 - thick) * (1 - ripe), 0);
 
     // ── 기포 — 젓는 동안 부상·팝 가속 (agitation) ──
     this.bubbles.update(t, p?.bubbleDensity ?? 0.4, p?.bubbleScale ?? 1, this.agitation);
@@ -948,8 +1001,8 @@ export class DoughMesh {
     //    셰이더는 이 값을 "수면 기울기"(액체)와 잔여 강체 시프트(고체)로 나눠 그린다 ──
     if (stirring && this.stirDrivesWobble) {
       // 되직한 반죽은 젓는다고 판째 기울지 않는다 — 출렁 목표 × smoothstep(0.3, 0.7, fluidity)
-      this.wobbleTgt.copy(this.stirVec).multiplyScalar(5.0 * this.sloshGain());
-      if (this.wobbleTgt.length() > 0.6) this.wobbleTgt.setLength(0.6);
+      this.wobbleTgt.copy(this.stirVec).multiplyScalar(SLOSH_GAIN * this.sloshGain());
+      if (this.wobbleTgt.length() > SLOSH_MAX) this.wobbleTgt.setLength(SLOSH_MAX);
     } else {
       this.wobbleTgt.set(0, 0);
     }
@@ -1031,34 +1084,48 @@ export class DoughMesh {
 
   /**
    * 소용돌이 노드 한 걸음 — 젓는 동안 각속도가 손 각속도 × 몫 × 가우스(반경 차)로 따라 붙고, 놓으면 되기별 τ로 멎는다(묽으면 더 돈다).
-   * Θ += ω·dt(풀리지 않는다). 저은 넓이 M += 돈 각/2π × MEM_PER_TURN(손끝 반경 ± MEM_FULL·R 다 참) — 한 바퀴면 넓은 고리가 다 찬다.
+   * Θ += ω·dt(풀리지 않는다). 저은 자리 기억은 손끝의 재료 좌표(q)에 찍는다 — 각도까지 남고 반죽과 같이 돈다(2차). 동적 기포도 같은 Θ로 돈다.
    * 테두리(r/R 0.8→1.0)는 유리에 붙어 돌지 않는다(vert pin과 같은 띠)
    */
-  private stepSwirl(dt: number, stirring: boolean, da: number, rTip: number, thick: number): void {
+  private stepSwirl(dt: number, stirring: boolean, da: number, tipP: THREE.Vector2, thick: number, ripe: number): void {
+    const rTip = tipP.length();
     const lerp = THREE.MathUtils.lerp;
     const w = R_BODY * lerp(SWIRL_W_FLUID, SWIRL_W_THICK, thick);
     const gain = lerp(SWIRL_GAIN_FLUID, SWIRL_GAIN_THICK, thick);
     const omegaH = dt > 0 ? da / dt : 0;
     const kRise = 1 - Math.exp(-dt / SPIN_RISE_TAU);
     const kSpin = Math.exp(-dt / lerp(SPIN_TAU_FLUID, SPIN_TAU_THICK, thick));
-    const kMem = Math.exp(-dt / lerp(MEM_TAU_FLUID, MEM_TAU_THICK, thick));
+    const kMem = Math.exp(-dt / lerp(lerp(MEM_TAU_FLUID, MEM_TAU_THICK, thick), MEM_TAU_PEAK, ripe));
     for (let i = 0; i < SWIRL_N; i++) {
       const ri = (i / (SWIRL_N - 1)) * R_BODY;
       const pin = 1 - THREE.MathUtils.smoothstep(ri / R_BODY, 0.8, 1.0);
       if (stirring) {
         const tgt = gain * omegaH * Math.exp(-(((ri - rTip) / w) ** 2)) * pin;
         this.swOmega[i] += (tgt - this.swOmega[i]) * kRise;
-        const cover = 1 - THREE.MathUtils.smoothstep(Math.abs(ri - rTip) / R_BODY, MEM_FULL, MEM_EDGE);
-        const dm = Math.min((Math.abs(da) / (2 * Math.PI)) * MEM_PER_TURN * cover * pin, 1 - this.swMem[i]);
-        this.swMem[i] += dm;
-        this.swStroke[i] += dm;
       } else {
         this.swOmega[i] *= kSpin;
         if (Math.abs(this.swOmega[i]) < 1e-4) this.swOmega[i] = 0;
       }
       this.swTheta[i] += this.swOmega[i] * dt;
-      this.swMem[i] *= kMem;
-      if (this.swMem[i] < 1e-4) this.swMem[i] = 0;
+    }
+    // 동적 기포(4개)도 제 반경의 각속도로 돈다 — 점이 손을 따라 돈다(S2)
+    this.bubbles.swirl((r) => this.nodeLerp(this.swOmega, r) * dt);
+    // 저은 자리 기억 — 옅어지고, 젓는 동안 손끝의 재료 좌표 둘레를 채운다(최댓값 — 지나간 자리 = 1)
+    for (let k = 0; k < this.mem.length; k++) this.mem[k] = this.mem[k] * kMem < 1e-4 ? 0 : this.mem[k] * kMem;
+    if (stirring) {
+      const th = this.nodeLerp(this.swTheta, rTip);
+      const qx = Math.cos(th) * tipP.x + Math.sin(th) * tipP.y;
+      const qz = -Math.sin(th) * tipP.x + Math.cos(th) * tipP.y;
+      for (let i = 0; i < MEM_NR; i++) {
+        const ri = (i / (MEM_NR - 1)) * R_BODY;
+        for (let j = 0; j < MEM_NA; j++) {
+          const aj = ((j / MEM_NA) - 0.5) * 2 * Math.PI;
+          const d = Math.hypot(ri * Math.cos(aj) - qx, ri * Math.sin(aj) - qz);
+          const c = 1 - THREE.MathUtils.smoothstep(d, MEM_IN, MEM_OUT);
+          const k = i * MEM_NA + j;
+          if (c > this.mem[k]) this.mem[k] = c;
+        }
+      }
     }
     // 전단 상한 — 이웃 노드 Θ 차가 SHEAR_MAX를 넘으면 둘을 같은 만큼 당긴다(합 = 평균 회전은 그대로). 2회전: 상한이 없으면 3바퀴 만에
     // 모틀 · 잔 광택 · 나선이 반경 사이 전단에 감겨 과녁 · 레코드판 동심원이 됐다(.work/r1 · r2). 반죽은 점성으로 이어져 덩어리째 돈다(S2)
@@ -1081,10 +1148,19 @@ export class DoughMesh {
     this.writeStir();
   }
 
-  /** 소용돌이 노드 → uSwirl (Θ, M) */
+  /** 반경 노드 배열을 r에서 선형 보간 — 셰이더 swirlAt과 같은 식 */
+  private nodeLerp(a: Float32Array, r: number): number {
+    const x = Math.min(Math.max(r / R_BODY, 0), 1) * (SWIRL_N - 1);
+    const i = Math.min(Math.floor(x), SWIRL_N - 2);
+    return a[i] + (a[i + 1] - a[i]) * (x - i);
+  }
+
+  /** 소용돌이 노드 → uSwirl (Θ, ω) · 저은 자리 기억 → uMem(vec4 묶음) */
   private writeStir(): void {
     const sw = this.material.uniforms.uSwirl.value as THREE.Vector2[];
-    for (let i = 0; i < SWIRL_N; i++) sw[i].set(this.swTheta[i], this.swMem[i]);
+    for (let i = 0; i < SWIRL_N; i++) sw[i].set(this.swTheta[i], this.swOmega[i]);
+    const mv = this.material.uniforms.uMem.value as THREE.Vector4[];
+    for (let k = 0; k < mv.length; k++) mv[k].fromArray(this.mem, k * 4);
   }
 
   /** 시계 역행 — CPU 시각 기록을 delta만큼 옮긴다(프로덕션 performance.now는 단조라 방어용) */
@@ -1122,8 +1198,8 @@ export class DoughMesh {
     if (!Number.isFinite(this.marblePhase)) this.marblePhase = 0;
     if (!Number.isFinite(this.murk)) this.murk = 0;
     if (!Number.isFinite(this.dentH + this.bowH)) this.dentH = this.bowH = 0;
-    if (![this.swTheta, this.swOmega, this.swMem, this.swStroke].every((a) => a.every(Number.isFinite))) {
-      for (const a of [this.swTheta, this.swOmega, this.swMem, this.swStroke]) a.fill(0);
+    if (![this.swTheta, this.swOmega, this.mem, this.memSnap].every((a) => a.every(Number.isFinite))) {
+      for (const a of [this.swTheta, this.swOmega, this.mem, this.memSnap]) a.fill(0);
     }
     this.writeStir();
     if (!Number.isFinite(u.uPokeAmt.value as number)) u.uPokeAmt.value = 0;
