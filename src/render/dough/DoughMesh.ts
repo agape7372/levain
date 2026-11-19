@@ -30,8 +30,8 @@ const HOLD_RISE_TAU = 0.6;
 const HOLD_FALL_TAU = 0.3;
 /** 하강 꺼짐 깊이(월드) — 가운데 기준, 테두리는 0(유리에 붙어 남는다). vert uSink 항과 같은 값 */
 const SINK_DEPTH = 0.05;
-/** 곰팡이 군락 수 — 확산(uMold)에 따라 1→3개가 드러난다 */
-const MOLD_N = 3;
+/** 곰팡이 군락 수 — 확산(uMold)에 따라 1→5개가 드러난다(반점 1~2개 · 퍼짐 3~5개) */
+const MOLD_N = 5;
 
 /** 시드 → 0~1 난수열(mulberry32) — 곰팡이 군락 자리. 같은 시드면 같은 자리 */
 function seededRandom(seed: number): () => number {
@@ -227,14 +227,16 @@ export class DoughMesh {
     this.layoutMold(seed);
   }
 
-  /** 곰팡이 군락 — 윗면 안쪽 0.15~0.65·R(유리 테두리에 붙지 않게), 크기 0.7~1.3배, 색 종류는 군락마다(R2-10) */
+  /** 곰팡이 군락 — 윗면 안쪽 0.15~0.65·R(유리 테두리에 붙지 않게), 크기 0.75~1.15배, 색 종류는 군락마다(R2-10) */
   private layoutMold(seed: number): void {
     const rnd = seededRandom(seed * 7 + 13);
-    for (const c of this.material.uniforms.uMoldA.value as THREE.Vector4[]) {
-      const ang = rnd() * Math.PI * 2;
+    // 방위는 황금각으로 돌리며 흔든다 — 순수 난수는 5개 중 둘셋이 한 덩이로 겹쳐 「몇 개 더」가 안 보였다
+    const ang0 = rnd() * Math.PI * 2;
+    (this.material.uniforms.uMoldA.value as THREE.Vector4[]).forEach((c, i) => {
+      const ang = ang0 + i * 2.39996 + (rnd() - 0.5) * 0.6;
       const rad = (0.15 + 0.5 * rnd()) * R_BODY;
-      c.set(Math.cos(ang) * rad, Math.sin(ang) * rad, 0.7 + 0.6 * rnd(), Math.min(2, Math.floor(rnd() * 3)));
-    }
+      c.set(Math.cos(ang) * rad, Math.sin(ang) * rad, 0.75 + 0.4 * rnd(), Math.min(2, Math.floor(rnd() * 3)));
+    });
   }
 
   /** 탭 눌림 — 오브젝트 공간 XZ. 되튐/아묾은 elasticity가 가른다(tick) */

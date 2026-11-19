@@ -31,7 +31,7 @@ uniform float uPin;        // 윗면 바늘구멍 0~1
 uniform float uFoam;       // 윗가장자리 잔거품 띠 0~1
 uniform float uSink;       // 하강 꺼짐 0~1 — vert와 같은 소스
 uniform float uStir;       // 갓 밥준 젓은 물결 0~1
-uniform vec4 uMoldA[3];    // 곰팡이 군락 (x, z, 크기 배율, 색 종류) — vert와 단일 소스(규칙 8)
+uniform vec4 uMoldA[5];    // 곰팡이 군락 (x, z, 크기 배율, 색 종류) — vert와 단일 소스(규칙 8)
 uniform vec2 uWobble;
 uniform vec2 uBumpPos[4];
 uniform float uBumpAmp[4];
@@ -317,30 +317,36 @@ void main() {
     col = mix(col, vec3(0.93, 0.91, 0.85), film * (0.30 + 0.30 * wrinkle));
   }
 
-  // ── 곰팡이(R2-10) — 테가 흐린 보송한 군락: 흰 솜털 후광(반경 40~100% 구간에서 흐려짐) + 작은 짙은 가운데(35% 이하).
-  //    색은 군락마다 흰 · 회녹 · 분홍빛 검정(채도 낮춤), 완전 매트(상수 색으로 섞어 광을 지운다). 딱 떨어진 초록 원 금지 ──
+  // ── 곰팡이(R2-10, 개정 2026-11-19 다듬기) — 「흰 솜털 반점」(실물 25 · 26 · 27). 군락 = 반죽보다 희고 덜 노란 몸통 +
+  //    고주파로 흐리게 부푼 솜털 테 + 비껴 앉은 옅은 기운(시드별 흰 · 청록 · 분홍빛 회색). 짙은 가운데 덩어리는
+  //    재 · 먼지 · 얼룩으로 읽혀 뺐다. 완전 매트(상수 색으로 섞어 광을 지운다). 반경 · 문턱은 vert와 같은 식 ──
   if (uMold > 0.001 && vTop > 0.5) {
-    float edgeN = fbm(vXZ * 9.0 + uSeed * 7.0);  // 테 흔들림
-    float fuzz = fbm(vXZ * 23.0 - uSeed * 5.0);  // 솜털 결
-    float halo = 0.0;
+    float edgeN = fbm(vXZ * 9.0 + uSeed * 7.0);   // 테 흔들림(저주파)
+    float fuzz = fbm(vXZ * 23.0 - uSeed * 5.0);   // 솜털 결
+    // 솜털 끝 — 1~2px 칸 해시 디더(고주파). sin FBM을 고주파로 올리면 테가 톱니 · 구름 꼴로 규칙적으로 물결쳤다
+    float hair = hash3(floor(vXZ * 380.0)).x;
+    float body = 0.0;
     float coreW = 0.0;
     vec3 coreSum = vec3(0.0);
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 5; i++) {
       vec4 m = uMoldA[i];
-      float gate = smoothstep(float(i) * 0.3, float(i) * 0.3 + 0.15, uMold);
-      vec2 md = (vXZ - m.xy) / ((0.08 + 0.14 * uMold) * m.z);
-      float d = length(md) + edgeN * 0.35;
-      halo = max(halo, (1.0 - smoothstep(0.4, 1.0, d)) * gate);
-      // 가운데는 후광 중심에서 비껴 있고 솜털 결로 테가 찢긴다 — 둥근 검은 눈동자가 되지 않게
-      float dc = length(md - vec2(0.12, -0.08)) + fuzz * 0.45 + edgeN * 0.2;
-      float cr = (1.0 - smoothstep(0.02, 0.32, dc)) * gate * smoothstep(0.2, 0.6, uMold);
-      vec3 cc = m.w < 0.5 ? vec3(0.80, 0.79, 0.76) : (m.w < 1.5 ? vec3(0.52, 0.55, 0.48) : vec3(0.50, 0.425, 0.43));
+      float th = i == 0 ? 0.0 : 0.2 + 0.09 * float(i); // 반점 1~2개 → 퍼짐에서 5개까지
+      float gate = smoothstep(th, th + 0.08, uMold);
+      vec2 md = (vXZ - m.xy) / (uRBody * (0.07 + 0.2 * uMold) * m.z);
+      float d = length(md) + edgeN * 0.26 + fuzz * 0.07;
+      body = max(body, (1.0 - smoothstep(0.35, 1.05, d)) * gate);
+      // 기운은 몸통 중심에서 비껴 있고 솜털 결로 테가 찢긴다 — 둥근 눈동자가 되지 않게
+      float dc = length(md - vec2(0.24, -0.15)) + fuzz * 0.3 + edgeN * 0.15;
+      float cr = (1.0 - smoothstep(0.0, 0.55, dc)) * gate;
+      vec3 cc = m.w < 0.5 ? vec3(0.90, 0.90, 0.885) : (m.w < 1.5 ? vec3(0.79, 0.855, 0.83) : vec3(0.88, 0.79, 0.785));
       coreSum += cc * cr;
       coreW += cr;
     }
-    float shade = 0.86 + 0.14 * ndl;
-    col = mix(col, vec3(0.88, 0.875, 0.85) * shade, halo * (0.62 + 0.25 * fuzz));
-    col = mix(col, coreSum / max(coreW, 1e-3) * shade, min(coreW, 1.0) * 0.75);
+    float shade = 0.9 + 0.1 * ndl;
+    // 몸통이 옅어지는 테에서만 디더가 듬성듬성 갉아 솜털이 된다(속은 꽉 찬 흰색)
+    float fluff = clamp((body - 0.4 * hair) / 0.6, 0.0, 1.0);
+    col = mix(col, vec3(0.965, 0.96, 0.945) * (0.97 + 0.03 * fuzz) * shade, fluff * 0.92);
+    col = mix(col, coreSum / max(coreW, 1e-3) * shade, min(coreW, 1.0) * 0.38 * fluff);
   }
 
   gl_FragColor = vec4(col, 1.0);

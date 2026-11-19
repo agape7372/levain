@@ -40,7 +40,7 @@ uniform float uPull;       // 윗가장자리 물러남(오브젝트) — Render
 uniform float uMenH;       // 메니스커스 높이(월드) — 응집이 높을수록 유리를 타고 오른다
 uniform float uSink;       // 하강 꺼짐 0~1 — 가운데 0.05월드, 테두리 0 (DoughMesh SINK_DEPTH)
 uniform float uMold;       // 곰팡이 확산 0~1
-uniform vec4 uMoldA[3];    // 곰팡이 군락 (x, z, 크기 배율, 색 종류) — 프래그와 단일 소스(규칙 8)
+uniform vec4 uMoldA[5];    // 곰팡이 군락 (x, z, 크기 배율, 색 종류) — 프래그와 단일 소스(규칙 8)
 varying vec2 vXZ;
 varying float vStretch;
 varying float vTop;        // 윗면 마스크 — 기울기·파동·메니스커스용 (옆벽 0)
@@ -137,12 +137,13 @@ vec3 topPoint(vec2 xz0, float layer, out float stretch) {
     float f = fbm(p.xz * 6.0 + 2.0);
     disp -= uSink * bowl * (0.05 + 0.02 * sqrt(f * f + 0.02));
   }
-  // 곰팡이 군락 — 살짝 솟은 보송한 덩어리(+0.008월드). 반경은 프래그와 같은 식
+  // 곰팡이 군락 — 살짝 솟은 보송한 덩어리(+0.008월드). 반경 · 문턱은 프래그와 같은 식
   if (uMold > 0.001) {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 5; i++) {
       vec4 m = uMoldA[i];
-      float gate = smoothstep(float(i) * 0.3, float(i) * 0.3 + 0.15, uMold);
-      float rad = (0.08 + 0.14 * uMold) * m.z;
+      float th = i == 0 ? 0.0 : 0.2 + 0.09 * float(i);
+      float gate = smoothstep(th, th + 0.08, uMold);
+      float rad = uRBody * (0.07 + 0.2 * uMold) * m.z;
       vec2 md = p.xz - m.xy;
       disp += 0.008 * gate * exp(-dot(md, md) / (rad * rad));
     }

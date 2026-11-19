@@ -148,13 +148,14 @@ describe('곰팡이 군락 — CPU가 시드로 자리를 정해 두 셰이더�
     d.setSeed(seed);
     return d.material.uniforms.uMoldA.value as THREE.Vector4[];
   };
-  it('군락 3개 — 윗면 안쪽(0.75·R) · 같은 시드면 같은 자리', () => {
+  // 개정 2026-11-19 다듬기: 반점 1~2개 → 퍼짐에서 몇 개 더(흰 솜털 반점, 실물 25 · 26 · 27)
+  it('군락 5개 — 윗면 안쪽(0.75·R) · 같은 시드면 같은 자리', () => {
     const a = colonies(12345);
-    expect(a.length).toBe(3);
+    expect(a.length).toBe(5);
     for (const c of a) expect(Math.hypot(c.x, c.y)).toBeLessThanOrEqual(0.75 * R_BODY);
     expect(colonies(12345).map((c) => c.toArray())).toEqual(a.map((c) => c.toArray()));
   });
-  it('시드마다 색 종류(흰 · 회녹 · 분홍빛 검정)가 갈린다', () => {
+  it('시드마다 색 종류(흰 · 청록 · 분홍빛 회색)가 갈린다', () => {
     const kinds = new Set<number>();
     for (let s = 1; s < 40; s++) for (const c of colonies(s * 7919)) kinds.add(c.w);
     expect([...kinds].sort()).toEqual([0, 1, 2]);
@@ -176,7 +177,7 @@ describe('셰이더 — 해시 · 줄무늬 필드 회귀 방지(R2-04 · A1-06 
   it('범프 배열은 버텍스 · 프래그가 같은 4슬롯 uniform을 읽는다(규칙 8)', () => {
     for (const s of [vert, frag]) {
       expect(s).toMatch(/uniform vec2 uBumpPos\[4\];/);
-      expect(s).toMatch(/uniform vec4 uMoldA\[3\];/);
+      expect(s).toMatch(/uniform vec4 uMoldA\[5\];/);
     }
   });
 });
