@@ -223,6 +223,77 @@ describe('R-M2 옆벽 입력 — 유리 너머 몸통도 반죽이다', () => {
   });
 });
 
+describe('RV-H1 옆벽 스냅은 누름 · 탭에만 — 끌기는 이어진다', () => {
+  /** (x, y0)에서 눌러 화면 아래로 3px씩 천천히(100ms) 끈다. 걸음마다 [y, 신장].
+   *  이 장면은 실기기(390폭)의 약 0.62배다(피크 옆벽 90px 대 145px) — 3px ≈ 실기기 5px */
+  function dragDown(l: Record<string, Fn>, dough: DoughMesh, x: number, y0: number, yEnd: number): [number, number][] {
+    const out: [number, number][] = [];
+    let t = 1000;
+    const now = vi.spyOn(performance, 'now').mockImplementation(() => t);
+    try {
+      l.pointerdown(ptr(x, y0));
+      for (let y = y0 + 3; y <= yEnd; y += 3) {
+        t += 100;
+        l.pointermove(ptr(x, y));
+        out.push([y, dough.grabStretch01()]);
+      }
+      l.pointerup(ptr(x, yEnd));
+    } finally {
+      now.mockRestore();
+    }
+    return out;
+  }
+  const checkSmooth = (rows: [number, number][]): void => {
+    // 첫 grab 걸음(탭 임계 8px를 넘는 순간 앵커에서 9px)은 원래 크다 — 그다음부터 본다
+    const first = rows.findIndex(([, s]) => s > 0);
+    expect(first).toBeGreaterThan(0);
+    for (let i = first + 1; i < rows.length; i++) {
+      const d = rows[i][1] - rows[i - 1][1];
+      expect(d).toBeGreaterThanOrEqual(-1e-9); // 줄지 않는다(테두리에 묶이지 않는다)
+      expect(d).toBeLessThanOrEqual(0.15); // 바닥선에서 튀지 않는다
+    }
+  };
+
+  it.each(['peak', 'justfed', 'falling'] as const)('%s 윗면 앞 0.6R에서 잡아 병 밑까지 끌면 신장이 매끄럽게 자란다', (state) => {
+    const { listeners, dough, px, R } = scene(state);
+    const [x0, y0] = px(0, dough.topY(), 0.6 * R);
+    const yBot = px(0, 0, R)[1];
+    const rows = dragDown(listeners, dough, x0, y0, yBot + 40);
+    checkSmooth(rows);
+    expect(rows.find(([y]) => y >= yBot)![1]).toBeGreaterThanOrEqual(0.95); // 바닥선 전에 다 늘어난다
+  });
+
+  it('옆벽에서 잡아 아래로 끌어도 신장이 자라고 바닥선에서 튀지 않는다', () => {
+    const { listeners, dough, px, R } = scene('peak');
+    const [x0, y0] = px(0, dough.levelY() * 0.6, R);
+    const yBot = px(0, 0, R)[1];
+    const rows = dragDown(listeners, dough, x0, y0, yBot + 40);
+    checkSmooth(rows);
+    expect(rows.filter(([y]) => y < yBot).pop()![1]).toBeGreaterThan(0.3);
+  });
+
+  it('빠르게 아래로 젓기 — 옆벽 위에서도 속도가 이어진다(0에 묶였다 튀지 않는다)', () => {
+    const { listeners, dough, px, R } = scene('peak');
+    const stir = vi.spyOn(dough, 'setStirInput');
+    const [x0, y0] = px(0, dough.topY(), 0);
+    const yBot = px(0, 0, R)[1];
+    let t = 1000;
+    const now = vi.spyOn(performance, 'now').mockImplementation(() => t);
+    try {
+      listeners.pointerdown(ptr(x0, y0));
+      for (let y = y0 + 12; y <= yBot + 60; y += 12) {
+        t += 4;
+        listeners.pointermove(ptr(x0, y));
+      }
+    } finally {
+      now.mockRestore();
+    }
+    const vz = stir.mock.calls.map((c) => c[3]);
+    expect(Math.min(...vz)).toBeGreaterThan(0);
+    expect(Math.max(...vz) / Math.min(...vz)).toBeLessThan(1.5);
+  });
+});
+
 describe('앱 검토 L4 홀드 — 반죽 위에서만 부푼다', () => {
   it('반죽 밖을 0.8초 넘게 눌러도 부풂이 켜지지 않는다 · 반죽 위는 켜진다', () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });

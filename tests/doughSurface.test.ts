@@ -206,9 +206,16 @@ describe('셰이더 — 해시 · 줄무늬 필드 회귀 방지(R2-04 · A1-06 
       for (const n of ['vec2 uBumpPos', 'float uBumpAmp', 'float uBumpK']) expect(s).toContain(`uniform ${n}[${DYN_SLOTS}];`);
       for (const n of ['vec2 uTrailPos', 'float uTrailAmp', 'float uTrailK']) expect(s).toContain(`uniform ${n}[${TRAIL_N}];`);
       expect(s).toContain(`uniform vec4 uMoldA[${MOLD_N}];`);
-      const bounds = [...s.matchAll(/for \(int i = 0; i < (\d+); i\+\+\)/g)].map((m) => Number(m[1]));
-      expect(bounds.length).toBeGreaterThanOrEqual(3);
-      for (const b of bounds) expect([DYN_SLOTS, TRAIL_N, MOLD_N]).toContain(b);
+      // 루프마다 본문이 읽는 배열의 상수와 짝짓는다 — 소속 검사만 하면 범프 루프가 TRAIL_N 값이어도 통과한다(RV-L2)
+      const want = { Bump: DYN_SLOTS, Trail: TRAIL_N, Mold: MOLD_N } as const;
+      const seen = new Set<string>();
+      for (const m of s.matchAll(/for \(int i = 0; i < (\d+); i\+\+\) \{([\s\S]*?)\n\s*\}/g)) {
+        const arr = /u(Bump|Trail|Mold)\w*\[i\]/.exec(m[2])?.[1] as keyof typeof want | undefined;
+        expect(arr, `루프 본문이 범프 · 실 · 곰팡이 배열을 읽지 않는다: ${m[0].slice(0, 60)}`).toBeDefined();
+        expect(Number(m[1]), `${arr} 루프 상한`).toBe(want[arr!]);
+        seen.add(arr!);
+      }
+      expect(seen.size).toBe(3);
     }
   });
 });

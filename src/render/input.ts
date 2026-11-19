@@ -81,6 +81,9 @@ export function attachInput(
   let activeId: number | null = null;
   let downHitX = 0;
   let downHitZ = 0;
+  /** 누름 때 옆벽 스냅이 옮긴 거리(월드) — 끌기 좌표 = 평면 교점 + 이 값. 윗면 시작이면 0 */
+  let snapDX = 0;
+  let snapDZ = 0;
   let coveredGesture = false;
   let holdTimer: ReturnType<typeof setTimeout> | null = null;
   let holding = false;
@@ -99,25 +102,26 @@ export function attachInput(
     ray.setFromCamera(ptr, camera);
     // 부피 연동 — 손끝 = 눌리는 지점. 가운데 꼭대기(topY)와 테두리(levelY) 사이에 둔다:
     // topY만 보면 하강(가운데 꺼짐)에서 테두리 탭이 반경의 ~10% 밀렸다(R-L2)
-    const levelY = dough.levelY();
-    plane.constant = -(dough.topY() + levelY) / 2;
-    if (ray.ray.intersectPlane(plane, hit) === null) return false;
-    // 유리 너머 옆벽(R-M2) — 평면 교점이 몸통 밖이면 원기둥 x²+z² = R², 0 ≤ y ≤ levelY의 앞면 교점을 본다.
-    // 맞으면 같은 방위의 테두리 안쪽 점으로 보낸다 — 덴트 · grab 앵커가 손끝 바로 위 테두리에 걸린다
+    plane.constant = -(dough.topY() + dough.levelY()) / 2;
+    return ray.ray.intersectPlane(plane, hit) !== null;
+  };
+
+  /** 유리 너머 옆벽(R-M2) — 직전 raycast의 평면 교점이 몸통 밖이면 원기둥 x²+z² = R², 0 ≤ y ≤ levelY의 앞면 교점을 본다.
+   *  맞으면 같은 방위의 테두리 안쪽 점으로 보낸다 — 덴트 · grab 앵커가 손끝 바로 위 테두리에 걸린다.
+   *  누름 · 탭에만 쓴다. 끌기 중에 쓰면 옆벽 위에서 목표가 테두리에 묶였다가 바닥선에서 튄다(RV-H1) */
+  const snapWall = (): void => {
     const R = dough.bodyRadius() * XZ_SCALE;
-    if (Math.hypot(hit.x, hit.z) > R) {
-      const { origin: o, direction: d } = ray.ray;
-      const a = d.x * d.x + d.z * d.z;
-      const b = o.x * d.x + o.z * d.z;
-      const disc = b * b - a * (o.x * o.x + o.z * o.z - R * R);
-      if (a > 1e-9 && disc >= 0) {
-        const t = (-b - Math.sqrt(disc)) / a; // 가까운 근 = 카메라 쪽 앞면
-        const y = o.y + d.y * t;
-        // 교점은 반경 R 위 — 같은 방위로 WALL_RIM배 안쪽
-        if (t > 0 && y >= 0 && y <= levelY) hit.set((o.x + d.x * t) * WALL_RIM, levelY, (o.z + d.z * t) * WALL_RIM);
-      }
-    }
-    return true;
+    if (Math.hypot(hit.x, hit.z) <= R) return;
+    const { origin: o, direction: d } = ray.ray;
+    const a = d.x * d.x + d.z * d.z;
+    const b = o.x * d.x + o.z * d.z;
+    const disc = b * b - a * (o.x * o.x + o.z * o.z - R * R);
+    if (a <= 1e-9 || disc < 0) return;
+    const t = (-b - Math.sqrt(disc)) / a; // 가까운 근 = 카메라 쪽 앞면
+    const y = o.y + d.y * t;
+    const levelY = dough.levelY();
+    // 교점은 반경 R 위 — 같은 방위로 WALL_RIM배 안쪽
+    if (t > 0 && y >= 0 && y <= levelY) hit.set((o.x + d.x * t) * WALL_RIM, levelY, (o.z + d.z * t) * WALL_RIM);
   };
 
   const clearHold = (): void => {
@@ -178,6 +182,9 @@ export function attachInput(
     }
     if (mode === 'swipe') return; // 반죽에 손대지 않는다 — 레이캐스트도 생략
     if (!raycast(e)) return;
+    // 끌기는 평면 교점을 따라 이어진다 — 누른 점(스냅된 테두리) + 평면 위 이동량 (RV-H1)
+    hit.x += snapDX;
+    hit.z += snapDZ;
     const t = performance.now() / 1000;
     const dt = Math.max(1 / 240, t - lastHitT);
     const ox = hit.x / XZ_SCALE;
@@ -222,7 +229,14 @@ export function attachInput(
     coveredGesture = hooks.isCovered?.() ?? false;
     if (coveredGesture) return; // 덮개 제스처 — up에서 판정
     downOnDough = false;
+    snapDX = 0;
+    snapDZ = 0;
     if (raycast(e)) {
+      snapDX = -hit.x;
+      snapDZ = -hit.z;
+      snapWall();
+      snapDX += hit.x;
+      snapDZ += hit.z;
       lastHitX = hit.x / XZ_SCALE;
       lastHitZ = hit.z / XZ_SCALE;
       lastHitT = performance.now() / 1000;
@@ -276,6 +290,7 @@ export function attachInput(
 
     endDrag();
     if (dist <= TAP_MAX_PX && dtMs <= TAP_MAX_MS && raycast(e)) {
+      snapWall();
       // 탭 — poke 덴트. 월드→오브젝트 공간 (메시 XZ_SCALE 역변환)
       dough.pokeAt(hit.x / XZ_SCALE, hit.z / XZ_SCALE);
     }
