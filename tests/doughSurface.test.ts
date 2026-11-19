@@ -1,0 +1,191 @@
+// 반죽 표면 질감 v2(2026-11-19 P1b) — 윗면 신호 · 광택 · 밀가루 톤 · 기포 · 곰팡이 · 셰이더 해시.
+// 정본: docs/VISUAL.md §2·§3-2·§3-3·§4-4·§8. 감사 id는 .work/audit-1119/audit_results.json.
+import { describe, it, expect } from 'vitest';
+import * as THREE from 'three';
+import { toRenderParams } from '../src/render/renderParams';
+import { DoughMesh, R_BODY, XZ_SCALE } from '../src/render/dough/DoughMesh';
+import { BubbleSystem, SCAR_AMP } from '../src/render/bubbles';
+import frag from '../src/render/dough/dough.frag.glsl?raw';
+import vert from '../src/render/dough/dough.vert.glsl?raw';
+import type { Snapshot } from '../src/sim';
+
+const base: Snapshot = {
+  canSplit: false, splitReadyAt: 0, discardReady: true, nextStage: null, fakeRise: false,
+  phase: 'active', activity: 0.5, hunger: 0, sourness: 0.1, dormancy: 0,
+  fill: 1.0, riseFill: 1.0, peakFill: 1.6, massRatio: 1, location: 'room',
+  hooch: 0, smell: 'flour', stage: 3, mass: 180, flour: 'white',
+  nextFeedAt: 0, peakAt: 0, peakEndAt: 0, effSinceFeedMs: 0,
+  moldStage: 'none', mold01: 0, moldDeadAt: 0, kahm: false, hasFlake: false,
+};
+// motionlab 프리셋과 같은 Snapshot (scripts/motionlab.ts PRESETS)
+const S = {
+  justfed: { ...base, activity: 0.15, riseFill: 1.0, sourness: 0.05 },
+  rising: { ...base, activity: 0.55, riseFill: 1.25, fill: 1.25 },
+  peak: { ...base, activity: 1.0, riseFill: 1.6, fill: 1.6, smell: 'yogurt' as const },
+  falling: { ...base, activity: 0.6, riseFill: 1.2, fill: 1.2, hunger: 0.3 },
+  hungry: { ...base, activity: 0.25, riseFill: 0.8, fill: 0.8, hunger: 1, sourness: 0.35 },
+  sour: { ...base, activity: 0.15, riseFill: 0.7, fill: 0.7, hunger: 1, sourness: 0.7, phase: 'sour' as const, hooch: 0.5 },
+  dormant: { ...base, activity: 0.02, riseFill: 0.65, fill: 0.65, hunger: 1, sourness: 0.8, dormancy: 1, phase: 'dormant' as const },
+  moldy: { ...base, activity: 0, riseFill: 0.65, fill: 0.65, dormancy: 1, phase: 'moldy' as const, moldStage: 'spread' as const, mold01: 0.6 },
+} satisfies Record<string, Snapshot>;
+const R = Object.fromEntries(Object.entries(S).map(([k, s]) => [k, toRenderParams(s)])) as Record<keyof typeof S, ReturnType<typeof toRenderParams>>;
+
+/** sRGB 0~1 → CIE L* (D65) */
+function lstar([r, g, b]: [number, number, number]): number {
+  const lin = (c: number): number => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const y = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  return y > 0.008856 ? 116 * Math.cbrt(y) - 16 : 903.3 * y;
+}
+
+describe('윗면 질감 신호 — 상태마다 문법이 다르다(R2-07 · R2-06 · R1 must ⑤)', () => {
+  it('갓 밥준 = 젓은 물결만, 바늘구멍 · 꺼짐 없음', () => {
+    expect(R.justfed.stir).toBeGreaterThan(0.8);
+    expect(R.justfed.pinholes).toBeLessThan(0.05);
+    expect(R.justfed.sink).toBe(0);
+  });
+  it('오르는 중 = 유리 닿는 가장자리 잔거품 띠, 꺼짐 없음', () => {
+    expect(R.rising.foam).toBeGreaterThan(0.3);
+    expect(R.rising.sink).toBe(0);
+    expect(R.rising.stir).toBeLessThan(R.justfed.stir * 0.5);
+  });
+  it('피크 = 바늘구멍 + 돔, 꺼짐 없음', () => {
+    expect(R.peak.pinholes).toBeGreaterThan(0.3);
+    expect(R.peak.ripe).toBeGreaterThan(0.5);
+    expect(R.peak.sink).toBe(0);
+  });
+  it('하강 = 가운데부터 꺼진다 — 오르는 중과 구별된다', () => {
+    expect(R.falling.sink).toBeGreaterThan(0.8);
+    expect(R.falling.sink - R.rising.sink).toBeGreaterThan(0.8);
+  });
+  it('배고픔 = 평평 + 고른 바늘구멍, 꺼짐 끝', () => {
+    expect(R.hungry.pinholes).toBeGreaterThan(0.4);
+    expect(R.hungry.sink).toBeLessThan(0.05);
+    expect(R.hungry.ripe).toBe(0);
+  });
+  it('휴면 · 곰팡이 = 살아있는 표면 신호 0(죽은 분기와 상호배타, §8 예산)', () => {
+    for (const k of ['dormant', 'moldy'] as const) {
+      expect(R[k].pinholes).toBe(0);
+      expect(R[k].foam).toBe(0);
+      expect(R[k].stir).toBe(0);
+      expect(R[k].wallCells).toBe(0);
+    }
+  });
+});
+
+describe('광택 — R1 실물 근거로 2026-08-25 가설을 뒤집는다(R2-12)', () => {
+  it('갓 밥준 = 넓은 젖은 광 높음 · 피크 = 새틴 · 배고픔 = 얇은 막 · 휴면 = 매트', () => {
+    expect(R.justfed.specStr).toBeGreaterThanOrEqual(0.6);
+    expect(R.justfed.specStr).toBeLessThanOrEqual(0.8);
+    expect(R.peak.specStr).toBeGreaterThanOrEqual(0.3);
+    expect(R.peak.specStr).toBeLessThanOrEqual(0.4);
+    expect(R.hungry.specStr).toBeGreaterThanOrEqual(0.25);
+    expect(R.hungry.specStr).toBeLessThanOrEqual(0.45);
+    expect(R.dormant.specStr).toBeLessThanOrEqual(0.1);
+    expect(R.justfed.specStr).toBeGreaterThan(R.peak.specStr);
+  });
+  it('젖음(wet)은 갓 밥준 몫이다 — 피크에 바닥값을 두지 않는다', () => {
+    expect(R.justfed.wet).toBeGreaterThan(0.9);
+    expect(R.peak.wet).toBeLessThan(0.1);
+  });
+});
+
+describe('밀가루 톤 — 통밀 따뜻한 황갈 · 호밀 갈색(R2-13 · R1 사진 28·29)', () => {
+  const pk = (flour: Snapshot['flour']) => toRenderParams({ ...S.peak, flour }).color;
+  it('통밀 · 호밀은 흰 밀가루보다 확연히 어둡다(ΔL* 15 이상)', () => {
+    const w = lstar(pk('white'));
+    expect(w - lstar(pk('wholewheat'))).toBeGreaterThan(15);
+    expect(w - lstar(pk('rye'))).toBeGreaterThan(15);
+  });
+  it('회색이 아니라 갈색 — r > g > b 이고 r−b 차가 흰 밀가루보다 크다', () => {
+    for (const f of ['wholewheat', 'rye'] as const) {
+      const [r, g, b] = pk(f);
+      expect(r).toBeGreaterThan(g);
+      expect(g).toBeGreaterThan(b);
+      const [wr, , wb] = pk('white');
+      expect(r - b).toBeGreaterThan(wr - wb);
+    }
+  });
+  it('호밀이 통밀보다 조금 더 어둡다(실물 ΔL* ≈ 2)', () => {
+    const d = lstar(pk('wholewheat')) - lstar(pk('rye'));
+    expect(d).toBeGreaterThan(0);
+    expect(d).toBeLessThan(6);
+  });
+});
+
+describe('기포 — 작고 날카로운 돔이 터지면 바늘구멍이 남았다 옅어진다(R2-08)', () => {
+  it('돔은 k 60~140 · 진폭 0.025 이하', () => {
+    const b = new BubbleSystem();
+    for (let i = 0; i < 4; i++) b.spawnNow(0, 1);
+    b.update(0.5, 0, 1);
+    for (let i = 0; i < 4; i++) {
+      expect(b.k[i]).toBeGreaterThanOrEqual(60);
+      expect(b.k[i]).toBeLessThanOrEqual(140);
+      expect(Math.abs(b.amp[i])).toBeLessThanOrEqual(0.025);
+    }
+  });
+  it('터진 뒤 1.5초에도 바늘구멍(음수 진폭)이 남아 있고, 6초 안에 슬롯이 빈다', () => {
+    const b = new BubbleSystem();
+    b.spawnNow(0, 1);
+    let poppedAt = -1;
+    for (let t = 0; t < 12; t += 1 / 60) {
+      b.update(t, 0, 1);
+      if (poppedAt < 0 && b.popsThisFrame > 0) poppedAt = t;
+      if (poppedAt >= 0 && Math.abs(t - poppedAt - 1.5) < 1 / 120) {
+        expect(b.amp[0]).toBeLessThan(0);
+      }
+    }
+    expect(poppedAt).toBeGreaterThan(0);
+    expect(b.amp[0]).toBe(0);
+  });
+});
+
+describe('하강 꺼짐 — 가운데가 테두리보다 낮다(R2-06)', () => {
+  it('하강은 topY < levelY, 피크는 topY > levelY', () => {
+    const d = new DoughMesh();
+    d.applyParams(R.falling);
+    d.tick(1);
+    expect(d.topY()).toBeLessThan(d.levelY());
+    d.applyParams(R.peak);
+    d.tick(2);
+    expect(d.topY()).toBeGreaterThan(d.levelY());
+  });
+});
+
+describe('곰팡이 군락 — CPU가 시드로 자리를 정해 두 셰이더가 같은 값을 읽는다(R2-10)', () => {
+  const colonies = (seed: number): THREE.Vector4[] => {
+    const d = new DoughMesh();
+    d.setSeed(seed);
+    return d.material.uniforms.uMoldA.value as THREE.Vector4[];
+  };
+  it('군락 3개 — 윗면 안쪽(0.75·R) · 같은 시드면 같은 자리', () => {
+    const a = colonies(12345);
+    expect(a.length).toBe(3);
+    for (const c of a) expect(Math.hypot(c.x, c.y)).toBeLessThanOrEqual(0.75 * R_BODY);
+    expect(colonies(12345).map((c) => c.toArray())).toEqual(a.map((c) => c.toArray()));
+  });
+  it('시드마다 색 종류(흰 · 회녹 · 분홍빛 검정)가 갈린다', () => {
+    const kinds = new Set<number>();
+    for (let s = 1; s < 40; s++) for (const c of colonies(s * 7919)) kinds.add(c.w);
+    expect([...kinds].sort()).toEqual([0, 1, 2]);
+  });
+});
+
+describe('셰이더 — 해시 · 줄무늬 필드 회귀 방지(R2-04 · A1-06 · 예산 §8)', () => {
+  it('mediump에서 뭉개지는 sin 해시(43758)와 주기 sin 기공 필드(cellField)가 없다', () => {
+    expect(frag).not.toMatch(/43758/);
+    expect(frag).not.toMatch(/cellField/);
+  });
+  it('3×3 이웃 탐색 없이 칸마다 기포 하나 — 기포 층 함수는 이중 루프를 갖지 않는다', () => {
+    expect(frag).not.toMatch(/for\s*\(int\s+\w+\s*=\s*-1/);
+  });
+  it('셰이더 상수가 CPU 쪽과 같다 — XZ_W = XZ_SCALE · SCAR_AMP', () => {
+    expect(frag).toContain(`const float XZ_W = ${XZ_SCALE};`);
+    expect(frag).toContain(`const float SCAR_AMP = ${SCAR_AMP};`);
+  });
+  it('범프 배열은 버텍스 · 프래그가 같은 4슬롯 uniform을 읽는다(규칙 8)', () => {
+    for (const s of [vert, frag]) {
+      expect(s).toMatch(/uniform vec2 uBumpPos\[4\];/);
+      expect(s).toMatch(/uniform vec4 uMoldA\[3\];/);
+    }
+  });
+});

@@ -28,6 +28,22 @@ const CRATER_RIM = Math.exp(-2.0 * 0.3844);
 const HOLD_AMP = 0.03;
 const HOLD_RISE_TAU = 0.6;
 const HOLD_FALL_TAU = 0.3;
+/** 하강 꺼짐 깊이(월드) — 가운데 기준, 테두리는 0(유리에 붙어 남는다). vert uSink 항과 같은 값 */
+const SINK_DEPTH = 0.05;
+/** 곰팡이 군락 수 — 확산(uMold)에 따라 1→3개가 드러난다 */
+const MOLD_N = 3;
+
+/** 시드 → 0~1 난수열(mulberry32) — 곰팡이 군락 자리. 같은 시드면 같은 자리 */
+function seededRandom(seed: number): () => number {
+  let a = Math.floor(Math.abs(seed)) >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 const TRAIL_N = 4;
 const TRAIL_SAMPLE_S = 0.04; // 실 능선 샘플 간격
@@ -117,7 +133,13 @@ export class DoughMesh {
         uWet: { value: 0 },
         uRipe: { value: 0 },
         uCollapse: { value: 0 },
-        uPoreDensity: { value: 0 },
+        // 윗면 질감(2026-11-19 P1b) — 바늘구멍 · 가장자리 잔거품 · 하강 꺼짐 · 젓은 물결
+        uPin: { value: 0 },
+        uFoam: { value: 0 },
+        uSink: { value: 0 },
+        uStir: { value: 0 },
+        // 곰팡이 군락 3개 — (x, z, 크기 배율, 색 종류 0 흰 · 1 회녹 · 2 분홍빛 검정). setSeed가 채운다
+        uMoldA: { value: Array.from({ length: MOLD_N }, () => new THREE.Vector4(0, 0, 1, 0)) },
         uKahm: { value: 0 },
         uMold: { value: 0 },
         uSeed: { value: 0.37 },
@@ -144,9 +166,9 @@ export class DoughMesh {
         uHeight: { value: 0.76 },
         uPull: { value: 0 },
         uMenH: { value: 0 },
-        // 진값은 Y_SCALE·fill/XZ_SCALE ≈ 0.6·fill — 1.0에서 시작해 실기기에서 내리며 튜닝
-        // (내리면 frag 범프 첨도 ×1.6 재튜닝 동반 — 오푸스 메모 §2-2b)
-        uSlopeAspect: { value: 1.0 },
+        // 기울기 진값 — 하이트필드는 오브젝트 xz(월드 ÷ XZ_SCALE) 위 월드 y 변위라 월드 기울기 = dBs / XZ_SCALE.
+        // 높이가 y 스케일이 아니라 uHeight라서 fill과 무관하다. 옛 1.0 고정은 노멀 교란을 1.3배 키워 얼룩을 키웠다(A1-05)
+        uSlopeAspect: { value: 1 / XZ_SCALE },
         uGrabPos: { value: new THREE.Vector2() },
         uGrabDisp: { value: new THREE.Vector2() },
         uGrabDispLag: { value: new THREE.Vector2() },
@@ -163,6 +185,7 @@ export class DoughMesh {
     this.mesh.position.y = 0;
     this.mesh.scale.set(XZ_SCALE, 1, XZ_SCALE);
     this.mesh.renderOrder = 2;
+    this.layoutMold(26000); // setSeed 전 기본 자리(uSeed 0.37과 같은 시드)
   }
 
   applyParams(p: RenderParams): void {
@@ -174,9 +197,10 @@ export class DoughMesh {
     u.uCrust.value = p.crust;
     u.uRipe.value = p.ripe;
     u.uCollapse.value = p.collapse;
-    // 윗면 기공도 폼 축으로 통일 — 갓 밥준에도 미세 기공이 있고, 죽은 상태에선 게이트가 닫힌다
-    // (§4-2b가 위임한 "uPoreDensity 다크 포어 재점검" 이행)
-    u.uPoreDensity.value = p.wallCells * 0.6;
+    u.uPin.value = p.pinholes;
+    u.uFoam.value = p.foam;
+    u.uSink.value = p.sink;
+    u.uStir.value = p.stir;
     u.uKahm.value = p.kahm;
     u.uMold.value = p.mold;
     u.uLevel.value = p.levelness;
@@ -200,6 +224,17 @@ export class DoughMesh {
     const s = (Math.abs(seed) % 100000) / 100000 + 0.11;
     this.material.uniforms.uSeed.value = s;
     this.seedPhase = s * Math.PI * 2;
+    this.layoutMold(seed);
+  }
+
+  /** 곰팡이 군락 — 윗면 안쪽 0.15~0.65·R(유리 테두리에 붙지 않게), 크기 0.7~1.3배, 색 종류는 군락마다(R2-10) */
+  private layoutMold(seed: number): void {
+    const rnd = seededRandom(seed * 7 + 13);
+    for (const c of this.material.uniforms.uMoldA.value as THREE.Vector4[]) {
+      const ang = rnd() * Math.PI * 2;
+      const rad = (0.15 + 0.5 * rnd()) * R_BODY;
+      c.set(Math.cos(ang) * rad, Math.sin(ang) * rad, 0.7 + 0.6 * rnd(), Math.min(2, Math.floor(rnd() * 3)));
+    }
   }
 
   /** 탭 눌림 — 오브젝트 공간 XZ. 되튐/아묾은 elasticity가 가른다(tick) */
@@ -314,7 +349,8 @@ export class DoughMesh {
   /** 반죽 가운데 꼭대기 월드 y — 레이캐스트 평면·밀가루 낙하 자리. 피크 돔·과숙 크레이터·숨까지(A1-11) */
   topY(): number {
     const p = this.params;
-    return (this.height() + 0.05 * (p?.ripe ?? 0) - 0.08 * (p?.collapse ?? 0)) * this.mesh.scale.y;
+    return (this.height() + 0.05 * (p?.ripe ?? 0) - 0.08 * (p?.collapse ?? 0) - SINK_DEPTH * (p?.sink ?? 0))
+      * this.mesh.scale.y;
   }
 
   /** t = 렌더 시계(초, CPU 로직 전부). shaderT = 셰이더 uTime — 생략하면 t. 호출자가 원점을 옮긴 작은 값을 넘겨 float32 해상도를 지킨다 */

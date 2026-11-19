@@ -78,6 +78,14 @@ export interface RenderParams {
   residue: number;
   /** 기운 0~1 — 단계(성숙)가 기포·돔·상승에 보이게 한다(A3-01). 5단계 = 1 */
   vigor: number;
+  /** 윗면 바늘구멍 0~1 — 피크(크기 제각각 + 가끔 분화구) · 배고픔(고른 잔 점). 갓 밥준 0(R2-07) */
+  pinholes: number;
+  /** 유리 닿는 윗가장자리 잔거품 띠 0~1 — 오르는 중 · 피크(R1 rising top_foam) */
+  foam: number;
+  /** 하강 꺼짐 0~1 — 가운데가 먼저 꺼지고 부드럽게 주름진다. hunger 0.05~0.5 구간 전용(R2-06) */
+  sink: number;
+  /** 젓은 물결 0~1 — 갓 밥준 매끈한 페이스트 위 옅은 물결(R1 justfed) */
+  stir: number;
   /** 냉장 0~1 — 유리 김서림·차가운 톤 */
   chill: number;
   /** 창가 0~1 — 아주 약한 따뜻함 */
@@ -108,10 +116,12 @@ const SOUR_TONE = hex(0xcbbda2);
 const DORMANT_TONE = hex(0xe4dccc);
 // 곰팡이 확정 — 잿빛이 도는 바랜 톤. 경고는 다이제틱(반점) 소관, 빨강 시맨틱 없음 (VISUAL §7-1)
 const MOLDY_TONE = hex(0xd8d0be);
-// 밀가루 색 톤 시프트 (§7-2) — 통밀 = 따뜻한 담갈, 호밀 = 어두운 회갈. 상태 톤 위에 약하게 얹는다
-const WHOLEWHEAT_TONE = hex(0xd9c4a3);
-const RYE_TONE = hex(0xbfb096);
-const FLOUR_TONE_MIX = 0.35;
+// 밀가루 색 톤 (§7-2, 개정 2026-11-19 R2-13) — R1 실측(사진 28·29): 통밀 · 호밀은 흰 밀가루보다 L* 11~13 어둡고
+// b* +8~10 노랗다. 옛 톤(#d9c4a3 · #bfb096 × 0.35)은 차이가 실물의 1/3이었고 호밀은 회색 쪽으로 갔다.
+// 통밀 = 따뜻한 황갈 L*57, 호밀 = 갈색 L*50(a* 8, 붉은 기). 섞으면 흰 크림 대비 ΔL* −21 · −25
+const WHOLEWHEAT_TONE = hex(0xa08458);
+const RYE_TONE = hex(0x93724f);
+const FLOUR_TONE_MIX = 0.6;
 // 냉장 = 차갑게 바랜 채도, 창가 = 아주 약한 햇빛 (R1 dormant: 「차갑게 바랜 채도와 뿌연 유리」)
 const COLD_TONE = hex(0xe2e3dc);
 const WARM_TONE = hex(0xf7e4c2);
@@ -136,11 +146,8 @@ export function toRenderParams(s: Snapshot): RenderParams {
   color = mix(color, COLD_TONE, 0.12 * chill);
   color = mix(color, WARM_TONE, 0.06 * warm);
 
-  // liquidity 재료 — 급여 직후 젖은 광 + 피크 거품광 바닥값 (실물 피크 르방은 젖은 유광)
-  const wet = clamp01(Math.max(
-    (1 - smooth(0.15, 0.8, a)) * (1 - smooth(0, 0.45, s.hunger)) * (1 - s.dormancy),
-    0.5 * smooth(0.55, 0.95, a) * (1 - s.dormancy),
-  ));
+  // 젖음 = 갓 밥준 페이스트 몫(R2-12). 옛 「피크 거품광 바닥값 0.5」는 R1(피크 = 매트 · 새틴 거품)과 어긋나 뺐다
+  const wet = clamp01((1 - smooth(0.15, 0.8, a)) * (1 - smooth(0, 0.45, s.hunger)) * (1 - s.dormancy));
   const ripe = smooth(0.7, 0.95, a) * (1 - clamp01(s.dormancy)) * (0.35 + 0.65 * vigor);
   const collapse = smooth(0.45, 0.8, s.sourness) * (1 - clamp01(s.dormancy));
 
@@ -173,13 +180,12 @@ export function toRenderParams(s: Snapshot): RenderParams {
     noiseSpeed: moldy ? 0 : 0.1 + 1.5 * a,
     bubbleDensity: moldy ? 0 : clamp01(a * 0.9 * (1 - 0.85 * s.dormancy) * (0.3 + 0.7 * vigor) * (1 - 0.45 * fake)),
     bubbleScale: Math.min(1.5, (0.5 + 0.8 * a) * (0.75 + 0.25 * vigor) * (1 + 0.45 * fake)),
-    // 피크에서도 무광 페이스트 — 과한 스펙은 플라스틱으로 읽힌다 (젖은 광은 uWet 소관).
-    // ⚠ 2026-08-25 실사진 관찰이 가설을 뒤집었다: "갓 섞은 젖은 페이스트가 가장 유광"이라 보고
-    // wet 쪽으로 옮기려 했으나, 실제 병 사진의 갓 밥준은 **무광·칙칙**이다(밀가루 먼지 + 젓은 자국).
-    // 유광은 피크의 것이다 — 얇은 기포막이 빛을 받아야 젖은 광이 생긴다.
-    // 그래서 gas가 주도하고 wet은 바닥을 조금 올리는 역할만 한다. 갓 밥준이 죽어 보이지 않는 건
-    // 광택이 아니라 물성(cohesion·creep)이 담당한다 — 그게 이번 개편의 요지다
-    specStr: Math.min(1.0, Math.max(0.1, 0.12 + 0.18 * wet + 0.68 * gas - 0.3 * hun - 0.6 * dry)),
+    // 광택 — 2026-11-19 R2-12: R1 실물(사진 03 · 07 · 08 · 17)로 2026-08-25 가설(「갓 밥준 무광 · 피크가 가장 번들」)을
+    // 뒤집었다. 그때 근거는 밀가루 먼지가 앉은 병 몇 장이었고, 30장 대조에선 갓 밥준이 넓고 부드러운 젖은 광(sdL 2.3),
+    // 피크는 매트 · 새틴 거품에 기포 테두리만 반짝, 배고픔은 얇은 막 광, 휴면은 매트다(VISUAL §3-3).
+    // 갓 밥준 0.70 · 오르는 중 ≈0.48 · 피크 0.35 · 배고픔 0.36 · 시큼 ≈0.26 · 휴면 0.10. hooch 광은 jar.ts 액체층 몫
+    specStr: Math.min(1.0, Math.max(0.1,
+      (0.1 + 0.6 * wet + 0.25 * gas + 0.25 * spent - 0.12 * proteo) * (1 - 0.9 * dry))),
     crust: 0.8 * clamp01(Math.max(s.dormancy, moldy ? 1 : 0)),
     height: doughHeight(s.riseFill, s.massRatio, s.stage),
     hoochAmt: clamp01(s.hooch),
@@ -219,6 +225,11 @@ export function toRenderParams(s: Snapshot): RenderParams {
       : (0.11912 + 0.313 * cohesion + 0.205 * elasticity + 0.281 * slack - 0.08 * proteo) * (1 - 0.52 * dry),
     grabCreepGain: moldy ? 0.06 : clamp01(0.25 + 0.48 * (1 - elasticity) + 0.18 * hun) * (1 - 0.8 * dry),
     grabReturnZeta: 1.07 - 0.13 * elasticity,
+    // ── 윗면 질감 신호(2026-11-19 P1b) — 전부 살아있는 분기(alive)라 휴면 · kahm · 곰팡이에선 0 ──
+    pinholes: clamp01(0.55 * domed * (0.45 + 0.55 * vigor) + 0.6 * spent) * alive,
+    foam: clamp01(gas * (1 - spent) * (0.5 + 0.5 * vigor)) * alive,
+    sink: smooth(0.05, 0.25, hun) * (1 - smooth(0.5, 0.85, hun)) * alive,
+    stir: clamp01(fresh * (1 - gas)) * alive,
     vigor,
     chill,
     warm,
@@ -274,6 +285,10 @@ export function smoothParams(cur: RenderParams, target: RenderParams, dtSec: num
     grabMax: n(cur.grabMax, target.grabMax),
     grabCreepGain: n(cur.grabCreepGain, target.grabCreepGain),
     grabReturnZeta: n(cur.grabReturnZeta, target.grabReturnZeta),
+    pinholes: n(cur.pinholes, target.pinholes),
+    foam: n(cur.foam, target.foam),
+    sink: n(cur.sink, target.sink),
+    stir: n(cur.stir, target.stir),
     vigor: n(cur.vigor, target.vigor),
     chill: n(cur.chill, target.chill),
     warm: n(cur.warm, target.warm),

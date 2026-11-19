@@ -2,11 +2,19 @@
 // 2026-11-19(A1-13): 동시 가시 상한이 4라 셰이더가 8슬롯을 늘 계산하던 것을 4로 맞췄다. 연출 스폰(spawnNow)은
 // 빈 슬롯이 없으면 가장 오래된 기포 자리를 넘겨받는다.
 // 레거시 고정 혹(음수 진폭 4개)은 '라떼아트 얼룩'의 주범이라 폐기 — 정지 실루엣은 셰이더 FBM이 담당.
-// 부풀기(easeOut) → 정점 → "뽁" 터짐(80ms 음수 + 잔상) → 소멸. 밀도에 따라 스폰 간격 lerp(6s, 0.8s).
+// 2026-11-19 R2-08: 큰 물집 돔(k 16~26 · 진폭 0.06~0.11 = 월드 1.2cm 혹)을 작고 날카로운 돔(k 60~140 · 진폭 ≤0.022)으로
+// 바꿨다. 터지면 바늘구멍(얕은 음수 진폭)이 SCAR_SEC 동안 남았다 옅어진다 — 프래그가 음수 슬롯을 바늘구멍으로 그린다.
+// 부풀기(easeOut) → 정점 → "뽁"(80ms에 바늘구멍으로) → 바늘구멍이 몇 초에 걸쳐 옅어짐 → 소멸. 스폰 간격 lerp(6s, 0.8s).
 // agitation(젓는 세기 0~1): 스폰 간격 ÷(1+2a), 수명 ÷(1+a) — 젓는 동안 끓어오른다.
 
 export const DYN_SLOTS = 4;
 const POP_SEC = 0.08;
+/** 터진 자리 바늘구멍이 남는 시간(초) — 그동안 슬롯을 비우지 않는다 */
+const SCAR_SEC = 4;
+/** 바늘구멍 깊이(오브젝트) — 프래그는 −amp/SCAR_AMP를 바늘구멍 세기로 읽는다(dough.frag.glsl 같은 상수) */
+export const SCAR_AMP = 0.004;
+/** 돔 진폭 상한 — 크기 배율(≤1.5)이 커도 혹이 되지 않게 */
+const DOME_MAX = 0.025;
 
 interface Bubble {
   active: boolean;
@@ -53,10 +61,10 @@ export class BubbleSystem {
     b.active = true;
     b.x = Math.cos(th) * r;
     b.z = Math.sin(th) * r;
-    b.k = 16 + Math.random() * 10; // 완만한 돔 — 크면 금속성 스파이크
+    b.k = 60 + Math.random() * 80; // 작고 날카로운 돔(1/e 반경 0.08~0.13 오브젝트) — 윗면 바늘구멍 크기
     b.bornAt = t;
     b.life = lifeBase + Math.random() * lifeBase;
-    b.maxAmp = (0.06 + Math.random() * 0.05) * scale;
+    b.maxAmp = Math.min(DOME_MAX, (0.012 + Math.random() * 0.01) * scale);
     b.popped = false;
   }
 
@@ -107,14 +115,17 @@ export class BubbleSystem {
       }
       if (b.popped) {
         const pa = t - b.poppedAt;
-        if (pa >= POP_SEC * 2.5) {
+        if (pa >= POP_SEC + SCAR_SEC) {
           b.active = false;
           this.amp[i] = 0;
         } else if (pa < POP_SEC) {
-          // "뽁" — 함몰 −0.3→−0.12 완화. 시각 잔상은 프래그 팝 링 하이라이트가 대체 (§4-2-7)
-          this.amp[i] = -0.12 * b.maxAmp * (pa / POP_SEC);
+          // "뽁" — 돔이 80ms에 바늘구멍 깊이로 꺼진다
+          const u = pa / POP_SEC;
+          this.amp[i] = b.maxAmp * (1 - u) - SCAR_AMP * u;
         } else {
-          this.amp[i] = -0.12 * b.maxAmp * (1 - (pa - POP_SEC) / (POP_SEC * 1.5));
+          // 바늘구멍이 옅어진다 — 처음엔 빨리, 끝은 천천히(easeOut)
+          const f = 1 - (pa - POP_SEC) / SCAR_SEC;
+          this.amp[i] = -SCAR_AMP * f * f;
         }
       }
       this.pos[i * 2] = b.x;

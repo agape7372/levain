@@ -44,17 +44,15 @@ const sour: Snapshot = {
 };
 
 describe('renderParams — 상태 앵커 (VISUAL §3-3)', () => {
-  it('activity 1·hunger 0·dormancy 0·5단계 → breatheAmp≈0.012, bubbleDensity≈0.9, specStr 0.89', () => {
+  it('activity 1·hunger 0·dormancy 0·5단계 → breatheAmp≈0.012, bubbleDensity≈0.9, specStr 0.35(새틴)', () => {
     // 2026-11-19 R2-15: 숨은 높이의 1.2% 이하(실물은 초 단위로 정지). 기포 상한 0.9는 기운 1(5단계)에서만
     const rp = toRenderParams({ ...base, activity: 1, fill: 1.4, stage: 5 });
     expect(rp.breatheAmp).toBeCloseTo(0.012, 5);
     expect(rp.bubbleDensity).toBeCloseTo(0.9, 5);
-    // 0.92 → 0.89 (2026-08-25 축 개편): activity 단독 구동을 그만두고 gas 주도 + wet 바닥으로 갈랐다.
-    // 유광은 피크의 것이다 — 실사진에서 갓 밥준은 무광·칙칙(밀가루 먼지)이고 피크가 가장 번들거린다.
-    // 갓 밥준을 살리는 건 광택이 아니라 물성(cohesion·creep) 쪽이다
-    expect(rp.specStr).toBeCloseTo(0.89, 5);
-    // 갓 밥준은 여전히 무광이어야 한다 — 이 순서가 뒤집히면 실사진과 어긋난다
-    expect(toRenderParams(justfed).specStr).toBeLessThan(rp.specStr * 0.5);
+    // 2026-11-19 R2-12: R1 실물 30장 대조로 2026-08-25 가설(피크가 가장 번들 · 갓 밥준 무광)을 뒤집었다.
+    // 피크 = 매트 · 새틴 거품(0.35), 갓 밥준 = 넓고 부드러운 젖은 광(0.70). 정본 VISUAL §3-3
+    expect(rp.specStr).toBeCloseTo(0.35, 5);
+    expect(toRenderParams(justfed).specStr).toBeGreaterThan(rp.specStr * 1.8);
   });
 
   it('🔒 피크 grab 물성은 사용자 실기기 확정치다 — grabMax 0.600 · ζ 0.956', () => {
