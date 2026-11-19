@@ -2,10 +2,11 @@
 //   탭(<8px & <250ms)      → poke 덴트 (damped spring 복귀)
 //   홀드 0.8s(무이동)       → 손가락 쪽 살짝 부풂 (swell)
 //   드래그(≥8px)            → 2채널: 반죽 위에서 천천히 끌면 미확정(젓기처럼) → 경로 32px에서
-//                             곧은 당김이면 grab(변위 추종·점탄성), 아니면 stir(F1).
+//                             곧고 화면 위쪽 ±40° 안이면 grab(가닥 다발 — 끝이 손끝을 따른다), 아니면 stir(F1 · §6-1).
 //                             빠르게 문지르거나 반죽 밖 시작이면 stir(속도 시어장)
-//                             — 소유권은 중간에 안 바뀐다 (§5-5 원칙). 예외 하나: grab 중 원 · 왕복을
-//                             그리면 stir로 넘긴다(StirJudge, 한 방향만 · 되돌아가지 않음)
+//                             — 소유권은 중간에 안 바뀐다 (§5-5 원칙). 예외 하나: grab 중 원 · 가로 왕복을
+//                             그리면 stir로 넘긴다(StirJudge, 한 방향만 · 되돌아가지 않음). 내렸다 다시 올리기는 grab 유지
+// grab 중 손끝 = 카메라를 마주 보는 수직 평면(누른 점을 지남)과 손끝 광선의 교점(월드) — 직교 카메라라 가닥 끝이 손끝을 1:1로 따른다.
 //   배경 시작 + 수평 우세      → swipe(르방 전환). canSwipe()가 false면 이 분기 자체가 없다
 //                             (= 기존 stir 경로 그대로)
 //   덮개 덮임               → 위로 플릭 또는 탭 = 걷기, 반죽 조작은 통과 안 함
@@ -43,6 +44,13 @@ const STIR_FLIPS = 2;
 const GRAB_COMMIT_PX = 32;
 /** 그때 |Σ|가 이 각도 미만이면 곧은 당김 = grab. 반경 80px 원은 32px에서 약 20° */
 const GRAB_COMMIT_TURN_RAD = (15 * Math.PI) / 180;
+/** 위로 끄는 것만 grab — 누른 점 → 지금 점이 화면 위쪽 ±40° 안(엄지 대각선, §6-1). 타원 뒤 호(화면 가로)는 곧아도 stir */
+const GRAB_UP_COS = Math.cos((40 * Math.PI) / 180);
+
+/** 화면 위쪽 ±40° 안인가(dy는 화면 아래가 +). 테스트용 export */
+export function isUpward(dx: number, dy: number): boolean {
+  return -dy >= Math.hypot(dx, dy) * GRAB_UP_COS && dy < 0;
+}
 
 /** grab 중 손짓이 젓기인지 — 화면 픽셀 점을 차례로 받아, 넘길 때가 되면 true.
  *  회전 누적은 조각 사이 꺾임(90° 이하만)의 합 = 처음 방향에서 지금 방향까지 돈 각도라
@@ -56,6 +64,8 @@ export class StirJudge {
   private flips = 0;
   /** 받아들인 조각 길이 합(px) */
   path = 0;
+  /** grab 확정 뒤 — 가로 우세 조각만 뒤집힘으로 센다(내렸다 다시 올리기 = grab 유지, §6-1) */
+  horizFlipsOnly = false;
   constructor(x: number, y: number) {
     this.ax = x;
     this.ay = y;
@@ -69,7 +79,9 @@ export class StirJudge {
     const uy = sy / len;
     if (this.dx !== 0 || this.dy !== 0) {
       const dot = this.dx * ux + this.dy * uy;
-      if (dot < STIR_FLIP_DOT) this.flips++;
+      if (dot < STIR_FLIP_DOT) {
+        if (!this.horizFlipsOnly || Math.abs(ux) > Math.abs(uy)) this.flips++;
+      }
       else if (dot >= 0) this.turn += Math.atan2(this.dx * uy - this.dy * ux, dot);
     }
     this.dx = ux;
@@ -97,7 +109,8 @@ export interface InputHooks {
   onStirMove?(speed01: number): void;
   onStirEnd?(): void;
   onGrabStart?(): void;
-  /** 신장 정도 0~1 — 사운드·햅틱 훅용. DoughMesh.grabStretch01() 값 그대로(grabTarget 길이 ÷ grabMax, 상한 1). 배선은 SceneHost.onGrab* → app.ts */
+  /** 신장 정도 0~1 — 사운드 훅용. DoughMesh.grabStretch01() 값 그대로(주 가닥 길이 ÷ 주 가닥 끊김 길이, 상한 1). 배선은 SceneHost.onGrab* → app.ts.
+   *  가닥 끊김(소리 · 진동)은 렌더 tick에서 나므로 여기 말고 SceneHost.onGrabBreak */
   onGrabMove?(stretch01: number): void;
   onGrabEnd?(): void;
   /** 지금 르방 전환 스와이프를 받아도 되는가 (르방 2마리 이상·모달/연출/쇼케이스 아님) */
@@ -123,6 +136,10 @@ export function attachInput(
   // fill 1.0에서 실제 윗면 y≈0.98과 어긋나 손끝과 눌리는 지점이 밀렸다)
   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.55);
   const hit = new THREE.Vector3();
+  /** grab 중 손끝 평면 — 누른 점을 지나고 카메라를 마주 보는 수직 평면 */
+  const vplane = new THREE.Plane();
+  const vnorm = new THREE.Vector3();
+  const vhit = new THREE.Vector3();
 
   let down = false;
   let downX = 0;
@@ -141,6 +158,8 @@ export function attachInput(
   let activeId: number | null = null;
   let downHitX = 0;
   let downHitZ = 0;
+  /** 누른 점 월드 y — 평면 교점(옆벽 스냅이면 테두리 높이) */
+  let downHitY = 0;
   /** 누름 때 옆벽 스냅이 옮긴 거리(월드) — 끌기 좌표 = 평면 교점 + 이 값. 윗면 시작이면 0 */
   let snapDX = 0;
   let snapDZ = 0;
@@ -248,8 +267,15 @@ export function attachInput(
       judge = null;
     } else if (mode === 'pending' && judge && judge.path >= GRAB_COMMIT_PX) {
       // 한 번만 가른다. 곧은 당김이면 누른 점을 잡고 아래 grab 분기가 같은 걸음에 지금 목표로 끈다(소리는 이어진다)
-      if (judge.straight()) {
+      if (judge.straight() && isUpward(e.clientX - downX, e.clientY - downY)) {
         mode = 'grab';
+        judge.horizFlipsOnly = true;
+        // 손끝 평면 — 법선 = 카메라 forward의 xz(카메라 쪽). 곧장 내려다보는 카메라면 +z
+        camera.getWorldDirection(vnorm);
+        vnorm.y = 0;
+        if (vnorm.lengthSq() < 1e-8) vnorm.set(0, 0, -1);
+        vnorm.normalize().negate();
+        vplane.setFromNormalAndCoplanarPoint(vnorm, vhit.set(downHitX * XZ_SCALE, downHitY, downHitZ * XZ_SCALE));
         dough.grabStart(downHitX, downHitZ);
         hooks.onGrabStart?.();
       } else {
@@ -258,7 +284,14 @@ export function attachInput(
       }
     }
     if (mode === 'swipe') return; // 반죽에 손대지 않는다 — 레이캐스트도 생략
-    if (!raycast(e)) return;
+    const onPlane = raycast(e);
+    if (mode === 'grab') {
+      // 손끝 = 수직 평면 교점(월드). 평면과 나란한 광선이면 윗면 평면 교점으로 대신한다
+      if (ray.ray.intersectPlane(vplane, vhit)) dough.grabMove3(vhit.x, vhit.y, vhit.z);
+      else if (onPlane) dough.grabMove3(hit.x + snapDX, hit.y, hit.z + snapDZ);
+      hooks.onGrabMove?.(dough.grabStretch01());
+    }
+    if (!onPlane) return;
     // 끌기는 평면 교점을 따라 이어진다 — 누른 점(스냅된 테두리) + 평면 위 이동량 (RV-H1)
     hit.x += snapDX;
     hit.z += snapDZ;
@@ -266,10 +299,7 @@ export function attachInput(
     const dt = Math.max(1 / 240, t - lastHitT);
     const ox = hit.x / XZ_SCALE;
     const oz = hit.z / XZ_SCALE;
-    if (mode === 'grab') {
-      dough.grabMove(ox, oz);
-      hooks.onGrabMove?.(dough.grabStretch01());
-    } else if (mode === 'stir' || mode === 'pending' || mode === 'swipeCandidate') {
+    if (mode === 'stir' || mode === 'pending' || mode === 'swipeCandidate') {
       const vx = (ox - lastHitX) / dt;
       const vz = (oz - lastHitZ) / dt;
       dough.setStirInput(ox, oz, vx, vz);
@@ -314,6 +344,7 @@ export function attachInput(
       snapWall();
       snapDX += hit.x;
       snapDZ += hit.z;
+      downHitY = hit.y;
       lastHitX = hit.x / XZ_SCALE;
       lastHitZ = hit.z / XZ_SCALE;
       lastHitT = performance.now() / 1000;

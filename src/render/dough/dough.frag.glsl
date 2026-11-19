@@ -26,7 +26,7 @@ uniform float uMold;
 uniform float uSeed;
 uniform float uLevel;      // (구 uLiquid) 형상 — 평평함. vert와 같은 소스
 uniform float uFluid;      // 흐름 — 슬로싱·진행파 조명 짝
-uniform float uCohesion;   // 응집 — 겹 가닥·메니스커스 세기
+uniform float uCohesion;   // 응집 — 메니스커스 세기
 uniform float uRBody;      // 몸통 적도 반경 = R × wallFill — **모든 반경 밴드의 정규화 기준**
 uniform vec2 uWallCell;    // x = 유리 너머 기포 수 0~1, y = 크기 축 34(크고 성김) ~ 80(잘고 촘촘)
 uniform float uNoiseSpeed; // 활동 — 유리 너머 기포가 자라는 빠르기
@@ -40,18 +40,20 @@ uniform vec2 uWobble;
 uniform vec2 uBumpPos[4];
 uniform float uBumpAmp[4];
 uniform float uBumpK[4];
-uniform vec2 uTrailPos[8];
-uniform float uTrailAmp[8];
-uniform float uTrailK[8];
+uniform vec2 uTrailPos[15];
+uniform float uTrailAmp[15];
+uniform float uTrailK[15];
+uniform vec4 uBow;         // 앞 둔덕 (x, z, 높이, 첨도) — vert와 같은 소스(TRAIL_GROOVE)
+uniform vec4 uStirMem;     // 저은 띠 기억 (W 0~1, 젓는 반경, 띠 폭, 0) — 오브젝트 단위(S2 · S4 · S8)
 uniform vec2 uPokePos;
 uniform float uPokeAmt;
 uniform float uPokeK;
-uniform vec2 uGrabPos;
-uniform vec2 uGrabDisp;
+uniform vec2 uGrabPos;     // 밑동 둔덕 가운데(오브젝트) — vert와 같은 소스
+uniform vec4 uGrab;        // x = 밑동 둔덕 높이, y = 끌려 모임 세기(방사 결 게이트)
+uniform vec4 uPile;        // 더미 (x, z, 높이, 반경)
 uniform float uRXZMax;
 uniform float uSlopeAspect; // 월드 기울기 진값 = 1 / XZ_SCALE (A1-05)
 varying vec2 vXZ;
-varying float vStretch;
 varying float vTop;
 varying vec3 vBaseN;
 varying float vY;          // 월드 높이 (vert와 단일 소스)
@@ -62,15 +64,8 @@ const float XZ_W = 1.3;
 /** 터진 기포 바늘구멍 깊이 — bubbles.ts SCAR_AMP와 같은 값(tests/doughSurface가 잠근다) */
 const float SCAR_AMP = 0.004;
 
-float fbm(vec2 p) {
-  mat2 R = mat2(0.8, -0.6, 0.6, 0.8);
-  float v = 0.6 * sin(p.x) * cos(p.y);
-  p = R * p * 1.9 + 13.7;
-  v += 0.3 * sin(p.x) * cos(p.y);
-  p = R * p * 1.9 + 5.1;
-  v += 0.15 * sin(p.x) * cos(p.y);
-  return v;
-}
+// FBM · 음영 — StrandMesh FBM_GLSL · DOUGH_SHADE(가닥 셰이더와 같은 소스)를 DoughMesh가 끼운다
+// #fbm
 
 // 해석적 FBM 그라디언트 — sin·cos 도함수 체인 (유한차분 편향·매직 e 제거, §예산)
 vec2 fbmG(vec2 p0) {
@@ -89,37 +84,11 @@ vec2 fbmG(vec2 p0) {
 // 고랑 자취(버텍스와 같은 소스, DoughMesh TRAIL_GROOVE) · 줄무늬 띠(hooch와 같은 소스, jar.ts MARBLE_GLSL)
 // #trailGroove
 // #marble
+// #grabField
+// #doughShade
 
-// 칸 해시 — 칸 번호를 37로 접어(정수라 fp16에서도 정확) 중간값을 16 아래로 묶는다. 반죽은 늘 highp(WebGL2, 위 머리 주석)라
-// 정밀도 이득은 없고, 접기는 mediump로 도는 경우를 위한 예비책이다(그때도 소수 7비트가 남는다). 대가로 37칸마다 배치가
-// 반복된다 — 옆벽 잔 기포 116° · 윗면 잔거품 1.18월드. 캡처 상관 −0.005라 눈에 띄지 않는다(2026-11-19 R-L4).
-// 옛 sin 큰 배율 해시는 fp16에서 줄무늬로 무너진다
-vec3 hash3(vec2 c) {
-  vec3 p = fract(mod(c.xyx, 37.0) * vec3(0.1031, 0.1030, 0.0973));
-  p = fract(p + dot(p, p.yzx + 2.33));
-  return fract((p.xxy + p.yzz) * p.zyx * 7.31);
-}
-
-// 칸 하나 = 기포 하나 — 자기 칸만 본다(이웃 탐색 없음). 기포는 칸 안에 들어가게 반지름을 묶고 중심을 지터한다.
-//   uv = 칸 단위 좌표, cell = 칸 크기(월드), pres = 칸에 기포가 있을 확률(빈칸이 격자를 지운다),
-//   r0·r1 = 반지름 범위(월드, 작은 것이 많다), asp = 세로/가로 비, grow = 크기 배율.
-// 반환: x = 속(부드러운 가장자리) · y = 테두리 고리 · z = 국소 세로 좌표(위 +) · w = 크기 0~1
-vec4 cellBubble(vec2 uv, vec2 cell, float pres, float r0, float r1, float asp, float grow) {
-  vec3 h = hash3(floor(uv));
-  if (h.z >= pres) return vec4(0.0);
-  float h4 = fract(h.x * 5.37 + h.y * 2.91);
-  float r = mix(r0, r1, h4 * h4) * grow;
-  float a = asp * mix(0.8, 1.25, fract(h.y * 3.7 + h.z * 11.3)); // 칸마다 타원비
-  vec2 rad = min(vec2(r * inversesqrt(a), r * sqrt(a)), cell * 0.36);
-  vec2 lo = rad / cell;
-  vec2 q = (fract(uv) - lo - (1.0 - 2.0 * lo) * h.xy) * cell / rad;
-  // 휨 — 납작할수록 더 휜다(렌즈가 알약 · 씨앗 꼴로 줄서지 않게). 부호는 크기(h4)와 따로 놀아야 큰 칸이 다 같은 쪽으로
-  // 휘지 않는다 — 위로 볼록한 회색 초승달이 줄지으면 「감은 눈」(판정 L1). 최대치 0.3 → 0.2
-  q.y += (fract(h.x * 7.13 + h.z * 3.71) - 0.5) * 0.4 / a * q.x * q.x;
-  float d = length(q);
-  float ring = smoothstep(0.5, 0.88, d) * (1.0 - smoothstep(0.88, 1.15, d));
-  return vec4(1.0 - smoothstep(0.62, 1.0, d), ring, q.y, h4);
-}
+// 칸 해시 · 칸 기포(hash3 · cellBubble) — 가닥 frag 기포 틈과 같은 소스(StrandMesh CELL_BUBBLE, DoughMesh가 끼운다)
+// #cellBubble
 
 // 느린 자람 — 칸마다 위상이 다른 부드러운 삼각파(trig 0). 흐르는 스크롤이 아니라 제자리에서 수십 초에 걸쳐 커졌다 준다
 float slowGrow(float phase, float speed) {
@@ -128,10 +97,9 @@ float slowGrow(float phase, float speed) {
 }
 
 void main() {
-  // 알베도 모틀 — 젓은 물결의 휨에도 같은 값을 쓴다(추가 FBM 0)
-  float mott = fbm(vXZ * 1.4 + 11.0);
-  vec3 base = uColor * (1.0 + mott * 0.03);
-  base *= mix(1.0, 0.93, uWet); // 젖으면 조금 진해진다(R2-12: 0.90 → 0.93, 젖은 광과 같이 다시 봄)
+  // 알베도(모틀 · 젖음) = DOUGH_ALBEDO — 가닥 frag와 같은 함수. 모틀은 젓은 물결의 휨에도 같은 값을 쓴다(추가 FBM 0)
+  float mott;
+  vec3 base = doughAlbedo(vXZ, mott);
 
   // ── 밥 주기 가루 · 줄무늬(2026-11-19 섞는 맛 M3, S4) — 알베도에 섞어 조명이 그대로 먹는다. 둘 다 무광(아래 광택에서 뺀다).
   //    옛 덮개는 sin×sin 체크무늬를 조명 뒤 상수 색으로 덮어 옆벽까지 하얀 세로줄 컵이 됐다 ──
@@ -167,10 +135,45 @@ void main() {
   }
   // 고랑 자취 — 버텍스와 같은 함수의 기울기(첨도 배율 없음). 비용 때문에 윗면에서만 — 옆벽은 테두리 높이만 따른다
   float trailWet = 0.0;
+  float rw = 0.0;          // 잔줄 · 눈물방울 띠 세기 — 머리 뒤 2~3선분의 갓 지난 띠
+  vec4 tl = vec4(0.0);
   if (vTop > 0.5) {
-    vec4 tg = trailGroove(vXZ);
+    vec4 tg = trailGroove(vXZ, tl);
     dBs += tg.yz;
     trailWet = tg.w;
+    // 잔줄(S1b) — 도구가 지난 띠에 나란한 잔줄 다발, 노멀에만(UPQ94 3s 칸4). 머리 뒤 2~3선분에만(§6-18) — 원 젓기 전체에
+    // 깔면 레코드판. 위상은 모틀로 휘고(§6-21 mott 재사용) 저주파로 군데군데 끊는다 — 고른 줄 · 지렁이 금지
+    rw = tl.w * trailWet * (1.0 - smoothstep(0.6 * RIDGE_BAND, RIDGE_BAND, abs(tl.x)));
+    if (rw > 0.01) {
+      float ph = 6.2832 * tl.x / RIDGE_GAP + mott * 5.0;
+      dBs += vec2(-tl.z, tl.y) * (cos(ph) * RIDGE_SLOPE * rw * smoothstep(-0.25, 0.1, mott));
+    }
+  }
+  // 저은 띠 기억(S2 · S4 · S8) — 저은 고리(반경 uStirMem.y · 폭 .z)가 W만큼 반들하다. 아래 바늘구멍 지움 · 젖은 광 · 감긴 결이 쓴다
+  float stirM = 0.0;
+  if (uStirMem.x > 0.004 && vTop > 0.5) {
+    float rr = length(vXZ);
+    float zz = (rr - uStirMem.y) / uStirMem.z;
+    stirM = uStirMem.x * exp(-zz * zz) * (1.0 - smoothstep(0.85, 1.0, rr / uRBody));
+  }
+  // 당기기 밑동 둔덕 · 더미(L2a · L6) — 버텍스와 같은 함수(GRAB_FIELD)의 기울기
+  if (uGrab.x + uPile.z > 1e-5) dBs += grabField(vXZ).yz * vTop;
+  // 더미는 갓 떨어진 매끈한 반죽 — 반들하고(젖은 광) 조금 밝다. 낮은 키 빛(28.6°)에 먼 쪽 비탈만 그늘이면 짙은 얼룩으로 읽혔다(시각 고침 1차 A-4).
+  // 광 +0.5 · 밝기 +4%는 추정 — 실측 없음(UPQ94 13s 더미가 둘레보다 밝은 것만 봤다)
+  float pileM = vTop > 0.5 ? pileSheen(vXZ) : 0.0;
+  base *= 1.0 + 0.04 * pileM;
+  // 방사 결(L2b) — 둔덕 바깥 띠에서 잡힌 자리를 향하는 불규칙한 결, 노멀에만(기울기 ≤ 0.02).
+  // fbm(방향·k)라 이음매가 없고 줄이 고르지 않다(§6-16). 모틀(mott)로 군데군데 끊는다 — 원판 + 고른 방사 띠(욱일) 금지
+  if (uGrab.y > 0.01 && vTop > 0.5) {
+    vec2 gd = vXZ - uGrabPos;
+    float gr = length(gd);
+    float ring = smoothstep(0.8 * GRAB_RB, 1.2 * GRAB_RB, gr) * (1.0 - smoothstep(0.6 * GRAB_BAND, GRAB_BAND, gr));
+    if (ring > 0.001) {
+      vec2 gdir = gd / gr;
+      vec2 gperp = vec2(-gdir.y, gdir.x);
+      float rib = clamp(dot(fbmG(gdir * 5.0 + gr * 1.5 + uSeed * 9.0), gperp) * 0.6, -1.0, 1.0);
+      dBs += gperp * (rib * 0.02 * uGrab.y * ring * smoothstep(-0.1, 0.15, mott));
+    }
   }
   { // 탭 자국 — 조명이 봐야 "자국이 남았다 아문다"가 읽힌다 (§0-B)
     vec2 d = vXZ - uPokePos;
@@ -198,8 +201,8 @@ void main() {
     float f = fbm(vXZ * 6.0 + 2.0);
     dBs += (-f * inversesqrt(f * f + 0.02)) * fbmG(vXZ * 6.0 + 2.0) * (6.0 * 0.02 * uSink * bowl * vTop);
   }
-  // 슬로싱 수면 기울기 — 기울어진 수면이 빛을 다르게 받는다 (버텍스와 동일 계수)
-  dBs += uWobble * (0.14 * uLevel * (0.5 + 0.5 * uFluid) * vTop);
+  // 슬로싱 수면 기울기 — 기울어진 수면이 빛을 다르게 받는다 (버텍스와 같은 식, 윗물이 덮으면 끈다 — SURF_TILT)
+  dBs += uWobble * (surfTiltK() * (1.0 - hoochSpread(uHooch)) * vTop);
   // 유휴 진행파 기울기 — 반사광이 수면 위를 흘러간다 (버텍스와 위상 동기)
   dBs += vec2(0.90, 0.44) * (0.009 * 11.0 * cos(dot(vXZ, vec2(0.90, 0.44)) * 11.0 - uTime * 1.3)) * uFluid * vTop;
   dBs += vec2(-0.50, 0.87) * (0.6 * 0.009 * 17.0 * cos(dot(vXZ, vec2(-0.50, 0.87)) * 17.0 + uTime * 1.6)) * uFluid * vTop;
@@ -217,51 +220,51 @@ void main() {
 
   // ── 노멀·확산 — 몸통(vBaseN) 위에 하이트필드 기울기 (§0-B: 형태 음영 복구) ──
   // 마른 가루 · 흰 줄은 빛을 흩어 굴곡 그늘이 옅다 — 흰 덮개 위 고랑 그늘이 회색 얼룩으로 읽혔다(S4)
-  vec3 nrm = normalize(vBaseN + vec3(dBs.x, 0.0, dBs.y) * (uSlopeAspect * (1.0 - 0.7 * matte)));
-  // 반죽 전용 키 — 씬 KEY_POS보다 낮다(고도 28.6°). 얼룩 증폭은 노이즈 원천(fbmG · 기공)을 지워 해결했고,
-  // 높이를 올리면 하강 주름 · 젓은 물결 · 돔의 결이 함께 죽어 그대로 둔다(A1-05 검토, VISUAL §1-3)
-  vec3 L = normalize(vec3(-0.7, 0.45, 0.45));
-  // wrap diffuse — 반투명 페이스트의 부드러운 터미네이터
-  float ndl = clamp((dot(nrm, L) + 0.35) / 1.35, 0.0, 1.0);
-  float slope = length(nrm.xz);
-
-  // 반구 앰비언트 — 윗면 밝기 유지, 어깨·측면 하강 = 부피감 + 유리 접촉 그늘
-  vec3 col = base * (0.58 + 0.16 * nrm.y + 0.44 * ndl) * vec3(1.04, 0.985, 0.915);
-
-  // ── 광택(R2-12) — "병 위 소프트박스" 상수 하프벡터. 젖으면 넓고 부드럽게(지수 16 → 9), 세기는 uSpecStr이 상태를 나른다:
-  //    갓 밥준 넓은 젖은 광 · 피크 새틴 · 배고픔 얇은 막 · 휴면 매트 ──
-  {
-    vec3 HS = normalize(vec3(-0.30, 1.0, 0.22));
-    // 갓 저은 자취는 반들하다 — 자리 젖음은 고랑이 메워지며 사라진다
-    float wetL = min(1.0, uWet + 0.4 * trailWet);
-    float sheet = pow(max(dot(nrm, HS), 0.0), mix(16.0, 9.0, wetL));
-    // 균일 밝힘은 '반사'로 안 읽힌다 — 완만한 띠로 잘라 창 모양을 준다
-    float band = 0.45 + 0.55 * smoothstep(-0.55, 0.30, dot(vXZ, vec2(-0.62, 0.78)));
-    // normalize(L+V) — 직교 카메라라 V는 화면 전체에서 같다. viewMatrix 3행 = 카메라 +Z(월드)
-    vec3 HC = normalize(L + vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]));
-    float spec = sheet * band * (0.30 + 0.45 * wetL) + pow(max(dot(nrm, HC), 0.0), 5.0) * 0.05;
-    col += vec3(0.28, 0.16, 0.08) * spec * uSpecStr * (1.0 - matte);
+  // 하이트필드 노멀 = (−∂h/∂x, 1, −∂h/∂z) — dBs는 ∇h라 뺀다. 2026-11-19 시각 고침 1차: 옛 식은 더해서 굴곡 음영이 뒤집혀 있었다
+  // (빛은 왼쪽인데 혹은 오른쪽이 밝음 = 패인 자리로 읽힘). 더미가 짙은 얼룩 · 고랑이 흐린 짙은 덩이로 읽힌 뿌리(.work/feel2/flipN)
+  vec3 nrm = normalize(vBaseN - vec3(dBs.x, 0.0, dBs.y) * (uSlopeAspect * (1.0 - 0.7 * matte)));
+  // 음영(반구 앰비언트 · wrap diffuse · 소프트박스 광 · 경사 페널티) = DOUGH_SHADE — 가닥 셰이더와 같은 함수.
+  // 갓 저은 자취는 반들하다 — 자리 젖음은 고랑이 메워지며 사라진다
+  // 저은 띠는 반짝인다(S8 oelv 214+3-5 · S4 매끈) + 감긴 결(S2 · S8)은 광에만 ≤ 0.15 — 줄무늬(uMarble)가 있거나 윗물 덮인 곳에선
+  // 끈다(밥 줄 때 흰 줄과 뜻이 겹친다, §6-17). 기존 marbleBand라 새 나선을 만들지 않는다
+  float swirl = 0.0;
+  if (stirM > 0.004 && uMarble < 0.004) {
+    float hc = uHooch > 0.004 ? hoochCover(length(vXZ) / uRBody, atan(vXZ.y, vXZ.x), uHooch) : 0.0;
+    swirl = marbleBand(vXZ / uRBody, uMarblePhase, stirM, mott * 0.35) * (1.0 - hc);
   }
-  // 경사 페널티 최소화 — 입체감은 ndl·반구가 담당
-  col -= vec3(0.03, 0.022, 0.015) * slope;
+  float ndl;
+  // 저은 띠 젖은 광 0.35 → 0.5(시각 고침 2차 B-4) — 2배 녹화(fix2_2)에서 피크 저은 띠의 반들함이 둘레와 구별되지 않았다(메모 상한 0.5)
+  vec3 col = doughShade(nrm, base, vXZ, min(1.0, uWet + 0.4 * trailWet + 0.5 * stirM + 0.15 * swirl + 0.5 * pileM), matte, ndl);
+  // 고랑 그늘을 따뜻하게(시각 고침 2차 B-5) — 밝기는 두고 그늘 쪽(ndl 낮음)만 채도를 반죽 쪽으로 1.3배(반투명 반죽 속 산란).
+  // 같은 채도로 어두워지기만 하면 갓 밥준 고랑이 회색 기로 탁했다(hi1_stir). 1.3 · 문턱 0.3~0.6은 추정 — 실측 없음
+  {
+    float sh = trailWet * (1.0 - smoothstep(0.3, 0.6, ndl));
+    float lum = dot(col, vec3(0.299, 0.587, 0.114));
+    col = mix(col, vec3(lum) + (col - vec3(lum)) * 1.3, sh);
+  }
 
   // ── 윗면 바늘구멍 · 잔거품 띠(R2-07) — 반죽보다 살짝 어두운 열린 구멍(검정 금지), 크기 제각각.
   //    피크 = 성기고 들쭉날쭉 + 큰 칸만 밝은 테(작은 분화구) · 배고픔 = 고른 잔 점 · 오르는 중 = 유리 닿는 가장자리 잔거품 ──
+  // 저은 자리는 바늘구멍 · 거품이 잔잔하다 — 갓 판 고랑 · 저은 띠 둘 다(S4 UPQ94 2s→3s 저은 자리 기포가 약 1s에 사라짐)
+  float calm = 1.0 - 0.85 * max(max(trailWet, stirM), pileM); // 더미도 기공을 덮는다
   if (vTop > 0.5 && uPin + uFoam > 0.004) {
     vec2 tw = vXZ * XZ_W;
+    // S4 눈물방울(구멍 도메인을 진행 방향으로 늘이기)은 해 보고 뺐다(§6-19) — 선분마다 방향이 달라 이음매에서 도메인이 칸 2~3개씩
+    // 튀었고(원 젓기 0.55R · 선분 0.49rad), 머리가 움직이면 구멍이 미끄러졌다. 저은 자리 지움(calm)만 남긴다
     vec2 ut = tw / 0.07;
     ut.x += fract(floor(ut.y) * 0.618); // 줄마다 무리수 밀림 — 세로 열이 서지 않는다
     vec4 pin = cellBubble(ut, vec2(0.07), uPin * 0.7,
                           mix(0.007, 0.005, uRipe), mix(0.011, 0.022, uRipe), 1.0, 1.0);
     float rr = length(vXZ) / uRBody;
-    float calm = 1.0 - 0.8 * trailWet; // 저은 자리는 바늘구멍 · 거품이 잔잔하다(피크 젓기 꺼짐)
+    // 피크는 큰 구멍만 남긴다 — 찢긴 틈(S7 8uAT 76s). 「큰」 문턱 smoothstep(0.5, 0.9, 크기)는 추정 — 실측 없음(구멍 크기 분포를 못 잰다)
+    float calmPin = 1.0 - (1.0 - calm) * (1.0 - uRipe * smoothstep(0.5, 0.9, pin.w));
     // 유리에 올라붙은 메니스커스 끝(rr 0.94~)은 거의 수직이라 xz 칸이 화면에서 1px 폭 세로 실선으로 늘어난다 —
     // 테 바로 아래 매달린 실선(판정 L2)의 원인. 벽 기포를 꺼도 남았다(wallCells=0 캡처). 구멍 · 거품 점만 거기서 끊는다
     float flatTop = 1.0 - smoothstep(0.93, 0.985, rr);
     float crater = pin.y * pin.w * pin.w * uRipe * flatTop; // 큰 구멍만 테가 밝다
     // 따뜻한 그늘(실물 07) — 회색 점은 후추 · 먼지로 읽힌다. 피크(uRipe)는 2배로 짙게(판정 M5 — 실물 sdL 6.5~14 대 렌더 1.9)
-    col *= 1.0 - vec3(0.055, 0.068, 0.09) * pin.x * (1.0 + uRipe) * flatTop * calm * (1.0 - cover); // 덮개 위 회색 점 금지(F4)
-    col += vec3(0.05, 0.042, 0.03) * crater * (0.6 + 0.6 * uSpecStr) * calm;
+    col *= 1.0 - vec3(0.055, 0.068, 0.09) * pin.x * (1.0 + uRipe) * flatTop * calmPin * (1.0 - cover); // 덮개 위 회색 점 금지(F4)
+    col += vec3(0.05, 0.042, 0.03) * crater * (0.6 + 0.6 * uSpecStr) * calmPin;
     float edge = smoothstep(0.80, 0.97, rr) * uFoam * calm;
     if (edge > 0.01) {
       vec4 fb = cellBubble(tw / 0.032, vec2(0.032), 0.85 * edge, 0.003, 0.008, 1.0, 1.0);
@@ -270,7 +273,7 @@ void main() {
     }
   }
   // 터진 기포가 남긴 바늘구멍 — 몇 초에 걸쳐 옅어진다(bubbles.ts SCAR_SEC)
-  col *= 1.0 - 0.08 * min(scar, 1.0) * vTop * (1.0 - 0.8 * trailWet) * (1.0 - cover); // 가루 덮개 아래에선 안 비친다(F4)
+  col *= 1.0 - 0.08 * min(scar, 1.0) * vTop * calm * (1.0 - cover); // 가루 덮개 아래에선 안 비친다(F4)
 
   // ── 유리 너머 기포 단면(R2-04 · A1-06) — 「반죽이 아니라 르방」의 단일 최강 단서. 원통 매개(호 길이 × 높이, 월드)라
   //    유리에 붙은 기포가 화면 가장자리에서 자연스럽게 눌려 보인다. atan 분기컷은 병 뒤쪽(보이지 않는 옆벽)이다.
@@ -312,20 +315,6 @@ void main() {
     col *= mix(vec3(1.0), vec3(0.95, 0.925, 0.885), fc.x * w);
     float rimHi = max(max(fa.y * 0.4 * clamp(fa.z, 0.0, 1.0), fb.y * clamp(fb.z, 0.0, 1.0)), fc.y * 0.6 * clamp(fc.z, 0.0, 1.0));
     col += vec3(0.05, 0.044, 0.034) * rimHi * w;
-  }
-
-  // 윈도우페인 — grab 신장부가 얇아지며 밝아진다 (§4-2-4)
-  float wpane = clamp(vStretch * 1.6, 0.0, 0.4);
-  col = mix(col, col * vec3(1.16, 1.12, 1.05) + vec3(0.035, 0.03, 0.02), wpane);
-
-  // 겹(글루텐 가닥) — 당김 직교 사인 줄무늬, 신장부에만
-  if (vStretch > 0.01) {
-    vec2 sdir = normalize(uGrabDisp + vec2(1e-5, 0.0));
-    float sOrtho = dot(vXZ - uGrabPos, vec2(-sdir.y, sdir.x));
-    float strand = 0.5 + 0.5 * sin(sOrtho * 46.0 + fbm(vXZ * 4.0) * 3.0);
-    // 겹은 글루텐 망이 만든다 — 시큼(응집 0)에선 사라진다. "끊겼다"가 눈으로 읽히는 지점
-    col -= vec3(0.045, 0.038, 0.028) * strand * clamp(vStretch * 1.4, 0.0, 0.5)
-         * (0.35 + 0.65 * uCohesion);
   }
 
   // ── 용기 접촉 (§2-3): 벽 쪽 접촉 그늘 + 벽을 타고 오른 밝은 메니스커스 테 ──

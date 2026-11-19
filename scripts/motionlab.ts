@@ -40,23 +40,21 @@ const PRESETS: Record<string, Preset> = {
 
 // ── 튜닝 노브 — [key, 라벨, min, max, step] ──
 const KNOBS = [
-  ['grabMax', '최대 신장', 0.04, 0.6, 0.01],
-  ['lift', '수직 리프트', 0, 1.6, 0.05],
-  ['kernelK', '커널 첨도 k', 0.8, 4, 0.1],
-  ['creepGain', '잔류 비율', 0, 1, 0.05],
-  ['zeta', '복귀 감쇠비 ζ', 0.5, 1.2, 0.01],
-  ['elasticTau', '추종 τ(s)', 0.03, 0.4, 0.01],
-  ['creepDelay', 'creep 지연(s)', 0, 2, 0.1],
-  ['creepTau', 'creep 축적 τ', 0.2, 3, 0.1],
-  ['releaseTau', '잔류 해소 τ', 0.3, 3, 0.1],
-  ['omega', '복귀 ω', 4, 24, 0.5],
+  ['grabMax', '끊김 길이 눈금', 0.04, 0.6, 0.01],
+  ['creepGain', '흔들림 잔류 비율', 0, 1, 0.05],
+  ['zeta', '밑동 둔덕 ζ', 0.5, 1.2, 0.01],
+  ['elasticTau', '끝 추종 τ(s)', 0.03, 0.4, 0.01],
+  ['creepDelay', '버팀 지연(s)', 0, 2, 0.1],
+  ['creepTau', '버팀 짧아짐 τ', 0.5, 5, 0.1],
+  ['releaseTau', '흔들림 해소 τ', 0.3, 3, 0.1],
+  ['omega', '밑동 둔덕 ω', 4, 24, 0.5],
 ] as const;
 type KnobKey = (typeof KNOBS)[number][0];
 // URL 키 → DoughMesh.grabTuning 키
 const TUNE_KEY: Record<KnobKey, string> = {
   grabMax: 'grabMax', creepGain: 'grabCreepGain', zeta: 'grabReturnZeta',
   elasticTau: 'elasticTau', creepDelay: 'creepDelay', creepTau: 'creepTau',
-  releaseTau: 'releaseTau', omega: 'omega', kernelK: 'kernelK', lift: 'lift',
+  releaseTau: 'releaseTau', omega: 'omega',
 };
 
 const params = new URLSearchParams(location.search);
@@ -187,8 +185,7 @@ function renderSliders(): void {
   const presetDefault: Record<string, number> = {
     grabMax: mapped.grabMax, creepGain: mapped.grabCreepGain, zeta: mapped.grabReturnZeta,
     // GRAB_DEFAULTS와 동기 (사용자 확정 2026-08-24 저녁)
-    elasticTau: 0.07, creepDelay: 0.7, creepTau: 1.0, releaseTau: 1.2, omega: 5.5,
-    kernelK: 1.6, lift: 1.6,
+    elasticTau: 0.07, creepDelay: 0.7, creepTau: 2.5, releaseTau: 1.2, omega: 5.5,
   };
   for (const [key, label, min, max, step] of KNOBS) {
     const row = document.createElement('div');
@@ -287,7 +284,7 @@ function hudLoop(): void {
     `preset  ${preset}\n` +
     `fps     ${fps}\n` +
     `grab    ${g.held ? '잡는 중' : '놓음'}  stretch ${dough.grabStretch01().toFixed(2)}\n` +
-    `elastic ${g.elastic.toFixed(3)}  creep ${g.creep.toFixed(3)}\n` +
+    `가닥    길이 ${g.len.toFixed(2)} / 끊김 ${g.breakLen.toFixed(2)}  붙은 몫 ${g.attached.toFixed(2)}\n` +
     `agitation ${dough.agitation.toFixed(2)}`;
   requestAnimationFrame(hudLoop);
 }

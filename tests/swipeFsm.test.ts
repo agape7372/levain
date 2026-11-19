@@ -40,7 +40,7 @@ function makeDough(): DoughMesh {
     levelY: () => 0,
     bodyRadius: () => 0.69,
     grabStart: () => {},
-    grabMove: () => {},
+    grabMove3: () => {},
     grabEnd: () => {},
     grabStretch01: () => 0,
     setStirInput: () => {},

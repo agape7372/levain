@@ -10,33 +10,35 @@ import { toRenderParams } from '../src/render/renderParams';
 import { simSnap } from '../scripts/lib/simSnap';
 import * as THREE from 'three';
 
-// 판정 M4(2026-11-19) — 피크에서 잡아 당기면 리본 끝이 병 입구 위로 솟아 소프트아이스크림 꼴이 됐다.
-// 리본 끝 y = topY + |변위| × uGrabShape.y × 1.7(dough.vert.glsl 리프트 식의 상수)
-describe('DoughMesh grab — 리본 끝은 병 입구 위로 솟지 않는다(판정 M4)', () => {
-  const tipY = (h: number): { tip: number; rp: ReturnType<typeof toRenderParams> } => {
+// 옛 판정 M4(리본 끝이 병 입구 위로 솟아 소프트아이스크림 꼴 → 헤드룸 클램프)는 대체됨(2026-11-19 가닥 다발).
+// 들리는 몸은 가닥이고 그 끝은 손끝이라 병 위로 나가도 된다(실물 8uAT · Sg__도 병 위). 반죽 윗면에 남는 것은 밑동 둔덕뿐 — 병 안에 머문다
+describe('DoughMesh grab — 밑동 둔덕은 병 안, 가닥 끝 = 손끝(옛 헤드룸 시험 대체)', () => {
+  const pull = (h: number, tip: [number, number, number], secs: number) => {
     const d = new DoughMesh();
     const rp = toRenderParams(simSnap(h));
     d.applyParams(rp);
     d.tick(0);
     d.grabStart(0, 0);
-    d.grabMove(5, 0); // grabMax까지 끝까지 당긴다
-    for (let i = 1; i <= 120; i++) d.tick(i / 60);
-    const u = d.material.uniforms;
-    const disp = (u.uGrabDisp.value as THREE.Vector2).length();
-    return { tip: d.topY() + disp * (u.uGrabShape.value as THREE.Vector2).y * 1.7, rp };
+    d.grabMove3(...tip);
+    let hMax = 0;
+    for (let i = 1; i <= secs * 60; i++) {
+      d.tick(i / 60);
+      hMax = Math.max(hMax, (d.material.uniforms.uGrab.value as THREE.Vector4).x);
+    }
+    return { d, rp, hMax };
   };
-  it('피크(+5h, 수위 ≈1.6) — 끝까지 당겨도 JAR_HEIGHT + 0.12 이하, 잠금값 grabMax는 그대로', () => {
-    const { tip, rp } = tipY(5);
+  it('피크(+5h, 수위 ≈1.6) — 손끝이 병 위로 나가도 밑동 둔덕 꼭대기는 JAR_HEIGHT 아래', () => {
+    const { d, rp, hMax } = pull(5, [0, 2.7, 0.2], 2);
     expect(rp.height).toBeGreaterThan(1.55);
-    expect(tip).toBeLessThanOrEqual(JAR_HEIGHT + 0.12 + 1e-6);
+    expect(hMax).toBeGreaterThan(0.05);
+    expect(d.topY() + hMax).toBeLessThan(JAR_HEIGHT);
   });
-  it('배고픔(+20h, 수위 ≈0.7)은 여유가 커서 리프트가 거의 줄지 않는다', () => {
-    const d = new DoughMesh();
-    d.applyParams(toRenderParams(simSnap(20)));
-    d.grabStart(0, 0);
-    d.grabMove(5, 0);
-    d.tick(0);
-    expect((d.material.uniforms.uGrabShape.value as THREE.Vector2).y).toBeGreaterThan(1.6 * 0.9);
+  it('주 가닥 끝(윗도막 P2)은 손끝을 따른다 — τ0.07이라 1초 뒤 1mm 안', () => {
+    const tip: [number, number, number] = [0.1, 2.3, 0.2];
+    const { d } = pull(5, tip, 1);
+    const C = d.strands.rig.C; // 도막 1 = 주 가닥 윗도막
+    expect(Math.hypot(C[4] - tip[0], C[5] - tip[1], C[6] - tip[2])).toBeLessThan(1e-3);
+    expect(d.strands.rig.visible).toBe(true);
   });
 });
 

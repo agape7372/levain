@@ -289,7 +289,8 @@ export function sfxSetDown(): void {
   noiseBurst({ type: 'highpass', freq: 1600, peak: 0.09, attack: 0.002, dur: 0.035 });
 }
 
-/** 반죽 떼는 쩍 — 끈적한 것이 끊어지는 짧은 내림. 젓기와 같은 대역(밴드패스)이라 한 재료로 들린다 */
-export function sfxPinch(): void {
-  noiseBurst({ type: 'bandpass', freq: 560, to: 240, q: 2.2, peak: 0.3, attack: 0.012, dur: 0.17 });
+/** 반죽 떼는 쩍 — 끈적한 것이 끊어지는 짧은 내림. 젓기와 같은 대역(밴드패스)이라 한 재료로 들린다.
+ *  gain = 크기 배율 — 당기기 가는 가닥 끊김은 0.45 */
+export function sfxPinch(gain = 1): void {
+  noiseBurst({ type: 'bandpass', freq: 560, to: 240, q: 2.2, peak: 0.3 * gain, attack: 0.012, dur: 0.17 });
 }

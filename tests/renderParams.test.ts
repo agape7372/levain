@@ -56,9 +56,12 @@ describe('renderParams — 상태 앵커 (VISUAL §3-3)', () => {
     expect(toRenderParams(justfed).specStr).toBeGreaterThan(rp.specStr * 1.8);
   });
 
-  it('🔒 피크 grab 물성은 사용자 실기기 확정치다 — grabMax 0.600 · ζ 0.956', () => {
+  it('🔒 피크 grab 물성은 사용자 실기기 확정치다 — grabMax 0.600 · ζ 0.956 (값 그대로, 뜻이 바뀜: grabMax = 끊김 길이 눈금, ζ = 밑동 둔덕 되돌아옴)', () => {
     // 2026-08-24 저녁 실기기 확정. 축 개편 계수는 이 두 값이 나오도록 역산해 고정했다.
-    // 리팩터가 이 값을 흔들면 촉감이 조용히 바뀐다 — 자동 방어선은 이 단정 하나뿐
+    // 리팩터가 이 값을 흔들면 촉감이 조용히 바뀐다 — 자동 방어선은 이 단정 하나뿐.
+    // 뜻이 바뀜(2026-11-19 가닥 다발): grabMax는 더 이상 최대 변위가 아니라 주 가닥 끊김 길이의 눈금이다
+    // (Lmain = 2·D·grabMax·(0.25 + 0.75·web + 1.55·runny), 피크 0.6 → 1.2D). ζ는 리본 복귀가 아니라 밑동 둔덕 · 흔들림
+    // 스프링(ω5.5)의 감쇠비 — 놓으면 둔덕이 「무겁게 되돌아온다」. 숫자는 그대로 둔다
     const rp = toRenderParams(peak);
     expect(rp.grabMax).toBeCloseTo(0.6, 3);
     expect(rp.grabReturnZeta).toBeCloseTo(0.956, 3);

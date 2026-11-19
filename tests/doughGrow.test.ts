@@ -259,20 +259,23 @@ describe('DoughMesh v2 — 시계·NaN 방어(A1-18)', () => {
     d.tick(5);
     const u = d.material.uniforms;
     for (const v of u.uTrailAmp.value as Float32Array) expect(Number.isFinite(v)).toBe(true);
-    const lag = u.uGrabDispLag.value as THREE.Vector2;
-    expect(Number.isFinite(lag.x) && Number.isFinite(lag.y)).toBe(true);
+    const g = u.uGrab.value as THREE.Vector4;
+    expect(Number.isFinite(g.x) && Number.isFinite(g.y)).toBe(true);
   });
   it('NaN 입력이 들어와도 다음 tick에서 스스로 복구한다', () => {
     const d = new DoughMesh();
     d.applyParams(toRenderParams(peakOf(4)));
     d.grabStart(0, 0);
-    d.grabMove(Number.NaN, 0);
+    d.grabMove3(Number.NaN, 0, 0);
     for (let i = 1; i <= 5; i++) d.tick(i / 60);
     const u = d.material.uniforms;
-    const disp = u.uGrabDisp.value as THREE.Vector2;
-    const lag = u.uGrabDispLag.value as THREE.Vector2;
-    expect(Number.isFinite(disp.x) && Number.isFinite(disp.y)).toBe(true);
-    expect(Number.isFinite(lag.x) && Number.isFinite(lag.y)).toBe(true);
+    const g = u.uGrab.value as THREE.Vector4;
+    const gp = u.uGrabPos.value as THREE.Vector2;
+    expect([g.x, g.y, gp.x, gp.y].every(Number.isFinite)).toBe(true);
+    // 가닥 uniform도 유한(§6-14 recoverNaN = 가닥 초기화)
+    for (const k of ['uSA', 'uSB', 'uSC'] as const) {
+      expect([...(d.strands.material.uniforms[k].value as Float32Array)].every(Number.isFinite)).toBe(true);
+    }
   });
 });
 

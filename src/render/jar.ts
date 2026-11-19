@@ -180,6 +180,8 @@ export interface Jar {
   setClimate(chill: number, warm: number): void;
   /** 젓는 동안 hooch 탁해짐 0~1 · 줄무늬 위상 · 반죽 색(sRGB 0~1) — DoughMesh.murk · marblePhase */
   setMurk(murk: number, phase: number, color: readonly [number, number, number]): void;
+  /** 윗물 윗면 기울기 — 반죽 머티리얼의 uWobble · uLevel · uFluid · uSlopeAspect를 같은 객체로 공유한다(값은 반죽 한 곳에서) */
+  shareSurface(u: Record<string, THREE.IUniform>): void;
 }
 
 /**
@@ -217,12 +219,34 @@ float marbleBand(vec2 n, float phase, float w, float warp) {
 }
 `;
 
+/**
+ * 반죽 수면 기울기(슬로싱) 계수 · 윗물 덮임 — 반죽 vert · frag와 윗물 vert가 이 소스 하나를 쓴다(규칙 8, 2026-11-19 젓기 실물화 S7).
+ * hoochSpread = HOOCH_COVER의 spread와 같은 식. 쓰는 uniform: uLevel · uFluid(윗물은 반죽 객체를 공유, Jar.shareSurface)
+ */
+export const SURF_TILT = /* glsl */ `
+float surfTiltK() { return 0.14 * uLevel * (0.5 + 0.5 * uFluid); }
+float hoochSpread(float amt) { return smoothstep(0.30, 0.80, amt); }
+`;
+
 const hoochVert = /* glsl */ `
+  uniform vec2 uWobble;
+  uniform float uLevel;
+  uniform float uFluid;
+  uniform float uSlopeAspect; // 월드 → 반죽 오브젝트 xz (= 1 / XZ_SCALE)
+  uniform float uThick;       // 윗물 두께(월드) — setHooch
   varying vec3 vP;   // x,z = 단위 원판 좌표, y = 옆띠 높이 0~1(윗면 1)
   varying vec3 vWorld;
+  ${SURF_TILT}
   void main() {
     vP = position;
-    vec4 w = modelMatrix * vec4(position, 1.0);
+    vec3 lp = position;
+    // 윗면은 반죽 수면과 같은 기울기 — 반죽이 출렁여 기운 가장자리가 수평 윗물을 뚫고 섬으로 뜨지 않게(S7).
+    // 0.6 × 두께로 자른다(§6-9). 옆띠 아랫단은 그대로라 옆띠가 늘고 준다
+    if (position.y > 0.999) {
+      float tilt = dot(position.xz * length(modelMatrix[0].xyz) * uSlopeAspect, uWobble) * surfTiltK();
+      lp.y += clamp(tilt, -0.6 * uThick, 0.6 * uThick) / length(modelMatrix[1].xyz);
+    }
+    vec4 w = modelMatrix * vec4(lp, 1.0);
     vWorld = w.xyz;
     gl_Position = projectionMatrix * viewMatrix * w;
   }
@@ -375,6 +399,12 @@ export function createJar(): Jar {
       uMurk: { value: 0 },
       uMurkPhase: { value: 0 },
       uDoughCol: { value: new THREE.Color(0xf4ead4) },
+      // 반죽과 공유(shareSurface) 전 기본값 — 기울기 0
+      uWobble: { value: new THREE.Vector2() },
+      uLevel: { value: 0.5 },
+      uFluid: { value: 0.3 },
+      uSlopeAspect: { value: 1 / 1.3 },
+      uThick: { value: 0 },
     },
     transparent: true,
     depthWrite: false,
@@ -393,6 +423,7 @@ export function createJar(): Jar {
     const thick = 0.006 + 0.11 * doughH * THREE.MathUtils.smoothstep(amt, 0.3, 1.0);
     hooch.position.y = levelY - 0.006;
     hooch.scale.y = thick + 0.006;
+    hoochMat.uniforms.uThick.value = thick;
     hooch.visible = amt > 0.01;
   };
 
@@ -418,5 +449,9 @@ export function createJar(): Jar {
     (hoochMat.uniforms.uDoughCol.value as THREE.Color).setRGB(color[0], color[1], color[2]);
   };
 
-  return { group, hooch, setHooch, setLevel, setClimate, setMurk };
+  const shareSurface = (u: Record<string, THREE.IUniform>): void => {
+    for (const k of ['uWobble', 'uLevel', 'uFluid', 'uSlopeAspect']) hoochMat.uniforms[k] = u[k];
+  };
+
+  return { group, hooch, setHooch, setLevel, setClimate, setMurk, shareSurface };
 }

@@ -161,6 +161,11 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   scene.onGrabStart = () => sfxStirStart(stirThick());
   scene.onGrabMove = (s) => sfxStirUpdate(s * 0.6, false);
   scene.onGrabEnd = () => { sfxStirEnd(); haptic('light'); };
+  // 가닥 끊김 — 떼는 쩍(가는 가닥은 작게), 주 가닥 · 마지막만 가벼운 진동. 소리는 기존 sfxPinch(실물 소리를 들은 게 아니다)
+  scene.onGrabBreak = (thin, last) => {
+    sfxPinch(thin && !last ? 0.45 : 1);
+    if (!thin || last) haptic('light');
+  };
 
   // ── 설정 반영 ──
   const applySettings = (): void => {
