@@ -88,6 +88,16 @@ export class Cloth {
     this.openT0 = -2; // tick이 첫 프레임에 t0을 채운다
   }
 
+  /** 걷는 중이면 즉시 끝낸다 — 쇼케이스가 천을 숨겨 tick이 멈춘 채 돌아오는 경우 (콜백 유실 방지) */
+  finishOpen(): void {
+    if (this.openT0 === -1) return;
+    this.mesh.visible = false;
+    this.openT0 = -1;
+    const cb = this.onOpened;
+    this.onOpened = null;
+    cb?.();
+  }
+
   /** 프레임 구동 — SceneHost loop에서 호출 */
   tick(t: number): void {
     if (this.openT0 === -1) {

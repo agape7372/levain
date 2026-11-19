@@ -23,6 +23,7 @@ import type { Clock } from './platform/clock';
 import type { StorageAdapter } from './platform/storage';
 import type { GameStore } from './store/gameStore';
 import { copy } from './ui/copy';
+import { createStageQueue } from './ui/stageQueue';
 import { toast } from './ui/components/toast';
 import { hasOpenModal, openModal } from './ui/components/modal';
 import { openMoldModal } from './ui/components/moldModal';
@@ -118,7 +119,6 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   // 승급 연출 — 천이 덮여 있으면(콜드 부트·긴 부재 뒤 복귀) 걷을 때까지 미룬다. 병이 안 보이는 채로
   // 터뜨리면 장면이 반쪽이고, 천 걷기가 첫 손짓이라 소리도 그때부터 난다.
   type StageUp = { stage: number; from: number }; // from = 그 승급 전의 집 최고 단계(새로 열린 빵을 세는 기준)
-  let stageQueue: StageUp[] = [];
   const cheerStages = (ups: StageUp[]): void => {
     if (ups.length === 0) return;
     // 두 단계를 한 번에 넘어도 소리·진동·기포는 한 번
@@ -129,16 +129,12 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     // 냉장·비율·이름표 해금 문구는 celebrate.ts가 단계에서 파생한다(GDD §5 획득 연출 행).
     for (const u of ups) celebrateStageUp(api, u.stage, u.from);
   };
-  const onStageUps = (ups: StageUp[]): void => {
-    if (scene.isClothCovering()) stageQueue.push(...ups);
-    else cheerStages(ups);
-  };
+  // 순서 = 천 덮기 → 복귀 브리핑 → (천 걷을 때) 승급. 미룬 승급은 큐에 남는다 (ui/stageQueue.ts, A3-05)
+  const stageQueue = createStageQueue<StageUp>(cheerStages, () => scene.isClothCovering());
+  const onStageUps = (ups: StageUp[]): void => stageQueue.offer(ups);
   scene.onClothOpen = () => {
     sfxCloth();
-    if (stageQueue.length === 0) return;
-    const queued = stageQueue;
-    stageQueue = [];
-    setTimeout(() => cheerStages(queued), 700); // 천이 걷힌 뒤에
+    if (stageQueue.size() > 0) setTimeout(() => stageQueue.drain(), 700); // 천이 걷힌 뒤에
   };
   scene.onStirStart = () => sfxStirStart();
   scene.onStirMove = (s) => sfxStirUpdate(s);
@@ -598,15 +594,21 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   const CLOTH_ABSENCE_MS = 30 * 60_000; // 30분 넘게 자리를 비우면 천이 덮여 있다
   onLifecycle((visible) => {
     if (visible) {
-      const resumeBriefing = store.resumeWithBriefing(); // catch-up + 부재 브리핑
+      const onboarded = store.getEnvelope().flags.onboarded;
+      // 천을 먼저 덮는다 — catch-up 중 난 승급이 덮이기 전에 터지지 않게 (A3-05)
+      if (onboarded && hiddenAt > 0 && clock.now() - hiddenAt > CLOTH_ABSENCE_MS) scene.coverCloth();
+      const resumeBriefing = stageQueue.during(() => store.resumeWithBriefing()); // catch-up + 부재 브리핑
       scene.snapParams(toRenderParams(store.getSnapshot())); // 복귀 = 즉시 스냅
       if (tabLevain.classList.contains('active') || showcaseActive) scene.start(); // 쇼케이스는 레시피 탭에서 열린다 (T4-1)
       store.startTicking();
       store.replanNotifications();
       resumeAudio();
-      if (store.getEnvelope().flags.onboarded) {
-        if (hiddenAt > 0 && clock.now() - hiddenAt > CLOTH_ABSENCE_MS) scene.coverCloth();
-        if (!hasOpenModal()) openBriefingCard(resumeBriefing, () => openMoldModal(api)); // 모달 위 모달 금지
+      if (onboarded) {
+        // 모달 위 모달 금지. 브리핑·곰팡이 모달이 닫힌 뒤에 승급 연출(천이 덮였으면 걷을 때까지 큐에 남는다)
+        if (!hasOpenModal()) openBriefingCard(resumeBriefing, () => openMoldModal(api, () => stageQueue.flush()));
+        else stageQueue.flush();
+      } else {
+        stageQueue.flush();
       }
     } else {
       hiddenAt = clock.now();

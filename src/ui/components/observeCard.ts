@@ -3,7 +3,7 @@
 // 말려두기가 여기 있는 이유 = 이 카드가 "잃을 수도 있다"를 말하는 유일한 화면이고,
 // 말려두기는 그에 대한 유일한 응답이기 때문이다. 다른 액션은 자기 자리를 따로 찾을 것.
 import { copy } from '../copy';
-import { agoText, untilText } from '../format';
+import { agoText, splitAdvised, untilText } from '../format';
 import { confirmModal, openModal } from './modal';
 import { FLAKE_COST_G, FLAKE_STAGE, FLOAT_OK_ACTIVITY, SEED_G, SPLIT_MIN_G } from '../../sim';
 import type { GameApi } from '../gameApi';
@@ -31,8 +31,10 @@ export function openObserveCard(api: GameApi): void {
     // 르방을 말하는 카드에서 말한다(빵은 통에서 나간다 — GDD §6-2 개정).
     // ★정보 행이지 버튼이 아니다: 이 카드의 조작은 말려두기 하나뿐이다(GDD §5 "조작 1개 상한").
     // 「떼어 두기 좋아요」는 실제로 뗄 수 있을 때만 — 항아리가 「아직」이라는데 이 줄이 떼라고 하던 모순(감사 T8-03)
+    // 빵이 안 열린 집(첫 빵 단계 전)도 떼기를 권하지 않는다 — 홈 머리 줄과 같은 기준(splitAdvised, A3-07)
     let floatText: string;
     if (snap.activity < FLOAT_OK_ACTIVITY) floatText = copy.observe.floatNotYet;
+    else if (!splitAdvised(api.houseStage())) floatText = copy.observe.floatPlain;
     else if (snap.canSplit) floatText = copy.observe.floatOk;
     else if (snap.mass - SEED_G < SPLIT_MIN_G) floatText = copy.observe.floatPlain; // 씨앗뿐 — 뗄 몫이 없다
     else floatText = copy.observe.floatSoon;

@@ -1,6 +1,6 @@
 // 홈 — 캔버스 위 HUD 오버레이. 상태 문구 탭 = 관찰 카드, 반죽 탭 = poke(게임필).
 import { copy } from '../copy';
-import { activityBand, agoText, untilText } from '../format';
+import { activityBand, agoText, sourPhaseKey, splitAdvised, untilText } from '../format';
 import { confirmModal, hasOpenModal, openModal } from '../components/modal';
 import { openHelp } from '../components/helpModal';
 import { openMoldModal } from '../components/moldModal';
@@ -10,7 +10,7 @@ import { toast } from '../components/toast';
 import type { GameApi } from '../gameApi';
 import type { FeedRatio, Flour, Location, SimEvent, Snapshot } from '../../sim';
 import {
-  RATIOS, RECIPES, FRIDGE_STAGE, SEED_G, SPLIT_MIN_G,
+  RATIOS, FRIDGE_STAGE, SEED_G, SPLIT_MIN_G,
   FLOUR_STAGE, HOUR, rateMult,
 } from '../../sim';
 // MASS_MAX는 sim/index가 재수출하지 않는다 — persistence.ts:10과 같은 직접 임포트
@@ -19,8 +19,6 @@ import { MASS_MAX } from '../../sim/constants';
 import type { Screen } from '../router';
 
 const LOCATIONS: Location[] = ['room', 'window', 'fridge'];
-/** 통의 반죽을 쓰는 첫 빵이 열리는 단계 — 그 전엔 떼어 둬도 쓸 곳이 없어 떼기를 권하지 않는다 */
-const FIRST_BREAD_STAGE = Math.min(...RECIPES.filter((r) => r.kind === 'bread').map((r) => r.stage));
 
 export function createHomeScreen(
   api: GameApi,
@@ -362,7 +360,9 @@ export function createHomeScreen(
           : 'active'
         : snap.phase === 'dormant' && snap.dormancy < 1
           ? 'reviving'
-          : snap.phase;
+          : snap.phase === 'sour'
+            ? sourPhaseKey(snap.smell)
+            : snap.phase;
     status.textContent = copy.phase[phaseKey];
 
     subFed.textContent = copy.observe.lastFed(agoText(api.lastFedAt(), now));
@@ -374,7 +374,7 @@ export function createHomeScreen(
     if (twoPart) {
       if (now < snap.peakAt) {
         nextLine = copy.observe.peak(untilText(snap.peakAt, now), untilText(snap.peakEndAt, now));
-      } else if (now < snap.peakEndAt && snap.canSplit && api.houseStage() >= FIRST_BREAD_STAGE) {
+      } else if (now < snap.peakEndAt && snap.canSplit && splitAdvised(api.houseStage())) {
         nextLine = copy.observe.peakNowSplit;
       } else {
         nextLine = copy.observe.nextFeed(copy.observe.after(untilText(snap.nextFeedAt, now)));

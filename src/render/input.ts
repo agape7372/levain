@@ -27,6 +27,8 @@ const SWIPE_H_RATIO = 1.5;
 const DOUGH_HIT_MARGIN = 1.15;
 
 export interface InputHooks {
+  /** 홈 입력을 통째로 막는가 — 쇼케이스 중엔 캔버스가 빵 돌리기 전용이라 젓기·걷기·소리가 나면 안 된다 */
+  isBlocked?(): boolean;
   /** 덮개가 덮여 있는가 — true면 반죽 조작 대신 걷기 제스처만 받는다 */
   isCovered?(): boolean;
   /** 덮개 걷기 요청 (플릭/탭) */
@@ -175,10 +177,21 @@ export function attachInput(
   };
 
   const onDown = (e: PointerEvent): void => {
+    if (hooks.isBlocked?.()) return;
     // 이미 제스처가 진행 중이면 두 번째 손가락은 무시한다. 예전엔 down/mode/downOnDough를
     // 통째로 덮어써서, 기기를 쥔 엄지가 캔버스에 스치는 것만으로 젓기가 스와이프로 재분류됐다
     if (down && activeId !== null && e.pointerId !== activeId) return;
+    // up이 유실된 채 같은 id로 다시 눌렀다면 남은 제스처부터 끝낸다 (젓기 소리·grab 고정 방지)
+    if (down) {
+      clearHold();
+      endDrag();
+    }
     activeId = e.pointerId;
+    try {
+      canvas.setPointerCapture?.(e.pointerId); // 캔버스 밖에서 놓아도 up이 온다
+    } catch {
+      /* 합성 이벤트·이미 끝난 포인터 — 캡처 없이도 동작한다 */
+    }
     down = true;
     downX = e.clientX;
     downY = e.clientY;
@@ -247,7 +260,8 @@ export function attachInput(
     }
   };
 
-  const onCancel = (): void => {
+  const onCancel = (e: PointerEvent): void => {
+    if (!down || (activeId !== null && e.pointerId !== activeId)) return; // onUp과 대칭
     down = false;
     activeId = null;
     coveredGesture = false;
@@ -259,11 +273,13 @@ export function attachInput(
   canvas.addEventListener('pointermove', onMove);
   canvas.addEventListener('pointerup', onUp);
   canvas.addEventListener('pointercancel', onCancel);
+  canvas.addEventListener('lostpointercapture', onCancel); // up이 유실돼도 제스처가 풀린다 (정상 up 뒤엔 down=false라 무시)
   return () => {
     canvas.removeEventListener('pointerdown', onDown);
     canvas.removeEventListener('pointermove', onMove);
     canvas.removeEventListener('pointerup', onUp);
     canvas.removeEventListener('pointercancel', onCancel);
+    canvas.removeEventListener('lostpointercapture', onCancel);
     if (rafId) cancelAnimationFrame(rafId);
     clearHold();
   };
