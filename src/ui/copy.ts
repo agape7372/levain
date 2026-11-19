@@ -488,7 +488,7 @@ export const copy = {
     // (탄생 +24h에 울리고 큰 부풀기는 그 뒤에 주는 밥의 사이클 — 과거형이면 일어나기 전에 말한 셈).
     sour: '조금 시큼해졌어요. 밥을 주면 금방 돌아와요',
     stageUp: (name: string) => `${name} 단계가 되었어요`,
-    firstWeek: '지금 밥을 주면 크게 부풀 거예요. 곧 조용해져요. 정상이에요',
+    firstWeek: '지금 밥을 주면 크게 부풀어요. 그 뒤 며칠은 잠잠해도 괜찮아요',
     channelWarn: '중요 알림', // Android 채널명 — 놓치면 잃는 신호(반점·깊은 잠) 전용
     permissionHint: '밥 시간을 알려줄까요',
     permissionSettings: '알림은 시스템 설정에서 켤 수 있어요',
@@ -506,7 +506,7 @@ export const copy = {
     peakSplit: (_n: number) => '한창 부풀어 있는 르방이가 있어요. 지금 떼어 두기 좋아요',
     sour: (_n: number) => '조금 시큼해진 르방이가 있어요. 밥을 주면 돌아와요',
     stageUp: (_n: number) => '단계가 오른 르방이가 있어요',
-    firstWeek: (_n: number) => '지금 밥을 주면 크게 부푸는 르방이가 있어요. 곧 조용해져요. 정상이에요',
+    firstWeek: (_n: number) => '지금 밥을 주면 크게 부푸는 르방이가 있어요. 그 뒤 며칠은 잠잠해도 괜찮아요',
   } as Record<string, (n: number) => string>,
 
   settings: {
