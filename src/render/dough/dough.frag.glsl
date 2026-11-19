@@ -302,9 +302,9 @@ void main() {
   // 휴면 마른 껍질 — 매트 + 잔금. 잔금은 FBM 0 등고선을 다른 저주파 FBM으로 잘라 짧게 끊긴 가는 금 몇 줄만 남긴다 —
   // 이어진 등고선은 닫힌 칸 그물(지도 · 기린 무늬 · 핏줄)로 읽혔다(2026-11-19 다듬기). hooch가 덮인 곳은 젖어 있어 금이 없다
   if (uCrust > 0.001) {
-    float crack = fbm(vXZ * 11.0 + fbm(vXZ * 4.0) * 1.6);
+    float crack = fbm(vXZ * 9.0 + fbm(vXZ * 4.0) * 0.7); // 휨을 줄여 곧은 금 — 굽이치는 선은 핏줄로 읽혔다
     float line = 1.0 - smoothstep(0.012, 0.04, abs(crack));
-    line *= smoothstep(0.12, 0.38, fbm(vXZ * 3.1 + 23.0 + uSeed * 11.0));
+    line *= smoothstep(0.2, 0.42, fbm(vXZ * 3.1 + 23.0 + uSeed * 11.0));
     float centerFade = 1.0 - smoothstep(uRBody * 0.774, uRBody * 1.097, length(vXZ));
     float dry = 1.0 - hoochCover(length(vXZ) / uRBody, atan(vXZ.y, vXZ.x), uHooch);
     col = mix(col, col * vec3(0.995, 0.975, 0.945), uCrust);
