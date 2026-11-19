@@ -6,11 +6,10 @@
 // 여러 개가 한꺼번에 열릴 때: 300ms 수집 창에 들어온 트리거를 **한 장으로 병합**한다(재료 아트 최대 3 + N,
 // 빵 스트립 최대 6 + 외 N종). 표시 중에 또 오면 최소 1.2s 지난 뒤 교체(그 안에 오면 다음 장에 병합).
 import type { IngredientId } from '../../sim';
-import {
-  FLAKE_STAGE, FLOUR_STAGE, FRIDGE_STAGE, INGREDIENTS, LABEL_STAGE, RATIOS, RECIPES, playableRules, recipeById, variantIdOf,
-} from '../../sim';
+import { INGREDIENTS, RECIPES, playableRules, recipeById, variantIdOf } from '../../sim';
 import type { GameApi } from '../gameApi';
 import { copy } from '../copy';
+import { stageUpExtras } from '../format';
 import { haptic } from '../../platform/haptics';
 import { sfxUnlock } from '../../audio/sounds';
 import { ingredientArtNode } from '../screens/ingredientArt';
@@ -198,18 +197,8 @@ function build(api: GameApi, p: Pending): HTMLElement {
   sub.textContent = openedIds.length > 0 ? copy.celebrate.openedBreads(openedIds.length) : copy.celebrate.openedNone;
   card.appendChild(sub);
 
-  // 승급 부수 해금 — 냉장·비율·이름표 (재료 제목 뒤에도 붙는다)
-  const extras: string[] = [];
-  for (const s of stages) {
-    if (ings.length > 0) extras.push(copy.celebrate.stageUp(copy.stage.names[s]));
-    if (s === 1) extras.push(copy.stage.quiet); // 잠잠기 — 부피가 줄어드는 단계라 미리 말해 둔다(감사 T8-06)
-    if (s === FRIDGE_STAGE) extras.push(copy.celebrate.fridgeUnlocked);
-    if (s === FLAKE_STAGE) extras.push(copy.celebrate.flakeUnlocked);
-    if (s === FLOUR_STAGE) extras.push(copy.celebrate.flourUnlocked);
-    for (const [ratio, def] of Object.entries(RATIOS)) if (def.stage === s && s > 0) extras.push(copy.celebrate.ratioUnlocked(ratio));
-    if (s === LABEL_STAGE) extras.push(copy.stage.labelUnlocked);
-  }
-  for (const line of extras) {
+  // 승급 부수 해금 — 잠잠기 · 냉장 · 비율 · 이름표 (재료 제목 뒤에도 붙는다). 개체 해금이라 지금 활성 통 기준 (H2 · M1)
+  for (const line of stageUpExtras(stages, api.getSnapshot(), ings.length > 0)) {
     const e = document.createElement('p');
     e.className = 'celebrate-extra';
     e.textContent = line;

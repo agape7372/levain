@@ -1,6 +1,7 @@
 // 승급 연출 순서 (A3-05): 천 덮기 → 브리핑 → (천 걷을 때) 승급 — 큐에 남는다.
 import { describe, it, expect } from 'vitest';
-import { createStageQueue } from '../src/ui/stageQueue';
+import { cheersOf, createStageQueue } from '../src/ui/stageQueue';
+import type { Cheer } from '../src/ui/stageQueue';
 
 function make(covered = false) {
   const state = { covered };
@@ -44,5 +45,18 @@ describe('승급 대기열', () => {
     expect(q.size()).toBe(1);
     q.drain();
     expect(cheered).toEqual([[3]]);
+  });
+
+  it('복귀 중 난 승급 보상 가루도 승급과 같이 브리핑 뒤로 — 토스트가 브리핑 밑에 먼저 깔리지 않는다 (L2)', () => {
+    const cheered: Cheer[][] = [];
+    const q = createStageQueue<Cheer>((u) => cheered.push(u), () => false);
+    q.during(() => q.offer(cheersOf([
+      { type: 'stageUp', stage: 3 },
+      { type: 'flourEarned', amount: 12 },
+      { type: 'moved', to: 'room' },
+    ], 2)));
+    expect(cheered).toEqual([]);
+    q.flush();
+    expect(cheered).toEqual([[{ stage: 3, from: 2 }, { flour: 12 }]]);
   });
 });

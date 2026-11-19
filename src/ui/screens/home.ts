@@ -1,6 +1,6 @@
 // 홈 — 캔버스 위 HUD 오버레이. 상태 문구 탭 = 관찰 카드, 반죽 탭 = poke(게임필).
 import { copy } from '../copy';
-import { activityBand, agoText, peakUntilText, sourPhaseKey, splitAdvised, untilText } from '../format';
+import { activityBand, afterText, agoText, peakRangeText, peakUntilText, splitNow, statusKey } from '../format';
 import { confirmModal, hasOpenModal, openModal } from '../components/modal';
 import { openHelp } from '../components/helpModal';
 import { openMoldModal } from '../components/moldModal';
@@ -145,7 +145,7 @@ export function createHomeScreen(
     if (!snap.canSplit) {
       // 남은 시간은 실제 시계로 환산해 말한다 — 유효시간을 그대로 말하면 냉장고에선 거짓말이 된다.
       // 게이트와 환산은 sim 한 곳(derive.splitGateH · splitReadyAt)이 갖는다
-      toast(copy.split.blockedTooSoon(untilText(snap.splitReadyAt, now)));
+      toast(copy.split.blockedTooSoon(afterText(snap.splitReadyAt, now)));
       return;
     }
     const g = snap.mass - SEED_G;
@@ -352,18 +352,8 @@ export function createHomeScreen(
     // "한창" 판정 = 피크 밴드(peakAt~peakEndAt) 소속 — 관찰 카드·타임라인·설명서와 같은 정의
     // (2026-08-30 통일. 종전 activity≥0.85는 밴드 가장자리 번짐까지 '한창'이라 말해 셋이 어긋났다).
     // activity 임계는 굽기 등급(GRADE_BEST) 전용으로 남는다 — 등급이 문구보다 살짝 관대한 건
-    // 플레이어에게 유리한 쪽 오차라 거짓말이 아니다.
-    const phaseKey =
-      snap.phase === 'active'
-        ? now >= snap.peakAt && now < snap.peakEndAt
-          ? 'peak'
-          : 'active'
-        : snap.phase === 'dormant' && snap.dormancy < 1
-          ? 'reviving'
-          : snap.phase === 'sour'
-            ? sourPhaseKey(snap.smell)
-            : snap.phase;
-    status.textContent = copy.phase[phaseKey];
+    // 플레이어에게 유리한 쪽 오차라 거짓말이 아니다. 판정은 format.statusKey 한 곳(부활 중 반점 = S-M1)
+    status.textContent = copy.phase[statusKey(snap, now)];
 
     subFed.textContent = copy.observe.lastFed(agoText(api.lastFedAt(), now));
     const twoPart = snap.phase === 'active';
@@ -373,11 +363,11 @@ export function createHomeScreen(
     let nextLine = '';
     if (twoPart) {
       if (now < snap.peakAt) {
-        nextLine = copy.observe.peak(peakUntilText(snap.peakAt, now), peakUntilText(snap.peakEndAt, now));
-      } else if (now < snap.peakEndAt && snap.canSplit && splitAdvised(api.houseStage())) {
+        nextLine = peakRangeText(snap.peakAt, snap.peakEndAt, now);
+      } else if (splitNow(snap, now, api.houseStage())) {
         nextLine = copy.observe.peakNowSplit;
       } else {
-        nextLine = copy.observe.nextFeed(copy.observe.after(untilText(snap.nextFeedAt, now)));
+        nextLine = copy.observe.nextFeed(afterText(snap.nextFeedAt, now));
       }
     }
     subNext.textContent = nextLine;

@@ -116,7 +116,7 @@ export function activityAt(state: SimState, now: number): number {
   else if (effH < b.peakStart) a = lerp(0.15, 1, smoothstep(b.latent, b.peakStart, effH));
   else if (effH < b.peakEnd) a = 1;
   else if (effH < b.hungry) a = lerp(1, ACTIVITY_AT_HUNGRY, smoothstep(b.peakEnd, b.hungry, effH));
-  else if (effH < b.sour) a = lerp(0.2, 0.08, (effH - b.hungry) / (b.sour - b.hungry));
+  else if (effH < b.sour) a = lerp(ACTIVITY_AT_HUNGRY, 0.08, (effH - b.hungry) / (b.sour - b.hungry));
   else if (effH < b.dormant) a = lerp(0.08, 0.01, (effH - b.sour) / (b.dormant - b.sour));
   else a = 0.01;
   if (state.reviveProgress === 1) a *= REVIVE_ACTIVITY_MULT; // 깨어나는 중 — 희미한 생기만
