@@ -21,6 +21,7 @@ import {
   SOUR_AFTER_HUNGRY_H,
 } from '../src/sim/constants';
 import type { NotifySlot, SimState } from '../src/sim';
+import { copy } from '../src/ui/copy';
 
 // 로컬 시각 기준 생성 — clampQuiet은 new Date().getHours()(로컬)로 판단한다
 function local(y: number, mo: number, d: number, h: number, mi: number): number {
@@ -280,6 +281,26 @@ describe('부활 알림 위치 배율 (2026-08-30 수정 — room 고정식은 �
     const plan = planNotifications(s, t0);
     const second = plan.slots.find((sl) => sl.copyKey === 'reviveSecond')!;
     expect(second.at).toBe(clampQuiet(t0 + 100 * HOUR));
+    // 부활+냉장 = 슬롯 2개(2회차 밥 + 곰팡이 예고) — 곰팡이 시각도 냉장 배율 wall 시각이다(R-L4)
+    expect(plan.slots.length).toBe(2);
+    const mold = plan.slots.find((sl) => sl.copyKey === 'moldWarn')!;
+    expect(mold.at).toBe(clampQuiet(t0 + (168 / 0.08) * HOUR));
+  });
+});
+
+describe('한창때 알림 떼기 권유 — 집 단계 기준 (R-02)', () => {
+  const t0 = local(2024, 0, 15, 6, 0);
+  it('splitAdvised=false(생략 포함) → peak, true → peakSplit. 시각 · id는 같다', () => {
+    const plain = planNotifications(initialState(t0), t0, { peakOptIn: true }).slots.find((sl) => sl.id === 4)!;
+    const split = planNotifications(initialState(t0), t0, { peakOptIn: true, splitAdvised: true }).slots.find((sl) => sl.id === 4)!;
+    expect(plain.copyKey).toBe('peak');
+    expect(split.copyKey).toBe('peakSplit');
+    expect(split.at).toBe(plain.at);
+  });
+  it('문구: peakSplit만 「떼어 두기 좋아요」를 담는다', () => {
+    expect(copy.notify.peak).not.toContain('떼어');
+    expect(copy.notify.peakSplit).toContain('떼어 두기 좋아요');
+    expect(copy.notifyMany.peakSplit(2)).toContain('떼어 두기 좋아요');
   });
 });
 

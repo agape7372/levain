@@ -1,9 +1,10 @@
 // 복귀 브리핑 카드 — 부재 중 있었던 일을 시간순으로 (GDD §8-1). 정보만, 조작 없음.
 import { copy } from '../copy';
 import { openModal } from './modal';
-import type { BriefingKey } from '../../sim';
+import { briefingText } from '../format';
+import type { BriefingKey, SmellBand } from '../../sim';
 
-export function openBriefingCard(keys: BriefingKey[], onClose?: () => void): void {
+export function openBriefingCard(keys: BriefingKey[], smell: SmellBand, onClose?: () => void): void {
   if (keys.length === 0) {
     onClose?.();
     return;
@@ -18,7 +19,7 @@ export function openBriefingCard(keys: BriefingKey[], onClose?: () => void): voi
     dot.textContent = '·';
     const v = document.createElement('span');
     v.className = 'v';
-    v.textContent = copy.briefing[k];
+    v.textContent = briefingText(k, smell);
     row.append(dot, v);
     wrap.appendChild(row);
   }

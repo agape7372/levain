@@ -327,6 +327,8 @@ export class SceneHost {
   /** 천 덮개 덮기 — 콜드 스타트·오랜 부재 복귀 (조건 판단은 app.ts) */
   coverCloth(): void {
     this.cloth?.cover();
+    // 쇼케이스 중엔 입력이 막혀 걷을 수 없다 — 상태(covering)만 두고 보이지 않게, exitShowcase가 homeGroup을 켜면 나타난다 (R-01)
+    if (this.cloth && this.isShowcasing()) this.cloth.mesh.visible = false;
   }
 
   isClothCovering(): boolean {

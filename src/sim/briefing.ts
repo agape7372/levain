@@ -2,7 +2,7 @@
 // pre-advance 상태의 경계 wall-clock이 (from, to]에 들면 시간순 수집.
 // 오프라인 구간은 위치·비율 불변(액션은 앱에서만)이라 wall 환산이 단일 배율로 정확하다.
 import type { BriefingKey, SimState } from './types';
-import { BRIEFING_HOOCH_VISIBLE, BRIEFING_MIN_ABSENCE_H, BRIEFING_PEAKED_ACTIVITY, HOUR } from './constants';
+import { ACTIVITY_AT_HUNGRY, BRIEFING_HOOCH_VISIBLE, BRIEFING_MIN_ABSENCE_H, BRIEFING_PEAKED_ACTIVITY, HOUR } from './constants';
 import { boundariesH, rateMult, smoothstepInv } from './derive';
 
 export function deriveBriefing(state: SimState, from: number, to: number): BriefingKey[] {
@@ -17,7 +17,7 @@ export function deriveBriefing(state: SimState, from: number, to: number): Brief
 
   const entries: Array<[number, BriefingKey]> = [
     // 피크 뒤 activity = lerp(1, 0.2, smoothstep(peakEnd, hungry)) 가 기준값 아래로 내려간 시각 (A2-03)
-    [wallFor(smoothstepInv(b.peakEnd, b.hungry, (1 - BRIEFING_PEAKED_ACTIVITY) / 0.8)), 'peaked'],
+    [wallFor(smoothstepInv(b.peakEnd, b.hungry, (1 - BRIEFING_PEAKED_ACTIVITY) / (1 - ACTIVITY_AT_HUNGRY))), 'peaked'],
     [wallFor(b.hungry), 'becameHungry'],
     [wallFor(b.sour), 'becameSour'],
     [wallFor(smoothstepInv(b.hooch, b.dormant, BRIEFING_HOOCH_VISIBLE)), 'hoochAppeared'],

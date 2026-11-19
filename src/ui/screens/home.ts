@@ -1,6 +1,6 @@
 // 홈 — 캔버스 위 HUD 오버레이. 상태 문구 탭 = 관찰 카드, 반죽 탭 = poke(게임필).
 import { copy } from '../copy';
-import { activityBand, agoText, sourPhaseKey, splitAdvised, untilText } from '../format';
+import { activityBand, agoText, peakUntilText, sourPhaseKey, splitAdvised, untilText } from '../format';
 import { confirmModal, hasOpenModal, openModal } from '../components/modal';
 import { openHelp } from '../components/helpModal';
 import { openMoldModal } from '../components/moldModal';
@@ -278,8 +278,8 @@ export function createHomeScreen(
         const loc: Location = selected === 'fridgePrep' ? 'fridge' : api.location(); // 냉장 갈 준비 = 냉장 배율 (T7-12)
         const mult = rateMult({ location: loc, flour: selectedFlour });
         const now = api.now();
-        const from = untilText(now + (r.peakStartH * HOUR) / mult, now);
-        const to = untilText(now + (r.peakEndH * HOUR) / mult, now);
+        const from = peakUntilText(now + (r.peakStartH * HOUR) / mult, now);
+        const to = peakUntilText(now + (r.peakEndH * HOUR) / mult, now);
         forecast.textContent =
           copy.feed.peakForecast(from, to) +
           (loc === 'window' ? '' : ` · ${copy.feed.peakForecastWindow}`);
@@ -373,7 +373,7 @@ export function createHomeScreen(
     let nextLine = '';
     if (twoPart) {
       if (now < snap.peakAt) {
-        nextLine = copy.observe.peak(untilText(snap.peakAt, now), untilText(snap.peakEndAt, now));
+        nextLine = copy.observe.peak(peakUntilText(snap.peakAt, now), peakUntilText(snap.peakEndAt, now));
       } else if (now < snap.peakEndAt && snap.canSplit && splitAdvised(api.houseStage())) {
         nextLine = copy.observe.peakNowSplit;
       } else {

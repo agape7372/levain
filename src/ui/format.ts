@@ -1,10 +1,10 @@
 // 한국어 시간·수치 포맷 — copy.ts와 짝. 내부 용어 노출 금지.
 import { copy } from './copy';
-import { FLOAT_OK_ACTIVITY, RECIPES } from '../sim';
-import type { DoughQuality, SmellBand } from '../sim';
+import { FIRST_BREAD_STAGE, FLOAT_OK_ACTIVITY } from '../sim';
+import type { BriefingKey, DoughQuality, SmellBand } from '../sim';
 
-/** 통의 반죽을 쓰는 첫 빵이 열리는 단계 — 그 전엔 떼어 둬도 쓸 곳이 없어 떼기를 권하지 않는다 */
-export const FIRST_BREAD_STAGE = Math.min(...RECIPES.filter((r) => r.kind === 'bread').map((r) => r.stage));
+// 첫 빵 단계 — 그 전엔 떼어 둬도 쓸 곳이 없어 떼기를 권하지 않는다(정의는 sim/recipes)
+export { FIRST_BREAD_STAGE };
 
 /** 떼기 권유(「떼어 두기 좋아요」)를 말해도 되는 집인가 — 홈·관찰 카드·알림이 같은 기준을 쓴다 (A3-07) */
 export function splitAdvised(houseStage: number): boolean {
@@ -16,11 +16,17 @@ export function sourPhaseKey(smell: SmellBand): 'sour' | 'sourStrong' {
   return smell === 'sharp' || smell === 'acetone' ? 'sourStrong' : 'sour';
 }
 
+/** 복귀 브리핑 행 문구 — 시큼해짐은 지금 냄새 밴드로 홈 머리와 같은 세기로 말한다 (R-03). sim은 키만 낸다 */
+export function briefingText(key: BriefingKey, smell: SmellBand): string {
+  if (key === 'becameSour') return copy.briefing[sourPhaseKey(smell) === 'sourStrong' ? 'becameSourStrong' : 'becameSour'];
+  return copy.briefing[key];
+}
+
 /** 시간 길이 말하기 — 실제보다 길게 말하지 않는다(내림). 1시간 아래 분, 10시간 아래 30분 단위, 이틀 아래 시간, 그 위 반일 단위 */
 function spanText(diffMs: number): string {
   const min = Math.floor(diffMs / 60_000 + 1e-6);
   if (min < 2) return copy.time.justNow;
-  if (min < 60) return copy.time.minutes(Math.round(diffMs / 60_000));
+  if (min < 60) return copy.time.minutes(min);
   const h = min / 60;
   if (h < 10) {
     const halves = Math.floor(min / 30);
@@ -40,6 +46,16 @@ export function agoText(fromMs: number, nowMs: number): string {
 export function untilText(atMs: number, nowMs: number): string {
   const diff = atMs - nowMs;
   return diff <= 0 ? copy.time.justNow : spanText(diff);
+}
+
+/**
+ * 피크 범위의 양 끝 — 30분 단위 반올림. 끝을 내림하면 밥 직후 5초만 지나도 「4시간~5시간 반」(실제 4.5~6h)이 되어
+ * 범위가 30분 동안 틀리게 읽힌다(R-04). 범위는 예보라 반올림이 정직하다. 15분 아래는 분 문구 그대로.
+ */
+export function peakUntilText(atMs: number, nowMs: number): string {
+  const diff = atMs - nowMs;
+  const HALF = 30 * 60_000;
+  return diff >= HALF / 2 ? spanText(Math.round(diff / HALF) * HALF) : untilText(atMs, nowMs);
 }
 
 /** 절대 날짜 — '8월 26일'. 선반 타일·결과 카드의 "처음 구운 날"(연도는 말하지 않는다) */

@@ -605,7 +605,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       resumeAudio();
       if (onboarded) {
         // 모달 위 모달 금지. 브리핑·곰팡이 모달이 닫힌 뒤에 승급 연출(천이 덮였으면 걷을 때까지 큐에 남는다)
-        if (!hasOpenModal()) openBriefingCard(resumeBriefing, () => openMoldModal(api, () => stageQueue.flush()));
+        if (!hasOpenModal()) openBriefingCard(resumeBriefing, store.getSnapshot().smell, () => openMoldModal(api, () => stageQueue.flush()));
         else stageQueue.flush();
       } else {
         stageQueue.flush();
@@ -676,7 +676,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     // 백드롭으로 닫으면 claimStarterGift가 안 불려 gifted가 false로 남고 → 매 콜드부팅마다
     // 다시 떴다. "한 번 권한다"가 아니라 매번이었다. 선물 진입로는 온보딩 직후 1회와
     // 재료 탭 배너 버튼(screens/recipes.ts) 둘뿐이다 — 되돌리지 말 것.
-    openBriefingCard(briefing, () => openMoldModal(api, showPendingBake));
+    openBriefingCard(briefing, store.getSnapshot().smell, () => openMoldModal(api, showPendingBake));
     // 앱이 꺼져 있는 동안 넘은 단계 — 천이 덮여 있으니 걷을 때 연출이 뜬다(onStageUps). 승급은 대부분
     // 날짜 조건이 차서 오므로 이 길이 가장 흔하다(감사 T8-01)
     if (bootStageUps.length > 0) {

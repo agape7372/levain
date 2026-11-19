@@ -23,7 +23,7 @@ export interface NotifierPort {
 
 /** extra.copyKey 역직렬화 가드 — 구버전 예약이 남아 있으면 모르는 키가 올라온다 */
 const COPY_KEYS: ReadonlySet<string> = new Set<NotifySlot['copyKey']>([
-  'feedTime', 'fridgeWeek', 'dormant', 'reviveSecond', 'moldWarn', 'peak',
+  'feedTime', 'fridgeWeek', 'dormant', 'reviveSecond', 'moldWarn', 'peak', 'peakSplit',
   'sour', 'stageUp', 'firstWeek',
 ]);
 

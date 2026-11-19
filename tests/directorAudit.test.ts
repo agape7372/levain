@@ -127,10 +127,22 @@ describe('스냅샷 파생 필드', () => {
     expect(deriveSnapshot(fedAgain, t0 + HOUR).discardReady).toBe(true);
   });
 
-  it('fakeRise — 갓 반죽의 둘째 날만', () => {
+  it('fakeRise — 갓 반죽의 둘째 날에 준 밥의 사이클만 (부피와 같은 기준, R-M1)', () => {
     const s = initialState(t0);
     expect(deriveSnapshot(s, t0 + 12 * HOUR).fakeRise).toBe(false);
-    expect(deriveSnapshot(s, t0 + 30 * HOUR).fakeRise).toBe(true);
-    expect(deriveSnapshot(s, t0 + 50 * HOUR).fakeRise).toBe(false);
+    // 24h 전에 준 밥의 사이클은 평범하다 — 지금 나이가 둘째 날이어도 카드 행은 없다
+    expect(deriveSnapshot(s, t0 + 30 * HOUR).fakeRise).toBe(false);
+    expect(deriveSnapshot(s, t0 + 30 * HOUR).fill).toBeLessThan(deriveSnapshot(s, t0 + 30 * HOUR).peakFill + 1e-9);
+    // 둘째 날에 밥을 주면 그 사이클 내내 켜져 있다(48h를 넘겨도 부피와 함께 유지)
+    const fed = applyAction(s, { type: 'feed', ratio: '1:1:1' }, t0 + 30 * HOUR).state;
+    const a = deriveSnapshot(fed, t0 + 33 * HOUR);
+    expect(a.fakeRise).toBe(true);
+    expect(deriveSnapshot(fed, t0 + 52 * HOUR).fakeRise).toBe(true);
+    // 부피 계수와 같은 날 — 같은 시간 오프셋에서 평범한 사이클보다 더 부푼다
+    const plain = deriveSnapshot(applyAction(s, { type: 'feed', ratio: '1:1:1' }, t0 + 12 * HOUR).state, t0 + 15 * HOUR);
+    expect(a.peakFill).toBeGreaterThan(plain.peakFill);
+    // 48h 뒤에 준 밥은 평범
+    const late = applyAction(s, { type: 'feed', ratio: '1:1:1' }, t0 + 50 * HOUR).state;
+    expect(deriveSnapshot(late, t0 + 53 * HOUR).fakeRise).toBe(false);
   });
 });

@@ -13,7 +13,7 @@ import {
   LABEL_STAGE, REWIND_TOLERANCE_MS, STAGES, STARTER_SLOTS_FREE,
   activityAt, advance, applyAction, betterGrade, deriveBriefing, deriveSnapshot, initialState,
   isPlayable, planNotificationsAll, playableRules, reanchor, ruleByVariantId, stageOf,
-  RECIPES, variantIdOf, DAY, INGREDIENT_SOFT_CAP, INGREDIENT_FLOUR_COST,
+  RECIPES, FIRST_BREAD_STAGE, variantIdOf, DAY, INGREDIENT_SOFT_CAP, INGREDIENT_FLOUR_COST,
   canBakeBread, recipeById, PANTRY_MAX, PANTRY_LEGACY_ACIDITY, PANTRY_LEGACY_ACTIVITY, INGREDIENTS,
   adRemaining, canWatchAd, recordAdGrant,
   consumeLots, lotsSum, pantryQualityOf, pickDough, pushLot, trimOldest,
@@ -457,6 +457,7 @@ export function createGameStore(deps: GameStoreDeps, envelope?: SaveEnvelope): G
     const plan: NotifyPlan = env.settings.notifyEnabled
       ? planNotificationsAll(env.starters.map((r) => r.sim), now, {
           peakOptIn: env.settings.notifyPeak,
+          splitAdvised: houseStage() >= FIRST_BREAD_STAGE, // 홈 ui/format.splitAdvised와 같은 기준
           sourOptIn: env.settings.notifySour,
           stageOptIn: env.settings.notifyStage,
           firstWeekOptIn: env.settings.notifyFirstWeek,

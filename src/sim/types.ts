@@ -206,7 +206,7 @@ export interface NotifySlot {
   at: number;
   /** copy.ts 키 — sim은 문구를 모른다 */
   copyKey:
-    | 'feedTime' | 'fridgeWeek' | 'dormant' | 'reviveSecond' | 'moldWarn' | 'peak'
+    | 'feedTime' | 'fridgeWeek' | 'dormant' | 'reviveSecond' | 'moldWarn' | 'peak' | 'peakSplit'
     | 'sour' | 'stageUp' | 'firstWeek';
   /** 냉장 슬롯 표식 — 원샷 예약이며 반복이 아니다(하루 상한 집계에도 든다) */
   weekly: boolean;
