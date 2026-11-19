@@ -127,10 +127,11 @@ const DORMANT_TONE = hex(0xe4dccc);
 const MOLDY_TONE = hex(0xd8d0be);
 // 밀가루 색 톤 (§7-2, 개정 2026-11-19 R2-13) — R1 실측(사진 28·29): 통밀 · 호밀은 흰 밀가루보다 L* 11~13 어둡고
 // b* +8~10 노랗다. 옛 톤(#d9c4a3 · #bfb096 × 0.35)은 차이가 실물의 1/3이었고 호밀은 회색 쪽으로 갔다.
-// 통밀 = 따뜻한 황갈 L*57, 호밀 = 갈색 L*50(a* 8, 붉은 기). 섞으면 흰 크림 대비 ΔL* −21 · −25
+// 통밀 = 따뜻한 황갈 L*57, 호밀 = 갈색 L*50(a* 8, 붉은 기). 섞는 비율 0.6(ΔL* −21 · −25)은 밀크티 · 진흙으로 읽혀
+// 0.38로 내렸다(2026-11-19 다듬기) — 색값 ΔL* −13.4 · −15.7, 렌더 실측 호밀 −12.5(실물 28 −12 · 보정 −13)
 const WHOLEWHEAT_TONE = hex(0xa08458);
 const RYE_TONE = hex(0x93724f);
-const FLOUR_TONE_MIX = 0.6;
+const FLOUR_TONE_MIX = 0.38;
 // 냉장 = 차갑게 바랜 채도, 창가 = 아주 약한 햇빛 (R1 dormant: 「차갑게 바랜 채도와 뿌연 유리」)
 const COLD_TONE = hex(0xe2e3dc);
 const WARM_TONE = hex(0xf7e4c2);

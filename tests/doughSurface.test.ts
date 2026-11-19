@@ -77,10 +77,15 @@ describe('광택 — R1 실물 근거로 2026-08-25 가설을 뒤집는다(R2-12
 
 describe('밀가루 톤 — 통밀 따뜻한 황갈 · 호밀 갈색(R2-13 · R1 사진 28·29)', () => {
   const pk = (flour: Snapshot['flour']) => toRenderParams({ ...S.peak, flour }).color;
-  it('통밀 · 호밀은 흰 밀가루보다 확연히 어둡다(ΔL* 15 이상)', () => {
+  // 개정 2026-11-19 다듬기: 섞는 비율 0.6은 ΔL* −21 · −25로 실물(28: 통밀 −10 · 호밀 −12)의 두 배였다 — 밀크티 · 진흙
+  it('통밀 · 호밀은 흰 밀가루보다 어둡되 실물 폭 안(호밀 ΔL* 12~16 · 통밀 9~16)', () => {
     const w = lstar(pk('white'));
-    expect(w - lstar(pk('wholewheat'))).toBeGreaterThan(15);
-    expect(w - lstar(pk('rye'))).toBeGreaterThan(15);
+    const dw = w - lstar(pk('wholewheat'));
+    const dr = w - lstar(pk('rye'));
+    expect(dr).toBeGreaterThanOrEqual(12);
+    expect(dr).toBeLessThanOrEqual(16);
+    expect(dw).toBeGreaterThanOrEqual(9);
+    expect(dw).toBeLessThanOrEqual(16);
   });
   it('회색이 아니라 갈색 — r > g > b 이고 r−b 차가 흰 밀가루보다 크다', () => {
     for (const f of ['wholewheat', 'rye'] as const) {
