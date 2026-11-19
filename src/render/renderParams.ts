@@ -33,7 +33,7 @@ const PULL_MAX = 0.028;
  * riseFill(질량 무관 부풀기 곡선) · massRatio · 단계 → 반죽 수위(월드 y, 병 바닥 0 기준).
  * 순서를 보존하는 단조 재매핑이라 sim 규칙과 무관한 시각 배율이다(R2-03).
  * peakFill = 이번 사이클 최고치. 정상 피크(1 + FILL_PEAK_RISE)를 넘으면 가짜 부풀기 사이클이라 상승을 누른다 —
- * 지금 시각의 fakeRise 플래그가 아니라 사이클 값이라 수위와 자국이 같은 매핑을 쓴다(판정 M3)
+ * 사이클 값(fakeRise도 같은 사이클 기준)이라 수위와 자국이 같은 매핑을 쓴다(판정 M3)
  */
 export function doughHeight(riseFill: number, massRatio: number, stage: number, peakFill = 1): number {
   const r = Number.isFinite(riseFill) ? riseFill : 1;

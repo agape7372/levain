@@ -4,7 +4,7 @@
 //   ② 활성 밴드의 상한 경계는 sim의 FLOAT_OK_ACTIVITY와 같은 선이다(띄워보기와 상태 줄이 어긋나면 안 된다)
 //   ③ 통이 비면(null) 품질을 지어내지 않고 "여기 모여요" 안내로 답한다
 import { describe, it, expect } from 'vitest';
-import { acidityBand, activityBand, agoText, briefingText, dateText, FIRST_BREAD_STAGE, pantryQualityText, peakUntilText, sourPhaseKey, splitAdvised, untilText } from '../src/ui/format';
+import { acidityBand, activityBand, agoText, briefingText, dateText, FIRST_BREAD_STAGE, pantryQualityText, peakUntilText, showFakeRiseRow, sourPhaseKey, splitAdvised, untilText } from '../src/ui/format';
 import { copy } from '../src/ui/copy';
 import { FLOAT_OK_ACTIVITY } from '../src/sim';
 import type { DoughQuality } from '../src/sim';
@@ -153,5 +153,17 @@ describe('떼기 권유 게이트 · 시큼 머리 문구 (A3-07 · A3-08)', () 
   });
   it('1:2:2 힌트는 시간을 단정하지 않는다 (배고픔 20h)', () => {
     expect(copy.feed.ratioHint['1:2:2']).not.toContain('하루짜리');
+  });
+});
+
+describe('showFakeRiseRow — 관찰 카드 「정상이에요」는 활발 · 배고픔 구간만 (B-H1)', () => {
+  it('휴면 · 시큼 · 반점이 겹치면 가짜 부풀기여도 말하지 않는다', () => {
+    const base = { fakeRise: true, phase: 'active', moldStage: 'none' } as const;
+    expect(showFakeRiseRow(base)).toBe(true);
+    expect(showFakeRiseRow({ ...base, phase: 'hungry' })).toBe(true);
+    expect(showFakeRiseRow({ ...base, phase: 'dormant' })).toBe(false);
+    expect(showFakeRiseRow({ ...base, phase: 'sour' })).toBe(false);
+    expect(showFakeRiseRow({ ...base, moldStage: 'spot' })).toBe(false);
+    expect(showFakeRiseRow({ ...base, fakeRise: false })).toBe(false);
   });
 });

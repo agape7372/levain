@@ -93,3 +93,8 @@ export function pantryQualityText(q: DoughQuality | null): string {
   if (q === null) return copy.pantry.emptyHint;
   return `${copy.pantry.quality.activity[activityBand(q.activity)]} · ${copy.pantry.quality.acidity[acidityBand(q.acidity)]}`;
 }
+
+/** 관찰 카드 「이 시기」의 가짜 부풀기 행(「정상이에요」)을 보일 때 — 활발 · 배고픔 구간만. 시큼 · 휴면 · 반점 옆에 정상이라 말하지 않는다 (B-H1) */
+export function showFakeRiseRow(s: { fakeRise: boolean; phase: string; moldStage: string }): boolean {
+  return s.fakeRise && s.moldStage === 'none' && (s.phase === 'active' || s.phase === 'hungry');
+}

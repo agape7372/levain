@@ -28,7 +28,7 @@ import { boundariesH, phaseAt, rateMult, stageOf } from './derive';
 export interface NotifyOpts {
   /** "한창때" 옵트인 슬롯 (settings.notifyPeak) */
   peakOptIn?: boolean;
-  /** 한창때 알림에 떼기 권유를 싣는가 — 홈과 같은 기준(집 단계 ≥ 첫 빵 단계). store가 ui/format.splitAdvised로 정해 넘긴다(sim은 ui를 모른다) */
+  /** 한창때 알림에 떼기 권유를 싣는가 — 홈과 같은 기준(집 단계 ≥ 첫 빵 단계). store가 houseStage() >= FIRST_BREAD_STAGE로 정해 넘긴다(format.splitAdvised와 같은 식)(sim은 ui를 모른다) */
   splitAdvised?: boolean;
   /** "시큼해질 때" 옵트인 슬롯 (settings.notifySour) */
   sourOptIn?: boolean;

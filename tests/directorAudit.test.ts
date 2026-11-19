@@ -2,6 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { DAY, HOUR, STAGES, applyAction, deriveSnapshot, initialState } from '../src/sim';
 import type { SimEvent, SimState } from '../src/sim';
+import { FILL_PEAK_RISE } from '../src/sim/constants';
 import { createGameStore, initGameStore, newEnvelope } from '../src/store/gameStore';
 import { loadDetailed, save } from '../src/store/persistence';
 import type { Clock } from '../src/platform/clock';
@@ -132,7 +133,7 @@ describe('스냅샷 파생 필드', () => {
     expect(deriveSnapshot(s, t0 + 12 * HOUR).fakeRise).toBe(false);
     // 24h 전에 준 밥의 사이클은 평범하다 — 지금 나이가 둘째 날이어도 카드 행은 없다
     expect(deriveSnapshot(s, t0 + 30 * HOUR).fakeRise).toBe(false);
-    expect(deriveSnapshot(s, t0 + 30 * HOUR).fill).toBeLessThan(deriveSnapshot(s, t0 + 30 * HOUR).peakFill + 1e-9);
+    expect(deriveSnapshot(s, t0 + 30 * HOUR).peakFill).toBeLessThanOrEqual(1 + FILL_PEAK_RISE);
     // 둘째 날에 밥을 주면 그 사이클 내내 켜져 있다(48h를 넘겨도 부피와 함께 유지)
     const fed = applyAction(s, { type: 'feed', ratio: '1:1:1' }, t0 + 30 * HOUR).state;
     const a = deriveSnapshot(fed, t0 + 33 * HOUR);
