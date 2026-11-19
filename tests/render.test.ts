@@ -4,6 +4,7 @@ import { describe, it, expect } from 'vitest';
 import { fitPixelRatio, CAM_ELEV_DEG } from '../src/render/SceneHost';
 import { BreadShowcase } from '../src/render/breadShowcase';
 import { DoughMesh } from '../src/render/dough/DoughMesh';
+import { LIFT_LUMP, LUMP_Y } from '../src/render/dough/StrandMesh';
 import { ParticlePool, STEAM_FADE_S } from '../src/render/particles';
 import { JAR_HEIGHT } from '../src/render/jar';
 import { toRenderParams } from '../src/render/renderParams';
@@ -19,6 +20,8 @@ describe('DoughMesh grab — 밑동 둔덕은 병 안, 가닥 끝 = 손끝(옛 �
     d.applyParams(rp);
     d.tick(0);
     d.grabStart(0, 0);
+    // 들기 v3: 밑자락은 커밋 뒤 끌어 올린 거리로 자란다 — 표면 가까이서 커밋한 뒤 손끝으로
+    d.grabMove3(0, d.surfaceY(0, 0) + 0.05, 0);
     d.grabMove3(...tip);
     let hMax = 0;
     for (let i = 1; i <= secs * 60; i++) {
@@ -33,11 +36,12 @@ describe('DoughMesh grab — 밑동 둔덕은 병 안, 가닥 끝 = 손끝(옛 �
     expect(hMax).toBeGreaterThan(0.05);
     expect(d.topY() + hMax).toBeLessThan(JAR_HEIGHT);
   });
-  it('주 가닥 끝(윗도막 P2)은 손끝을 따른다 — τ0.07이라 1초 뒤 1mm 안', () => {
+  it('주 가닥 끝(윗도막 P2)은 손끝(덩이 띄움 몫 위)을 따른다 — τ0.07이라 1초 뒤 1mm 안', () => {
     const tip: [number, number, number] = [0.1, 2.3, 0.2];
     const { d } = pull(5, tip, 1);
     const C = d.strands.rig.C; // 도막 1 = 주 가닥 윗도막
-    expect(Math.hypot(C[4] - tip[0], C[5] - tip[1], C[6] - tip[2])).toBeLessThan(1e-3);
+    // 들기 v3: 손끝 덩이를 띄우면(LIFT_LUMP) 끝은 터치점보다 LUMP_Y 위
+    expect(Math.hypot(C[4] - tip[0], C[5] - tip[1] - LIFT_LUMP * LUMP_Y, C[6] - tip[2])).toBeLessThan(1e-3);
     expect(d.strands.rig.visible).toBe(true);
   });
 });
