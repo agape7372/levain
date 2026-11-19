@@ -105,7 +105,7 @@ export type Action =
 // 젓기·관찰·띄워보기는 액션이 아님 — 상태 무변형(젓기=코스메틱, 관찰·띄워보기=derive 읽기)
 ```
 
-- **닫힌 함수**: `advance`는 시계 역행 재정박(GDD §3-8)과 60일 클램프만 수행하고 `lastSimulatedAt`을 갱신.
+- **닫힌 함수**: `advance`는 시계 역행 재정박(GDD §3-8)과 산미 적분만 수행하고 `lastSimulatedAt`을 갱신(catch-up 상한 없음, 2026-11-19).
   `now`가 유한수가 아니면(NaN·Infinity) 상태를 그대로 돌려준다(2026-11-12). store의 tick·dispatch도 같은 가드를 둔다.
   나머지는 전부 `deriveSnapshot`의 파생 — advance에 적분 루프 없음.
   (예외적으로 acidity만 누적값: advance가 구간별 요율로 갱신 — 구간 경계는 닫힌 식으로 산출, 루프 없음.)
@@ -132,9 +132,9 @@ export type Action =
   상태 불변.
 - **알림**: `planNotifications` 반환 슬롯이 2종에서 **3종**으로 확장(GDD §7) — 신규 슬롯 3(`moldWarn`, 곰팡이 예고).
   2026-11-12 기준 슬롯 1~8. 냉장 주간은 전용 `NOTIFY_SLOT_FRIDGE = 8`이다.
-- **`MAX_CATCHUP_MS`**(constants.ts): 60일 유지. 근거 갱신 — 실온에서는 곰팡이 종착(≤15일)과 산미 포화가
-  고정점이라 그 이상은 상태 불변. 곰팡이 판정 자체는 파생이라 이 캡과 무관하며, 캡은 acidity 적분의
-  안전벨트일 뿐이다(GDD §3-8).
+- **`MAX_CATCHUP_MS` 삭제**(2026-11-19, 감사 A2-04): 적분이 경계 컷 최대 5개의 O(1) 식이라 상한이 필요 없고,
+  60일 상한은 부활+냉장에서 쪼개기 등가를 깼다(GDD §3-8).
+- **알림 상한**: `capPerDay`는 `weekly` 슬롯(냉장)도 날짜 집계에 넣는다. `weekly`는 냉장 슬롯 표식일 뿐 반복이 아니다(원샷 예약).
 
 ### 시간 소스
 
@@ -326,7 +326,8 @@ vitest (`environment: 'node'` — sim에 DOM 불필요), FakeClock으로 시간 
 |---|---|
 | `curves.test.ts` | 밥→잠복→피크→하강 곡선, 비율·온도별 피크 시각이 notifyPlan과 정합 |
 | `neglect.test.ts` | 2주 방치 → 휴면, 전 필드 NaN 0·유계, 부활 의식 완주 → 활발 복귀, maturity 보존 |
-| `clock.test.ts` | 역행 → 전 타임스탬프 재정박(상대 간격 보존), 60일 클램프, 저장시점 무관성 |
+| `clock.test.ts` | 역행 → 전 타임스탬프 재정박(상대 간격 보존), 60일 초과 점프 포화, 저장시점 무관성 |
+| `simAudit1119.test.ts` | 부피 연속(날짜 경계·부활), 브리핑 peaked·hooch 경계, advance 쪼개기 등가, 휴면 경계 activity, 부활 곰팡이 예고, 하루 2건 상한 |
 | `persistence.test.ts` | envelope 왕복, 손상 → clamp 회수 → 미러 폴백 → 새 게임, pendingBake 재노출 |
 | `recipes.test.ts` | 단계·mass 경계 해금, 씨앗 60g 보존, 판정 등급 경계, discard 쿨다운 |
 | `notifyPlan.test.ts` | 상태별 슬롯, 냉장 주간 전환, 휴면 침묵, revive 분기, 조용시간 클램프 |

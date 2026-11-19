@@ -266,7 +266,11 @@ describe('A14 멀티 르방 알림 병합은 같은 copyKey끼리만 (T2-11)', (
   it('부활 중 A + 실온 B → 서로 세지 않고, 슬롯 id는 겹치지 않는다', () => {
     const a: SimState = { ...initialState(T0), reviveProgress: 1 };
     const plan = planNotificationsAll([a, initialState(T0)], T0 + HOUR, noQuiet);
-    expect(plan.slots.every((s) => s.count === undefined)).toBe(true);
+    // reviveSecond·feedTime은 서로 안 세고, 같은 copyKey인 moldWarn만 병합된다
+    for (const s of plan.slots) {
+      if (s.copyKey === 'moldWarn') expect(s.count).toBe(2);
+      else expect(s.count).toBeUndefined();
+    }
     const ids = plan.slots.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
   });

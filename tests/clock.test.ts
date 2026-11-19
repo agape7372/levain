@@ -55,7 +55,7 @@ describe('clock — 시계 방어 (GDD §3-8)', () => {
     expect(result).toEqual(s);
   });
 
-  it('60일 초과 점프: acidity는 60일 캡 시점과 동일(포화), lastSimulatedAt은 now로 갱신', () => {
+  it('60일 초과 점프: acidity 포화(상한 없이도 같은 값), lastSimulatedAt은 now로 갱신', () => {
     const capped = advance(initialState(t0), t0 + 60 * DAY);
     const over = advance(initialState(t0), t0 + 90 * DAY);
 
