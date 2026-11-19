@@ -37,6 +37,7 @@ function makeCamera(): THREE.Camera {
 function makeDough(): DoughMesh {
   return {
     topY: () => 0,
+    levelY: () => 0,
     bodyRadius: () => 0.69,
     grabStart: () => {},
     grabMove: () => {},

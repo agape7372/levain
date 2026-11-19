@@ -30,8 +30,8 @@ const HOLD_RISE_TAU = 0.6;
 const HOLD_FALL_TAU = 0.3;
 /** 하강 꺼짐 깊이(월드) — 가운데 기준, 테두리는 0(유리에 붙어 남는다). vert uSink 항과 같은 값 */
 const SINK_DEPTH = 0.05;
-/** 곰팡이 군락 수 — 확산(uMold)에 따라 1→5개가 드러난다(반점 1~2개 · 퍼짐 3~5개) */
-const MOLD_N = 5;
+/** 곰팡이 군락 수 — 확산(uMold)에 따라 1→5개가 드러난다(반점 1~2개 · 퍼짐 3~5개). 셰이더 uMoldA 길이와 같다(테스트가 잠근다) */
+export const MOLD_N = 5;
 
 /** 시드 → 0~1 난수열(mulberry32) — 곰팡이 군락 자리. 같은 시드면 같은 자리 */
 function seededRandom(seed: number): () => number {
@@ -45,7 +45,8 @@ function seededRandom(seed: number): () => number {
   };
 }
 
-const TRAIL_N = 4;
+/** 실 능선 슬롯 수 — 셰이더 uTrail* 길이와 같다(테스트가 잠근다) */
+export const TRAIL_N = 4;
 const TRAIL_SAMPLE_S = 0.04; // 실 능선 샘플 간격
 // 실 능선 감쇠 — 응집(글루텐 망)이 기억을 붙든다. 피크 0.63/s(수명 1.6s) · 갓밥준 0.89/s ·
 // 시큼 1.45/s(0.7s, 글루텐이 끊겨 자국이 안 남는다). 0.5s는 고무 문법이라 하한을 이보다 위에 둔다
@@ -138,7 +139,7 @@ export class DoughMesh {
         uFoam: { value: 0 },
         uSink: { value: 0 },
         uStir: { value: 0 },
-        // 곰팡이 군락 3개 — (x, z, 크기 배율, 색 종류 0 흰 · 1 회녹 · 2 분홍빛 검정). setSeed가 채운다
+        // 곰팡이 군락 MOLD_N(5)개 — (x, z, 크기 배율, 색 종류 0 흰 · 1 회녹 · 2 분홍빛 검정). setSeed가 채운다
         uMoldA: { value: Array.from({ length: MOLD_N }, () => new THREE.Vector4(0, 0, 1, 0)) },
         uKahm: { value: 0 },
         uMold: { value: 0 },

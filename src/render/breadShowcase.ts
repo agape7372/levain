@@ -6,13 +6,17 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { applyBreadMaterials, disposeBreadMaterial } from './breadMaterial';
 import { applyToon } from './toonMaterial';
+import { CAM_ELEV_DEG } from './SceneHost';
 
 const TURNTABLE_S = 12; // 12s/rev
 const FIT_SIZE = 1.6;   // 씬 단위 목표 크기 (병 폭과 비슷하게)
-/** 홈 카메라는 +Z 쪽 위에서 52° 부감이다. 빵 윗면을 카메라 반대쪽(−Z)으로 16° 젖혀 썸네일·레퍼런스와 같은
- *  36°에서 보게 한다(VISUAL §4-6). 52°에선 쌓은 빵의 옆면이 안 보이고 윗면 토핑만 보였다 — 통딸기가 토마토 꼭지로 읽혔다.
- *  ★부호: rotation.x가 +면 윗면이 카메라 쪽으로 숙어 68°가 된다(첫 판이 그랬다 — QA 캡처에서 팬케이크가 원반으로 보였다) */
-const TILT = THREE.MathUtils.degToRad(-16);
+/** 빵을 보는 고도(°) — 썸네일 하네스 카메라(scripts/thumbsHarness.ts, 35.8°) · 레퍼런스와 같다(VISUAL §4-6).
+ *  홈 카메라는 +Z 쪽 위에서 CAM_ELEV_DEG(42°) 부감이라 빵 윗면을 카메라 반대쪽(−Z)으로 (CAM_ELEV_DEG − 36)° = 6° 젖힌다(생성자).
+ *  부감 그대로면 쌓은 빵의 옆면이 덜 보이고 윗면 토핑만 보인다 — 52° 때 통딸기가 토마토 꼭지로 읽혔다.
+ *  2026-11-19 R-H1: 고도를 52° → 42°로 내리고도 52° 기준 −16°가 남아 빵이 26°로 보였다 — 이제 고도에서 계산한다.
+ *  ★부호: rotation.x가 +면 윗면이 카메라 쪽으로 숙는다(첫 판이 그랬다 — QA 캡처에서 팬케이크가 원반으로 보였다).
+ *  ★SceneHost ↔ 여기 순환 import라 CAM_ELEV_DEG는 생성자에서만 읽는다(모듈 최상위에서 읽으면 TDZ) */
+const VIEW_ELEV_DEG = 36;
 
 export class BreadShowcase {
   /** 자리·기울기 */
@@ -30,7 +34,7 @@ export class BreadShowcase {
     this.loader.setMeshoptDecoder(MeshoptDecoder);
     this.group.visible = false;
     this.group.position.y = 0.9;
-    this.group.rotation.x = TILT;
+    this.group.rotation.x = THREE.MathUtils.degToRad(VIEW_ELEV_DEG - CAM_ELEV_DEG);
     this.group.add(this.spin);
   }
 

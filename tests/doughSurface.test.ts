@@ -1,11 +1,11 @@
 // 반죽 표면 질감 v2(2026-11-19 P1b) — 윗면 신호 · 광택 · 밀가루 톤 · 기포 · 곰팡이 · 셰이더 해시.
 // 정본: docs/VISUAL.md §2·§3-2·§3-3·§4-4·§8. 감사 id는 .work/audit-1119/audit_results.json.
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import * as THREE from 'three';
 import { toRenderParams } from '../src/render/renderParams';
-import { DoughMesh, R_BODY, XZ_SCALE } from '../src/render/dough/DoughMesh';
+import { DoughMesh, R_BODY, XZ_SCALE, MOLD_N, TRAIL_N } from '../src/render/dough/DoughMesh';
 import { createJar, HOOCH_COVER } from '../src/render/jar';
-import { BubbleSystem, SCAR_AMP } from '../src/render/bubbles';
+import { BubbleSystem, SCAR_AMP, DYN_SLOTS } from '../src/render/bubbles';
 import frag from '../src/render/dough/dough.frag.glsl?raw';
 import vert from '../src/render/dough/dough.vert.glsl?raw';
 import type { Snapshot } from '../src/sim';
@@ -129,6 +129,32 @@ describe('기포 — 작고 날카로운 돔이 터지면 바늘구멍이 남았
     expect(poppedAt).toBeGreaterThan(0);
     expect(b.amp[0]).toBe(0);
   });
+  // 판정 R-M3(2026-11-19 최종 검토) — 바늘구멍이 4초 동안 슬롯을 붙들어, 젓기(수명 ↓ · 스폰 ↑)가 오히려 돔을 줄였다
+  // (쉼 1.62 → 젓기 0.65, .work/final-review/render/bubsim.mts). 밀도 1로 10분, 시드 고정
+  it('젓는 동안 평균 돔 수가 쉴 때보다 적지 않다 — 쉼도 목표 2~4개(R-M3)', () => {
+    const avgDomes = (ag: number): number => {
+      let seed = 7;
+      const rnd = vi.spyOn(Math, 'random').mockImplementation(() => {
+        seed = (seed * 16807) % 2147483647;
+        return (seed - 1) / 2147483646;
+      });
+      try {
+        const b = new BubbleSystem();
+        const N = 600 * 60;
+        let sum = 0;
+        for (let i = 0; i < N; i++) {
+          b.update(i / 60, 1, 1, ag);
+          for (const a of b.amp) if (a > 1e-4) sum++;
+        }
+        return sum / N;
+      } finally {
+        rnd.mockRestore();
+      }
+    };
+    const rest = avgDomes(0);
+    expect(rest).toBeGreaterThanOrEqual(2);
+    expect(avgDomes(1)).toBeGreaterThanOrEqual(rest);
+  });
 });
 
 describe('하강 꺼짐 — 가운데가 테두리보다 낮다(R2-06)', () => {
@@ -175,11 +201,40 @@ describe('셰이더 — 해시 · 줄무늬 필드 회귀 방지(R2-04 · A1-06 
     expect(frag).toContain(`const float XZ_W = ${XZ_SCALE};`);
     expect(frag).toContain(`const float SCAR_AMP = ${SCAR_AMP};`);
   });
-  it('범프 배열은 버텍스 · 프래그가 같은 4슬롯 uniform을 읽는다(규칙 8)', () => {
+  it('범프 · 실 능선 · 곰팡이 배열 길이와 루프 상한이 TS 상수와 같다(규칙 8 · R-L3)', () => {
     for (const s of [vert, frag]) {
-      expect(s).toMatch(/uniform vec2 uBumpPos\[4\];/);
-      expect(s).toMatch(/uniform vec4 uMoldA\[5\];/);
+      for (const n of ['vec2 uBumpPos', 'float uBumpAmp', 'float uBumpK']) expect(s).toContain(`uniform ${n}[${DYN_SLOTS}];`);
+      for (const n of ['vec2 uTrailPos', 'float uTrailAmp', 'float uTrailK']) expect(s).toContain(`uniform ${n}[${TRAIL_N}];`);
+      expect(s).toContain(`uniform vec4 uMoldA[${MOLD_N}];`);
+      const bounds = [...s.matchAll(/for \(int i = 0; i < (\d+); i\+\+\)/g)].map((m) => Number(m[1]));
+      expect(bounds.length).toBeGreaterThanOrEqual(3);
+      for (const b of bounds) expect([DYN_SLOTS, TRAIL_N, MOLD_N]).toContain(b);
     }
+  });
+});
+
+// 판정 R-M1(2026-11-19 최종 검토) — 유리 자국 흘러내림 · 냉장 물방울이 sin 해시(×43758)를 쓰는데 프래그가 mediump였다.
+// fp16(Mali · Adreno)에선 곱이 1024를 넘으면 ulp ≥ 1이라 fract가 0으로 무너져 물방울 0.308 → 0.002, 흘러내림 5줄 → 0줄
+// (.work/final-review/render/fp16.mjs). 데스크톱 ANGLE은 mediump를 무시해 캡처로는 안 보인다 — 선언으로 잠근다
+describe('유리 · hooch 셰이더 정밀도 — highp(R-M1)', () => {
+  const jar = createJar();
+  const frags: string[] = [];
+  jar.group.traverse((o) => {
+    const m = (o as THREE.Mesh).material;
+    if (m instanceof THREE.ShaderMaterial) frags.push(m.fragmentShader);
+  });
+  it('sin 해시를 쓰는 프래그(유리 앞 · 뒤)는 전부 highp다', () => {
+    const hashed = frags.filter((f) => f.includes('43758'));
+    expect(hashed.length).toBe(2);
+    for (const f of hashed) {
+      expect(f).toMatch(/precision highp float;/);
+      expect(f).not.toMatch(/precision\s+mediump/);
+    }
+  });
+  it('hooch 프래그도 highp다', () => {
+    const f = (jar.hooch.material as THREE.ShaderMaterial).fragmentShader;
+    expect(f).toMatch(/precision highp float;/);
+    expect(f).not.toMatch(/precision\s+mediump/);
   });
 });
 

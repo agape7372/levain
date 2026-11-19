@@ -6,8 +6,8 @@ import { toRenderParams, smoothParams, doughHeight, FED_LEVEL, PEAK_CAP } from '
 import { DoughMesh, XZ_SCALE } from '../src/render/dough/DoughMesh';
 import { JAR_RADIUS } from '../src/render/jar';
 import type { Snapshot } from '../src/sim';
-import { FILL_PEAK_RISE, STAGE_FILL_FACTOR } from '../src/sim/constants';
-import { simSnap } from '../scripts/lib/simSnap';
+import { FILL_PEAK_RISE, RATIOS, STAGE_FILL_FACTOR } from '../src/sim/constants';
+import { simSnap, simState } from '../scripts/lib/simSnap';
 
 const base: Snapshot = {
   canSplit: false, splitReadyAt: 0, discardReady: true, nextStage: null, fakeRise: false,
@@ -92,6 +92,13 @@ describe('유리 최고 수위 — Snapshot.peakFill을 같은 매핑으로(A3-0
 });
 
 // ── 실제 sim 궤적(2026-11-19 판정 H1 · M1 · M2 · M3) — 손으로 짠 Snapshot은 sim이 못 만드는 조합이라 화면을 가렸다 ──
+describe('simSnap — 비율을 받으면 그 비율로 밥 준 직후 질량에서 시작한다(S-L1)', () => {
+  it.each(['1:1:1', '1:2:2', '1:5:5'] as const)('%s: mass = RATIOS 밥 질량 · 질량비 1', (ratio) => {
+    expect(simState({ ratio }).mass).toBe(RATIOS[ratio].mass);
+    expect(simSnap(0, { ratio }).massRatio).toBe(1);
+  });
+});
+
 describe('실제 sim 하강 — 상승 · 갓 밥준과 갈린다(판정 H1)', () => {
   it.each([['1:1:1', 9], ['1:5:5', 18]] as const)('%s 밥 +%ih 하강: 자국 · 꺼짐 켜짐, 거품 · 물결 꺼짐', (ratio, h) => {
     const rp = toRenderParams(simSnap(h, { ratio }));
@@ -99,7 +106,9 @@ describe('실제 sim 하강 — 상승 · 갓 밥준과 갈린다(판정 H1)', (
     expect(rp.sink).toBeGreaterThan(0.3);
     expect(rp.foam).toBeLessThan(0.3);
     expect(rp.stir).toBeLessThan(0.1);
-    // 수면과 자국 사이 빈 유리 — 1:5:5는 질량비 0.41이라 월드 0.3을 못 넘는다. 최고 수위 대비 15%로 같이 본다
+    // 수면과 자국 사이 빈 유리 — 실측(2026-11-19 S-L1, 밥 질량 그대로) 1:1:1 +9h 0.353월드(22%) · 1:5:5 +18h 0.289월드(18%).
+    // 1:5:5는 0.3월드에 조금 못 미친다. 0.25월드 · 최고 수위 대비 15%로 같이 본다
+    expect(rp.markHeight - rp.height).toBeGreaterThan(0.25);
     expect((rp.markHeight - rp.height) / rp.markHeight).toBeGreaterThan(0.15);
   });
   it('1:1:1 +9h 빈 유리는 0.3월드 이상', () => {

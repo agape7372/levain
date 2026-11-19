@@ -1,10 +1,13 @@
-// 입력 방어 — 쇼케이스 동안 홈 입력 차단(A1-08) · 유실된 포인터 복구(A1-09) · 천 걷기 도중 쇼케이스(A1-19).
-// node 환경이라 canvas·DoughMesh는 swipeFsm.test.ts와 같은 최소 스텁.
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+// 입력 방어 — 쇼케이스 동안 홈 입력 차단(A1-08) · 유실된 포인터 복구(A1-09) · 천 걷기 도중 쇼케이스(A1-19)
+// · 옆벽 입력(R-M2 · R-L2) · 반죽 밖 홀드(L4). 앞쪽은 swipeFsm.test.ts와 같은 최소 스텁, 뒤쪽은 실제 DoughMesh.
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import * as THREE from 'three';
 import { attachInput, type InputHooks } from '../src/render/input';
 import { Cloth } from '../src/render/cloth';
-import type { DoughMesh } from '../src/render/dough/DoughMesh';
+import { DoughMesh, XZ_SCALE } from '../src/render/dough/DoughMesh';
+import { CAM_ELEV_DEG } from '../src/render/SceneHost';
+import { toRenderParams } from '../src/render/renderParams';
+import { simSnap, STATE_HOURS } from '../scripts/lib/simSnap';
 
 const W = 200;
 type Fn = (e: PointerEvent) => void;
@@ -23,7 +26,7 @@ function setup(hooks: InputHooks) {
   cam.lookAt(0, 0, 0);
   cam.updateMatrixWorld(true);
   const dough = {
-    topY: () => 0, bodyRadius: () => 0.69, grabStart() {}, grabMove() {}, grabEnd() {},
+    topY: () => 0, levelY: () => 0, bodyRadius: () => 0.69, grabStart() {}, grabMove() {}, grabEnd() {},
     grabStretch01: () => 0, setStirInput() {}, pokeAt() {},
   } as unknown as DoughMesh;
   attachInput(canvas, cam, dough, hooks);
@@ -126,5 +129,118 @@ describe('A1-19 천 걷기 도중 쇼케이스', () => {
     cloth.finishOpen();
     expect(cloth.covering).toBe(true);
     expect(cloth.mesh.visible).toBe(true);
+  });
+});
+
+// ── 실제 반죽 · 실제 고도 카메라 — 유리 너머 옆벽 입력(R-M2 · R-L2) · 반죽 밖 홀드(앱 검토 L4) ──
+const SW = 400;
+function scene(state: keyof typeof STATE_HOURS, hooks: InputHooks = {}) {
+  const listeners: Record<string, Fn> = {};
+  const canvas = {
+    addEventListener: (t: string, fn: Fn) => { listeners[t] = fn; },
+    removeEventListener: () => {},
+    setPointerCapture: () => {},
+    getBoundingClientRect: () => ({ left: 0, top: 0, width: SW, height: SW }),
+  } as unknown as HTMLCanvasElement;
+  const a = THREE.MathUtils.degToRad(CAM_ELEV_DEG);
+  const cam = new THREE.OrthographicCamera(-2.7, 2.7, 2.7, -2.7, 0.1, 30);
+  cam.position.set(0, 0.64 + 9.12 * Math.sin(a), 9.12 * Math.cos(a));
+  cam.lookAt(0, 0.64, 0);
+  cam.updateMatrixWorld(true);
+  const dough = new DoughMesh();
+  dough.applyParams(toRenderParams(simSnap(STATE_HOURS[state])));
+  attachInput(canvas, cam, dough, hooks);
+  /** 월드 점 → 캔버스 픽셀 */
+  const px = (x: number, y: number, z: number): [number, number] => {
+    const v = new THREE.Vector3(x, y, z).project(cam);
+    return [((v.x + 1) / 2) * SW, ((1 - v.y) / 2) * SW];
+  };
+  /** 옆벽 반경(월드) */
+  const R = dough.bodyRadius() * XZ_SCALE;
+  return { listeners, dough, px, R };
+}
+const tap = (l: Record<string, Fn>, [x, y]: [number, number]): void => {
+  l.pointerdown(ptr(x, y));
+  l.pointerup(ptr(x, y));
+};
+
+describe('R-M2 옆벽 입력 — 유리 너머 몸통도 반죽이다', () => {
+  it('피크 옆벽 탭은 같은 방위 테두리 안쪽에 덴트를 낸다', () => {
+    const { listeners, dough, px, R } = scene('peak');
+    const poke = vi.spyOn(dough, 'pokeAt');
+    // 앞 가운데 · 오른쪽 아래 · 왼쪽 위(테두리 바로 밑)
+    for (const [ang, hy] of [[0, 0.5], [0.5, 0.2], [-0.6, 0.85]] as const) {
+      tap(listeners, px(R * Math.sin(ang), dough.levelY() * hy, R * Math.cos(ang)));
+      const [ox, oz] = poke.mock.calls[poke.mock.calls.length - 1];
+      expect(Math.hypot(ox, oz)).toBeLessThan(dough.bodyRadius());
+      expect(Math.atan2(ox, oz)).toBeCloseTo(ang, 1);
+    }
+  });
+
+  it('르방이 둘 이상이어도 옆벽에서 시작한 가로 끌기는 전환이 아니다 — 빠르면 젓기, 느리면 grab', () => {
+    let swipes = 0;
+    let grabs = 0;
+    let stirs = 0;
+    const { listeners, dough, px, R } = scene('peak', {
+      canSwipe: () => true,
+      onSwipe: () => { swipes += 1; },
+      onGrabStart: () => { grabs += 1; },
+      onStirStart: () => { stirs += 1; },
+    });
+    const [x, y] = px(0, dough.levelY() * 0.4, R);
+    listeners.pointerdown(ptr(x, y));
+    listeners.pointermove(ptr(x + 70, y));
+    listeners.pointerup(ptr(x + 70, y));
+    expect(stirs).toBe(1);
+    const now = vi.spyOn(performance, 'now');
+    try {
+      now.mockReturnValue(1000);
+      listeners.pointerdown(ptr(x, y));
+      now.mockReturnValue(2000);
+      listeners.pointermove(ptr(x + 70, y));
+      listeners.pointerup(ptr(x + 70, y));
+    } finally {
+      now.mockRestore();
+    }
+    expect(grabs).toBe(1);
+    expect(swipes).toBe(0);
+    // 대조 — 병 옆 배경에서 같은 끌기는 여전히 전환이다
+    const [bx, by] = px(R * 2.2, dough.levelY() * 0.4, 0);
+    listeners.pointerdown(ptr(bx, by));
+    listeners.pointermove(ptr(bx - 70, by));
+    listeners.pointerup(ptr(bx - 70, by));
+    expect(swipes).toBe(1);
+  });
+
+  it('R-L2 하강 테두리 탭은 손끝에서 반경의 5% 안에 눌린다(옛 평면 = 꼭대기 topY)', () => {
+    const { listeners, dough, px, R } = scene('falling');
+    const poke = vi.spyOn(dough, 'pokeAt');
+    const z = 0.95 * R;
+    tap(listeners, px(0, dough.levelY(), z));
+    const [ox, oz] = poke.mock.calls[0];
+    expect(Math.abs(ox)).toBeLessThan(1e-3);
+    expect(Math.abs(oz * XZ_SCALE - z)).toBeLessThan(0.05 * R);
+  });
+});
+
+describe('앱 검토 L4 홀드 — 반죽 위에서만 부푼다', () => {
+  it('반죽 밖을 0.8초 넘게 눌러도 부풂이 켜지지 않는다 · 반죽 위는 켜진다', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      const { listeners, dough, px, R } = scene('peak');
+      const hold = vi.spyOn(dough, 'holdStart');
+      const bg = px(R * 2.2, dough.levelY() * 0.4, 0);
+      listeners.pointerdown(ptr(...bg));
+      vi.advanceTimersByTime(900);
+      listeners.pointerup(ptr(...bg));
+      expect(hold).not.toHaveBeenCalled();
+      const top = px(0, dough.topY(), 0);
+      listeners.pointerdown(ptr(...top));
+      vi.advanceTimersByTime(900);
+      listeners.pointerup(ptr(...top));
+      expect(hold).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

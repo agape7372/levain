@@ -68,6 +68,7 @@ const glassCommonGlsl = /* glsl */ `
   uniform float uWetRim;  // 0~1 갓 밥준 젖은 테
   uniform float uChill;   // 0~1 냉장 김서림
   uniform float uWarm;    // 0~1 창가
+  // 고전 sin 해시 — 곱이 커서 fp16(mediump)에선 fract가 0이 된다. 그래서 이 소스를 쓰는 프래그는 highp다(R-M1)
   float hash21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   // 알파 합성 — 위에 얹는 층(lc, la)
   void over(inout vec3 c, inout float a, vec3 lc, float la) {
@@ -121,7 +122,7 @@ const glassCommonGlsl = /* glsl */ `
 // 뒷면: 은은한 내벽 톤 + 하단으로 갈수록 두꺼워지는 유리 암시. 자국이 가장 잘 읽히는 면이다
 // (부감에서 수위 위 「먼 쪽」 벽이 반죽 윗면과 안 겹친다)
 const glassBackFrag = /* glsl */ `
-  precision mediump float;
+  precision highp float; // R-M1 — hash21(sin ×43758)는 fp16에서 0으로 무너진다. WebGL2는 프래그 highp 필수 지원
   varying vec3 vLocal;
   ${glassCommonGlsl}
   void main() {
@@ -139,7 +140,7 @@ const glassBackFrag = /* glsl */ `
 // (절차 눈금은 저각에서 얼룩 아티팩트로 번져 제거. 고무줄 마커도 사용자 확정으로 제거(2026-08-23)
 //  — 부피 정보는 도우 높이 + 유리 최고 수위 자국 + 관찰 카드가 정본)
 const glassFrontFrag = /* glsl */ `
-  precision mediump float;
+  precision highp float; // R-M1 — glassBackFrag와 같은 이유
   varying vec3 vNormal;
   varying vec3 vViewDir;
   varying vec3 vLocal;
@@ -209,7 +210,7 @@ const hoochVert = /* glsl */ `
 // 색 R1: 가장자리 #9f977f · 옆 띠 호박색 #998064 · 짙은 띠 #867562. 광택 높음(매트 반죽과 대비가 가장 큼).
 // 불투명 진갈색 금지(흙·썩음).
 const hoochFrag = /* glsl */ `
-  precision mediump float;
+  precision highp float; // R-M1 — 유리와 같은 판정(fp16 실폰에서 흐름 · 광 무늬가 뭉개지지 않게)
   uniform float uAmt;
   uniform float uTime;
   varying vec3 vP;

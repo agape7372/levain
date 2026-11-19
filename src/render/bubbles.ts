@@ -6,10 +6,12 @@
 // 바꿨다. 터지면 바늘구멍(얕은 음수 진폭)이 SCAR_SEC 동안 남았다 옅어진다 — 프래그가 음수 슬롯을 바늘구멍으로 그린다.
 // 부풀기(easeOut) → 정점 → "뽁"(80ms에 바늘구멍으로) → 바늘구멍이 몇 초에 걸쳐 옅어짐 → 소멸. 스폰 간격 lerp(6s, 0.8s).
 // agitation(젓는 세기 0~1): 스폰 간격 ÷(1+2a), 수명 ÷(1+a) — 젓는 동안 끓어오른다.
+// 2026-11-19 R-M3: 바늘구멍이 슬롯을 붙들어 젓기가 오히려 돔을 줄였다(쉼 1.6 → 젓기 0.6개). 새 돔은 빈 슬롯이 없으면
+// 가장 오래된 바늘구멍 자리를 넘겨받고, 수명은 update의 ÷(1+a) 한 번만 줄인다(스폰 때 한 번 더 나눠 ÷(1+a)²였다).
 
 export const DYN_SLOTS = 4;
 const POP_SEC = 0.08;
-/** 터진 자리 바늘구멍이 남는 시간(초) — 그동안 슬롯을 비우지 않는다 */
+/** 터진 자리 바늘구멍이 남는 시간(초) — 새 돔이 오면 가장 오래된 바늘구멍부터 자리를 내준다 */
 const SCAR_SEC = 4;
 /** 바늘구멍 깊이(오브젝트) — 프래그는 −amp/SCAR_AMP를 바늘구멍 세기로 읽는다(dough.frag.glsl 같은 상수) */
 export const SCAR_AMP = 0.004;
@@ -50,6 +52,13 @@ export class BubbleSystem {
 
   private spawn(t: number, scale: number, lifeBase: number, steal = false): void {
     let slot = this.bubbles.findIndex((b) => !b.active);
+    // 바늘구멍은 돔 자리를 막지 않는다 — 가장 오래 전에 터진 자리를 넘겨받는다(R-M3)
+    if (slot < 0) {
+      for (let i = 0; i < DYN_SLOTS; i++) {
+        const b = this.bubbles[i];
+        if (b.popped && (slot < 0 || b.poppedAt < this.bubbles[slot].poppedAt)) slot = i;
+      }
+    }
     if (slot < 0 && steal) {
       slot = 0;
       for (let i = 1; i < DYN_SLOTS; i++) if (this.bubbles[i].bornAt < this.bubbles[slot].bornAt) slot = i;
@@ -88,7 +97,7 @@ export class BubbleSystem {
 
     if (density > 0.02 && t >= this.nextSpawnAt) {
       // 동시 가시 상한 4(= 슬롯 수) — 밀집 클러스터 회피 (확장기획 §4-1·§4-2b 트라이포포비아 근거)
-      this.spawn(t, scale, 2 / (1 + agitation));
+      this.spawn(t, scale, 2); // 젓기 수명 단축은 아래 effLife ÷(1+a) 한 번
       const interval = (6 + (0.8 - 6) * Math.min(1, density)) / (1 + 2 * agitation);
       this.nextSpawnAt = t + interval * (0.7 + Math.random() * 0.6);
     }

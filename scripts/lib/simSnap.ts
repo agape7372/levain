@@ -3,7 +3,7 @@
 // 60일 묵은 5단계 르방을 T0에 밥 준 뒤 h시간을 advance → deriveSnapshot으로 굴린다(.work/judge-1119/judge.ts와 같은 식).
 import { initialState, advance, deriveSnapshot } from '../../src/sim';
 import type { FeedRatio, Flour, Location, SimState, Snapshot } from '../../src/sim';
-import { STAGES } from '../../src/sim/constants';
+import { RATIOS, STAGES } from '../../src/sim/constants';
 
 const H = 3_600_000;
 const D = 24 * H;
@@ -22,11 +22,14 @@ export function simState(o: SimSnapOpts = {}): SimState {
   const stage = o.stage ?? 5;
   const st = STAGES[stage];
   const ageD = o.ageD ?? (stage === 5 ? 60 : (st.days + STAGES[stage + 1].days) / 2);
+  const ratio = o.ratio ?? '1:1:1';
   return {
     ...initialState(T0 - ageD * D),
     lastFedAt: T0, locAnchorAt: T0, lastSimulatedAt: T0,
     maturity: stage === 5 ? 999 : st.cycles,
-    feedRatio: o.ratio ?? '1:1:1',
+    // 그 비율로 밥 준 직후 질량(feed 경로와 같다, S-L1) — 180 고정이면 1:5:5가 질량비 0.41인 도달 불가 상태였다
+    feedRatio: ratio,
+    mass: RATIOS[ratio].mass,
     acidity: 20,
     ...(o.flour ? { flour: o.flour } : {}),
     ...(o.location ? { location: o.location } : {}),

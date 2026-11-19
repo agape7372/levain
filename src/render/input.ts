@@ -25,6 +25,8 @@ const SWIPE_MIN_PX = 48;
 const SWIPE_H_RATIO = 1.5;
 /** 반죽 위 판정 여유 — 실측 몸통 반경(DoughMesh.bodyRadius)에 곱한다. 경계는 반죽 쪽으로 */
 const DOUGH_HIT_MARGIN = 1.15;
+/** 옆벽 탭 · 끌기를 보낼 테두리 점 — 몸통 반경 비(R-M2) */
+const WALL_RIM = 0.95;
 
 export interface InputHooks {
   /** 홈 입력을 통째로 막는가 — 쇼케이스 중엔 캔버스가 빵 돌리기 전용이라 젓기·걷기·소리가 나면 안 된다 */
@@ -95,8 +97,27 @@ export function attachInput(
     ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
     ptr.y = -((e.clientY - r.top) / r.height) * 2 + 1;
     ray.setFromCamera(ptr, camera);
-    plane.constant = -dough.topY(); // 부피 연동 — 손끝 = 눌리는 지점
-    return ray.ray.intersectPlane(plane, hit) !== null;
+    // 부피 연동 — 손끝 = 눌리는 지점. 가운데 꼭대기(topY)와 테두리(levelY) 사이에 둔다:
+    // topY만 보면 하강(가운데 꺼짐)에서 테두리 탭이 반경의 ~10% 밀렸다(R-L2)
+    const levelY = dough.levelY();
+    plane.constant = -(dough.topY() + levelY) / 2;
+    if (ray.ray.intersectPlane(plane, hit) === null) return false;
+    // 유리 너머 옆벽(R-M2) — 평면 교점이 몸통 밖이면 원기둥 x²+z² = R², 0 ≤ y ≤ levelY의 앞면 교점을 본다.
+    // 맞으면 같은 방위의 테두리 안쪽 점으로 보낸다 — 덴트 · grab 앵커가 손끝 바로 위 테두리에 걸린다
+    const R = dough.bodyRadius() * XZ_SCALE;
+    if (Math.hypot(hit.x, hit.z) > R) {
+      const { origin: o, direction: d } = ray.ray;
+      const a = d.x * d.x + d.z * d.z;
+      const b = o.x * d.x + o.z * d.z;
+      const disc = b * b - a * (o.x * o.x + o.z * o.z - R * R);
+      if (a > 1e-9 && disc >= 0) {
+        const t = (-b - Math.sqrt(disc)) / a; // 가까운 근 = 카메라 쪽 앞면
+        const y = o.y + d.y * t;
+        // 교점은 반경 R 위 — 같은 방위로 WALL_RIM배 안쪽
+        if (t > 0 && y >= 0 && y <= levelY) hit.set((o.x + d.x * t) * WALL_RIM, levelY, (o.z + d.z * t) * WALL_RIM);
+      }
+    }
+    return true;
   };
 
   const clearHold = (): void => {
@@ -214,7 +235,7 @@ export function attachInput(
     clearHold();
     holdTimer = setTimeout(() => {
       // 홀드 — 손가락 쪽이 아주 천천히 0.03 부풀고, 떼면 가라앉는다 (VISUAL §5, A1-15)
-      if (!down || moved) return;
+      if (!down || moved || !downOnDough) return; // 반죽 밖 홀드는 아무 일 없다(앱 검토 L4)
       holding = true;
       dough.holdStart(lastHitX, lastHitZ);
     }, HOLD_MS);
