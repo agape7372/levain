@@ -8,7 +8,8 @@ import { boundariesH, rateMult, smoothstepInv } from './derive';
 export function deriveBriefing(state: SimState, from: number, to: number): BriefingKey[] {
   if (from >= to) return [];                                  // 역행 직후 — 오보 방지
   if (to - from < BRIEFING_MIN_ABSENCE_H * HOUR) return [];   // 짧은 부재 — 스팸 방지
-  if (state.reviveProgress === 1) return [];                  // 부활 의식 중 — 경계 의미 없음
+  // 부활 의식 중 — 배고픔 · 시큼 · hooch · 휴면 경계는 의식과 무관한 오보라 빼고, 곰팡이는 그대로 온다(S-M1, GDD §8-1)
+  const reviving = state.reviveProgress === 1;
 
   const b = boundariesH(state);
   const mult = rateMult(state);
@@ -27,7 +28,7 @@ export function deriveBriefing(state: SimState, from: number, to: number): Brief
     [wallFor(b.moldDead), 'moldDied'],
   ];
   return entries
-    .filter(([at]) => at > from && at <= to)
+    .filter(([at, k]) => at > from && at <= to && (!reviving || k.startsWith('mold')))
     .sort((a, c) => a[0] - c[0])
     .map(([, k]) => k);
 }

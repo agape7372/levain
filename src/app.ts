@@ -23,7 +23,8 @@ import type { Clock } from './platform/clock';
 import type { StorageAdapter } from './platform/storage';
 import type { GameStore } from './store/gameStore';
 import { copy } from './ui/copy';
-import { createStageQueue } from './ui/stageQueue';
+import { cheersOf, createStageQueue } from './ui/stageQueue';
+import type { Cheer } from './ui/stageQueue';
 import { toast } from './ui/components/toast';
 import { hasOpenModal, openModal } from './ui/components/modal';
 import { openMoldModal } from './ui/components/moldModal';
@@ -118,20 +119,33 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   };
   // 승급 연출 — 천이 덮여 있으면(콜드 부트·긴 부재 뒤 복귀) 걷을 때까지 미룬다. 병이 안 보이는 채로
   // 터뜨리면 장면이 반쪽이고, 천 걷기가 첫 손짓이라 소리도 그때부터 난다.
-  type StageUp = { stage: number; from: number }; // from = 그 승급 전의 집 최고 단계(새로 열린 빵을 세는 기준)
-  const cheerStages = (ups: StageUp[]): void => {
-    if (ups.length === 0) return;
-    // 두 단계를 한 번에 넘어도 소리·진동·기포는 한 번
-    sfxUnlock();
-    haptic('success');
-    scene.celebrate(); // 기포 3연속 팝 — 다이제틱 축하
-    // 토스트 2줄(단계·이름표)을 획득 연출 레이어가 대신한다 — 새로 열린 빵까지 같이 보여준다.
-    // 냉장·비율·이름표 해금 문구는 celebrate.ts가 단계에서 파생한다(GDD §5 획득 연출 행).
-    for (const u of ups) celebrateStageUp(api, u.stage, u.from);
+  // 대기열 칸 = 승급(from = 그 승급 전의 집 최고 단계, 새로 열린 빵을 세는 기준) 또는 가루 보상
+  const cheerStages = (items: Cheer[]): void => {
+    let flour = 0;
+    const ups: Array<{ stage: number; from: number }> = [];
+    for (const c of items) {
+      if ('flour' in c) flour += c.flour;
+      else ups.push(c);
+    }
+    if (ups.length > 0) {
+      // 두 단계를 한 번에 넘어도 소리·진동·기포는 한 번
+      sfxUnlock();
+      haptic('success');
+      scene.celebrate(); // 기포 3연속 팝 — 다이제틱 축하
+      // 토스트 2줄(단계·이름표)을 획득 연출 레이어가 대신한다 — 새로 열린 빵까지 같이 보여준다.
+      // 냉장·비율·이름표 해금 문구는 celebrate.ts가 단계에서 파생한다(GDD §5 획득 연출 행).
+      for (const u of ups) celebrateStageUp(api, u.stage, u.from);
+    }
+    // 가루 보상은 승급 카드 뒤에 — 복귀 중이면 브리핑이 닫힌 뒤로 같이 미뤄진다 (L2)
+    if (flour > 0) toast(copy.economy.earned(flour));
   };
   // 순서 = 천 덮기 → 복귀 브리핑 → (천 걷을 때) 승급. 미룬 승급은 큐에 남는다 (ui/stageQueue.ts, A3-05)
-  const stageQueue = createStageQueue<StageUp>(cheerStages, () => scene.isClothCovering());
-  const onStageUps = (ups: StageUp[]): void => stageQueue.offer(ups);
+  const stageQueue = createStageQueue<Cheer>(cheerStages, () => scene.isClothCovering());
+  const onStageUps = (items: Cheer[]): void => {
+    // 승급 없이 온 가루(굽기 · 밥 미션)는 기다릴 연출이 없다 — 레시피 탭에서 천이 덮여 있어도 바로 낸다
+    if (items.some((c) => 'stage' in c)) stageQueue.offer(items);
+    else cheerStages(items);
+  };
   scene.onClothOpen = () => {
     sfxCloth();
     if (stageQueue.size() > 0) setTimeout(() => stageQueue.drain(), 700); // 천이 걷힌 뒤에
@@ -488,7 +502,6 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
 
   // ── 이벤트 → 사운드·햅틱·토스트 ──
   const onEvents = (events: SimEvent[]): void => {
-    const ups: StageUp[] = [];
     for (const e of events) {
       switch (e.type) {
         case 'fed':
@@ -497,9 +510,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
           haptic('light');
           scene.playFeed(false);
           break;
-        case 'stageUp':
-          ups.push({ stage: e.stage, from: houseSeen });
-          break;
+        // stageUp · flourEarned는 연출 대기열로 (맨 아래 onStageUps)
         case 'reviveStarted':
           sfxPour();
           toast(copy.revive.started);
@@ -551,9 +562,6 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
           sfxPinch();
           haptic('light');
           break;
-        case 'flourEarned':
-          toast(copy.economy.earned(e.amount));
-          break;
         case 'flakeMade':
           haptic('light');
           toast(copy.flake.made);
@@ -578,7 +586,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
           break;
       }
     }
-    onStageUps(ups);
+    onStageUps(cheersOf(events, houseSeen));
   };
 
   // 승급 연출이 「새로 열린 빵」을 셀 기준 — 이 통지 직전의 집 최고 단계 (T7-08)

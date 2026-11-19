@@ -1,6 +1,6 @@
 // 사용자 대면 문구 전체 — 이 파일 한 곳 (전수 감수용). 정본: docs/GDD.md §10.
 // 담백한 한 문장. 시스템어·내부 용어·죄책감 유발·느낌표 남발 금지. 빨강 경고 시맨틱 없음.
-import { SEED_G } from '../sim';
+import { REVIVE_GAP_H, SEED_G } from '../sim';
 
 /** 끝 글자에 받침이 있는가 (한글 음절만 — 그 밖은 없는 것으로) */
 const hasBatchim = (word: string): boolean => {
@@ -74,6 +74,9 @@ export const copy = {
     sourStrong: '많이 시큼해졌어요',
     dormant: '깊이 잠들어 있어요',
     reviving: '천천히 깨어나는 중이에요',
+    /** 부활 중(덜 깬 채) 반점이 생겼을 때 — 「깨어나는 중」이 사실이 아니다 (S-M1) */
+    moldSpot: '표면에 반점이 생겼어요',
+    moldSpread: '반점이 번지고 있어요',
     moldy: '곰팡이가 피었어요',
   },
 
@@ -91,7 +94,7 @@ export const copy = {
     greySurface: '표면이 잿빛이에요. 자는 동안 겉모습만 그래요',
     moldSpot: '표면에 작은 반점이 생겼어요. 밥을 주면 아직 괜찮아요',
     moldSpread: '반점이 번지고 있어요. 지금 밥을 주면 살릴 수 있어요',
-    moldDeadline: (at: string) => `이대로 두면 ${at}쯤 곰팡이가 펴요`,
+    moldDeadline: (when: string) => `이대로 두면 ${when} 곰팡이가 펴요`,
   },
 
   // 곰팡이 사망 — 사실 서술 + 위로 한 문장. 원인 추궁·'~했더라면' 금지 (GDD §10)
@@ -116,7 +119,7 @@ export const copy = {
     confirmAfter: (quality: string, g: number) =>
       `${quality}. 씨앗 ${SEED_G}g만 남기고 ${g}g을 떼어 보관할까요?`,
     done: (g: number) => `${g}g을 떼어 보관해두었어요`,
-    blockedTooSoon: (left: string) => `밥 준 지 얼마 안 됐어요. ${left} 뒤에 떼어낼 수 있어요`,
+    blockedTooSoon: (when: string) => `밥 준 지 얼마 안 됐어요. ${when} 떼어낼 수 있어요`,
     blockedMass: '아직 양이 적어요',
     blockedDormant: '자는 동안에는 떼어낼 수 없어요',
     // 떼어내기 확인 모달 둘째 줄 — 지금 떼면 어떤 반죽이 통에 들어가는지(2026-09-05, 통 품질 모델).
@@ -211,14 +214,16 @@ export const copy = {
 
   observe: {
     lastFed: (ago: string) => `${ago} 전에 밥을 먹었어요`,
-    nextFeed: (at: string) => `${at}쯤 배고파질 거예요`,
+    nextFeed: (when: string) => `${when} 배고파질 거예요`,
     // 범위로 말한다 — 실제 르방도 "정답 시간"이 없다 (§19-1, 상태·온도로 변동)
     peak: (from: string, to: string) => `${from}~${to} 뒤쯤 가장 부풀어요`,
     peakNow: '지금이 한창때예요',
+    /** 한창때 시작이 2분 안 — 「곧~1시간 반 뒤쯤」 대신 (L1) */
+    peakSoon: '곧 한창때예요',
     /** 홈 머리 줄 둘째 줄 — 한창때이고 뗄 수 있을 때(빵이 열린 집만) */
     peakNowSplit: '지금 떼어 두기 좋아요',
-    /** 남은 시간 뒤에 붙는 말 — '3시간' → '3시간 뒤' */
-    after: (t: string) => `${t} 뒤`,
+    /** 남은 시간 뒤에 붙는 말 — '3시간' → '3시간 뒤쯤'. 2분 안은 format.afterText가 「곧」 하나로 바꾼다 */
+    after: (t: string) => `${t} 뒤쯤`,
     massG: (g: number) => `지금 ${g}g이에요`,
     /** 살펴보기 창 행 이름표 */
     rows: {
@@ -255,7 +260,7 @@ export const copy = {
 
   revive: {
     needRoom: '실온에 두고 밥을 주세요',
-    started: '한 술 먹였어요. 12시간쯤 뒤에 다시 밥을 주세요',
+    started: `한 술 먹였어요. ${REVIVE_GAP_H}시간쯤 뒤에 다시 밥을 주세요`, // 2회차 게이트 · 알림과 같은 시간 (L3)
     tooSoon: '아직 소화 중이에요. 조금 더 기다려요',
     done: '다시 숨쉬기 시작했어요',
   },
@@ -572,6 +577,8 @@ export const copy = {
   time: {
     // format.ts가 사용하는 단위 문구
     justNow: '방금',
+    /** 2분 안의 미래 — 미래 문장에 「방금」이 들어가지 않게 (L1) */
+    soon: '곧',
     minutes: (n: number) => `${n}분`,
     hours: (n: number) => `${n}시간`,
     hoursHalf: (n: number) => `${n}시간 반`,

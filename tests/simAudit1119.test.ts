@@ -158,6 +158,15 @@ describe('A2-02 · 부활 의식 중에도 곰팡이 예고가 예약된다', ()
     expect(restored.reviveProgress).toBe(1);
     expect(planNotifications(restored, t0 + 9 * HOUR).slots.map((s) => s.copyKey)).toContain('moldWarn');
   });
+  it('1회차 뒤 방치 — 복귀 브리핑엔 곰팡이 키만 남는다 (S-M1, GDD §8-1)', () => {
+    const dormant: SimState = { ...initialState(t0 - 30 * DAY), maturity: 14, lastFedAt: t0 - 6 * DAY, locAnchorAt: t0 - 6 * DAY, lastSimulatedAt: t0 - 6 * DAY };
+    const rev = applyAction(advance(dormant, t0), { type: 'feed', ratio: '1:1:1' }, t0).state;
+    expect(rev.reviveProgress).toBe(1);
+    expect(deriveBriefing(rev, t0, t0 + 8 * DAY)).toEqual(['moldSpotted']);
+    expect(deriveBriefing(rev, t0, t0 + 11 * DAY)).toEqual(['moldSpotted', 'moldSpread']);
+    expect(deriveBriefing(rev, t0, t0 + 15 * DAY)).toEqual(['moldSpotted', 'moldSpread', 'moldDied']);
+    expect(deriveBriefing(rev, t0, t0 + 20 * HOUR)).toEqual([]); // 배고픔 · 시큼 · hooch · 휴면은 계속 뺀다
+  });
 });
 
 describe('하루 최대 2건 — 냉장 슬롯도 집계에 든다 (GDD §7)', () => {
