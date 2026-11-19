@@ -12,7 +12,7 @@ import vert from './dough.vert.glsl?raw';
 import frag from './dough.frag.glsl?raw';
 import type { RenderParams } from '../renderParams';
 import { BubbleSystem, DYN_SLOTS } from '../bubbles';
-import { createFillGeometry, FILL_RADIUS, JAR_HEIGHT } from '../jar';
+import { createFillGeometry, FILL_RADIUS, HOOCH_COVER, JAR_HEIGHT } from '../jar';
 
 export const XZ_SCALE = 1.3; // 월드→오브젝트 XZ 변환에 입력층이 사용 (월드 XZ = 오브젝트 XZ × XZ_SCALE)
 /** 옆벽 반경(오브젝트) — 유리 안쪽 FILL_RADIUS(0.912 월드) */
@@ -142,6 +142,7 @@ export class DoughMesh {
         uMoldA: { value: Array.from({ length: MOLD_N }, () => new THREE.Vector4(0, 0, 1, 0)) },
         uKahm: { value: 0 },
         uMold: { value: 0 },
+        uHooch: { value: 0 },
         uSeed: { value: 0.37 },
         uBumpPos: { value: bumpPos },
         uBumpAmp: { value: new Float32Array(DYN_SLOTS) },
@@ -176,7 +177,7 @@ export class DoughMesh {
         uGrabWrinkle: { value: 0 },
       },
       vertexShader: vert,
-      fragmentShader: frag,
+      fragmentShader: frag.replace('// #hoochCover', HOOCH_COVER),
     });
     const geo = createFillGeometry(SEG, RINGS, ROWS);
     // 셰이더가 높이를 정하므로 자리 기준 구를 손으로 준다 — 병 전체(바닥~피크 상한)를 덮는다
@@ -195,6 +196,7 @@ export class DoughMesh {
     u.uNoiseSpeed.value = p.noiseSpeed;
     u.uSpecStr.value = p.specStr;
     u.uCrust.value = p.crust;
+    u.uHooch.value = p.hoochAmt;
     u.uRipe.value = p.ripe;
     u.uCollapse.value = p.collapse;
     u.uPin.value = p.pinholes;

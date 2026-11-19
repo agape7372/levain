@@ -32,6 +32,7 @@ uniform float uFoam;       // 윗가장자리 잔거품 띠 0~1
 uniform float uSink;       // 하강 꺼짐 0~1 — vert와 같은 소스
 uniform float uStir;       // 갓 밥준 젓은 물결 0~1
 uniform vec4 uMoldA[5];    // 곰팡이 군락 (x, z, 크기 배율, 색 종류) — vert와 단일 소스(규칙 8)
+uniform float uHooch;      // hooch 양 0~1 — 덮인 곳엔 마른 금이 없다(jar.ts HOOCH_COVER와 같은 식)
 uniform vec2 uWobble;
 uniform vec2 uBumpPos[4];
 uniform float uBumpAmp[4];
@@ -79,6 +80,9 @@ vec2 fbmG(vec2 p0) {
   g += 0.15 * vec2(cos(p2.x) * cos(p2.y), -sin(p2.x) * sin(p2.y)) * (J * J);
   return g;
 }
+
+// 아래 표지 줄은 DoughMesh가 jar.ts HOOCH_COVER로 바꿔 끼운다(hooch 윗면과 같은 소스)
+// #hoochCover
 
 // 칸 해시 — 칸 번호를 37로 접어(정수라 fp16에서도 정확) 중간값을 16 아래로 묶는다. mediump(유효 11비트)에서도
 // 소수 7비트(1/128)가 남아 지터가 뭉개지지 않는다. 옛 sin 큰 배율 해시는 fp16에서 줄무늬로 무너진다
@@ -295,13 +299,16 @@ void main() {
          * (0.25 + 0.45 * uWet + 0.30 * uCohesion) * vTop * uLevel;
   }
 
-  // 휴면 마른 껍질 — 매트 + 잔금. 잔금은 FBM 0 등고선(가는 그물)이다 — 옛 abs(fbm) 문턱은 점으로 읽혔다(A1-05)
+  // 휴면 마른 껍질 — 매트 + 잔금. 잔금은 FBM 0 등고선을 다른 저주파 FBM으로 잘라 짧게 끊긴 가는 금 몇 줄만 남긴다 —
+  // 이어진 등고선은 닫힌 칸 그물(지도 · 기린 무늬 · 핏줄)로 읽혔다(2026-11-19 다듬기). hooch가 덮인 곳은 젖어 있어 금이 없다
   if (uCrust > 0.001) {
     float crack = fbm(vXZ * 11.0 + fbm(vXZ * 4.0) * 1.6);
-    float line = 1.0 - smoothstep(0.015, 0.06, abs(crack));
+    float line = 1.0 - smoothstep(0.012, 0.04, abs(crack));
+    line *= smoothstep(0.12, 0.38, fbm(vXZ * 3.1 + 23.0 + uSeed * 11.0));
     float centerFade = 1.0 - smoothstep(uRBody * 0.774, uRBody * 1.097, length(vXZ));
+    float dry = 1.0 - hoochCover(length(vXZ) / uRBody, atan(vXZ.y, vXZ.x), uHooch);
     col = mix(col, col * vec3(0.995, 0.975, 0.945), uCrust);
-    col -= vec3(0.028, 0.025, 0.022) * line * uCrust * centerFade * vTop;
+    col -= vec3(0.034, 0.03, 0.026) * line * uCrust * centerFade * dry * vTop;
   }
 
   // 밥주기 밀가루 덮임 (M5 연출)

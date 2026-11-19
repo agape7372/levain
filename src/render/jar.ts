@@ -179,6 +179,20 @@ export interface Jar {
   setClimate(chill: number, warm: number): void;
 }
 
+/**
+ * hooch 덮임 0~1 — 단위 원판 반경 rN · 방위 ang · 양 amt. 유리 가장자리 고리(amt 0~0.35) → 윗면 전체.
+ * hooch 윗면 셰이더와 반죽 잔금(덮인 곳은 젖어 있어 마른 금이 없다)이 이 소스 하나를 쓴다(2026-11-19 다듬기).
+ * 안쪽 경계는 넓고 불규칙하게 — 또렷한 동심원은 과녁 · 계란프라이로 읽혔다(판정 L3). 각도 저주파 흔들림 +
+ * 번지는 중엔 전이 폭 0.25(고리 단계는 0.10 그대로 — 가장자리 실선이 옅어지지 않게)
+ */
+export const HOOCH_COVER = /* glsl */ `
+float hoochCover(float rN, float ang, float amt) {
+  float spread = smoothstep(0.30, 0.80, amt);
+  float ringW = mix(0.10, 1.25, spread) + spread * (1.0 - spread) * (0.24 * sin(3.0 * ang + 1.3) + 0.14 * sin(5.0 * ang - 0.7));
+  return smoothstep(1.0 - ringW, 1.0 - ringW + mix(0.10, 0.25, spread), rN) * smoothstep(0.0, 0.05, amt);
+}
+`;
+
 const hoochVert = /* glsl */ `
   varying vec3 vP;   // x,z = 단위 원판 좌표, y = 옆띠 높이 0~1(윗면 1)
   varying vec3 vWorld;
@@ -200,6 +214,7 @@ const hoochFrag = /* glsl */ `
   uniform float uTime;
   varying vec3 vP;
   varying vec3 vWorld;
+  ${HOOCH_COVER}
   void main() {
     float rN = length(vP.xz);
     float spread = smoothstep(0.30, 0.80, uAmt);          // 고리 → 전면
@@ -214,20 +229,17 @@ const hoochFrag = /* glsl */ `
       return;
     }
     // 윗면 — 가장자리 먼저. 안쪽은 맑아 아래 반죽이 비친다
-    // 안쪽 경계는 넓고 불규칙하게 — 또렷한 동심원은 과녁 · 계란프라이로 읽혔다(판정 L3). 각도 저주파 흔들림 +
-    // 번지는 중엔 전이 폭 0.25(고리 단계는 0.10 그대로 — 가장자리 실선이 옅어지지 않게)
-    float ang = atan(vP.z, vP.x);
-    float ringW = mix(0.10, 1.25, spread) + spread * (1.0 - spread) * (0.24 * sin(3.0 * ang + 1.3) + 0.14 * sin(5.0 * ang - 0.7));
-    float cover = smoothstep(1.0 - ringW, 1.0 - ringW + mix(0.10, 0.25, spread), rN);
+    float cover = hoochCover(rN, atan(vP.z, vP.x), uAmt);
     vec3 c = mix(vec3(0.64, 0.60, 0.51), vec3(0.624, 0.592, 0.498), smoothstep(0.6, 1.0, rN)); // 가장자리 #9f977f
     float flow = 0.5 + 0.5 * sin(vP.x * 9.0 + uTime * 0.3) * sin(vP.z * 8.0 - uTime * 0.22);
-    float a = cover * show * (0.30 + 0.22 * smoothstep(0.55, 1.0, rN) + 0.05 * flow);
-    // 날카로운 반사 — 병 위 창이 비친 띠(평면 거울이라 노멀 대신 자리로 그린다)
-    float u = dot(vP.xz, vec2(-0.62, 0.78));
-    float refl = exp(-pow((u - 0.30) / 0.07, 2.0)) * (0.6 + 0.4 * flow) + 0.5 * exp(-pow((u + 0.10) / 0.03, 2.0));
-    c = mix(c, vec3(1.0, 0.985, 0.95), clamp(refl, 0.0, 1.0) * 0.75);
-    a = max(a, clamp(refl, 0.0, 1.0) * 0.55 * cover * show);
-    // 유리에 닿은 액면 테 — 밝은 실선
+    float a = cover * (0.34 + 0.20 * smoothstep(0.55, 1.0, rN) + 0.05 * flow);
+    // 광 — 안쪽 뒤 왼편에 치우친 넓고 흐린 길쭉한 얼룩 하나(소프트박스가 비친 액면). 옛 평행 대각선 두 줄은
+    // 유리판 · 뚜껑으로 읽혔다(2026-11-19 다듬기). 대비는 낮게, 가장자리는 흐름으로 살짝 흔들린다
+    vec2 q = mat2(0.91, 0.42, -0.42, 0.91) * (vP.xz - vec2(-0.34, -0.12));
+    float sheen = exp(-(q.x * q.x / 0.12 + q.y * q.y / 0.03) * (0.85 + 0.3 * flow));
+    c = mix(c, vec3(1.0, 0.99, 0.965), sheen * 0.85);
+    a = max(a, sheen * 0.55 * cover);
+    // 유리에 닿은 액면 테 — 얇은 밝은 실선(메니스커스가 빛을 모은다)
     float rim = smoothstep(0.975, 0.997, rN);
     c = mix(c, vec3(0.95, 0.92, 0.85), rim * 0.7);
     a = max(a, rim * 0.6 * show);

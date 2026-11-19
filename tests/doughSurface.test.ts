@@ -4,6 +4,7 @@ import { describe, it, expect } from 'vitest';
 import * as THREE from 'three';
 import { toRenderParams } from '../src/render/renderParams';
 import { DoughMesh, R_BODY, XZ_SCALE } from '../src/render/dough/DoughMesh';
+import { createJar, HOOCH_COVER } from '../src/render/jar';
 import { BubbleSystem, SCAR_AMP } from '../src/render/bubbles';
 import frag from '../src/render/dough/dough.frag.glsl?raw';
 import vert from '../src/render/dough/dough.vert.glsl?raw';
@@ -179,5 +180,24 @@ describe('셰이더 — 해시 · 줄무늬 필드 회귀 방지(R2-04 · A1-06 
       expect(s).toMatch(/uniform vec2 uBumpPos\[4\];/);
       expect(s).toMatch(/uniform vec4 uMoldA\[5\];/);
     }
+  });
+});
+
+describe('hooch — 액체로 읽히되 유리판 줄이 없다 · 덮인 곳엔 마른 금이 없다(2026-11-19 다듬기)', () => {
+  const hoochFrag = (createJar().hooch.material as THREE.ShaderMaterial).fragmentShader;
+  it('반사는 1차원 띠(평행 줄)가 아니라 2차원 얼룩 — vP.xz를 한 축에 투영한 띠 함수가 없다', () => {
+    expect(hoochFrag).not.toMatch(/float u = dot\(vP\.xz/);
+  });
+  it('덮임 함수는 hooch와 반죽 셰이더가 같은 소스를 쓴다(규칙 8과 같은 이유)', () => {
+    const d = new DoughMesh();
+    expect(hoochFrag).toContain(HOOCH_COVER);
+    expect(d.material.fragmentShader).toContain(HOOCH_COVER);
+  });
+  it('반죽이 hooch 양을 받아 잔금을 덮인 만큼 지운다', () => {
+    const d = new DoughMesh();
+    d.applyParams(R.dormant);
+    expect(R.dormant.hoochAmt).toBeGreaterThan(0.5);
+    expect(d.material.uniforms.uHooch.value).toBeCloseTo(R.dormant.hoochAmt, 6);
+    expect(d.material.fragmentShader).toMatch(/1\.0 - hoochCover\(/);
   });
 });
