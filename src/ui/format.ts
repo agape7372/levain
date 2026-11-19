@@ -27,20 +27,20 @@ export function floatText(
 ): string {
   if (s.activity < FLOAT_OK_ACTIVITY) return copy.observe.floatNotYet;
   if (splitNow(s, now, houseStage)) return copy.observe.floatOk;
-  // 씨앗뿐이면 뗄 몫이 없다 · 빵 전 집은 권하지 않는다(A3-07) · 한창때가 지났으면 「곧」이 거짓말이다
-  if (!splitAdvised(houseStage) || s.mass - SEED_G < SPLIT_MIN_G || now >= s.peakEndAt) return copy.observe.floatPlain;
+  // 씨앗뿐이면 뗄 몫이 없다 · 빵 전 집은 권하지 않는다(A3-07) · 한창때가 지났거나 이미 뗄 수 있으면 「곧」이 거짓말이다(N-M1: 통은 잠금이 풀려 있다)
+  if (!splitAdvised(houseStage) || s.mass - SEED_G < SPLIT_MIN_G || now >= s.peakEndAt || s.canSplit) return copy.observe.floatPlain;
   return copy.observe.floatSoon;
 }
 
-/** 홈 머리 문구 키. 한창때 = 피크 밴드. 부활 중(휴면이 덜 깬 채)이라도 반점이 생겼으면 「깨어나는 중」 대신 반점을 말한다 (S-M1) */
+/** 홈 머리 문구 키. 한창때 = 피크 밴드. 휴면 중(부활 중 포함)에도 반점이 생겼으면 「깨어나는 중」 · 「깊이 잠들어 있어요」 대신 반점을 말한다 (S-M1 · N-L3) */
 export function statusKey(
   s: Pick<Snapshot, 'phase' | 'dormancy' | 'moldStage' | 'smell' | 'peakAt' | 'peakEndAt'>, now: number,
 ): keyof typeof copy.phase {
   if (s.phase === 'active') return inPeakBand(s, now) ? 'peak' : 'active';
-  if (s.phase === 'dormant' && s.dormancy < 1) {
+  if (s.phase === 'dormant') {
     if (s.moldStage === 'spot') return 'moldSpot';
     if (s.moldStage === 'spread') return 'moldSpread';
-    return 'reviving';
+    if (s.dormancy < 1) return 'reviving';
   }
   if (s.phase === 'sour') return sourPhaseKey(s.smell);
   return s.phase;

@@ -189,9 +189,12 @@ describe('떼기 권유 시간 기준 — 홈 · 관찰 카드 · 알림이 같�
     expect(splitNow(s, 11 * H, 4)).toBe(true);
     expect(floatText(s, 10 * H, 4)).toBe(copy.observe.floatOk);
   });
-  it('밴드 전이면 「곧」 — 같은 카드의 부풀기 행이 「… 뒤쯤 가장 부풀어요」라고 하는 동안 떼라고 하지 않는다', () => {
+  it('밴드 전이라도 이미 뗄 수 있으면 「동동 떠요」 — 통이 잠금 풀린 채 「곧」이라 하지 않는다 (N-M1)', () => {
     expect(splitNow(s, 9 * H, 4)).toBe(false);
-    expect(floatText(s, 9 * H, 4)).toBe(copy.observe.floatSoon);
+    expect(floatText(s, 9 * H, 4)).toBe(copy.observe.floatPlain);
+  });
+  it('밴드 전이고 아직 못 떼면 「곧」', () => {
+    expect(floatText({ ...s, canSplit: false }, 9 * H, 4)).toBe(copy.observe.floatSoon);
   });
   it('밴드가 지나면 권하지 않는다 — 홈은 배고픔 예보로 넘어간다', () => {
     expect(splitNow(s, 12 * H, 4)).toBe(false);
@@ -259,6 +262,12 @@ describe('홈 머리 — 부활 중 곰팡이면 「깨어나는 중」 대신 �
     expect(statusKey(s, 0)).toBe('reviving');
     expect(statusKey({ ...s, moldStage: 'spot' }, 0)).toBe('moldSpot');
     expect(statusKey({ ...s, moldStage: 'spread' }, 0)).toBe('moldSpread');
+  });
+  it('휴면이어도 반점 · 번짐이면 곰팡이 문구 — 완전 휴면(dormancy 1)도 (N-L3)', () => {
+    const d = { ...s, dormancy: 1 } as const;
+    expect(statusKey(d, 0)).toBe('dormant');
+    expect(statusKey({ ...d, moldStage: 'spot' }, 0)).toBe('moldSpot');
+    expect(statusKey({ ...d, moldStage: 'spread' }, 0)).toBe('moldSpread');
   });
   it('나머지 갈래는 그대로 — 한창때 = 피크 밴드', () => {
     const H = 3_600_000;
