@@ -66,6 +66,14 @@ export function sfxBubble(): void {
   tone(400 * r, ctx.currentTime, 0.12, 'sine', 0.5, 700 * r);
 }
 
+/** 다 섞임(M4) — 맑은 사인 한 점 A6 + 옥타브 배음 약하게, 0.22s. sfxFed 2음보다 작다 */
+export function sfxMixed(): void {
+  if (muted || !ensureCtx() || !ctx) return;
+  const t = ctx.currentTime;
+  tone(1760, t, 0.22, 'sine', 0.3);
+  tone(3520, t, 0.12, 'sine', 0.05);
+}
+
 /** 밥 완료 — triangle 2음 C5→E5, 마림바 느낌 */
 export function sfxFed(): void {
   if (muted || !ensureCtx() || !ctx) return;
@@ -120,32 +128,91 @@ function ensureNoise(): AudioBuffer | null {
 let stirSrc: AudioBufferSourceNode | null = null;
 let stirGain: GainNode | null = null;
 let stirFilter: BiquadFilterNode | null = null;
+let stirThick = 0.5;
+let stirPlan: StirPlan = { nextAt: 0, tickIn: 2 };
 
-/** 젓기 시작 — 밴드패스 노이즈 루프 (게인 0에서 대기, update가 속도 추종) */
-export function sfxStirStart(): void {
+/** 젓기 3겹(M4) 일정 — 찰박을 다음 시각(ctx.currentTime 기준)까지 들고 있다가 update 때 미리 예약한다 */
+export interface StirPlan {
+  /** 다음 찰박 시각(초) */
+  nextAt: number;
+  /** 다음 끈적 틱까지 남은 찰박 수 */
+  tickIn: number;
+}
+/** 이만큼 앞까지 예약 — update(포인터 이동 ≈ 프레임) 간격보다 길게 */
+export const STIR_LOOKAHEAD_S = 0.12;
+/** 이 속도 미만이면 찰박 없음(몸통만) */
+const STIR_SLAP_MIN_SPEED = 0.05;
+
+/** 찰박 간격 — clamp(0.9 − 0.6·speed, 0.25, 0.9)s에 ±25% 흔들림(rnd 0~1) */
+export function stirSlapGap(speed: number, rnd: number): number {
+  return Math.min(0.9, Math.max(0.25, 0.9 - 0.6 * speed)) * (1 + (rnd * 2 - 1) * 0.25);
+}
+
+/** 몸통 잡음 중심 — 180~500Hz, 되직할수록(thick 1) 낮고 빠를수록 조금 높다 */
+export function stirBodyHz(thick: number, speed: number): number {
+  const c = (v: number): number => Math.min(1, Math.max(0, v));
+  return 180 + 220 * (1 - c(thick)) + 100 * c(speed);
+}
+
+/** now ~ now+LOOKAHEAD 안의 찰박 · 틱 일정. 순수 — 새 plan을 돌려준다. 멈췄다 다시 저으면 밀린 사건 없이 지금부터 */
+export function planStirEvents(
+  plan: StirPlan,
+  now: number,
+  speed: number,
+  rnd: () => number,
+): { plan: StirPlan; events: { at: number; tick: boolean }[] } {
+  const events: { at: number; tick: boolean }[] = [];
+  if (speed < STIR_SLAP_MIN_SPEED) return { plan, events };
+  let { nextAt, tickIn } = plan;
+  if (nextAt < now) nextAt = now;
+  while (nextAt < now + STIR_LOOKAHEAD_S) {
+    tickIn--;
+    const tick = tickIn <= 0;
+    if (tick) tickIn = rnd() < 0.5 ? 2 : 3;
+    events.push({ at: nextAt, tick });
+    nextAt += stirSlapGap(speed, rnd());
+  }
+  return { plan: { nextAt, tickIn }, events };
+}
+
+/** 젓기 시작 — ① 몸통 저역 잡음 루프(게인 0에서 대기, update가 속도 추종). thick = 되기 0 묽음 ~ 1 되직 */
+export function sfxStirStart(thick = 0.5): void {
   if (muted || !ensureCtx() || !ctx || !master) return;
   if (stirSrc) return;
   const buf = ensureNoise();
   if (!buf) return;
+  stirThick = thick;
+  stirPlan = { nextAt: 0, tickIn: 2 };
   stirSrc = ctx.createBufferSource();
   stirSrc.buffer = buf;
   stirSrc.loop = true;
   stirFilter = ctx.createBiquadFilter();
   stirFilter.type = 'bandpass';
-  stirFilter.frequency.value = 450;
-  stirFilter.Q.value = 1.6;
+  stirFilter.frequency.value = stirBodyHz(thick, 0);
+  stirFilter.Q.value = 1.4;
   stirGain = ctx.createGain();
   stirGain.gain.value = 0;
   stirSrc.connect(stirFilter).connect(stirGain).connect(master);
   stirSrc.start();
 }
 
-/** 젓는 속도(0~1) 추종 — 게인·중심 주파수 */
-export function sfxStirUpdate(speed: number): void {
+/** 젓는 속도(0~1) 추종 — 몸통 게인 · 중심, ② 찰박 · ③ 끈적 틱 미리 예약. slaps = false면 몸통만(당기기) */
+export function sfxStirUpdate(speed: number, slaps = true): void {
   if (!ctx || !stirGain || !stirFilter) return;
   const t = ctx.currentTime;
-  stirGain.gain.setTargetAtTime(0.16 * Math.min(1, speed), t, 0.06);
-  stirFilter.frequency.setTargetAtTime(300 + 600 * Math.min(1, speed), t, 0.08);
+  const s = Math.min(1, Math.max(0, speed));
+  stirGain.gain.setTargetAtTime(0.16 * s, t, 0.06);
+  stirFilter.frequency.setTargetAtTime(stirBodyHz(stirThick, s), t, 0.08);
+  if (!slaps) return;
+  const r = planStirEvents(stirPlan, t, s, Math.random);
+  stirPlan = r.plan;
+  for (const e of r.events) {
+    // ② 찰박 — 500~1200Hz 짧은 대역 잡음(되직할수록 낮게), 살짝 내려앉는다
+    const f = (1200 - 700 * stirThick) * (0.88 + Math.random() * 0.12);
+    noiseBurst({ type: 'bandpass', freq: f, to: f * 0.75, q: 2, peak: 0.2 * (0.4 + 0.6 * s), attack: 0.006, dur: 0.04 + Math.random() * 0.03, at: e.at });
+    // ③ 끈적 틱 — 3~6kHz 아주 짧고 작게, 찰박 끝자락에
+    if (e.tick) noiseBurst({ type: 'bandpass', freq: 3000 + Math.random() * 3000, q: 3, peak: 0.05, attack: 0.002, dur: 0.018, at: e.at + 0.03 });
+  }
 }
 
 export function sfxStirEnd(): void {
@@ -180,6 +247,8 @@ function noiseBurst(o: {
   attack: number;
   dur: number;
   rate?: number;
+  /** 예약 시각(ctx 시계) — 없으면 지금 */
+  at?: number;
 }): void {
   if (muted || !ensureCtx() || !ctx || !master) return;
   const buf = ensureNoise();
@@ -189,7 +258,7 @@ function noiseBurst(o: {
   src.playbackRate.value = o.rate ?? 1;
   const f = ctx.createBiquadFilter();
   f.type = o.type;
-  const t = ctx.currentTime;
+  const t = Math.max(ctx.currentTime, o.at ?? 0);
   f.frequency.setValueAtTime(o.freq, t);
   if (o.to) f.frequency.exponentialRampToValueAtTime(o.to, t + o.dur);
   if (o.q) f.Q.value = o.q;

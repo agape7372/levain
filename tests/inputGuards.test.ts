@@ -29,8 +29,9 @@ function setup(hooks: InputHooks) {
     topY: () => 0, levelY: () => 0, bodyRadius: () => 0.69, grabStart() {}, grabMove() {}, grabEnd() {},
     grabStretch01: () => 0, setStirInput() {}, pokeAt() {},
   } as unknown as DoughMesh;
+  const grabEnd = vi.spyOn(dough, 'grabEnd');
   attachInput(canvas, cam, dough, hooks);
-  return { listeners, captured };
+  return { listeners, captured, grabEnd, dough };
 }
 
 const ptr = (x: number, y: number, id = 1): PointerEvent =>
@@ -313,5 +314,107 @@ describe('앱 검토 L4 홀드 — 반죽 위에서만 부푼다', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+});
+
+describe('F1 · M1 반죽 위 느린 끌기 — 32px까지 미확정(젓기처럼), 곧은 당김만 grab', () => {
+  /** 점 목록을 100ms 간격으로 끈다(첫 점 = 누름). 훅 · 반죽 호출을 차례로 적는다 */
+  function drag(pts: [number, number][], up = true) {
+    const ev: string[] = [];
+    const { listeners, dough } = setup({
+      onGrabStart: () => ev.push('grabStart'),
+      onGrabEnd: () => ev.push('grabEnd'),
+      onStirStart: () => ev.push('stirStart'),
+      onStirEnd: () => ev.push('stirEnd'),
+    });
+    const spy = (k: 'grabStart' | 'grabMove' | 'grabEnd' | 'setStirInput') =>
+      vi.spyOn(dough, k).mockImplementation((() => { ev.push(`d.${k}`); }) as never);
+    const gs = spy('grabStart');
+    spy('grabMove');
+    spy('grabEnd');
+    spy('setStirInput');
+    /** 처음 d.grabStart가 난 걸음의 누른 점에서 경로 길이(px) */
+    let commitPath = -1;
+    let path = 0;
+    let t = 1000;
+    const now = vi.spyOn(performance, 'now').mockImplementation(() => t);
+    try {
+      listeners.pointerdown(ptr(...pts[0]));
+      for (let i = 1; i < pts.length; i++) {
+        t += 100;
+        path += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+        listeners.pointermove(ptr(...pts[i]));
+        if (commitPath < 0 && gs.mock.calls.length) commitPath = path;
+      }
+      if (up) listeners.pointerup(ptr(...pts[pts.length - 1]));
+    } finally {
+      now.mockRestore();
+    }
+    return { ev, commitPath, grabAt: gs.mock.calls[0] as [number, number] | undefined };
+  }
+  const line = (x0: number, y0: number, dx: number, dy: number, n: number): [number, number][] =>
+    Array.from({ length: n + 1 }, (_, i) => [x0 + dx * i, y0 + dy * i]);
+  /** (C, C)에서 시작해 반경 r로 도는 원(프레임당 3px) */
+  const circle = (r: number, turns: number): [number, number][] => {
+    const n = Math.round((turns * 2 * Math.PI * r) / 3);
+    return Array.from({ length: n + 1 }, (_, i) => {
+      const a = (i * 3) / r;
+      return [C - r + Math.cos(a) * r, C + Math.sin(a) * r];
+    });
+  };
+  const has = (ev: string[], k: string): boolean => ev.includes(k);
+
+  it('곧은 당김 — 32px 전엔 젓기(소리 · 고랑), 32px에서 누른 점으로 grab · 같은 걸음에 grabMove', () => {
+    const { ev, commitPath, grabAt } = drag(line(C, C, 3, 0, 20));
+    expect(ev[0]).toBe('stirStart');
+    const g = ev.indexOf('d.grabStart');
+    expect(ev.slice(0, g)).toContain('d.setStirInput'); // 손끝이 바로 반응
+    expect(ev.slice(g, g + 3)).toEqual(['d.grabStart', 'grabStart', 'd.grabMove']);
+    expect(ev.slice(g)).not.toContain('d.setStirInput');
+    expect(commitPath).toBeGreaterThanOrEqual(32);
+    expect(commitPath).toBeLessThan(42);
+    expect(Math.hypot(...grabAt!)).toBeLessThan(0.01); // 누른 점(화면 가운데)
+    expect(ev[ev.length - 1]).toBe('grabEnd');
+    expect(has(ev, 'stirEnd')).toBe(false);
+  });
+
+  it('손떨림 섞인 곧은 당김(옆 ±2px · 앞뒤 ±1px)도 grab', () => {
+    const pts = line(C, C - 40, 0, 3, 30).map(([x, y], i): [number, number] =>
+      i === 0 ? [x, y] : [x + (i % 2 ? 2 : -2) * Math.sin(i * 1.7), y + Math.cos(i * 2.3)],
+    );
+    expect(has(drag(pts).ev, 'd.grabStart')).toBe(true);
+  });
+
+  it.each([80, 40])('반경 %ipx 원은 grab 없이 젓기로 끝난다', (r) => {
+    const { ev } = drag(circle(r, 1.5));
+    expect(ev[0]).toBe('stirStart');
+    expect(has(ev, 'd.grabStart')).toBe(false);
+    expect(has(ev, 'grabStart')).toBe(false);
+    expect(ev.filter((k) => k === 'd.setStirInput').length).toBeGreaterThan(30);
+    expect(ev[ev.length - 1]).toBe('stirEnd');
+  });
+
+  it('32px 전에 떼면 젓기로 끝난다', () => {
+    const { ev } = drag(line(C, C, 3, 0, 8));
+    expect(has(ev, 'd.grabStart')).toBe(false);
+    expect(ev.filter((k) => k === 'stirStart' || k === 'stirEnd')).toEqual(['stirStart', 'stirEnd']);
+  });
+
+  it('grab으로 확정된 뒤 원을 그리면 여전히 stir로 넘긴다 — onGrabEnd 없이 · 놓으면 onStirEnd', () => {
+    const pull = line(C, C, 0, 3, 15);
+    const r = 40;
+    const [ex, ey] = pull[pull.length - 1];
+    const loop = Array.from({ length: 120 }, (_, i): [number, number] => {
+      const a = ((i + 1) * 3) / r;
+      return [ex - r + Math.cos(a) * r, ey + Math.sin(a) * r];
+    });
+    const { ev } = drag([...pull, ...loop]);
+    const g = ev.indexOf('d.grabStart');
+    expect(g).toBeGreaterThan(0);
+    const e = ev.indexOf('d.grabEnd');
+    expect(e).toBeGreaterThan(g); // 넘길 때 리본 스프링 복귀
+    expect(ev.slice(e)).toContain('d.setStirInput');
+    expect(has(ev, 'grabEnd')).toBe(false);
+    expect(ev[ev.length - 1]).toBe('stirEnd');
   });
 });

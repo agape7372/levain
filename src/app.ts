@@ -17,7 +17,7 @@ import { glbUrl, loadRemoteAssets } from './platform/remoteAssets';
 import { exportEnvelope, pickImportFile } from './platform/saveTransfer';
 import {
   setMuted, sfxBubble, sfxFed, sfxRevived, sfxUnlock, suspendAudio, resumeAudio, unlockAudio,
-  sfxStirStart, sfxStirUpdate, sfxStirEnd, sfxCloth, sfxBaked, sfxPour, sfxSetDown, sfxPinch,
+  sfxStirStart, sfxStirUpdate, sfxStirEnd, sfxMixed, sfxCloth, sfxBaked, sfxPour, sfxSetDown, sfxPinch,
 } from './audio/sounds';
 import type { Clock } from './platform/clock';
 import type { StorageAdapter } from './platform/storage';
@@ -136,7 +136,7 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
       // 냉장·비율·이름표 해금 문구는 celebrate.ts가 단계에서 파생한다(GDD §5 획득 연출 행).
       for (const u of ups) celebrateStageUp(api, u.stage, u.from);
     }
-    // 가루 보상은 승급 카드 뒤에 — 복귀 중이면 브리핑이 닫힌 뒤로 같이 미뤄진다 (L2)
+    // 가루 보상은 승급 카드와 같이 뜬다 — 복귀 중이면 브리핑이 닫힌 뒤로 같이 미뤄진다 (L2)
     if (flour > 0) toast(copy.economy.earned(flour));
   };
   // 순서 = 천 덮기 → 복귀 브리핑 → (천 걷을 때) 승급. 미룬 승급은 큐에 남는다 (ui/stageQueue.ts, A3-05)
@@ -150,12 +150,16 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
     sfxCloth();
     if (stageQueue.size() > 0) setTimeout(() => stageQueue.drain(), 700); // 천이 걷힌 뒤에
   };
-  scene.onStirStart = () => sfxStirStart();
+  // 젓기 소리는 되기를 따라 낮아진다(M4). grab에서 젓기로 넘어가면 시작 훅 없이 같은 소리가 이어진다
+  const stirThick = (): number => scene.dough?.stirThickness() ?? 0.5;
+  scene.onStirStart = () => sfxStirStart(stirThick());
   scene.onStirMove = (s) => sfxStirUpdate(s);
   scene.onStirEnd = () => sfxStirEnd();
-  // 당기기도 같은 반죽 소리 — 늘어난 만큼만 작게, 놓을 때 톡 (감사 T4-6)
-  scene.onGrabStart = () => sfxStirStart();
-  scene.onGrabMove = (s) => sfxStirUpdate(s * 0.6);
+  // 다 섞임 — 맑은 한 점 + 가벼운 진동 한 번 (넘김 · 혼자 옅어짐엔 없음)
+  scene.onMixed = () => { sfxMixed(); haptic('light'); };
+  // 당기기도 같은 반죽 소리(몸통만, 찰박 없음) — 늘어난 만큼만 작게, 놓을 때 톡 (감사 T4-6)
+  scene.onGrabStart = () => sfxStirStart(stirThick());
+  scene.onGrabMove = (s) => sfxStirUpdate(s * 0.6, false);
   scene.onGrabEnd = () => { sfxStirEnd(); haptic('light'); };
 
   // ── 설정 반영 ──

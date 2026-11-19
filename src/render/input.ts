@@ -1,9 +1,11 @@
 // 포인터 제스처 FSM — 반죽 촉감의 입력층 (VISUAL §5, 확장기획 §4-2 개편).
 //   탭(<8px & <250ms)      → poke 덴트 (damped spring 복귀)
 //   홀드 0.8s(무이동)       → 손가락 쪽 살짝 부풂 (swell)
-//   드래그(≥8px)            → 2채널: 반죽 위에서 천천히 끌면 grab(변위 추종·점탄성),
+//   드래그(≥8px)            → 2채널: 반죽 위에서 천천히 끌면 미확정(젓기처럼) → 경로 32px에서
+//                             곧은 당김이면 grab(변위 추종·점탄성), 아니면 stir(F1).
 //                             빠르게 문지르거나 반죽 밖 시작이면 stir(속도 시어장)
-//                             — 한 포인터 세션의 소유권은 중간에 안 바뀐다 (§5-5 원칙)
+//                             — 소유권은 중간에 안 바뀐다 (§5-5 원칙). 예외 하나: grab 중 원 · 왕복을
+//                             그리면 stir로 넘긴다(StirJudge, 한 방향만 · 되돌아가지 않음)
 //   배경 시작 + 수평 우세      → swipe(르방 전환). canSwipe()가 false면 이 분기 자체가 없다
 //                             (= 기존 stir 경로 그대로)
 //   덮개 덮임               → 위로 플릭 또는 탭 = 걷기, 반죽 조작은 통과 안 함
@@ -27,6 +29,61 @@ const SWIPE_H_RATIO = 1.5;
 const DOUGH_HIT_MARGIN = 1.15;
 /** 옆벽 탭 · 끌기를 보낼 테두리 점 — 몸통 반경 비(R-M2) */
 const WALL_RIM = 0.95;
+
+/** grab → stir 넘김 판정(M1) — 이 픽셀 미만 조각은 다음 점과 합친다(손떨림 · 아주 느린 끌기).
+ *  10px: 4px였을 땐 ±2px 떨림 섞인 곧은 당김이 32px에서 Σ 33°로 흔들렸고, 당긴 채 머무는 ±3px 떨림이
+ *  뒤집힘으로 쌓여 넘어갔다(R3). ±3px 떨림은 한 점에서 10px 조각을 못 만든다(최대 8.5px) */
+const STIR_SEG_PX = 10;
+/** 부호 있는 회전 누적이 이 각도를 넘으면 원 그리기 */
+const STIR_TURN_RAD = (100 * Math.PI) / 180;
+/** 직전 조각과 내적이 이 값 미만 = 방향 뒤집힘. 이만큼 뒤집히면 왕복 */
+const STIR_FLIP_DOT = -0.5;
+const STIR_FLIPS = 2;
+/** 미확정 판정(F1) — 반죽 위 느린 끌기는 경로가 이만큼 갈 때까지 젓기로 다루다가 한 번 가른다 */
+const GRAB_COMMIT_PX = 32;
+/** 그때 |Σ|가 이 각도 미만이면 곧은 당김 = grab. 반경 80px 원은 32px에서 약 20° */
+const GRAB_COMMIT_TURN_RAD = (15 * Math.PI) / 180;
+
+/** grab 중 손짓이 젓기인지 — 화면 픽셀 점을 차례로 받아, 넘길 때가 되면 true.
+ *  회전 누적은 조각 사이 꺾임(90° 이하만)의 합 = 처음 방향에서 지금 방향까지 돈 각도라
+ *  떨림은 서로 지워지고 ㄱ자 한 번 꺾기는 안 쌓인다. 테스트용 export */
+export class StirJudge {
+  private ax: number;
+  private ay: number;
+  private dx = 0;
+  private dy = 0;
+  private turn = 0;
+  private flips = 0;
+  /** 받아들인 조각 길이 합(px) */
+  path = 0;
+  constructor(x: number, y: number) {
+    this.ax = x;
+    this.ay = y;
+  }
+  push(x: number, y: number): boolean {
+    const sx = x - this.ax;
+    const sy = y - this.ay;
+    const len = Math.hypot(sx, sy);
+    if (len < STIR_SEG_PX) return false;
+    const ux = sx / len;
+    const uy = sy / len;
+    if (this.dx !== 0 || this.dy !== 0) {
+      const dot = this.dx * ux + this.dy * uy;
+      if (dot < STIR_FLIP_DOT) this.flips++;
+      else if (dot >= 0) this.turn += Math.atan2(this.dx * uy - this.dy * ux, dot);
+    }
+    this.dx = ux;
+    this.dy = uy;
+    this.ax = x;
+    this.ay = y;
+    this.path += len;
+    return Math.abs(this.turn) >= STIR_TURN_RAD || this.flips >= STIR_FLIPS;
+  }
+  /** 곧은 당김인가 — 부호 있는 회전 누적이 GRAB_COMMIT_TURN 미만 */
+  straight(): boolean {
+    return Math.abs(this.turn) < GRAB_COMMIT_TURN_RAD;
+  }
+}
 
 export interface InputHooks {
   /** 홈 입력을 통째로 막는가 — 쇼케이스 중엔 캔버스가 빵 돌리기 전용이라 젓기·걷기·소리가 나면 안 된다 */
@@ -75,7 +132,10 @@ export function attachInput(
   // swipeCandidate = 배경에서 시작해 수평 우세지만 **아직 확정 전**. 젓기는 계속 흘려보낸다.
   // 확정(isSwipeCommit)되는 순간에만 'swipe'로 승격하고 그때 젓기를 취소한다 —
   // 8px 시점에 잠가 버리면 반죽을 젓다가 옆 르방으로 넘어간다 (2026-08-25 실기기 신고)
-  let mode: 'grab' | 'stir' | 'swipe' | 'swipeCandidate' | null = null;
+  // pending = 반죽 위 느린 끌기, 곧은 당김인지 아직 모름(F1). 젓기처럼 흘리다가 GRAB_COMMIT_PX에서 가른다
+  let mode: 'grab' | 'pending' | 'stir' | 'swipe' | 'swipeCandidate' | null = null;
+  /** 넘김 판정기 — pending · grab일 때만 있다 */
+  let judge: StirJudge | null = null;
   let downOnDough = false;
   /** 제스처 소유 포인터 — 기기를 쥔 엄지가 스쳐도 진행 중인 제스처를 뺏기지 않는다 */
   let activeId: number | null = null;
@@ -134,7 +194,7 @@ export function attachInput(
   };
 
   const endDrag = (): void => {
-    if (mode === 'stir' || mode === 'swipeCandidate') hooks.onStirEnd?.();
+    if (mode === 'stir' || mode === 'pending' || mode === 'swipeCandidate') hooks.onStirEnd?.();
     if (mode === 'grab') {
       dough.grabEnd();
       hooks.onGrabEnd?.();
@@ -158,9 +218,10 @@ export function attachInput(
         const dxT = e.clientX - downX;
         const dyT = e.clientY - downY;
         if (downOnDough && slow) {
-          mode = 'grab';
-          dough.grabStart(downHitX, downHitZ);
-          hooks.onGrabStart?.();
+          // 바로 들지 않는다 — 원을 그리기 시작하면 판째 들린 원판이 윗물을 뚫었다(F1). 소리 · 고랑은 바로
+          mode = 'pending';
+          judge = new StirJudge(downX, downY);
+          hooks.onStirStart?.();
         } else if (
           // 배경 시작 + 수평 우세 → 스와이프 **후보**. 확정은 아래 승격 지점에서만 (§5-5)
           !downOnDough &&
@@ -180,6 +241,22 @@ export function attachInput(
       hooks.onStirEnd?.();
       mode = 'swipe';
     }
+    // grab · 미확정 → stir 넘김(M1). 리본은 스프링으로 돌아가고, 소리 · 진동 훅은 안 부른다(시작 소리가 그대로 젓기 소리)
+    if ((mode === 'grab' || mode === 'pending') && judge?.push(e.clientX, e.clientY)) {
+      if (mode === 'grab') dough.grabEnd();
+      mode = 'stir';
+      judge = null;
+    } else if (mode === 'pending' && judge && judge.path >= GRAB_COMMIT_PX) {
+      // 한 번만 가른다. 곧은 당김이면 누른 점을 잡고 아래 grab 분기가 같은 걸음에 지금 목표로 끈다(소리는 이어진다)
+      if (judge.straight()) {
+        mode = 'grab';
+        dough.grabStart(downHitX, downHitZ);
+        hooks.onGrabStart?.();
+      } else {
+        mode = 'stir';
+        judge = null;
+      }
+    }
     if (mode === 'swipe') return; // 반죽에 손대지 않는다 — 레이캐스트도 생략
     if (!raycast(e)) return;
     // 끌기는 평면 교점을 따라 이어진다 — 누른 점(스냅된 테두리) + 평면 위 이동량 (RV-H1)
@@ -192,7 +269,7 @@ export function attachInput(
     if (mode === 'grab') {
       dough.grabMove(ox, oz);
       hooks.onGrabMove?.(dough.grabStretch01());
-    } else if (mode === 'stir' || mode === 'swipeCandidate') {
+    } else if (mode === 'stir' || mode === 'pending' || mode === 'swipeCandidate') {
       const vx = (ox - lastHitX) / dt;
       const vz = (oz - lastHitZ) / dt;
       dough.setStirInput(ox, oz, vx, vz);
