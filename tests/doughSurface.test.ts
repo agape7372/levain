@@ -3,7 +3,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import * as THREE from 'three';
 import { toRenderParams } from '../src/render/renderParams';
-import { DoughMesh, R_BODY, XZ_SCALE, MOLD_N, TRAIL_N } from '../src/render/dough/DoughMesh';
+import { DoughMesh, R_BODY, XZ_SCALE, MOLD_N, SWIRL_N } from '../src/render/dough/DoughMesh';
 import { createJar, HOOCH_COVER } from '../src/render/jar';
 import { BubbleSystem, SCAR_AMP, DYN_SLOTS } from '../src/render/bubbles';
 import frag from '../src/render/dough/dough.frag.glsl?raw';
@@ -201,25 +201,25 @@ describe('셰이더 — 해시 · 줄무늬 필드 회귀 방지(R2-04 · A1-06 
     expect(frag).toContain(`const float XZ_W = ${XZ_SCALE};`);
     expect(frag).toContain(`const float SCAR_AMP = ${SCAR_AMP};`);
   });
-  it('범프 · 고랑 자취 · 곰팡이 배열 길이와 루프 상한이 TS 상수와 같다(규칙 8 · R-L3)', () => {
-    // 고랑 함수(trailGroove)는 DoughMesh가 두 셰이더에 끼워 넣는다 — 끼운 뒤의 소스를 본다
+  it('범프 · 소용돌이 · 곰팡이 배열 길이와 루프 상한이 TS 상수와 같다(규칙 8 · R-L3)', () => {
+    // 젓기 함수(stirField)는 DoughMesh가 두 셰이더에 끼워 넣는다 — 끼운 뒤의 소스를 본다.
+    // 2026-11-19 손맛 3차: 15점 자취 루프를 뺐다 — 루프는 범프 · 곰팡이 둘, 소용돌이 uSwirl은 루프 없이 동적 첨자
     const m = new DoughMesh().material;
-    expect(vert).toContain('// #trailGroove');
+    expect(vert).toContain('// #stirField');
     for (const s of [m.vertexShader, m.fragmentShader]) {
       for (const n of ['vec2 uBumpPos', 'float uBumpAmp', 'float uBumpK']) expect(s).toContain(`uniform ${n}[${DYN_SLOTS}];`);
-      for (const n of ['vec2 uTrailPos', 'float uTrailAmp', 'float uTrailK']) expect(s).toContain(`uniform ${n}[${TRAIL_N}];`);
+      expect(s).toContain(`uniform vec2 uSwirl[${SWIRL_N}];`);
       expect(s).toContain(`uniform vec4 uMoldA[${MOLD_N}];`);
       // 루프마다 본문이 읽는 배열의 상수와 짝짓는다 — 소속 검사만 하면 범프 루프가 TRAIL_N 값이어도 통과한다(RV-L2)
-      // 자취 루프는 선분을 돈다 — 점 TRAIL_N개 · 선분 TRAIL_N − 1개(i와 i + 1을 잇는다)
-      const want = { Bump: DYN_SLOTS, Trail: TRAIL_N - 1, Mold: MOLD_N } as const;
+      const want = { Bump: DYN_SLOTS, Mold: MOLD_N } as const;
       const seen = new Set<string>();
       for (const m of s.matchAll(/for \(int i = 0; i < (\d+); i\+\+\) \{([\s\S]*?)\n\s*\}/g)) {
-        const arr = /u(Bump|Trail|Mold)\w*\[i\]/.exec(m[2])?.[1] as keyof typeof want | undefined;
+        const arr = /u(Bump|Mold)\w*\[i\]/.exec(m[2])?.[1] as keyof typeof want | undefined;
         expect(arr, `루프 본문이 범프 · 실 · 곰팡이 배열을 읽지 않는다: ${m[0].slice(0, 60)}`).toBeDefined();
         expect(Number(m[1]), `${arr} 루프 상한`).toBe(want[arr!]);
         seen.add(arr!);
       }
-      expect(seen.size).toBe(3);
+      expect(seen.size).toBe(2);
     }
   });
 });

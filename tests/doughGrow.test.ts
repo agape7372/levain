@@ -258,7 +258,8 @@ describe('DoughMesh v2 — 시계·NaN 방어(A1-18)', () => {
     d.tick(864000, 12.5);
     d.tick(5);
     const u = d.material.uniforms;
-    for (const v of u.uTrailAmp.value as Float32Array) expect(Number.isFinite(v)).toBe(true);
+    for (const v of u.uSwirl.value as THREE.Vector2[]) expect(Number.isFinite(v.x) && Number.isFinite(v.y)).toBe(true);
+    expect(Number.isFinite((u.uTip.value as THREE.Vector4).z)).toBe(true);
     const g = u.uGrab.value as THREE.Vector4;
     expect(Number.isFinite(g.x) && Number.isFinite(g.y)).toBe(true);
   });

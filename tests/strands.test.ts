@@ -283,7 +283,8 @@ describe('DoughMesh 당기기 배선', () => {
     const sil = fbm2(3.1 + seed, 7.4 + seed) * 0.045 * (1 - 0.55 * rp.levelness - 0.3 * rp.fluidity) * (1 - 0.5 * rp.ripe);
     expect(d.surfaceY(0, 0)).toBeCloseTo(d.topY() + sil * d.mesh.scale.y, 6);
     const v = d.material.vertexShader;
-    expect(v).toContain('fbm(p.xz * 1.8 + vec2(3.1, 7.4) + uSeed * 37.0) * 0.045');
+    // 젓기 v3: 정지 혹은 소용돌이 도메인 q에서 읽는다(젓지 않았으면 q = p.xz — 위 값 그대로)
+    expect(v).toContain('fbm(q * 1.8 + vec2(3.1, 7.4) + uSeed * 37.0) * 0.045');
     expect(v).toContain('* (1.0 - 0.55 * uLevel - 0.30 * uFluid) * (1.0 - 0.5 * uRipe)');
     expect(v).toContain('disp += uRipe * 0.05 * exp(-c2 * 2.5 * kR)');
     expect(v).toContain('disp -= uCollapse * 0.08 * exp(-c2 * 2.0 * kR)');
@@ -388,18 +389,18 @@ describe('DoughMesh 당기기 배선', () => {
     expect(d.strands.rig.len).toBeGreaterThan(0.1);
     expect(d.strands.material.uniforms.uLen.value).toBe(d.strands.rig.len);
   });
-  it('잡기 확정 = 그 획의 고랑을 τ0.1s로 지운다(§6-12)', () => {
+  it('잡기 확정 = 그 획의 손끝 패임을 τ0.1s로 지운다(§6-12, 젓기 v3 — 옛 고랑 자취 대신 uTip.z)', () => {
     const d = new DoughMesh();
     d.applyParams(RP('justfed'));
     for (let i = 0; i <= 20; i++) {
       d.setStirInput(0.01 * i, 0, 0.6, 0);
       d.tick(i / 60);
     }
-    const amp = d.material.uniforms.uTrailAmp.value as Float32Array;
-    expect(Math.max(...amp)).toBeGreaterThan(0.004);
+    const tip = d.material.uniforms.uTip.value as THREE.Vector4;
+    expect(tip.z).toBeGreaterThan(0.004);
     d.grabStart(0.2, 0);
     for (let i = 21; i <= 21 + 45; i++) d.tick(i / 60);
-    expect(Math.max(...amp)).toBeLessThan(1e-4);
+    expect(tip.z).toBeLessThan(1e-4);
   });
   it('끊김은 grabBreaks로 나간다(SceneHost.onGrabBreak)', () => {
     const d = new DoughMesh();

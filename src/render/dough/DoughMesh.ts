@@ -50,71 +50,62 @@ function seededRandom(seed: number): () => number {
   };
 }
 
-// ── 고랑 자취(2026-11-19 섞는 맛 M2) — 실 능선 4점 가우시안 솟음을 버리고 손끝 자취를 고랑으로 판다.
-//    점 TRAIL_N개를 잇는 선분 TRAIL_N − 1개(캡슐 거리), 단면 = U자 + 입술(grooveProf, 시각 고침 2차) — 평평한 바닥 −A · 가파른 벽 · 좁은 마루 +0.5A.
-//    맨 끝 점(머리)은 손끝을 따라다니다 TRAIL_STEP만큼 멀어지면 굳고 새 머리가 생긴다 → 손끝 밑 = 고랑 끝의 둥근 패임 ──
-/** 자취 점 수 — 셰이더 uTrail* 길이(선분 루프는 TRAIL_N − 1)와 같다(테스트가 잠근다).
- *  시각 고침 3차 S-1: 8 → 15 · 간격 0.19 → 0.095 — 원 젓기 반경 0.55R에서 선분 하나가 0.49rad라 U자 벽이 13각형 토막으로 꺾였다
- *  (hi2_stir). 0.095면 선분당 0.25rad. 15 = 굳은 13선분 × 0.095 = 1.24 ≈ 옛 6 × (0.19 + 넘침 ≈ 0.02) — 굳는 점을 정확히 STEP에 두며
- *  (pushTrail) 넘침이 빠졌다. 자취 길이 · F3 0.58바퀴 그대로. 메모 16은 0.62바퀴를 넘는다 */
-export const TRAIL_N = 15;
-/** 갓 판 고랑 깊이(월드) — 셰이더 TRAIL_A와 단일 소스(TRAIL_GROOVE에 끼운다).
- *  추정 — 실측 없음(위 시점뿐, 8uAT 0:48 「두툼한 고랑」). 폭을 3배로 넓혀 기울기가 √3배 준 대비를 지키는 값 */
-const TRAIL_A = 0.035;
-/** 단면 = U자 + 입술(시각 고침 2차 B-4) — x = 옆 거리 ÷ 반폭. 바닥 평평(x < 0.55) · 벽 가파름(0.55~1.0 smoothstep, 벽 끝 = 마루 꼭대기) ·
- *  마루 높이 0.5A, 바깥쪽은 1.0~1.8에 걸쳐 완만히 내려온다. 1차 가우시안 f = −A(1 − 3q)e^(−q)는 2배 녹화에서도 흐린 물결 · 얼룩으로
- *  읽혔다(hi1_stir). 실물 8uAT 47.7~49.3 겹 고랑 = 홈 바닥 가는 그늘 선 + 마루 밝은 띠. 바닥이 평평해 어둡지 않고, 그늘은 빛 반대쪽 벽에만 선다.
- *  바닥 0.55 · 벽 끝 1.0 · 높이 0.5A는 메모 B-4 그대로. 바깥 비탈 1.8은 메모(마루 폭 0.15)에서 벗어남 — 0.15 폭 대칭 마루는 양 비탈이
- *  다 가팔라 밝은 선 + 짙은 선이 겹친 유리 테 · 투명 접시로 읽혔다(.work/feel2/fix2_1). 추정 — 실측 없음(높이를 못 잰다) */
-const TRAIL_FLOOR = 0.55;
-const TRAIL_CREST = 1.0;
-const TRAIL_LIP_OUT = 1.8;
-const TRAIL_LIP_H = 0.5;
-/** 이음매 부드러운 최소 온도 k(q 단위) — 로그합지수 smin(시각 고침 3차 S-1). 두 칸 몫이 12~88%로 갈리는 폭 |Δq| < 2k = 0.5가
- *  2차 다항 smin 폭(0.5)과 같다. 추정 — 실측 없음 */
-const TRAIL_SEAM_Q = 0.25;
-/** 이 q 밖 칸은 합에 안 더한다 — e^(−12/0.25) ≈ 1e-21. 고랑은 q 9에서 끝나 합 결과에 안 보인다(루프 비용만 줄인다) */
-const TRAIL_Q_CUT = 12;
-/** 고랑 높이를 버텍스 변위에만 곱하는 배율(시각 고침 3차 S-2, hi2 판) — 42° 시선에서 앞 입술이 가파른 벽을 가리는데 그 가림이
- *  삼각형(칸 ≈ 0.02, 벽 폭 ≈ 2.5칸) 단위라 고랑 테두리가 톱니가 됐다. 프래그 기울기는 같은 문자열의 해석적 미분 그대로(배율 없음)라
- *  음영 · 단면 읽힘은 그대로이고 실루엣 가림만 줄어든다. 0.35 = 메모 출발값. 추정 — 실측 없음(톱니가 2배 판에서 사라지는 값) */
-const GROOVE_VERT_GAIN = 0.35;
-const TRAIL_STEP = 0.095;    // 자취 점 간격(오브젝트) — 굳은 12선분 ≈ 손끝 뒤 0.6바퀴(F3: 옛 0.13 × 6은 쉼표 한 토막으로 읽혔다). 시각 고침 3차 0.19 → 0.095
-/** 꼬리 가늘어짐 길이 = 0.38(오브젝트) — 옛 0.19 간격 두 점 그대로. 점 수로 = 0.38 / TRAIL_STEP */
-const TRAIL_TAIL_PTS = Math.round(0.38 / TRAIL_STEP);
-/** 잔줄 띠(머리 뒤 몫) — 머리에서 0.38까지 1, 0.665에서 0(옛 0.19 간격 「머리 뒤 2~3.5선분」 그대로, §6-18). 선분 번호 단위로 */
-const RIDGE_FROM_I = TRAIL_N - 1 - 0.665 / TRAIL_STEP;
-const RIDGE_RAMP_I = (0.665 - 0.38) / TRAIL_STEP;
-/** 손가락 반폭(오브젝트) — S1a fGJz 55.7 · 8uAT 0:48 고랑 폭 ≈ 도구 폭, 손가락 0.18D */
-const FINGER_HALF = (0.09 * D_W) / XZ_SCALE;
-/** 갓 판 고랑 첨도 ≈ 31 — 반폭(q 0.5) = 손가락 반폭(S1a). 나이 들수록 넓어진다 */
-const TRAIL_K0 = 0.5 / FINGER_HALF ** 2;
-/** 넓어짐 하한 — §6-10 K0/1.5 (K0/3이면 둔덕 마루가 원 젓기 반경에 모여 도넛 · 과녁) */
-const TRAIL_K_MIN = TRAIL_K0 / 1.5;
-/** 앞 둔덕(S3) — 머리 + 진행 방향 × 1.2 · 반폭, 지름 0.25D(UPQ94 4s 0.4~0.5D ×0.65). 첨도는 반폭(q 0.5) 기준 */
-const BOW_AHEAD = 1.2 * FINGER_HALF;
-const BOW_K = 0.5 / ((0.125 * D_W) / XZ_SCALE) ** 2;
-/** 앞 둔덕 높이 = 머리 깊이 × 1.2 × (0.4 + 0.6·되기) — 추정 — 실측 없음(위 시점뿐, kib6 149 밀려 오른 더미).
- *  시각 고침 1차 B: 0.8 → 1.2(× 1.5) — 2배 녹화에서 머리 앞 둔덕이 안 보였다(UPQ94 4s 앞 더미) */
-const BOW_GAIN = 1.2;
-/** 잔줄(S1b, 프래그 노멀만) — 간격 = 손가락 폭 × 0.2 = 0.036D · 띠 반폭 = 손가락 폭 × 1.5 (UPQ94 3s 칸4) */
-const RIDGE_GAP = (0.036 * D_W) / XZ_SCALE;
-const RIDGE_BAND = (1.5 * 0.18 * D_W) / XZ_SCALE;
-/** 잔줄 기울기 진폭 — 추정 — 실측 없음(높이를 못 잰다). 시각 고침 2차 B-4: 0.05 → 0.075(× 1.5, 메모 상한) — 2배 녹화(fix2_2)에서도
- *  머리 뒤 잔줄이 안 보였다. 1차 가우시안 고랑 최대 기울기(≈0.37)의 약 1/5 */
-const RIDGE_SLOPE = 0.075;
-/** 저은 띠 기억(S2 · S4 · S8) — W는 가운데 둘레를 돈 각도로 쌓인다(한 바퀴 = 1, §6-11).
- *  τ_W = 2 + 4·되기 — S4 UPQ94 2s→3s 저은 자리 약 1s에 매끈 · 8-13s 5s 뒤 다시 거칠어짐 */
-const STIRMEM_TAU0 = 2;
-const STIRMEM_TAU_THICK = 4;
-/** 젓는 반경 지수 평균 τ(s) — 추정 — 실측 없음(손끝 반경 떨림만 거른다) */
-const STIRMEM_R_TAU = 0.3;
-/** 띠 폭 = R × mix(0.18, 0.55, 1 − 되기) — S2 되직은 도구 둘레만(8uAT 0:48) · 묽음은 지름 거의 전체(8uAT 1:51) */
-const STIRMEM_W_THICK = 0.18;
-const STIRMEM_W_FLUID = 0.55;
-const TRAIL_TAU_THICK = 1.6; // 메워짐 τ(s) — 되직(stirThickness 1)
-const TRAIL_TAU_FLUID = 0.3; //                묽음(0)
-const TRAIL_TAU_RIPE = 1.5;  // 피크(ripe 1)는 τ × (1 + 1.5) — 공기가 빠진 자리는 덜 메워진다
+// ── 젓기 v3(2026-11-19 손맛 3차) — 15점 고랑 자취 루프를 뺐다. 1.6.16은 정지 무늬 위에 C자 선을 긋는 꼴이라(고랑 실제 높이 ≈ 화면 1.4px,
+//    폰에서 손가락 0.4D가 덮는다) 실물의 두 신호 — 덩어리가 통째로 돌고(S2) 지나간 넓은 자리가 다른 표면으로 남는다(S1) — 가 없었다.
+//    이제 닫힌 식 셋: 손끝 패임(캡슐 하나) + 앞 둔덕(초승달 하나) + 반경 칸 소용돌이 상태(누적 각 Θ · 저은 넓이 M) ──
+/** 반지름 칸 노드 수 — r = i/8 · R (i 0~8). 셰이더 uSwirl 길이와 같다(테스트가 잠근다) */
+export const SWIRL_N = 9;
+/** 나선 굴곡 켬(1) · 끔(0) — 시안 비교용. 켜면 저은 넓이(M) 안에 Θ를 따라 감긴 낮은 굴곡이 선다 */
+export const STIR_SPIRAL: number = 1;
+/** 오브젝트 단위 반죽 지름 D — 아래 크기는 전부 D 배수(폰 D ≈ 216 CSS px, 손가락 ≈ 0.4D) */
+const D_O = D_W / XZ_SCALE;
+/** 손끝 패임 깊이(월드) — 손끝(머리)에서 최대, 꼬리(τ 전 자리)로 갈수록 0.35배. 1.6.16 고랑 실제 높이 0.012의 약 3.5배 —
+ *  폰 1배에서 패인 그늘이 손가락 뒤로 읽히는 값. 추정 — 실측 없음(8uAT 46~49s 주걱 뒤 구멍 0.25D만 봤다) */
+const DENT_A = 0.042;
+/** 패임 반폭(가우스 반경, 오브젝트) — 0.1D. 손가락 접촉 폭(0.18D) 남짓 */
+const DENT_W = 0.1 * D_O;
+/** 꼬리 = 손끝이 τ초 전에 있던 자리(지연). 되직 0.25s · 피크 0.18s · 묽음 0.1s — 추정 — 실측 없음 */
+const TIP_TAU_THICK = 0.25;
+const TIP_TAU_PEAK = 0.18;
+const TIP_TAU_FLUID = 0.1;
+/** 앞 둔덕(S2 · UPQ94 4s 숟가락 앞 둔덕 0.4~0.5D) — 머리 앞 0.2D에 초승달(옆으로 0.22D 반경 → 보이는 지름 ≈ 0.45D, 양끝이 뒤로 휜다).
+ *  손가락(0.4D) 옆 · 앞으로 삐져나와 보이게. 높이 = 패임 × 1.25 × (0.4 + 0.6·되기). 추정 — 실측 없음(높이를 못 잰다) */
+const BOW_AHEAD = 0.2 * D_O;
+const BOW_LA = 0.09 * D_O;
+const BOW_LC = 0.22 * D_O;
+const BOW_CURVE = 1.1 / D_O;
+const BOW_GAIN = 1.25;
+/** 되기별 패임 · 둔덕 몫 — 묽음(시큼)은 거의 없이 광 흐름 + 출렁(f). 0.12는 추정 */
+const DENT_FLUID_K = 0.12;
+/** 메워짐 τ(s) — 묽으면 빨리, 되직하면 늦게, 피크는 덜 메워진다(1.6.16 값 그대로) */
+const FILL_TAU_THICK = 1.6;
+const FILL_TAU_FLUID = 0.3;
+const FILL_TAU_RIPE = 1.5;
+/** 소용돌이(S2) — 노드 각속도 목표 = 손 각속도 × 몫 × 가우스(반경 차 ÷ 폭). 묽을수록 넓고(윗면 전체, 8uAT 112~114s) 많이 딸려 온다.
+ *  폭 0.28R(되직) ~ 0.6R(묽음) · 몫 0.55 ~ 0.8 · 놓은 뒤 계속 도는 τ 0.2s ~ 0.9s — 추정 — 실측 없음 */
+const SWIRL_W_THICK = 0.28;
+const SWIRL_W_FLUID = 0.6;
+const SWIRL_GAIN_THICK = 0.55;
+const SWIRL_GAIN_FLUID = 0.8;
+const SPIN_TAU_THICK = 0.2;
+const SPIN_TAU_FLUID = 0.9;
+const SPIN_RISE_TAU = 0.15;
+/** 이웃 노드(R/8 간격) Θ 차 상한(rad) — 무늬가 반경 사이에서 늘어나는 정도의 상한. 추정 — 실측 없음 */
+const SHEAR_MAX = 0.45;
+/** 저은 넓이 기억(S1) — 손끝 반경 ± 0.4R(손가락 반폭 0.2D)은 다 차고 0.6R에서 0. 반경 0.55R 한 바퀴 = 1(윗면 60% 넘게).
+ *  τ = 6s(묽음) ~ 10s(되직) → 10~30초에 돌아온다(피크는 기포가 다시 올라옴). 추정 — 실측 없음(UPQ94 2s→3s · 8-13s만 봤다) */
+const MEM_FULL = 0.4;
+const MEM_EDGE = 0.6;
+const MEM_PER_TURN = 1.2;
+const MEM_TAU_FLUID = 6;
+const MEM_TAU_THICK = 10;
+/** 나선 굴곡(d) — 높이(월드) × (0.5 + 0.5·되기) · 파장 0.25D. 낮게 — 그늘보다 광의 결로 읽히는 값. 추정 — 실측 없음 */
+const SPIRAL_A = 0.007;
+const SPIRAL_L = 0.25 * D_O;
+/** 피크 꺼짐 보이기(e) — knock(0~KNOCK_MAX)가 꽉 차면 반죽 높이 7% ↓(렌더만 · 옆벽 수위선도 같이). τ20s라 30~60초에 돌아온다 */
+const KNOCK_DROP = 0.07;
+/** 손끝 지연 기록 길이 — 0.25s × 60Hz 넘게 */
+const TIP_HIST = 40;
 const STIR_IDLE_S = 0.08;    // (stir 전용) 마지막 입력 후 이 시간 지나면 '놓음' — grab은 pointerup 기준
 /** 되기 정규화 — fluidity 0.1 이하 = 되직 1, 0.65 이상 = 묽음 0 (갓 밥준 0.22 → 0.78 · 시큼 0.66 → 0) */
 const THICK_FLUID_LO = 0.1;
@@ -135,140 +126,94 @@ const MURK_RISE_TAU = 1.8;
 const MURK_FALL_TAU = 5;
 
 /**
- * 고랑 함수 — 버텍스(높이 x)와 프래그(기울기 yz · 갓 저은 정도 w)가 이 소스 하나를 쓴다(규칙 8).
- * 거리장 = 선분 전부의 누적 부드러운 최소(로그합지수, 시각 고침 3차 S-1). 합이라 선분 순서와 무관하고, 가장 가까운 선분이
- * 바뀌는 자리(꺾인 자취 안쪽)에 곧은 모서리가 서지 않는다. 이웃 선분은 꼭짓점을 나눠 가져 그 둘레에서 둘 다 같은 q를 내므로
- * 그대로 더하면 꼭짓점마다 두 번 패여 구슬 줄 · 꽃잎 테두리가 된다 — 켜진 이웃 사이 꼭짓점 몫을 한 번 뺀다(포함-배제).
- * uTrailK 음수 = 그 점이 새 획의 시작이라 앞 점과 잇지 않는다(크기는 절댓값).
- * 앞 둔덕(uBow, S3)도 여기서 더한다 — vert · frag 짝. 솟는 항(양옆 둔덕 · 앞 둔덕)은 윗물 아래서 riseK()만큼 눌린다(§6-9).
- * tl = 같은 가중으로 섞은 (부호 있는 옆 거리, 진행 방향 xz, 머리 뒤 몫) — 프래그 잔줄만 쓴다(vert는 버린다).
- * 버텍스는 높이에 GROOVE_VERT_GAIN을 곱한다(가림 톱니, S-2) — 프래그 기울기는 배율 없음.
- * 앞에 SURF_TILT(hoochSpread)가 끼워져 있어야 한다.
+ * 젓기 v3 함수 — 버텍스(높이 x)와 프래그(기울기 yz · 손끝 젖음 w)가 이 소스 하나를 쓴다(규칙 8). 루프 0.
+ * swirlAt = 반경 칸 노드(uSwirl: Θ 누적 각 · M 저은 넓이) 선형 보간 + 반경 미분. swirlQ = 무늬 도메인(반죽이 Θ만큼 돌았으니 거꾸로 돌려 읽는다).
+ * stirField = 손끝 패임(꼬리 → 머리 캡슐) + 앞 둔덕(초승달) + 나선 굴곡(uSpiralA > 0일 때, M 안에서 Θ를 따라 감김).
+ * 솟는 항(앞 둔덕 · 나선 마루)은 윗물 아래서 riseK()만큼 눌린다(§6-9). fbmG(해석적 FBM 기울기)도 여기 — vert는 높이만 써서 컴파일러가 버린다.
+ * 앞에 SURF_TILT(hoochSpread) · FBM_GLSL(fbm)이 끼워져 있어야 한다.
  */
-export const TRAIL_GROOVE = /* glsl */ `
-const float TRAIL_A = ${TRAIL_A};
-const float TRAIL_FLOOR = ${TRAIL_FLOOR};
-const float TRAIL_CREST = ${TRAIL_CREST.toFixed(1)};
-const float TRAIL_LIP_OUT = ${TRAIL_LIP_OUT};
-const float TRAIL_LIP_H = ${TRAIL_LIP_H};
-const float TRAIL_SEAM_Q = ${TRAIL_SEAM_Q};
-const float TRAIL_Q_CUT = ${TRAIL_Q_CUT.toFixed(1)};
-const float GROOVE_VERT_GAIN = ${GROOVE_VERT_GAIN};
-const float RIDGE_GAP = ${RIDGE_GAP};
-const float RIDGE_BAND = ${RIDGE_BAND};
-const float RIDGE_SLOPE = ${RIDGE_SLOPE};
-// 솟는 항 배율 — 윗물 덮인 반죽은 덜 솟는다(§6-9). 고랑 양옆 둔덕 · 앞 둔덕 · 밑동 둔덕 · 더미가 같이 쓴다
+export const STIR_FIELD = /* glsl */ `
+const float SWIRL_N1 = ${(SWIRL_N - 1).toFixed(1)};
+const float DENT_W = ${DENT_W};
+const float BOW_AHEAD = ${BOW_AHEAD};
+const float BOW_LA = ${BOW_LA};
+const float BOW_LC = ${BOW_LC};
+const float BOW_CURVE = ${BOW_CURVE};
+const float SPIRAL_L = ${SPIRAL_L};
+// 솟는 항 배율 — 윗물 덮인 반죽은 덜 솟는다(§6-9). 앞 둔덕 · 나선 마루 · 밑동 둔덕 · 더미가 같이 쓴다
 float riseK() { return 1.0 - 0.85 * hoochSpread(uHooch); }
-// U자 + 입술 단면 — x = 옆 거리 ÷ 반폭 → (높이, d높이/dx). 높이와 기울기를 같은 식의 해석적 미분으로 함께 낸다(vert · frag 짝).
-// 스칼라만 써서 시험이 이 문자열을 그대로 수치 미분과 대조한다. 솟는 마루만 rise(윗물 덮임)로 누른다
-// 벽 w = smoothstep(바닥, 벽 끝) · 바깥 비탈 o = smoothstep(벽 끝, 바깥) — 두 구간이 겹치지 않아 x = 벽 끝에서 기울기 0으로 이어진다
-vec2 grooveProf(float x, float A, float rise) {
-  float t = clamp((x - TRAIL_FLOOR) / (TRAIL_CREST - TRAIL_FLOOR), 0.0, 1.0);
-  float w = t * t * (3.0 - 2.0 * t);
-  float dw = 6.0 * t * (1.0 - t) / (TRAIL_CREST - TRAIL_FLOOR);
-  float u = clamp((x - TRAIL_CREST) / (TRAIL_LIP_OUT - TRAIL_CREST), 0.0, 1.0);
-  float o = u * u * (3.0 - 2.0 * u);
-  float du = 6.0 * u * (1.0 - u) / (TRAIL_LIP_OUT - TRAIL_CREST);
-  float lip = TRAIL_LIP_H * A * rise;
-  return vec2(-A * (1.0 - w) + lip * w * (1.0 - o),
-              A * dw + lip * (dw * (1.0 - o) - w * du));
+// 해석적 FBM 그라디언트 — sin·cos 도함수 체인 (유한차분 편향·매직 e 제거, §예산)
+vec2 fbmG(vec2 p0) {
+  mat2 R = mat2(0.8, -0.6, 0.6, 0.8);
+  mat2 J = mat2(1.52, -1.14, 1.14, 1.52); // 1.9R
+  vec2 g = 0.6 * vec2(cos(p0.x) * cos(p0.y), -sin(p0.x) * sin(p0.y));
+  vec2 p1 = R * p0 * 1.9 + 13.7;
+  g += 0.3 * vec2(cos(p1.x) * cos(p1.y), -sin(p1.x) * sin(p1.y)) * J;
+  vec2 p2 = R * p1 * 1.9 + 5.1;
+  g += 0.15 * vec2(cos(p2.x) * cos(p2.y), -sin(p2.x) * sin(p2.y)) * (J * J);
+  return g;
 }
-// 단면 하나 — (높이, 기울기 xz, 갓 저은 정도). q = 옆 거리² × K, ∇q는 부르는 쪽이 준다. x = √(2q)라 반폭(q 0.5) = 손가락 반폭(S1a)
-vec4 grooveAt(float q, float A, vec2 gq) {
-  if (q > 9.0) return vec4(0.0);
-  float x = sqrt(2.0 * max(q, 0.0));
-  vec2 pr = grooveProf(x, A, riseK());
-  // ∇x = ∇q / x — 바닥(x < 0.55)은 평평해 x → 0에서도 기울기 0
-  return vec4(pr.x, pr.y * gq / max(x, 1e-4), clamp(A / TRAIL_A, 0.0, 1.0) * exp(-0.7 * q));
+// 반경 r의 (Θ, M, dΘ/dr, dM/dr) — 노드 i = r/R · 8. 동적 첨자(WebGL2 = GLSL ES 3.00)라 루프가 없다
+vec4 swirlAt(float r) {
+  float x = clamp(r / uRBody, 0.0, 1.0) * SWIRL_N1;
+  int i = min(int(x), ${SWIRL_N - 2});
+  vec2 a = uSwirl[i];
+  vec2 b = uSwirl[i + 1];
+  return vec4(mix(a, b, x - float(i)), (b - a) * (SWIRL_N1 / uRBody));
 }
-// 누적 부드러운 최소 한 칸 — 가중 sg·e^(−q/k)를 합 S에 더하고, 같은 가중으로 섞을 값(∇q · 깊이 g, 기울기 방향 u, 잔줄 t)도 더한다.
-// sg = +1 선분 · −1 꼭짓점(포함-배제). 먼 칸(q ≥ TRAIL_Q_CUT)은 건너뛴다 — 꼭짓점 q ≥ 양옆 선분 q라 빼는 몫이 더한 몫을 넘지 않는다
-void seamAdd(inout float S, inout vec3 G, inout vec2 U, inout vec4 T, float q, float sg, vec3 g, vec2 u, vec4 t) {
-  if (q >= TRAIL_Q_CUT) return;
-  float w = sg * exp(-q / TRAIL_SEAM_Q);
-  S += w;
-  G += w * g;
-  U += w * u;
-  T += w * t;
+// 무늬 도메인 — Rot(−Θ)·p. 반죽이 반경마다 Θ만큼 돌았으니 무늬는 Θ 전 자리에서 읽는다(점 · 모틀이 손을 따라 돈다)
+vec2 swirlQ(vec2 p, float th) {
+  float c = cos(th), s = sin(th);
+  return vec2(c * p.x + s * p.y, -s * p.x + c * p.y);
 }
-vec4 trailGroove(vec2 p, out vec4 tl) {
-  // 거리장 q = −k·ln Σ e^(−q_i/k)(선분 전부의 로그합지수 smin) − 이웃 사이 꼭짓점 몫. 합이라 선분 순서와 무관하다.
-  // 시각 고침 3차 S-1: 2차의 「가장 가까운 둘만 smin」은 셋째 선분이 자리를 바꾸는 곳에 곧은 모서리가 남았다(fix2_3b).
-  // 한 칸뿐이면 정확히 그 q, 바깥쪽 꼭짓점(두 선분이 같은 꼭짓점을 봄)은 둘을 더하고 꼭짓점을 빼 정확히 꼭짓점 q — 꽃잎 · 구슬이 없다.
-  // 선분은 이웃 꺾임만큼 활꼴로 휘고(윤곽), 기울기 방향은 꼭짓점 접선(이웃 방향 평균)을 선분 따라 보간한 방향(음영) — 곧은 선분의
-  // 기울기는 선분마다 한 방향이라 0.4rad 꺾임에서 면마다 밝기가 다른 다각형으로 칠해졌다(fix3_1 fastcircle). 크기는 거리장 그대로(|∇q|).
-  // 루프 안은 거리 · 방향 · 머리 몫 · 합만, 단면 · 기울기(grooveAt)는 루프 밖 한 번
-  float S = 0.0;
-  vec3 G = vec3(0.0);   // Σ w · (∇q, 깊이)
-  vec2 U = vec2(0.0);   // Σ w · 보간한 기울기 방향
-  vec4 T = vec4(0.0);   // Σ w · tl
-  bool on = false;      // 앞 선분이 켜져 있나 — 둘 다 켜졌을 때만 나눈 꼭짓점을 뺀다
-  vec2 dnP = vec2(0.0);
-  for (int i = 0; i < ${TRAIL_N - 1}; i++) {
-    float kb = uTrailK[i + 1];
-    if (kb < 0.0 || max(uTrailAmp[i], uTrailAmp[i + 1]) < 1e-5) { on = false; continue; }
-    vec2 a = uTrailPos[i];
-    vec2 ab = uTrailPos[i + 1] - a;
-    float il = inversesqrt(max(dot(ab, ab), 1e-8));
-    vec2 dn = ab * il;
-    float hr = dot(p - a, dn) * il;
-    float h = clamp(hr, 0.0, 1.0);
-    vec2 d = p - a - ab * h;
-    // 먼 선분은 나머지(방향 · 휨 · 합)를 건너뛴다 — 활꼴 거리 ≥ 곧은 거리 − 휨(≤ 0.005)이라 0.9배 여유, 끝 꼭짓점도 더 멀어 같이 빠진다.
-    // 윗면 대부분은 자취에서 멀어 선분마다 이 몇 줄만 돈다(시각 고침 3차 비용)
-    if (dot(d, d) * min(abs(uTrailK[i]), kb) * 0.9 >= TRAIL_Q_CUT) { on = true; dnP = dn; continue; }
-    // 다음 선분이 켜져 있으면 끝 접선 = 두 방향 평균. 획 끝(앞 · 뒤 없음)은 제 방향 그대로
-    int j = min(i + 2, ${TRAIL_N - 1});
-    bool nx = i < ${TRAIL_N - 2} && uTrailK[j] >= 0.0 && max(uTrailAmp[i + 1], uTrailAmp[j]) >= 1e-5;
-    vec2 dnN = nx ? normalize(uTrailPos[j] - uTrailPos[i + 1] + vec2(1e-6, 0.0)) : dn;
-    vec2 tA = on ? dn + dnP : dn;
-    vec2 tB = dn + dnN;
-    // 선분을 활꼴로 휜다 — 양 끝 꺾임(sin)의 평균 φ만큼 도는 원호를 포물선 y = φ·L/2·h(1 − h)로(작은 각, 꺾임 둘의 합 × L/4). 꼭짓점은 그대로 지나고 끝 접선이
-    // 이웃과 반씩 나눠 이어진다(G1). 곧은 선분이면 원 젓기 반경 0.22에서 0.44rad 토막마다 윤곽이 꺾여 15각형으로 읽혔다(fix3_4 fastcircle)
-    vec2 nl = vec2(-dn.y, dn.x);
-    float bend = ((on ? dnP.x * dn.y - dnP.y * dn.x : 0.0) + (dn.x * dnN.y - dn.y * dnN.x)) * 0.25 / il;
-    d += nl * (bend * h * (1.0 - h));
-    float K = mix(abs(uTrailK[i]), kb, h);
-    vec2 t = mix(tA, tB, h);
-    t *= inversesqrt(max(dot(t, t), 1e-8));
-    // 옆 거리 · 부호는 보간 접선 t 기준 — 선분 안에선 dn 기준과 같고, 끝에 걸린 자리(h 0 · 1)에선 꼭짓점 몫과 똑같아 정확히 지워진다.
-    // dn 기준이면 머리 너머 좁은 쐐기에서 부호가 어긋나 곧은 머리카락 금이 섰다(fix3_5 stirc_justfed 3.6s)
-    float s = dot(d, vec2(-t.y, t.x));
-    // 획 끝 둥근 마개(손끝 밑 패임 · 꼬리)는 참 방향(끝점에서 바깥) — 옆 방향만 쓰면 마개 앞뒤 비탈이 사라진다
-    bool cap = (hr < 0.0 && !on) || (hr > 1.0 && !nx);
-    vec2 u = cap ? d * inversesqrt(max(dot(d, d), 1e-12)) : sign(s) * vec2(-t.y, t.x);
-    // 머리 뒤 몫 — 선분 번호 + 선분 안 자리로 이어서(이음매에서 끊기지 않게). 머리에서 0.38까지 1, 0.665에서 0
-    seamAdd(S, G, U, T, dot(d, d) * K, 1.0, vec3(2.0 * K * d, mix(uTrailAmp[i], uTrailAmp[i + 1], h)), u,
-            vec4(s, t, clamp((float(i) + h - ${RIDGE_FROM_I.toFixed(1)}) / ${RIDGE_RAMP_I.toFixed(1)}, 0.0, 1.0)));
-    if (on) {
-      // 앞 선분 끝(h 1) = 이 선분 시작(h 0) = 꼭짓점 a — K · 깊이 · 방향도 양쪽에서 같은 값이라 정확히 지워진다
-      vec2 dv = p - a;
-      float Kv = abs(uTrailK[i]);
-      vec2 m = tA * inversesqrt(max(dot(tA, tA), 1e-8));
-      float sv = dot(dv, vec2(-m.y, m.x));
-      seamAdd(S, G, U, T, dot(dv, dv) * Kv, -1.0, vec3(2.0 * Kv * dv, uTrailAmp[i]), sign(sv) * vec2(-m.y, m.x),
-              vec4(sv, m, clamp((float(i) - ${RIDGE_FROM_I.toFixed(1)}) / ${RIDGE_RAMP_I.toFixed(1)}, 0.0, 1.0)));
-    }
-    on = true;
-    dnP = dn;
-  }
-  // S ≥ 가장 큰 선분 몫 > 0(꼭짓점은 양옆 선분보다 늘 멀다 — K는 이웃 점끼리 거의 같다). 다 멀면 S = 0 — 고랑 밖
+// (높이 월드, 기울기 xz, 손끝 젖음 0~1). sw = swirlAt(|p|), q = swirlQ(p, sw.x)
+vec4 stirField(vec2 p, vec4 sw, vec2 q) {
   vec4 o = vec4(0.0);
-  tl = vec4(0.0);
-  if (S > 1e-30) {
-    float iS = 1.0 / S;
-    vec2 gq = G.xy * iS;
-    // 기울기 = 거리장 크기 × 보간 방향(방향이 다 지워진 자리 — 고랑 바닥 가운데 — 는 거리장 방향 그대로)
-    float lu = length(U);
-    if (lu > 1e-6 * S) gq = length(gq) * U / lu;
-    o = grooveAt(-TRAIL_SEAM_Q * log(S), G.z * iS, gq);
-    // 잔줄 tl도 같은 가중으로 — 가장 가까운 선분이 바뀌는 자리에서 옆 거리가 튀어 잔줄 띠에 곧은 금이 섰다(fix2_3)
-    tl = T * iS;
+  if (uTip.z + uTip.w > 1e-5) {
+    // 손끝 패임 — 꼬리(τ초 전 손끝)에서 머리(지금 손끝)까지 캡슐. 머리 쪽이 깊고 꼬리 쪽이 얕다(손끝 뒤 패임이 조금 남는다, 8uAT 46~49s)
+    vec2 tail = uTipB.zw;
+    vec2 ab = uTip.xy - tail;
+    float il2 = 1.0 / max(dot(ab, ab), 1e-6);
+    float s = clamp(dot(p - tail, ab) * il2, 0.0, 1.0);
+    vec2 d = p - tail - ab * s;
+    float k = 1.0 / (DENT_W * DENT_W);
+    float e = exp(-dot(d, d) * k);
+    float dep = uTip.z * (0.35 + 0.65 * s);
+    float inner = (s > 0.0 && s < 1.0) ? 1.0 : 0.0;
+    o.x -= dep * e;
+    o.yz -= e * (uTip.z * 0.65 * inner * ab * il2 - dep * 2.0 * k * d);
+    o.w = e * (0.35 + 0.65 * s);
+    // 앞 둔덕 — 머리 앞 BOW_AHEAD에 선 초승달(양끝이 뒤로 휜다 = 손가락 옆으로 삐져나온 더미)
+    vec2 t = uTipB.xy;
+    vec2 n = vec2(-t.y, t.x);
+    vec2 h = p - uTip.xy;
+    float c = dot(h, n);
+    float b = dot(h, t) - BOW_AHEAD + BOW_CURVE * c * c;
+    float eb = uTip.w * riseK() * exp(-b * b / (BOW_LA * BOW_LA) - c * c / (BOW_LC * BOW_LC));
+    o.x += eb;
+    o.yz -= eb * 2.0 * ((t + 2.0 * BOW_CURVE * c * n) * (b / (BOW_LA * BOW_LA)) + n * (c / (BOW_LC * BOW_LC)));
   }
-  if (uBow.z > 1e-5) {
-    vec2 d = p - uBow.xy;
-    float e = uBow.z * riseK() * exp(-dot(d, d) * uBow.w);
-    o.xyz += vec3(e, -2.0 * uBow.w * e * d);
+  // 나선 굴곡 — 반경 파장 SPIRAL_L의 결을 돌아간 도메인(q)의 fbm으로 크게(1.2파장) 휘고, 다른 fbm으로 군데군데 끊어 짧은 밧줄 주름 토막만 남긴다.
+  // 1회전: 한 갈래 아르키메데스 나선(ψ에 각 항)은 반경 사이 Θ 차(전단)만큼 감겨 3바퀴 만에 과녁 · 레코드판 동심원이 됐다(.work/r1).
+  // 각 항을 빼면 결은 회전에 불변이고, 휨 · 끊김 fbm만 q에서 읽혀 주름 토막이 손을 따라 돈다. M 안에서만 · 가운데 · 테두리는 끈다
+  if (uSpiralA > 1e-5 && sw.y > 0.004) {
+    float r = max(length(p), 1e-4);
+    float rq = r / uRBody;
+    float m = uSpiralA * sw.y * smoothstep(0.2, 0.4, rq) * (1.0 - smoothstep(0.8, 0.95, rq));
+    vec2 qk = q * 1.6;
+    float f = fbm(qk);
+    float brk = smoothstep(-0.05, 0.4, fbm(q * 1.3 + 4.0));
+    float psi = r / SPIRAL_L + 1.2 * f;
+    float sn = sin(6.2832 * psi);
+    // 마루만 riseK — 윗물 아래선 덜 솟는다
+    float amp = m * brk * (sn > 0.0 ? riseK() : 1.0);
+    o.x += amp * sn;
+    // ∇_q ψ → ∇_p ψ = Rot(Θ)·∇_q ψ − (∇_q ψ · ⊥q)·Θ'(r)·p/r (q = Rot(−Θ(r))·p의 연쇄 법칙)
+    vec2 pq = vec2(-q.y, q.x);
+    vec2 gq = q / (r * SPIRAL_L) + 1.2 * 1.6 * fbmG(qk);
+    float cs = cos(sw.x), si = sin(sw.x);
+    vec2 gp = vec2(cs * gq.x - si * gq.y, si * gq.x + cs * gq.y) - dot(gq, pq) * sw.z * p / r;
+    o.yz += amp * 6.2832 * cos(6.2832 * psi) * gp;
   }
   return o;
 }
@@ -305,7 +250,7 @@ const STROKE_CANCEL_TAU = 0.1;
 /**
  * 당기기 높이장 — 버텍스(높이 x)와 프래그(기울기 yz)가 이 소스 하나를 쓴다(규칙 8).
  * 밑동 둔덕(uGrab.x · 반경 GRAB_RB, L2a) + 더미(uPile, L6). 둘레 오목 · 더미 접힌 주름은 뺐다(§6-20).
- * TRAIL_GROOVE(riseK) 뒤에 끼운다.
+ * STIR_FIELD(riseK) 뒤에 끼운다.
  */
 export const GRAB_FIELD = /* glsl */ `
 const float GRAB_RB = ${GRAB_RB};
@@ -327,7 +272,7 @@ vec3 grabField(vec2 p) {
     float e = uPile.z * uPileK * exp(-dot(d, d) * k);
     o += vec3(e, -2.0 * k * e * d);
   }
-  return o * riseK(); // 윗물 아래서 덜 솟는다(§6-9, TRAIL_GROOVE riseK)
+  return o * riseK(); // 윗물 아래서 덜 솟는다(§6-9, STIR_FIELD riseK)
 }
 // 더미 몫 0~1 — 갓 떨어진 반죽은 매끈하고 젖어 반들하다(프래그 광 · 바늘구멍 지움만 쓴다). 높이 PILE_FULL_H에서 1
 float pileSheen(vec2 p) {
@@ -368,18 +313,22 @@ export class DoughMesh {
   /** 슬로싱 진동자 속도항 — wobble은 감쇠 진동(1.5Hz), ζ는 fluidity가 정한다 */
   private wobbleVel = new THREE.Vector2();
   private wobbleTgt = new THREE.Vector2();
-  /** 고랑 자취 링버퍼 — trailHead가 손끝을 따라다니는 머리, brk = 새 획의 첫 점(앞 점과 안 잇는다),
-   *  fast = 잡기로 확정된 획이라 τ0.1s로 지운다(§6-12) */
-  private trail: Array<{ x: number; z: number; amp: number; bornAt: number; brk: boolean; fast: boolean }> = [];
-  private trailHead = 0;
-  /** 앞 둔덕(S3) — 높이(월드) · 진행 방향 · 잡기 확정으로 빨리 지우는 중 */
+  /** 손끝 지연 기록(지금 획) — 꼬리 = τ초 전 손끝(TIP_TAU_*). 링버퍼 [t, x, z] */
+  private tipHist = new Float64Array(TIP_HIST * 3);
+  private tipHistN = 0;
+  private tipHistHead = 0;
+  /** 손끝 패임 깊이 · 앞 둔덕 높이(월드) · 진행 방향 · 잡기 확정으로 빨리 지우는 중(§6-12) */
+  private dentH = 0;
   private bowH = 0;
-  private bowDir = new THREE.Vector2(1, 0);
-  private bowFast = false;
-  /** 저은 띠 기억(S2 · S4 · S8) — 저은 양 W(0~1, 한 바퀴 = 1) · 젓는 반경(오브젝트) · 이번 획이 쌓은 몫(잡기 확정 때 뺀다, §6-12) */
-  private stirMem = 0;
-  private stirMemR = 0;
-  private stirMemStroke = 0;
+  private tipDir = new THREE.Vector2(1, 0);
+  private tipFast = false;
+  /** 소용돌이 노드(r = i/8 · R) — Θ 누적 각(rad, 풀리지 않는다) · 각속도 · 저은 넓이 M 0~1 · 이번 획이 쌓은 M(잡기 확정 때 뺀다) */
+  private swTheta = new Float32Array(SWIRL_N);
+  private swOmega = new Float32Array(SWIRL_N);
+  private swMem = new Float32Array(SWIRL_N);
+  private swStroke = new Float32Array(SWIRL_N);
+  private prevTipAng = NaN;
+  private tailTmp = new THREE.Vector2();
   /** 젓는 세기 0~1 — 기포 가속·젖은 광 부스트·사운드 게인의 공통 소스 */
   agitation = 0;
   /** 피크 젓기 꺼짐 0~0.6 — uSink에 더한다(τ20s 회복) */
@@ -423,8 +372,6 @@ export class DoughMesh {
 
   constructor() {
     const bumpPos = Array.from({ length: DYN_SLOTS }, () => new THREE.Vector2());
-    const trailPos = Array.from({ length: TRAIL_N }, () => new THREE.Vector2(9, 9)); // 화면 밖
-    for (let i = 0; i < TRAIL_N; i++) this.trail.push({ x: 9, z: 9, amp: 0, bornAt: 0, brk: true, fast: false });
     this.material = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
@@ -455,12 +402,12 @@ export class DoughMesh {
         uBumpPos: { value: bumpPos },
         uBumpAmp: { value: new Float32Array(DYN_SLOTS) },
         uBumpK: { value: new Float32Array(DYN_SLOTS) },
-        uTrailPos: { value: trailPos },
-        uTrailAmp: { value: new Float32Array(TRAIL_N) },
-        uTrailK: { value: new Float32Array(TRAIL_N).fill(-TRAIL_K0) },
-        // 젓기 실물화(2026-11-19) — 앞 둔덕 (x, z, 높이, 첨도) · 저은 띠 기억 (W, 반경, 띠 폭, 0)
-        uBow: { value: new THREE.Vector4(0, 0, 0, BOW_K) },
-        uStirMem: { value: new THREE.Vector4() },
+        // 젓기 v3(2026-11-19 손맛 3차) — 손끝 (머리 x, z, 패임 깊이, 앞 둔덕 높이) · (진행 방향 x, z, 꼬리 x, z) ·
+        // 소용돌이 노드 (Θ, M) × SWIRL_N · 나선 굴곡 높이(STIR_SPIRAL 0이면 0)
+        uTip: { value: new THREE.Vector4() },
+        uTipB: { value: new THREE.Vector4(1, 0, 0, 0) },
+        uSwirl: { value: Array.from({ length: SWIRL_N }, () => new THREE.Vector2()) },
+        uSpiralA: { value: 0 },
         uPokePos: { value: new THREE.Vector2() },
         uPokeAmt: { value: 0 },
         uPokeK: { value: POKE_K0 },
@@ -489,12 +436,12 @@ export class DoughMesh {
       },
       vertexShader: vert
         .replace('// #fbm', FBM_GLSL)
-        .replace('// #trailGroove', SURF_TILT + TRAIL_GROOVE)
+        .replace('// #stirField', SURF_TILT + STIR_FIELD)
         .replace('// #grabField', GRAB_FIELD),
       fragmentShader: frag
         .replace('// #fbm', FBM_GLSL)
         .replace('// #hoochCover', HOOCH_COVER)
-        .replace('// #trailGroove', SURF_TILT + TRAIL_GROOVE)
+        .replace('// #stirField', SURF_TILT + STIR_FIELD)
         .replace('// #marble', MARBLE_GLSL)
         .replace('// #grabField', GRAB_FIELD)
         .replace('// #doughShade', DOUGH_ALBEDO + DOUGH_SHADE)
@@ -532,7 +479,7 @@ export class DoughMesh {
     u.uLevel.value = p.levelness;
     u.uFluid.value = p.fluidity;
     u.uCohesion.value = p.cohesion;
-    u.uHeight.value = p.height;
+    u.uHeight.value = this.height();
     u.uPull.value = p.pull / XZ_SCALE;
     u.uMenH.value = this.menH();
     (u.uWallCell.value as THREE.Vector2).set(p.wallCells, p.cellFreq);
@@ -604,18 +551,16 @@ export class DoughMesh {
 
   /**
    * grab 시작 — 앵커(오브젝트 xz). 입력층이 미확정(젓기처럼 흘린 획)을 grab으로 확정하는 순간이라
-   * 그 획의 고랑 자취를 τ0.1s로 지운다(§6-12 — 들기 전 32px 고랑이 둔덕 옆에 남지 않게). 놓기 = grabEnd(pointerup)
+   * 그 획의 손끝 패임 · 앞 둔덕 · 저은 넓이를 지운다(§6-12). 놓기 = grabEnd(pointerup)
    */
   grabStart(x: number, z: number): void {
-    for (let j = 0; j < TRAIL_N; j++) {
-      const s = this.trail[(this.trailHead - j + TRAIL_N) % TRAIL_N];
-      s.fast = true;
-      if (s.brk) break;
+    // 패임 · 앞 둔덕은 τ0.1s로 지우고, 이 획이 쌓은 저은 넓이는 M에서 뺀다(§6-12 — 들기 전 32px가 저은 자리로 남지 않게).
+    // Θ는 32px 몫이라 작아 그대로 둔다(되감기면 무늬가 거꾸로 도는 게 보인다)
+    this.tipFast = true;
+    for (let i = 0; i < SWIRL_N; i++) {
+      this.swMem[i] = Math.max(0, this.swMem[i] - this.swStroke[i]);
+      this.swStroke[i] = 0;
     }
-    // 앞 둔덕도 같이 지우고, 이 획이 쌓은 저은 양은 W에서 뺀다(§6-12)
-    this.bowFast = true;
-    this.stirMem = Math.max(0, this.stirMem - this.stirMemStroke);
-    this.stirMemStroke = 0;
     // 젓기 획은 여기서 끝 — 머리가 계속 파지 않게
     this.lastStirInputT = this.lastHandStirT = -Infinity;
     this.grabbing = true;
@@ -696,14 +641,12 @@ export class DoughMesh {
     this.mixGlint = 0;
     this.mixedThisFrame = false;
     this.lastStirInputT = this.lastHandStirT = -Infinity; // 지난 르방의 획을 잇지 않는다
-    for (const s of this.trail) {
-      s.amp = 0;
-      s.brk = true;
-      s.fast = false;
-    }
-    this.bowH = this.stirMem = this.stirMemR = this.stirMemStroke = 0;
-    this.bowFast = false;
-    this.writeTrail(this.lastT);
+    this.dentH = this.bowH = 0;
+    this.tipFast = false;
+    this.tipHistN = 0;
+    this.prevTipAng = NaN;
+    for (const a of [this.swTheta, this.swOmega, this.swMem, this.swStroke]) a.fill(0);
+    this.writeStir();
     // 당기기 — 가닥 · 더미 · 밑동 둔덕도 넘기지 않는다
     this.grabbing = false;
     this.strands.rig.reset();
@@ -737,7 +680,7 @@ export class DoughMesh {
 
   /** 반죽 높이(월드, 숨 제외) — RenderParams.height */
   height(): number {
-    return this.params?.height ?? 0.76;
+    return (this.params?.height ?? 0.76) * (1 - KNOCK_DROP * (this.knock / KNOCK_MAX));
   }
 
   /** 몸통 XZ 반경(오브젝트 공간) — 입력 히트 테스트 전용. 옆벽은 늘 유리 안쪽(R_BODY)에 붙어 있다 */
@@ -775,11 +718,17 @@ export class DoughMesh {
     const wob = u.uWobble.value as THREE.Vector2;
     const kR = 0.3844 / (rb * rb);
     const c2 = x * x + z * z;
-    // 수면 기울기 × (1 − 덮임) · 솟는 항 × riseK — vert SURF_TILT · TRAIL_GROOVE와 같은 식(§6-9)
+    // 수면 기울기 × (1 − 덮임) · 솟는 항 × riseK — vert SURF_TILT · STIR_FIELD와 같은 식(§6-9)
     const spread = this.hoochSpread();
     const rise = 1 - 0.85 * spread;
     let y = (u.uHeight.value as number) + (x * wob.x + z * wob.y) * 0.14 * lev * (0.5 + 0.5 * fl) * (1 - spread);
-    y += fbm2(x * 1.8 + 3.1 + seed, z * 1.8 + 7.4 + seed) * 0.045 * (1 - 0.55 * lev - 0.3 * fl) * (1 - 0.5 * ripe);
+    // 정지 혹은 소용돌이 도메인에서 — vert swirlAt · swirlQ와 같은 식(반경 노드 선형 보간, Rot(−Θ))
+    const sx = Math.min(Math.max(Math.sqrt(x * x + z * z) / rb, 0), 1) * (SWIRL_N - 1);
+    const si = Math.min(Math.floor(sx), SWIRL_N - 2);
+    const th = this.swTheta[si] + (this.swTheta[si + 1] - this.swTheta[si]) * (sx - si);
+    const qx = Math.cos(th) * x + Math.sin(th) * z;
+    const qz = -Math.sin(th) * x + Math.cos(th) * z;
+    y += fbm2(qx * 1.8 + 3.1 + seed, qz * 1.8 + 7.4 + seed) * 0.045 * (1 - 0.55 * lev - 0.3 * fl) * (1 - 0.5 * ripe);
     y += ripe * 0.05 * Math.exp(-c2 * 2.5 * kR);
     y -= (u.uCollapse.value as number) * 0.08 * Math.exp(-c2 * 2.0 * kR);
     const sink = u.uSink.value as number;
@@ -825,42 +774,46 @@ export class DoughMesh {
     this.lastT = t;
     const u = this.material.uniforms;
 
-    // ── 젓기 스프링 · 고랑 자취 ──
+    // ── 젓기 스프링 · 손끝 지연 · 소용돌이 ──
     const stirring = t - this.lastStirInputT < STIR_IDLE_S;
     const hand = t - this.lastHandStirT < STIR_IDLE_S;
     const stirPos = u.uStirPos.value as THREE.Vector2;
     this.mixedThisFrame = false;
     let pathLen = 0;
+    let handDa = 0; // 이번 tick 손끝이 가운데 둘레를 돈 각(rad) — 소용돌이 · 저은 넓이
+    const thick = this.stirThickness();
+    const ripe = p?.ripe ?? 0;
     if (stirring) {
       const fresh = !this.wasStirring;
       if (fresh) {
-        // 새 획 — 손끝 자리로 바로(지난 획 끝에서 끌려오며 고랑을 긋지 않게)
+        // 새 획 — 손끝 자리로 바로(지난 획 끝에서 끌려오며 패임을 긋지 않게)
         stirPos.copy(this.stirTarget);
         this.prevStirTarget.copy(this.stirTarget);
-        this.bowFast = false;
-        this.stirMemStroke = 0;
-        if (this.stirMem < 0.01) this.stirMemR = this.stirTarget.length();
+        this.tipFast = false;
+        this.swStroke.fill(0);
+        this.tipHistN = 0;
+        this.prevTipAng = NaN;
       }
-      // 손가락 추종 — 빠른 지수 수렴, 놓기 전까지 스프링 비활성
-      stirPos.lerp(this.stirTarget, 1 - Math.exp(-14 * dt));
+      // 손가락 추종 — 머리 = 손끝 자리(τ ≈ 0.03s, 입력 떨림만 거른다). 반죽의 늦음은 꼬리(지연) · 소용돌이 각속도가 맡는다
+      stirPos.lerp(this.stirTarget, 1 - Math.exp(-30 * dt));
       this.stirVec.lerp(this.stirVecTarget, 1 - Math.exp(-12 * dt));
       this.stirVecVel.set(0, 0);
       pathLen = this.stirTarget.distanceTo(this.prevStirTarget);
-      // 소용돌이 위상 — 손끝이 가운데를 도는 각도를 따라간다(손 · 연출 둘 다)
+      // 줄무늬 소용돌이 위상 — 손끝이 가운데를 도는 각도를 따라간다(손 · 연출 둘 다)
       if (this.prevStirTarget.lengthSq() > 1e-4 && this.stirTarget.lengthSq() > 1e-4) {
         const a0 = Math.atan2(this.prevStirTarget.y, this.prevStirTarget.x);
         const a1 = Math.atan2(this.stirTarget.y, this.stirTarget.x);
-        const da = Math.atan2(Math.sin(a1 - a0), Math.cos(a1 - a0));
-        this.marblePhase += da;
-        // 저은 양 — 가운데 둘레를 돈 각도(한 바퀴 = 1, §6-11). 짧은 획 하나로 고리 전체가 반들해지지 않게
-        const dw = Math.min(Math.abs(da) / (2 * Math.PI), 1 - this.stirMem);
-        this.stirMem += dw;
-        this.stirMemStroke += dw;
+        this.marblePhase += Math.atan2(Math.sin(a1 - a0), Math.cos(a1 - a0));
       }
-      this.stirMemR += (stirPos.length() - this.stirMemR) * (1 - Math.exp(-dt / STIRMEM_R_TAU));
       this.prevStirTarget.copy(this.stirTarget);
-      this.pushTrail(t, stirPos, fresh);
-      if (this.stirVecTarget.lengthSq() > 1e-6) this.bowDir.copy(this.stirVecTarget).normalize();
+      this.pushTip(t, stirPos);
+      // 손끝이 가운데 둘레를 돈 각 — 가운데 근처(0.12R 안)는 각이 튀어 세지 않는다
+      const r = stirPos.length();
+      const ang = Math.atan2(stirPos.y, stirPos.x);
+      if (r > 0.12 * R_BODY && Number.isFinite(this.prevTipAng)) {
+        handDa = Math.atan2(Math.sin(ang - this.prevTipAng), Math.cos(ang - this.prevTipAng));
+      }
+      this.prevTipAng = r > 0.12 * R_BODY ? ang : NaN;
     } else if (this.stirVec.lengthSq() > 1e-8) {
       // 놓음 — damped spring e^(-5t)cos(12t) 감각 (ω≈12, 오버슈트 1회)
       const ax = -144 * this.stirVec.x - 10 * this.stirVecVel.x;
@@ -876,11 +829,13 @@ export class DoughMesh {
     this.wasStirring = stirring;
     (u.uStirVec.value as THREE.Vector2).copy(this.stirVec);
     this.agitation = Math.min(1, this.stirVec.length() * 6);
+    this.stepSwirl(dt, stirring, handDa, stirPos.length(), thick);
 
     // ── 피크 젓기 꺼짐 — 젓는 거리 × ripe로 쌓이고 τ20s로 돌아온다 ──
     this.knock = Math.min(KNOCK_MAX, this.knock * Math.exp(-dt / KNOCK_TAU) + pathLen * (p?.ripe ?? 0) * KNOCK_GAIN);
     if (this.knock < 1e-5) this.knock = 0;
     u.uSink.value = this.sinkNow();
+    u.uHeight.value = this.height(); // 피크 꺼짐 보이기(e) — 옆벽 수위선도 같이 내려간다
 
     // ── 줄무늬 — 손으로 저으면 한 바퀴마다 ×0.38, 아니면 혼자 τ6s. 손이 0.05 아래로 떨어뜨린 순간 = 다 섞임 ──
     if (this.marble > 0) {
@@ -947,35 +902,36 @@ export class DoughMesh {
       (u.uPile.value as THREE.Vector4).set(pl[0] / XZ_SCALE, pl[1] / XZ_SCALE, pl[2], pl[3] / XZ_SCALE);
     }
 
-    // ── 고랑 메워짐 — 묽으면 τ0.3s · 되직하면 1.6s, 피크는 덜 메워진다. 메워지며 넓어진다(첨도 K0 → K0/3) ──
-    const tau = (TRAIL_TAU_FLUID + (TRAIL_TAU_THICK - TRAIL_TAU_FLUID) * this.stirThickness())
-      * (1 + TRAIL_TAU_RIPE * (p?.ripe ?? 0));
-    const decay = Math.exp(-dt / tau);
-    const fastDecay = Math.exp(-dt / STROKE_CANCEL_TAU);
-    for (let i = 0; i < TRAIL_N; i++) {
-      const s = this.trail[i];
-      if (!(stirring && i === this.trailHead)) s.amp *= s.fast ? fastDecay : decay; // 머리는 손끝이 계속 판다
-      if (s.amp < 1e-5) s.amp = 0;
-    }
-    this.writeTrail(t);
-    // 앞 둔덕(S3) — 젓는 동안 머리 앞에 서고, 손을 떼면 고랑과 같은 τ로 준다
-    const thick = this.stirThickness();
-    const bow = u.uBow.value as THREE.Vector4;
+    // ── 손끝 패임 · 앞 둔덕 — 젓는 동안 손 속도만큼 파이고(τ0.08s), 놓으면 묽으면 τ0.3s · 되직하면 1.6s(피크는 덜) 메워진다 ──
+    const tip = u.uTip.value as THREE.Vector4;
+    const tb = u.uTipB.value as THREE.Vector4;
     if (stirring) {
-      const head = this.trail[this.trailHead];
-      this.bowH = head.amp * BOW_GAIN * (0.4 + 0.6 * thick);
-      bow.x = head.x + this.bowDir.x * BOW_AHEAD;
-      bow.y = head.z + this.bowDir.y * BOW_AHEAD;
+      const live = DENT_A * (DENT_FLUID_K + (1 - DENT_FLUID_K) * thick)
+        * Math.min(1, 0.35 + (this.stirVec.length() / 0.22) * 0.65);
+      this.dentH += (live - this.dentH) * (1 - Math.exp(-dt / 0.08));
+      this.bowH = this.dentH * BOW_GAIN * (0.4 + 0.6 * thick);
+      // 꼬리 = τ초 전 손끝(되기별 지연) — 머리에서 꼬리까지 패임이 얕아지며 남는다
+      const tipTau = THREE.MathUtils.lerp(THREE.MathUtils.lerp(TIP_TAU_FLUID, TIP_TAU_THICK, thick), TIP_TAU_PEAK, ripe);
+      this.tipAt(t - tipTau, this.tailTmp);
+      const dx = stirPos.x - this.tailTmp.x;
+      const dz = stirPos.y - this.tailTmp.y;
+      const dl = Math.hypot(dx, dz);
+      if (dl > 0.02) this.tipDir.set(dx / dl, dz / dl);
+      else if (this.stirVecTarget.lengthSq() > 1e-6) this.tipDir.copy(this.stirVecTarget).normalize();
+      tip.x = stirPos.x;
+      tip.y = stirPos.y;
+      tb.set(this.tipDir.x, this.tipDir.y, this.tailTmp.x, this.tailTmp.y);
     } else {
-      this.bowH *= this.bowFast ? fastDecay : decay;
+      const fill = Math.exp(-dt / (this.tipFast ? STROKE_CANCEL_TAU
+        : (FILL_TAU_FLUID + (FILL_TAU_THICK - FILL_TAU_FLUID) * thick) * (1 + FILL_TAU_RIPE * ripe)));
+      this.dentH *= fill;
+      this.bowH *= fill;
     }
+    if (this.dentH < 1e-5) this.dentH = 0;
     if (this.bowH < 1e-5) this.bowH = 0;
-    bow.z = this.bowH;
-    // 저은 띠 기억 — τ_W = 2 + 4·되기로 옅어진다. 띠 폭은 되기로(되직 = 좁게)
-    this.stirMem *= Math.exp(-dt / (STIRMEM_TAU0 + STIRMEM_TAU_THICK * thick));
-    if (this.stirMem < 1e-4) this.stirMem = 0;
-    (u.uStirMem.value as THREE.Vector4).set(this.stirMem, this.stirMemR,
-      R_BODY * THREE.MathUtils.lerp(STIRMEM_W_THICK, STIRMEM_W_FLUID, 1 - thick), 0);
+    tip.z = this.dentH;
+    tip.w = this.bowH;
+    u.uSpiralA.value = STIR_SPIRAL * SPIRAL_A * (0.5 + 0.5 * thick);
 
     // ── 기포 — 젓는 동안 부상·팝 가속 (agitation) ──
     this.bubbles.update(t, p?.bubbleDensity ?? 0.4, p?.bubbleScale ?? 1, this.agitation);
@@ -1046,64 +1002,96 @@ export class DoughMesh {
     this.recoverNaN();
   }
 
-  /** 자취 머리를 손끝으로 옮기고, 앞 점에서 TRAIL_STEP 멀어지면 굳혀 새 머리를 낸다. fresh = 새 획 */
-  private pushTrail(t: number, at: THREE.Vector2, fresh: boolean): void {
-    const live = TRAIL_A * Math.min(1, 0.35 + (this.stirVec.length() / 0.22) * 0.65);
-    const cur = this.trail[this.trailHead];
-    const prev = this.trail[(this.trailHead + TRAIL_N - 1) % TRAIL_N];
-    const dist = Math.hypot(at.x - prev.x, at.y - prev.z);
-    // 획 첫 점(brk)은 옛 판정 그대로. 이어지는 머리는 손끝이 앞 점에서 TRAIL_STEP을 넘는 그 입력에 정확히 STEP 자리에서 굳힌다 —
-    // 시각 고침 3차: 넘친 만큼(입력 간격 ≈ 0.045, 60Hz 빠른 원)이 선분마다 쌓여 간격을 반으로 줄이자 자취가 15% 길어졌다(F3 0.62바퀴 넘음)
-    const step = cur.brk ? this.headStep() >= TRAIL_STEP : dist >= TRAIL_STEP;
-    if (!fresh && !cur.brk && step) {
-      const k = TRAIL_STEP / dist;
-      cur.x = prev.x + (at.x - prev.x) * k;
-      cur.z = prev.z + (at.y - prev.z) * k;
-    }
-    if (fresh || step) {
-      this.trailHead = (this.trailHead + 1) % TRAIL_N;
-      const next = this.trail[this.trailHead];
-      next.brk = fresh;
-      next.fast = false;
-      next.amp = 0;
-    }
-    const head = this.trail[this.trailHead];
-    head.x = at.x;
-    head.z = at.y;
-    head.amp = Math.max(head.amp, live);
-    head.bornAt = t;
+  /** 손끝 기록 — 꼬리(τ초 전 손끝) 찾기용 링버퍼 */
+  private pushTip(t: number, at: THREE.Vector2): void {
+    this.tipHistHead = (this.tipHistHead + 1) % TIP_HIST;
+    const j = this.tipHistHead * 3;
+    this.tipHist[j] = t;
+    this.tipHist[j + 1] = at.x;
+    this.tipHist[j + 2] = at.y;
+    this.tipHistN = Math.min(this.tipHistN + 1, TIP_HIST);
   }
 
-  /** 머리와 바로 앞 점 사이 거리(오브젝트) */
-  private headStep(): number {
-    const head = this.trail[this.trailHead];
-    const prev = this.trail[(this.trailHead + TRAIL_N - 1) % TRAIL_N];
-    return Math.hypot(head.x - prev.x, head.z - prev.z);
+  /** 시각 tq의 손끝 — 기록을 거슬러 선형 보간. 기록이 그보다 짧으면(획 시작) 가장 옛 점 */
+  private tipAt(tq: number, out: THREE.Vector2): void {
+    const h = this.tipHist;
+    let j = this.tipHistHead;
+    out.set(h[j * 3 + 1], h[j * 3 + 2]);
+    for (let n = 1; n < this.tipHistN; n++) {
+      const k = (j - 1 + TIP_HIST) % TIP_HIST;
+      if (h[k * 3] <= tq) {
+        const f = THREE.MathUtils.clamp((tq - h[k * 3]) / Math.max(h[j * 3] - h[k * 3], 1e-6), 0, 1);
+        out.set(h[k * 3 + 1] + (h[j * 3 + 1] - h[k * 3 + 1]) * f, h[k * 3 + 2] + (h[j * 3 + 2] - h[k * 3 + 2]) * f);
+        return;
+      }
+      j = k;
+      out.set(h[j * 3 + 1], h[j * 3 + 2]);
+    }
   }
 
-  /** 링버퍼 → uniform(옛 점부터 차례로). 꼬리 TRAIL_TAIL_PTS점(0.38)은 머리가 나아간 만큼 이어서 가늘어진다 — 덮어쓸 때 툭 끊기지 않게 */
-  private writeTrail(t: number): void {
-    const u = this.material.uniforms;
-    const pos = u.uTrailPos.value as THREE.Vector2[];
-    const amp = u.uTrailAmp.value as Float32Array;
-    const kk = u.uTrailK.value as Float32Array;
-    const N = TRAIL_N;
-    const prog = this.trail[this.trailHead].brk ? 0 : Math.min(1, this.headStep() / TRAIL_STEP);
-    for (let j = 0; j < N; j++) {
-      const s = this.trail[(this.trailHead + 1 + j) % N];
-      const age = Math.max(0, t - s.bornAt);
-      pos[j].set(s.x, s.z);
-      amp[j] = s.amp * THREE.MathUtils.clamp((j - prog) / TRAIL_TAIL_PTS, 0, 1);
-      const k = Math.max(TRAIL_K0 / (1 + age / 0.8), TRAIL_K_MIN);
-      kk[j] = s.brk ? -k : k;
+  /**
+   * 소용돌이 노드 한 걸음 — 젓는 동안 각속도가 손 각속도 × 몫 × 가우스(반경 차)로 따라 붙고, 놓으면 되기별 τ로 멎는다(묽으면 더 돈다).
+   * Θ += ω·dt(풀리지 않는다). 저은 넓이 M += 돈 각/2π × MEM_PER_TURN(손끝 반경 ± MEM_FULL·R 다 참) — 한 바퀴면 넓은 고리가 다 찬다.
+   * 테두리(r/R 0.8→1.0)는 유리에 붙어 돌지 않는다(vert pin과 같은 띠)
+   */
+  private stepSwirl(dt: number, stirring: boolean, da: number, rTip: number, thick: number): void {
+    const lerp = THREE.MathUtils.lerp;
+    const w = R_BODY * lerp(SWIRL_W_FLUID, SWIRL_W_THICK, thick);
+    const gain = lerp(SWIRL_GAIN_FLUID, SWIRL_GAIN_THICK, thick);
+    const omegaH = dt > 0 ? da / dt : 0;
+    const kRise = 1 - Math.exp(-dt / SPIN_RISE_TAU);
+    const kSpin = Math.exp(-dt / lerp(SPIN_TAU_FLUID, SPIN_TAU_THICK, thick));
+    const kMem = Math.exp(-dt / lerp(MEM_TAU_FLUID, MEM_TAU_THICK, thick));
+    for (let i = 0; i < SWIRL_N; i++) {
+      const ri = (i / (SWIRL_N - 1)) * R_BODY;
+      const pin = 1 - THREE.MathUtils.smoothstep(ri / R_BODY, 0.8, 1.0);
+      if (stirring) {
+        const tgt = gain * omegaH * Math.exp(-(((ri - rTip) / w) ** 2)) * pin;
+        this.swOmega[i] += (tgt - this.swOmega[i]) * kRise;
+        const cover = 1 - THREE.MathUtils.smoothstep(Math.abs(ri - rTip) / R_BODY, MEM_FULL, MEM_EDGE);
+        const dm = Math.min((Math.abs(da) / (2 * Math.PI)) * MEM_PER_TURN * cover * pin, 1 - this.swMem[i]);
+        this.swMem[i] += dm;
+        this.swStroke[i] += dm;
+      } else {
+        this.swOmega[i] *= kSpin;
+        if (Math.abs(this.swOmega[i]) < 1e-4) this.swOmega[i] = 0;
+      }
+      this.swTheta[i] += this.swOmega[i] * dt;
+      this.swMem[i] *= kMem;
+      if (this.swMem[i] < 1e-4) this.swMem[i] = 0;
     }
+    // 전단 상한 — 이웃 노드 Θ 차가 SHEAR_MAX를 넘으면 둘을 같은 만큼 당긴다(합 = 평균 회전은 그대로). 2회전: 상한이 없으면 3바퀴 만에
+    // 모틀 · 잔 광택 · 나선이 반경 사이 전단에 감겨 과녁 · 레코드판 동심원이 됐다(.work/r1 · r2). 반죽은 점성으로 이어져 덩어리째 돈다(S2)
+    for (let pass = 0; pass < 3; pass++) {
+      for (let i = 0; i < SWIRL_N - 1; i++) {
+        const d = this.swTheta[i] - this.swTheta[i + 1];
+        const ex = Math.abs(d) - SHEAR_MAX;
+        if (ex > 0) {
+          const e = (ex / 2) * Math.sign(d);
+          this.swTheta[i] -= e;
+          this.swTheta[i + 1] += e;
+        }
+      }
+    }
+    // 오래 저으면 Θ가 커진다 — 64바퀴를 넘으면 노드 전부를 같은 2π 배수만큼 당겨 float 정밀도만 지킨다(노드 사이 차 = 무늬는 그대로)
+    if (Math.abs(this.swTheta[SWIRL_N - 1]) > 128 * Math.PI) {
+      const wrap = Math.round(this.swTheta[SWIRL_N - 1] / (2 * Math.PI)) * 2 * Math.PI;
+      for (let i = 0; i < SWIRL_N; i++) this.swTheta[i] -= wrap;
+    }
+    this.writeStir();
+  }
+
+  /** 소용돌이 노드 → uSwirl (Θ, M) */
+  private writeStir(): void {
+    const sw = this.material.uniforms.uSwirl.value as THREE.Vector2[];
+    for (let i = 0; i < SWIRL_N; i++) sw[i].set(this.swTheta[i], this.swMem[i]);
   }
 
   /** 시계 역행 — CPU 시각 기록을 delta만큼 옮긴다(프로덕션 performance.now는 단조라 방어용) */
   private shiftClock(delta: number): void {
     this.lastStirInputT += delta;
     this.lastHandStirT += delta;
-    for (const s of this.trail) s.bornAt += delta;
+    for (let i = 0; i < TIP_HIST; i++) this.tipHist[i * 3] += delta;
     this.bubbles.shift(delta);
   }
 
@@ -1125,7 +1113,6 @@ export class DoughMesh {
     if (!ok(this.sway) || !ok(this.swayV) || !ok(this.swayRest) || !Number.isFinite(this.moundH + this.moundV)) {
       this.resetMound();
     }
-    for (const s of this.trail) if (!Number.isFinite(s.amp)) s.amp = 0;
     if (!Number.isFinite(this.holdLevel)) this.holdLevel = 0;
     const u = this.material.uniforms;
     (u.uWobble.value as THREE.Vector2).copy(this.wobble);
@@ -1134,11 +1121,11 @@ export class DoughMesh {
     if (!Number.isFinite(this.marble)) this.marble = 0;
     if (!Number.isFinite(this.marblePhase)) this.marblePhase = 0;
     if (!Number.isFinite(this.murk)) this.murk = 0;
-    if (!Number.isFinite(this.bowH)) this.bowH = 0;
-    if (!Number.isFinite(this.stirMem + this.stirMemR + this.stirMemStroke)) {
-      this.stirMem = this.stirMemR = this.stirMemStroke = 0;
+    if (!Number.isFinite(this.dentH + this.bowH)) this.dentH = this.bowH = 0;
+    if (![this.swTheta, this.swOmega, this.swMem, this.swStroke].every((a) => a.every(Number.isFinite))) {
+      for (const a of [this.swTheta, this.swOmega, this.swMem, this.swStroke]) a.fill(0);
     }
-    this.writeTrail(this.lastT);
+    this.writeStir();
     if (!Number.isFinite(u.uPokeAmt.value as number)) u.uPokeAmt.value = 0;
   }
 }

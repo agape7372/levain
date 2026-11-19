@@ -7,7 +7,8 @@
 //   마름·배고픔은 윗가장자리만 유리에서 물러난다(uPull, 위 12% 높이 · A1-02).
 //   오브젝트 공간: 월드 XZ = 오브젝트 XZ × XZ_SCALE, 월드 y = 오브젝트 y × 숨쉬기(바닥 y = 0 고정).
 // 버텍스 첨도 = uBumpK, 프래그 첨도 = uBumpK×1.6 — 한 소스 구동 (VISUAL §0 함정 노트).
-// 2026-11-19 섞는 맛(M2): 손끝 밑 섬(|uStirVec|·0.35·sfall)과 실 능선 4점 솟음을 지우고 고랑 자취(trailGroove, 8점 · 선분 7개 → 시각 고침 3차 15점 · 14개)로.
+// 2026-11-19 섞는 맛(M2): 손끝 밑 섬(|uStirVec|·0.35·sfall)과 실 능선 4점 솟음을 지우고 고랑 자취로 → 손맛 3차(젓기 v3): 15점 자취 루프를 빼고
+//   닫힌 식(stirField = 손끝 패임 캡슐 + 앞 둔덕 초승달 + 나선 굴곡) · 반경 칸 소용돌이(uSwirl — 정지 혹 무늬도 Θ만큼 돌려 읽는다).
 //   시어 끌림 · grab xz · 슬로싱 강체 xz는 테두리(r/R 0.8→1.0)에서 0 — 옆면은 유리에서 뜨거나 밀리지 않는다(pin).
 // 2026-11-19 P1b: 피크 크래그(fbm·0.030·uRipe)를 지웠다 — 회색 FBM 덩어리의 한 축이었다(R2-07). 그 자리(같은 fbm 도메인 5.0)는
 //   하강 주름(uSink)이 쓴다. 곰팡이 군락은 살짝 솟는다(uMoldA, R2-10). 옆벽 기공 도메인은 프래그가 원통 매개로 푼다(vY).
@@ -25,10 +26,10 @@ uniform vec2 uStirVec;
 uniform vec2 uGrabPos;     // 밑동 둔덕 가운데(오브젝트) = 앵커 + 밑동 흔들림
 uniform vec4 uGrab;        // x = 밑동 둔덕 높이(월드), y = 끌려 모임 세기(tension) — DoughMesh 스프링
 uniform vec4 uPile;        // 더미 (x, z, 높이, 반경) — 떨어진 가닥이 닿은 자리, τ_pile로 가라앉는다
-uniform vec2 uTrailPos[15];
-uniform float uTrailAmp[15];
-uniform float uTrailK[15];  // 고랑 첨도 — 나이 들수록 넓어진다. 음수 = 새 획 첫 점(앞 점과 안 잇는다)
-uniform vec4 uBow;         // 앞 둔덕 (x, z, 높이, 첨도) — 젓는 손끝 앞에 밀려 오른 더미(S3)
+uniform vec4 uTip;         // 손끝 (머리 x, z, 패임 깊이, 앞 둔덕 높이) — 젓기 v3(DoughMesh STIR_FIELD)
+uniform vec4 uTipB;        // (진행 방향 x, z, 꼬리 x, z) — 꼬리 = τ초 전 손끝
+uniform vec2 uSwirl[9];    // 반경 칸 노드 (Θ 누적 각, M 저은 넓이) — r = i/8 · uRBody
+uniform float uSpiralA;    // 나선 굴곡 높이(월드) — STIR_SPIRAL 0이면 0
 uniform float uHooch;      // 윗물 양 — 덮이면 수면 기울기를 끄고 솟는 항을 누른다(§6-9, SURF_TILT)
 uniform float uRipe;
 uniform float uCollapse;
@@ -52,8 +53,8 @@ varying float vWallY;      // 옆벽 정규화 높이 0~1(윗면 1) — 기포 �
 // 무리수 회전 3옥타브 트리그 FBM — StrandMesh FBM_GLSL(반죽 frag · 가닥 frag와 같은 소스)를 DoughMesh가 끼운다
 // #fbm
 
-// 수면 기울기 · 윗물 덮임(jar.ts SURF_TILT) + 고랑 자취 · 앞 둔덕 — DoughMesh가 TRAIL_GROOVE(프래그와 같은 소스)를 여기 끼운다
-// #trailGroove
+// 수면 기울기 · 윗물 덮임(jar.ts SURF_TILT) + 젓기 v3(패임 · 앞 둔덕 · 소용돌이 · 나선) — DoughMesh가 STIR_FIELD(프래그와 같은 소스)를 여기 끼운다
+// #stirField
 // 당기기 밑동 둔덕 · 더미 — DoughMesh GRAB_FIELD(프래그와 같은 소스)
 // #grabField
 
@@ -84,8 +85,11 @@ vec3 topPoint(vec2 xz0, float layer) {
   // 윗물이 덮으면 수면 기울기를 끈다 — 기운 가장자리가 수평 윗물을 뚫고 섬으로 뜨던 것(S7). 윗물 윗면이 대신 기운다(jar.ts)
   p.y += dot(p.xz, uWobble) * surfTiltK() * (1.0 - hoochSpread(uHooch));
 
+  // 소용돌이 — 반경마다 Θ만큼 돈 무늬 도메인(정지 혹이 젓는 손을 따라 돈다). 프래그와 같은 함수
+  vec4 sw = swirlAt(length(p.xz));
+  vec2 q = swirlQ(p.xz, sw.x);
   // 정지 혹 — 평평할수록·흐를수록 영구 혹을 못 가진다. 피크에선 눌러 준다(소프트아이스크림 꼭지 방지)
-  float silhouette = fbm(p.xz * 1.8 + vec2(3.1, 7.4) + uSeed * 37.0) * 0.045
+  float silhouette = fbm(q * 1.8 + vec2(3.1, 7.4) + uSeed * 37.0) * 0.045
                    * (1.0 - 0.55 * uLevel - 0.30 * uFluid) * (1.0 - 0.5 * uRipe);
   // 살아있는 표면 — 시간 흐르는 FBM. 실물은 초 단위로 정지해 있어 약하게만(R2-15: 0.035 → 0.012)
   float n = fbm(p.xz * 2.6 + vec2(uTime * 0.30 * uNoiseSpeed, -uTime * 0.24 * uNoiseSpeed));
@@ -95,10 +99,8 @@ vec3 topPoint(vec2 xz0, float layer) {
     vec2 d = p.xz - uBumpPos[i];
     disp += uBumpAmp[i] * exp(-dot(d, d) * uBumpK[i]);
   }
-  // 고랑 자취 — 손끝 뒤로 패인 골 + 양옆 둔덕, 묽기만큼 메워진다(CPU τ). 손끝 밑 = 고랑 끝의 둥근 패임
-  // 높이만 × GROOVE_VERT_GAIN(시각 고침 3차 S-2) — 앞 입술이 가파른 벽을 삼각형 단위로 가려 테두리가 톱니였다. 프래그 기울기는 배율 없음
-  vec4 tl;
-  disp += trailGroove(p.xz, tl).x * GROOVE_VERT_GAIN;
+  // 젓기 v3 — 손끝 패임 · 앞 둔덕 · 나선 굴곡의 실제 높이(배율 없음 — 가우스 반경이 칸 5개 넘게 넓어 옛 U자 벽 톱니가 없다)
+  disp += stirField(p.xz, sw, q).x;
   // 밑동 둔덕 · 더미(L2a · L6) — 프래그가 같은 함수의 기울기를 쓴다
   if (uGrab.x + uPile.z > 1e-5) disp += grabField(p.xz).x;
 
