@@ -13,7 +13,7 @@ import { smoothParams, type RenderParams } from './renderParams';
 
 // 세로폰(aspect ~0.46)에서 병 폭 ≈ 화면 70%, 병+헤드룸 55~65% 점유 (VISUAL §1-1 목표값 실측 보정)
 const VIEW_H = 5.4;
-const LOOK_Y = 0.8; // 병 몸통 중심보다 살짝 위 — 상단 HUD 헤드룸 확보
+const LOOK_Y = 0.64; // 병 몸통 중심보다 살짝 위 — 상단 HUD 헤드룸 · 아래 위치 알약과 틈(VISUAL §1-1)
 /** 카메라 시선 고도(°) — 2026-11-19 52.1° → 42°(반죽 모델 v2, VISUAL §1-1). 옆벽 높이가 보여야 성장이 읽힌다 */
 const CAM_ELEV_DEG = 42;
 /** 시선 기준점까지 거리 — 직교라 화면 크기와 무관, near/far 안에만 두면 된다(구 (0,8,5.6)과 같은 9.12) */
