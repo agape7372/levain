@@ -24,7 +24,7 @@ uniform float uPokeK;
 uniform vec2 uStirPos;
 uniform vec2 uStirVec;
 uniform vec2 uGrabPos;     // 밑동 둔덕 가운데(오브젝트) = 앵커 + 밑동 흔들림
-uniform vec4 uGrab;        // x = 밑동 둔덕 높이(월드), y = 끌려 모임 세기(tension) — DoughMesh 스프링
+uniform vec4 uGrab;        // x = 밑자락 둔덕 높이(월드), y = 끌려 모임 세기, z = 높이 주름 · 무늬 끌림 세기 — DoughMesh
 uniform vec4 uPile;        // 더미 (x, z, 높이, 반경) — 떨어진 가닥이 닿은 자리, τ_pile로 가라앉는다
 uniform vec4 uTip;         // 손끝 (머리 x, z, 패임 깊이, 앞 둔덕 높이) — 젓기 v3(DoughMesh STIR_FIELD)
 uniform vec4 uTipB;        // (진행 방향 x, z, 꼬리 x, z) — 꼬리 = τ초 전 손끝
@@ -56,7 +56,7 @@ varying float vWallY;      // 옆벽 정규화 높이 0~1(윗면 1) — 기포 �
 
 // 수면 기울기 · 윗물 덮임(jar.ts SURF_TILT) + 젓기 v3(패임 · 앞 둔덕 · 소용돌이 · 나선) — DoughMesh가 STIR_FIELD(프래그와 같은 소스)를 여기 끼운다
 // #stirField
-// 당기기 밑동 둔덕 · 더미 — DoughMesh GRAB_FIELD(프래그와 같은 소스)
+// 들기 밑자락 · 주름 · 더미 · 무늬 끌림 — DoughMesh GRAB_FIELD(프래그와 같은 소스)
 // #grabField
 
 // 윗면 한 점의 변형 — xz0 = 휴지 자리(오브젝트), layer = 1(윗면) ~ 0(바닥 쪽 층, 슬로싱 강체 배분)
@@ -69,7 +69,7 @@ vec3 topPoint(vec2 xz0, float layer) {
   //    리본 리프트 · 주름 · necking은 지웠다(대체됨 — 들리는 몸은 StrandMesh 가닥, 밑동은 아래 grabField 둔덕) ──
   if (uGrab.y > 0.001) {
     vec2 gd = p.xz - uGrabPos;
-    p.xz -= gd * (0.18 * uGrab.y * exp(-dot(gd, gd) / (GRAB_PULL_R * GRAB_PULL_R)) * pin);
+    p.xz -= gd * (0.18 * uGrab.y * exp(-dot(gd, gd) / PULL_R2) * pin);
   }
 
   // 손가락 추종 점성 시어장 — 범프 평가 전 적용(기포가 반죽과 함께 끌려간다) + 약한 컬
@@ -88,7 +88,7 @@ vec3 topPoint(vec2 xz0, float layer) {
 
   // 소용돌이 — 반경마다 Θ만큼 돈 무늬 도메인(정지 혹이 젓는 손을 따라 돈다). 프래그와 같은 함수
   vec4 sw = swirlAt(length(p.xz));
-  vec2 q = swirlQ(p.xz, sw.x);
+  vec2 q = liftQ(swirlQ(p.xz, sw.x), sw.x); // 들기 끌림 · 더미 꼬임을 회전 뒤에 한 번 더(GRAB_FIELD)
   // 정지 혹 — 평평할수록·흐를수록 영구 혹을 못 가진다. 피크에선 눌러 준다(소프트아이스크림 꼭지 방지)
   float silhouette = fbm(q * 1.8 + vec2(3.1, 7.4) + uSeed * 37.0) * 0.045
                    * (1.0 - 0.55 * uLevel - 0.30 * uFluid) * (1.0 - 0.5 * uRipe);
@@ -103,7 +103,7 @@ vec3 topPoint(vec2 xz0, float layer) {
   // 젓기 v3 — 손끝 패임 · 앞 둔덕 · 나선 굴곡의 실제 높이(배율 없음 — 가우스 반경이 칸 5개 넘게 넓어 옛 U자 벽 톱니가 없다)
   disp += stirField(p.xz, sw, q, memAt(length(p.xz), q)).x;
   // 밑동 둔덕 · 더미(L2a · L6) — 프래그가 같은 함수의 기울기를 쓴다
-  if (uGrab.x + uPile.z > 1e-5) disp += grabField(p.xz).x;
+  if (uGrab.x + uGrab.z + uPile.z > 1e-5) disp += liftH(p.xz);
 
   // 피크 돔(uRipe) / 과숙 크레이터(uCollapse) — 중심 광폭 가우시안, 윗면 전용(바닥 극 없음).
   // ⚠ frag의 돔/크레이터 짝(계수 4.0 / 3.2)도 같은 kR을 곱해야 한다 (0.3844 = 구 R²)

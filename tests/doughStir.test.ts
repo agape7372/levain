@@ -307,7 +307,7 @@ describe('윗물 섬 고침(S7 · §6-9) — 반죽 기울기는 덮이면 끄�
     // 젓기 v3: 패임은 그대로, 솟는 앞 둔덕 · 나선 마루만 누른다
     expect(STIR_FIELD).toContain('float eb = uTip.w * riseK() *');
     expect(STIR_FIELD).toContain('(prof > 0.0 ? riseK() : 1.0)');
-    expect(GRAB_FIELD).toContain('return o * riseK();');
+    expect(GRAB_FIELD).toContain('return h * riseK();');
   });
   it('surfaceY(CPU)도 덮이면 기울기가 없다', () => {
     const tiltAt = (hooch: number): number => {

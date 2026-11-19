@@ -1,5 +1,5 @@
 // 당기기 가닥 다발(2026-11-19 당기기 실물화, 명세 .work/feel2/spec.md §1 · §6) — 고깔 하나를 버리고
-// 가닥 STRAND_N(주 1 + 가는 5) × 도막 2(아래 · 위)를 한 draw call로 그린다.
+// 가닥 STRAND_N(주 1 + 끊기기 직전 곁가닥 1 — 들기 v3에서 가는 실 5를 뺐다) × 도막 2(아래 · 위)를 한 draw call로 그린다.
 // 로직(길이 · 굵기 · 벌어짐 · 끊김 · 낙하 · 더미)은 StrandRig(순수 TS, three 없음)가 맡고, 셰이더는 베지어 · 틀 · 단면만 푼다.
 // 칸 ID = .work/feel2/table.md(실물 대조표). D = 병 안지름 = D_W(월드).
 import * as THREE from 'three';
@@ -7,7 +7,7 @@ import { FILL_RADIUS } from '../jar';
 
 /** 병 안지름(월드) — 실물 대조표의 D */
 export const D_W = 2 * FILL_RADIUS;
-export const STRAND_N = 6;
+export const STRAND_N = 2;
 const SEG_N = STRAND_N * 2;
 /** 길이 16마디 · 둘레 16(이음매 꼭짓점 하나 더 = 17). 시각 고침 2차 A-2: 11 · 8 → 17 · 16 — 8각은 갓 밥준 덩이가 8각 갓 · 끊긴 뒤
  *  8각 보석 팽이로 깎였고, 10마디는 덩이 부풂(u 0.55~0.9)에 링이 셋뿐이라 원통 대 + 갓으로 꺾였다. 꼭짓점이 늘어도 draw call은 1 */
@@ -126,91 +126,72 @@ vec4 cellBubble(vec2 uv, vec2 cell, float pres, float r0, float r1, float asp, f
 }
 `;
 
-// ── 굵기 · 길이 · 벌어짐 (칸 ID = 실물 대조표) ──
-/** 반지름 몫 — 주 1 · 가는 5. 반지름 = 몫 × W/2 (L1b · L1c).
- *  2026-11-19 시각 고침 1차: 가는 0.33~0.42 → 0.12~0.17(머리카락) — 주 가닥 아래쪽과 굵기가 같아 젓가락 · 해파리 다리로 읽혔다.
- *  실물 8uAT 1:16.3 · w93D 가는 실은 주 기둥의 1/4 아래. 메모 출발값 0.16~0.22는 2배 녹화에서 아직 주 기둥의 1/3 리본이라 더 내렸다.
- *  시각 고침 2차 A-1: 주 0.85 → 1 — 가는 가닥이 머리카락이 된 뒤로 보이는 기둥 = 주 가닥 하나라 W(합친 목 폭)를 그대로 받는다.
- *  가는 가닥은 ÷ 1.1735(W 기준 길이를 0.5D로 옮기며 커진 배율, neckWidth) — 실 굵기는 1차와 같다(유지) */
-const SHARE = [1, 0.128, 0.111, 0.145, 0.102, 0.119];
-/** 피크 끊김 길이 비(주 = 1) — 가는 가닥부터 하나씩(L5a w93D 한 가닥씩 약 1s · 8uAT 두 갈래가 하나씩) */
-const BREAK_FRAC = [1, 0.42, 0.55, 0.68, 0.8, 0.9];
-/** 부채 방위(°, 화면 가로축 기준 한쪽 ±60) · 밑점 반경(D) — 가닥마다 제각각(§6-6, L3a 8uAT 1:16.3). 고르게 두면 별 · 욱일 */
-const FAN_DEG = [0, -48, 14, -21, 55, 33];
-const FAN_R = [0, 0.3, 0.18, 0.35, 0.12, 0.24];
-/** 가늘어짐 기준 길이 — W(L) = W0 · √(L0/(L0 + L)) (L1c). 시각 고침 1차 0.25D → 0.6D: 실물 UPQ94 9s 기둥은 끊기기 직전까지
- *  0.2D로 굵다 — 가늘어짐은 끊김 바로 앞 목 조임(PINCH_*)이 맡는다 */
-const THIN_L0 = 0.6 * D_W;
-/** W 기준 길이 — L1b 폭은 들린 기둥(UPQ94 9s)에서 잰 값이라 L = 0.5D에서 W = w0이 되게 √을 맞춘다(시각 고침 2차 A-1).
- *  옛 식은 L = 0에서 w0이라 0.5D에서 × 0.739가 한 번 더 깎였다(SHARE 0.85 · body 가운데 0.9와 겹쳐 0.084D, 측정 36px = 계산 36px) */
-const LIFT_REF = 0.5 * D_W;
-/** 묽음 폭 하한 — 굵은 크림 줄(§6-8, L3c 8uAT 1:56 위 0.15D → 아래 0.08D). 시각 고침 1차 0.05D → 0.15D: 주 가닥 목 지름 =
- *  0.85 × 0.8(body 아래) × 0.15D ≈ 0.1D. 0.05D는 실제로 걸려 목이 0.03D 바늘이 됐다(lift_sour) */
-// 시각 고침 2차: 0.15 → 0.115 — SHARE 1 · body 가운데 정규화로 같은 W가 1/(0.85 × 0.9)배 굵게 보여 같은 화면 폭으로 환산(1 × 0.92(body 아래) × 0.115 ≈ 0.1D)
-const RUNNY_W_MIN = 0.115 * D_W;
-/** 묽음 시작 폭 몫(W0 = 이 값 × D) — 시각 고침 1차 0.12 → 0.2: 하한 0.15D 위에서 출발해야 √ 가늘어짐이 보인다(L3c 위 0.15D) */
-// 시각 고침 2차: L = 0.5D 기준 0.113 = 0.2 × 0.85 × 0.9 × √(0.6/1.1) — 기준 길이 · SHARE · body 정규화를 바꿔도 시큼 크림 줄은
-// 1차와 같은 화면 폭(묽음은 메모 대상 아님)
-const RUNNY_W0 = 0.113;
-/** 처짐 — 정적 처짐만(§6-20). 주 가닥 = SAG · L · (1 − 0.5·web). 추정 — 실측 없음(8uAT 옆 살짝 휨만 봤다) */
+// ── 들기 v3(2026-11-19 손맛 3차, 정본 .work/feel3/spec.md 「들기 v3 명세 초안」) — 가는 실 5가닥을 뺐다(폰 1배에서 손가락 밑 크기).
+//    주 가닥 1개 + 끊기기 직전에만 갈라지는 곁가닥 1개. 넓은 신호(끌림 결 · 밑자락 · 더미 주름)는 반죽 높이장(DoughMesh GRAB_FIELD) 몫 ──
+/** 손끝 덩이 띄우기 — 1이면 반죽 덩이(지름 ≈ 0.25D)를 터치점 위 ≈ 60 CSS px에 띄우고 가닥이 거기로 이어진다(블록 퍼즐 끌기 띄움과
+ *  같은 수법 — 손가락이 가닥 끝을 덮지 않게). 0이면 가닥 끝 = 터치점. 시안 비교용(사용자 결정 거리) */
+export const LIFT_LUMP: number = 1;
+/** 띄움 높이(월드 y) — 폰 1배 반죽 지름 146 CSS px = D_W라 60px = 0.41D(화면). 42° 부감에서 세로 변위는 cos 42°배로 보여 나눈다 */
+export const LUMP_Y = (0.41 / Math.cos((42 * Math.PI) / 180)) * D_W;
+/** 반지름 몫 — 주 1 · 곁가닥 0.7(갈라진 두 줄, UPQ94 12s) */
+const SHARE = [1, 0.7];
+/** 시작 폭(D) — 그물 0.17 · 되직 0.13 · 묽음 0.12. 부피 보존 W = W0 · √(LW ÷ L)(L ≥ LW) — 1.2D 들면 × 0.46, 목 조임 × 0.4와 겹쳐
+ *  목이 시작의 1/5 아래(명세 「5배 넘게」). 추정 — 실측 없음(UPQ94 9s 밑 0.4D · 12s 목 0.03D만 봤다) */
+const W0_WEB = 0.17;
+const W0_STIFF = 0.13;
+const W0_RUNNY = 0.12;
+const THIN_LW = 0.25 * D_W;
+/** 묽음 폭 하한 — 굵은 크림 줄(L3c 8uAT 1:56 아래 0.08D). 묽음은 목 조임이 없다 */
+const RUNNY_W_MIN = 0.1 * D_W;
+/** 처짐 — 정적 처짐만. 추정 — 실측 없음 */
 const SAG = 0.08;
-/** 가는 가닥 처짐 = 0.18 · L — 현수선처럼 살짝 휜 실(시각 고침 1차 A-1, 8uAT 1:16.3 위에서 본 휜 실).
- *  추정 — 실측 없음(옆 영상에서 휨 깊이를 못 잰다) */
-const SAG_THIN = 0.18;
-/** 가는 가닥 위 끝 = 주 가닥 u 0.7(덩이 아래 목) — 실이 기둥 · 도구 아래 가장자리에서 갈라져 나온다(8uAT 1:16.3 · UPQ94 12s).
- *  손끝 꼭대기로 모으면 닫힌 캡이 덩이 위로 솟아 마늘 · 왕관 혹이 됐다(시각 고침 1차 A-1) */
-const THIN_JOIN_U = 0.7;
-/** 끊기기 직전 목 조임 — 끊김 길이의 85%부터 목(u 0.2~0.35)만 × 0.4까지(L1b 끊기기 직전 0.03D, 8uAT 1:26). 묽음은 빼고.
- *  시각 고침 2차 A-1: 0.4 → 0.6 — 기둥이 0.1D(1.1D 들었을 때)로 굵어져 × 0.6이면 목이 0.06D에 머문다. × 0.4 = 0.04D(메모 목표 0.03~0.05D) */
+/** 끊기기 직전 목 조임 — 끊김 길이의 85%부터 끊는 자리(u ≈ 0.5)만 × 0.4까지. 묽음은 빼고 */
 const PINCH_FROM = 0.85;
 const PINCH_MAX = 0.6;
-/** 되직 판정 — 벌어짐이 이 아래면 여섯이 한 기둥이라 가는 가닥 끊김을 주 가닥 끊김에 합친다(쩍 두 번 금지, 검토 C-4).
- *  추정 — 실측 없음(벌어짐 0 근처 문턱) */
-const STIFF_FAN = 0.05;
-/** 병 안 클램프 — 가는 가닥 밑점 · 그루터기 끝 · 끝점 xz(§6-7) */
+/** 두 갈래 — 그물만, 끊김 길이 55%부터 곁가닥이 밑에서 갈라져 나와 주 가닥 u 0.55에 붙는다(UPQ94 12s). 밑점 간격 ± 0.07D. 추정 — 실측 없음 */
+const SPLIT_FROM = 0.55;
+const SPLIT_OFF = 0.07 * D_W;
+const SPLIT_JOIN_U = 0.55;
+/** 병 안 클램프 — 밑점 · 끝점 xz */
 const CLAMP_R = 0.85 * FILL_RADIUS;
-/** 휴면 · 곰팡이 문턱 — grabMax가 이 아래면 가닥 없음 · 끊김 소리 없음, 밑동 둔덕만 조금(§6-2) */
+/** 휴면 · 곰팡이 문턱 — grabMax가 이 아래면 가닥 없음 · 끊김 소리 없음, 밑자락만 조금 */
 export const STRAND_MIN_GRABMAX = 0.2;
-/** 끊는 자리 tb = 0.2 ~ 0.35(해시) — 윗도막이 길게 매달린다(§6-3, L5a 8uAT 1:27.0) */
-const TB_LO = 0.2;
-const TB_SPAN = 0.15;
-/** 윗도막 — 0.25s에 길이 × 0.7까지 줄고 아래로 매달린다(§6-3 L5a). 뾰족한 끝 = 아래 60%에 걸쳐 0으로 */
-const HANG_SHRINK = 0.3;
-const HANG_SHRINK_S = 0.25;
-/** 되직 윗도막 = 둥근 방울 + 짧은 뾰족 꼬리(시각 고침 2차 A-2) — 천막(아래 넓은 원뿔) 몫은 버리고 목(u 0.5)부터만 매달고,
- *  길이 × 0.5까지 줄이며, 뾰족 끝은 아래 40%. 넓은 천막을 뾰족하게 깎으면 보석 팽이였다(hi1_jf_sheet). 추정 — 실측 없음(8uAT 0:47 덩이만 봤다) */
-const HANG_U0_STIFF = 0.5;
-const HANG_SHRINK_STIFF = 0.5;
-const HANG_POINT_STIFF = 0.4;
-const HANG_DROOP_S = 0.4; // 추정 — 실측 없음(시트 2~6fps라 0.1s 아래는 못 봄)
-const HANG_POINT = 0.6; // 추정 — 실측 없음(L5a 8uAT 1:27.0 「뾰족 끝」만 봤다, 뾰족해지는 길이는 못 잰다)
-/** 그물 윗도막 덩이 = lumpR × 0.6 — 손가락에 묻은 정도(시각 고침 1차 A-3). 실기기에선 손가락이 가린다. 추정 — 실측 없음 */
-const HANG_LUMP_WEB = 0.6;
-/** 가는 가닥 윗도막 — 매달리지 않고 0.3s에 길이 × 0.35 · 반지름 0으로 주 기둥에 흡수(시각 고침 1차 A-3).
- *  머리카락 굵기라 고무줄로 안 읽히고, 매달리면 끊긴 뒤 허공에 양파 + 뿌리가 떴다. 추정 — 실측 없음(시트 fps로 못 봄) */
-const ABSORB_S = 0.3;
+/** 끊는 자리 tb = 0.47 ~ 0.55(해시) — 목 조임 창(셰이더 u 0.3~0.72)과 같은 자리 */
+const TB_LO = 0.47;
+const TB_SPAN = 0.08;
+/** 위쪽은 0.15s에 손끝 덩이로 말려 올라간다(8uAT 85.3 → 85.7s) — 길이 × 0.06까지 · 가닥 반지름 × 0.3, 덩이는 남는다 */
+const CURL_S = 0.15;
+const CURL_LEN = 0.06;
+const HANG_DROOP_S = 0.4; // 추정 — 실측 없음
+const HANG_POINT = 0.6; // 끊긴 끝 뾰족 길이 몫. 추정 — 실측 없음
+/** 곁가닥 윗도막 — 0.15s에 주 기둥으로 흡수 */
+const ABSORB_S = 0.15;
 const ABSORB_LEN = 0.35;
-/** 아랫도막 그루터기 — 표면으로 내려앉는다(§6-3, w93D 털 끝). 끝 50%가 털 끝으로 가늘어짐.
- *  시각 고침 2차 A-3: 0.4s → 0.12s — t² 낙하라 0.4s면 처음 0.2s 동안 25%도 안 움직여 표면 위 곧은 가시로 서 있었다(메모 상한 0.12s) */
-const STUMP_S = 0.12;
-const STUMP_POINT = 0.5; // 추정 — 실측 없음(w93D 털 끝이 가늘어지는 길이는 못 잰다)
-/** 놓기 낙하 — 0.35s(L5b UPQ94 0.3~0.5s), 누운 자리 = 밑점에서 수평 방향으로 길이 × 0.5(w93D 든 방향으로 누운 끝) */
+/** 아래쪽 주저앉음 — 1 ~ 2.5s 느리게 접혀 내려앉으며 높이장 더미로 녹아든다(UPQ94 12 → 13s). 묽음 1s · 되직 1.5s · 그물 2.2s. 추정 */
+const SLUMP_RUNNY = 1.0;
+const SLUMP_STIFF = 1.5;
+const SLUMP_WEB = 2.2;
+const SLUMP_POINT = 0.35; // 끊긴 끝 뾰족 길이 몫. 추정 — 실측 없음
+/** 놓은 덩이 낙하 — 0.35s(L5b UPQ94 0.3~0.5s) */
 const FALL_S = 0.35;
-const LIE_FRAC = 0.5;
-const COIL = 0.25; // 똬리 한 번 — 가운데 점 옆 오프셋 = 길이 × 0.25 (L5b UPQ94 12s 칸4→6)
-/** 닿은 뒤 사라짐 — 가는 관이 표면에 오래 누워 있지 않는다(§6-3). 추정 — 실측 없음(지렁이 금지가 근거) */
+const LIE_FRAC = 0.3;
+const COIL = 0.25; // 접힐 때 가운데 점 옆 오프셋 = 길이 × 0.25 (L5b UPQ94 12s)
 const VANISH_S = 0.2;
-/** 더미(L6) — 높이 = 누운 반지름 × 2.0, 상한 1.0 × 둔덕 최대. 반경은 추정 — 실측 없음(UPQ94 13s 더미 ≈ 밑동 둔덕 크기).
- *  시각 고침 1차 A-4: 1.2 · 0.6 → 2.0 · 1.0 — 끊긴 뒤 더미가 거의 안 보였다(실물 UPQ94 13s 접힌 더미 1.3s+ 또렷) */
-export const MOUND_H = 0.07 * D_W; // 밑동 둔덕 최대 높이(월드) — 추정(측면 실측 없음, 깔때기만 확인 Sg__ 259-270)
-const PILE_GAIN = 2.0;
-const PILE_MAX = 1.0 * MOUND_H;
-export const PILE_R = 0.12 * D_W;
-/** 더미 가라앉음 τ — 3s(묽음 2s) (L6 UPQ94 1.3s+ · oelv 2s+ · SbPf 3s+) */
-const PILE_TAU = 3;
-const PILE_TAU_RUNNY = 2;
-/** 묽음 누운 도막은 굵어져 합쳐진다(L5b 8uAT 2:01) */
-const RUNNY_LIE_GAIN = 1.3;
+/** 밑자락 둔덕(높이장) 최대 높이 · 반경 — 명세 0.2D · 0.28D(UPQ94 9s 밑 0.4~0.5D). 둔덕 모양은 GRAB_FIELD(오목 윤곽) */
+export const MOUND_H = 0.2 * D_W;
+export const MOUND_R = 0.28 * D_W;
+/** 더미(높이장) — 지름 0.45D(반경 0.225D 가우스) · 높이 0.07D · 겹 고리 2개. 추정 — 실측 없음(UPQ94 13s 접힌 더미만 봤다) */
+export const PILE_R = 0.225 * D_W;
+const PILE_H = 0.07 * D_W;
+const PILE_MAX = 1.3 * PILE_H;
+/** 더미 가라앉음 τ — 4s(묽음 2.5s) */
+const PILE_TAU = 4;
+const PILE_TAU_RUNNY = 2.5;
+/** 반들 자국 — 더미가 생긴 뒤 6s까지 다 차 있다가 13s에 0(명세 8~15s) */
+const SHEEN_HOLD = 6;
+const SHEEN_END = 13;
+/** 더미 자리 무늬 꼬임(rad) — 접혀 포개진 반죽이라 표면 무늬가 더미 둘레로 감긴다(따로 놓인 물건이 아니라 표면이 이어진다). 추정 */
+const PILE_TWIST = 1.6;
 const HIDE_R = 0.0005;
 
 export interface StrandMix {
@@ -235,8 +216,8 @@ export function strandMix(elasticity: number, fluidity: number, grabMax: number)
   return { web, runny, stiff: Math.max(0, 1 - web - runny), grabMax };
 }
 
-/** 주 가닥 끊김 길이(월드, 버팀 짧아짐 전) — L4b: 피크 grabMax 0.6 → 1.2D(Sg__ 1.2~1.4D · 8uAT ≥0.9D) ·
- *  갓 밥준 0.497 → 0.25D(8uAT 0:47 짧은 결) · 시큼 0.278 → 1.0D(8uAT 1:56 안 끊김) */
+/** 주 가닥 끊김 길이(월드, 버팀 짧아짐 전, 커밋 길이 위로) — L4b: 피크 grabMax 0.6 → 1.2D · 갓 밥준 0.497 → 0.25D · 시큼 0.278 → 1.0D.
+ *  잠금값 grabMax 0.600(2026-08-24 확정)의 지금 뜻 = 피크 끊김 길이 1.2D(1.6.16과 같다, 들기 v3에서 안 바뀜) */
 export function mainBreakLen(m: StrandMix): number {
   return 2 * D_W * m.grabMax * (0.25 + 0.75 * m.web + 1.55 * m.runny);
 }
@@ -271,15 +252,18 @@ type Seg = {
   u1: number;
   ta: number;
   tb: number;
+  /** 더미에 보탤 높이(월드) · 이미 보탠 높이 */
   vol: number;
-  piled: boolean;
-  /** 매달림 중 가는 가닥 윗도막 — 매달리지 않고 ABSORB_S에 주 기둥으로 흡수된다 */
+  added: number;
+  /** 주저앉음(느린 접힘, 더미가 같이 자란다) — 아니면 덩이 낙하(t², 닿은 뒤 더미) */
+  slump: boolean;
+  /** 곁가닥 윗도막 — 매달리지 않고 ABSORB_S에 주 기둥으로 흡수된다 */
   absorb: boolean;
 };
 
 const newSeg = (): Seg => ({
   mode: 0, age: 0, from: new Array<number>(9).fill(0), to: new Array<number>(9).fill(0), dur: 1,
-  rel: [0, 0, 0, 0, 0, 0], rn: 0, lump: 0, u0: 0, u1: 1, ta: 0, tb: 0, vol: 0, piled: false, absorb: false,
+  rel: [0, 0, 0, 0, 0, 0], rn: 0, lump: 0, u0: 0, u1: 1, ta: 0, tb: 0, vol: 0, added: 0, slump: false, absorb: false,
 });
 
 /** 배열 값이 전부 유한한가 — 매 tick 부르므로 할당 없이 인덱스 루프(검토 C-3) */
@@ -304,7 +288,7 @@ function clampR(p: number[], o: number): void {
 
 /**
  * 가닥 상태기 — 순수 TS(three · DOM 없음). 월드 좌표. 출력 = 도막마다 vec4 넷(uniform 배열 그대로).
- *   A = (P0, 목 반지름) · B = (P1, 손끝 덩이 반지름) · C = (P2, 목 조임 0~0.4) · D = (u0, u1, 시작 뾰족 길이, 끝 뾰족 길이)
+ *   A = (P0, 목 반지름) · B = (P1, 손끝 덩이 반지름) · C = (P2, 목 조임 0~0.6) · D = (u0, u1, 시작 뾰족 길이, 끝 뾰족 길이)
  * 도막 i·2 = 아랫도막, i·2+1 = 윗도막. 붙어 있는 동안 두 도막은 한 베지어를 tb에서 나눈 것이라 이음매가 없다.
  */
 export class StrandRig {
@@ -312,19 +296,19 @@ export class StrandRig {
   readonly B = new Float32Array(SEG_N * 4);
   readonly C = new Float32Array(SEG_N * 4);
   readonly D = new Float32Array(SEG_N * 4);
-  /** 벌어짐 s 0~1 — 셰이더 밑동 나팔 */
-  fan = 0;
-  /** 되직 몫 — 셰이더 단면 꼴(천막 원뿔 + 손끝 덩이, 시각 고침 2차 A-2) */
+  /** 두 갈래 0~1 — 끊기기 직전 곁가닥 몫 */
+  split = 0;
+  /** 되직 몫 — 셰이더 덩이 거칠기 */
   stiff = 0;
   /** 합친 목 반지름(W/2, 월드) — 셰이더 가늘수록 밝음의 기준 */
   neck = 0;
   visible = false;
   /** 이번 tick의 끊김(소리 · 진동) */
   readonly events: StrandBreak[] = [];
-  /** 더미 — 월드 x, z, 높이, 반경 */
-  readonly pile = [0, 0, 0, PILE_R];
+  /** 더미 — 월드 x, z, 높이, 반경, 반들 0~1, 접힘 방위(rad), 무늬 꼬임(rad) */
+  readonly pile = [0, 0, 0, PILE_R, 0, 0, 0];
 
-  /** 묽음 몫 0~1 — 더미 메시가 K1에서 시작하는 근거(CoilMesh) */
+  /** 묽음 몫 0~1 — 셰이더 덩이 꼴(줄줄 흐름) */
   runny(): number {
     return this.mix.runny;
   }
@@ -333,14 +317,14 @@ export class StrandRig {
   active = false;
   /** 휴면 · 곰팡이 — 가닥 없음 */
   none = false;
-  /** 주 가닥 길이(월드) — 밑동 둔덕 · 끌려 모임이 쓴다 */
+  /** 주 가닥 길이(월드) — 밑자락 둔덕 · 끌림 결이 쓴다 */
   len = 0;
   private held = 0;
   /** 끊기기 직전 목 조임 0 ~ PINCH_MAX — 주 가닥 도막의 C.w로 셰이더에 간다 */
   private pinch = 0;
   private readonly base = [0, 0, 0];
   private readonly tip = [0, 0, 0];
-  /** 가는 가닥이 갈라져 나오는 자리 = 주 가닥 u THIN_JOIN_U(월드) */
+  /** 곁가닥이 붙는 자리 = 주 가닥 u SPLIT_JOIN_U(월드) */
   private readonly joint = [0, 0, 0];
   private readonly target = [0, 0, 0];
   private hasTarget = false;
@@ -351,16 +335,16 @@ export class StrandRig {
   private mix: StrandMix = { web: 0, runny: 0, stiff: 1, grabMax: 0 };
   private width = 0;
   private pileTau = PILE_TAU;
+  private pileAge = Infinity;
   private readonly att: boolean[] = new Array<boolean>(STRAND_N).fill(false);
-  private readonly tbs = new Array<number>(STRAND_N).fill(0.3);
-  private readonly jit = new Array<number>(STRAND_N).fill(0);
+  private tb = 0.5;
   private readonly segs: Seg[] = Array.from({ length: SEG_N }, newSeg);
   private readonly g = new Array<number>(9).fill(0);
 
-  /** 잡기 — 앵커 월드 xz. 남은 낙하 도막은 바로 더미로 넘기고 새 다발을 낸다(§6-14) */
+  /** 잡기 — 앵커 월드 xz. 남은 낙하 도막은 바로 더미로 넘기고 새 가닥을 낸다(§6-14) */
   start(x: number, z: number, mix: StrandMix, env: StrandEnv): void {
     for (const s of this.segs) {
-      if (s.mode === 3 && !s.piled) this.addPile(s.to[6], s.to[8], s.vol);
+      if (s.mode === 3) this.addPile(s.to[3], s.to[5], s.vol - s.added);
       s.mode = 0;
     }
     this.grabs++;
@@ -371,11 +355,12 @@ export class StrandRig {
     this.held = 0;
     this.hasTarget = false;
     this.lenCommit = 0;
-    this.side = x > 0 ? -1 : 1; // 부채는 병 가운데 쪽으로
+    this.split = 0;
+    this.side = hash(3, this.grabs) > 0.5 ? 1 : -1;
     this.width = this.neckWidth(0);
     const sy = env.surfaceY(x, z);
     this.base[0] = x;
-    this.base[1] = sy - this.width * 0.5 * SHARE[0];
+    this.base[1] = sy - this.width * 0.5;
     this.base[2] = z;
     // 끝점은 밑점에서 출발한다(높이 0 출발, §6-2)
     this.tip[0] = x;
@@ -384,11 +369,8 @@ export class StrandRig {
     for (let k = 0; k < 3; k++) this.joint[k] = this.tip[k];
     this.len = 0;
     this.pinch = 0;
-    for (let i = 0; i < STRAND_N; i++) {
-      this.att[i] = !this.none;
-      this.tbs[i] = TB_LO + TB_SPAN * hash(i, this.grabs);
-      this.jit[i] = 2 * hash(i + 7, this.grabs) - 1;
-    }
+    this.att.fill(!this.none);
+    this.tb = TB_LO + TB_SPAN * hash(0, this.grabs);
   }
 
   /** 손끝(월드) — 첫 값이 커밋 길이 L_commit이 된다(§6-2) */
@@ -404,16 +386,16 @@ export class StrandRig {
     }
   }
 
-  /** 놓기 — 붙은 가닥은 한 줄로 합쳐 한 더미로 떨어지고(§6-4), 매달린 윗도막도 같이 떨어진다(§6-14) */
+  /** 놓기 — 붙은 가닥은 느리게 주저앉아 더미가 되고(§6-4), 손끝 덩이도 떨어진다(§6-14) */
   release(env: StrandEnv): void {
     if (!this.active) return;
     this.active = false;
-    this.dropAttached(env, this.mix.runny);
+    this.dropAttached(env);
     for (let i = 0; i < SEG_N; i++) {
       const s = this.segs[i];
       if (s.mode !== 2) continue;
       if (s.absorb) {
-        s.mode = 0; // 흡수 중인 가는 가닥 윗도막은 머리카락 굵기라 떨어뜨리지 않는다
+        s.mode = 0;
         continue;
       }
       this.hangPoints(s, this.g);
@@ -427,8 +409,9 @@ export class StrandRig {
       s.mode = 3;
       s.age = 0;
       s.dur = FALL_S;
-      s.vol = s.rn;
-      s.piled = false;
+      s.slump = false;
+      s.vol = 0.5 * PILE_H;
+      s.added = 0;
     }
   }
 
@@ -437,13 +420,15 @@ export class StrandRig {
     this.active = false;
     this.hasTarget = false;
     this.len = 0;
-    this.fan = 0;
+    this.split = 0;
     this.neck = 0;
     this.width = 0;
     this.lenCommit = 0;
     this.held = 0;
     this.pinch = 0;
-    this.pile[0] = this.pile[1] = this.pile[2] = 0;
+    this.pileAge = Infinity;
+    this.pile.fill(0);
+    this.pile[3] = PILE_R;
     this.att.fill(false);
     for (const a of [this.base, this.tip, this.target, this.joint]) a.fill(0);
     for (const s of this.segs) {
@@ -458,7 +443,7 @@ export class StrandRig {
 
   /** 상태값에 NaN이 섞였나 */
   finite(): boolean {
-    if (!Number.isFinite(this.len + this.fan) || !allFinite(this.base) || !allFinite(this.tip)
+    if (!Number.isFinite(this.len + this.split) || !allFinite(this.base) || !allFinite(this.tip)
       || !allFinite(this.target) || !allFinite(this.pile)) return false;
     for (let i = 0; i < SEG_N; i++) {
       const s = this.segs[i];
@@ -482,16 +467,15 @@ export class StrandRig {
     return lb <= 0 ? 0 : Math.min(1, Math.max(0, (this.dist(this.target, this.base) - this.lenCommit) / lb));
   }
 
-  /** 붙은 몫 0~1(목 반지름 몫으로 무게). 가닥 없는 휴면은 잡는 동안 1 */
+  /** 붙은 몫 0~1 — 주 가닥이 붙어 있으면 1. 가닥 없는 휴면은 잡는 동안 1 */
   attached(): number {
     if (this.none) return this.active ? 1 : 0;
-    let a = 0;
-    let all = 0;
-    for (let i = 0; i < STRAND_N; i++) {
-      all += SHARE[i];
-      if (this.att[i]) a += SHARE[i];
-    }
-    return a / all;
+    return this.att[0] ? 1 : 0;
+  }
+
+  /** 끌어 올린 거리(월드) = 주 가닥 길이 − 커밋 길이 — 밑자락 둔덕 · 주름이 쓴다. 손끝 덩이를 띄워도 누르는 순간은 0 */
+  pulled(): number {
+    return this.active ? Math.max(0, this.len - this.lenCommit) : 0;
   }
 
   /** 손끝 − 밑점 수평 오프셋(월드) → out[0] · out[1] — 밑동 흔들림 목표. 매 tick 부르므로 out 인자(검토 C-3) */
@@ -511,19 +495,19 @@ export class StrandRig {
       }
       this.len = this.dist(this.tip, this.base);
       this.width = this.neckWidth(this.len);
-      this.base[1] = env.surfaceY(this.base[0], this.base[2]) - this.width * 0.5 * SHARE[0];
+      this.base[1] = env.surfaceY(this.base[0], this.base[2]) - this.width * 0.5;
       const over = Math.max(0, this.len - this.lenCommit);
       const lb = this.breakLen(env);
-      const near = smooth(PINCH_FROM, 1, over / Math.max(lb, 1e-4));
-      // 묽음 — 끊김 길이 끝 15%에서 소리 없이 가늘어진다(§6-8 L5b 8uAT 2:01). 하한(목 0.1D) 아래로는 안 간다(시각 고침 1차 A-5)
+      const f = over / Math.max(lb, 1e-4);
+      const near = smooth(PINCH_FROM, 1, f);
       if (m.runny > 0.5) this.width = Math.max(this.width * (1 - 0.5 * near), RUNNY_W_MIN * m.runny);
       this.pinch = PINCH_MAX * (1 - m.runny) * near;
-      this.fan = m.web * smooth(0.15 * D_W, 0.6 * D_W, this.len); // L3a
+      this.split = this.att[0] ? m.web * smooth(SPLIT_FROM, 0.95, f) : 0;
+      this.att[1] = this.att[0] && this.split > 0.01;
       this.updateJoint(env);
       if (!this.none) this.checkBreaks(over, lb, env);
     } else {
-      // 낙하 중 한 줄로 합친다(§6-4). τ0.1s 추정 — 실측 없음(놓는 순간 0.35s 낙하 안에 합쳐 보이면 된다)
-      this.fan *= Math.exp(-dt / 0.1);
+      this.split = 0;
       this.len = 0;
       this.pinch = 0;
     }
@@ -533,6 +517,9 @@ export class StrandRig {
       this.pile[2] *= Math.exp(-dt / this.pileTau);
       if (this.pile[2] < 1e-4) this.pile[2] = 0;
     }
+    this.pileAge += dt;
+    this.pile[4] = 1 - smooth(SHEEN_HOLD, SHEEN_END, this.pileAge);
+    this.pile[6] = PILE_TWIST * Math.min(1, this.pile[2] / PILE_H);
     this.write();
   }
 
@@ -540,31 +527,26 @@ export class StrandRig {
 
   private neckWidth(len: number): number {
     const m = this.mix;
-    // L1b — 합친 목 폭(L = 0.5D에서): 그물 UPQ94 9s 0.2D × 0.65 = 0.13D(시각 고침 2차 A-1, 옛 0.15는 L = 0 기준).
-    // 되직 0.072 — 메모 A-2 목 0.08~0.1D(8uAT 0:47 · 0:52, 갓 밥준은 L ≈ 0.26D에서 √ × 1.13 = 0.081D, 덩이 시작이 얹혀 화면 0.1D).
-    // 0.08은 화면 목 0.11D(fix2_2 측정 47px). 옛 0.18(Sg__ 굵은 기둥)은
-    // 끝 덩이 · 천막과 겹쳐 원통 대 + 갓이 됐다
-    const w0 = D_W * (0.13 * m.web + 0.072 * m.stiff + RUNNY_W0 * m.runny);
-    const w = w0 * Math.sqrt((THIN_L0 + LIFT_REF) / (THIN_L0 + len)); // L1c 부피 보존 √ 가늘어짐 — L = 0.5D에서 1
+    const w0 = D_W * (W0_WEB * m.web + W0_STIFF * m.stiff + W0_RUNNY * m.runny);
+    // 부피 보존 — 늘어난 만큼 단면이 준다(r ∝ 1/√L)
+    const w = w0 * Math.sqrt(THIN_LW / Math.max(len, THIN_LW));
     return Math.max(w, RUNNY_W_MIN * m.runny);
   }
 
-  /** 손끝 덩이 반지름 — 주 가닥만(L3b 8uAT 0:47 덩이 = 막대 1.5~2배 · ×0.65, 지름 → 반지름).
-   *  가닥이 짧을 땐 작게 — 들기 시작부터 크면 짧은 기둥 위 못대가리로 읽혔다(첫 녹화). 길이 몫은 추정 — 실측 없음.
-   *  시각 고침 1차 A-2: 그물 0.08 → 0.035 — 가는 대 위 둥근 덩이(핀 머리 · 서양배)로 읽혔다. 되직 0.12는 그대로(8uAT 0:52 손끝에 붙은 덩이).
-   *  시각 고침 2차: 그물 0.035 → 0.015 — 기둥이 굵어져 위 끝이 기둥 폭 × 1.3을 넘으면 면봉 머리(메모 A-1).
-   *  되직 0.12 → 0.08 — 덩이 지름 = 2(목 반지름 + 덩이) ≈ 0.14D(L 0.25D) ~ 0.16D(L 0.5D)(메모 A-2 0.13~0.15D, 8uAT 0:47 · 0:52).
-   *  0.12면 0.29D 갓이었다(측정 125px), 0.06은 0.12D로 목과 거의 같았다(fix2_1) */
+  /** 손끝 덩이 반지름(목 위에 더하는 몫) — 띄우면(LIFT_LUMP) 덩이 지름 ≈ 0.25~0.29D(되직이 크다), 안 띄우면 1.6.16 값(손가락이 덮는다) */
   private lumpR(): number {
     const m = this.mix;
-    return 0.5 * D_W * (0.08 * m.stiff + 0.015 * m.web + 0.05 * m.runny) * smooth(0.05 * D_W, 0.4 * D_W, this.len);
+    const k = LIFT_LUMP
+      ? D_W * (0.13 * m.stiff + 0.12 * m.web + 0.06 * m.runny)
+      : 0.5 * D_W * (0.08 * m.stiff + 0.015 * m.web + 0.05 * m.runny);
+    return k * smooth(0.05 * D_W, 0.3 * D_W, this.len);
   }
 
-  /** 가는 가닥이 갈라져 나오는 자리 — 주 가닥 베지어의 u THIN_JOIN_U */
+  /** 곁가닥이 붙는 자리 — 주 가닥 베지어의 u SPLIT_JOIN_U */
   private updateJoint(env: StrandEnv): void {
     const g = this.g;
     this.strandGeom(0, env, g);
-    const t = THIN_JOIN_U;
+    const t = SPLIT_JOIN_U;
     for (let k = 0; k < 3; k++) {
       this.joint[k] = (1 - t) * (1 - t) * g[k] + 2 * t * (1 - t) * g[3 + k] + t * t * g[6 + k];
     }
@@ -576,21 +558,20 @@ export class StrandRig {
 
   /** 붙은 가닥 i의 베지어 P0 · P1 · P2 → out(9). 반환 = 목 반지름 */
   private strandGeom(i: number, env: StrandEnv, out: number[]): number {
-    const rn = SHARE[i] * this.width * 0.5;
-    const a = (FAN_DEG[i] * Math.PI) / 180;
-    const off = this.fan * FAN_R[i] * D_W;
-    // 화면 가로축(카메라 오른쪽 = 월드 +x, 홈 카메라는 x = 0에서 −z를 본다) 한쪽 부채 ±60°(§6-6)
-    out[0] = this.base[0] + this.side * Math.cos(a) * off;
-    out[2] = this.base[2] + Math.sin(a) * off;
+    // 갈라지면 두 줄이 넓이를 나눈다 — 주 가닥은 조금 가늘어지고 곁가닥이 생긴다
+    const rn = i === 0 ? this.width * 0.5 * (1 - 0.3 * this.split) : SHARE[1] * this.width * 0.5 * this.split;
+    // 화면 가로축(월드 x)으로 두 밑점이 벌어진다
+    const off = (i === 0 ? -1 : 1) * this.side * SPLIT_OFF * this.split;
+    out[0] = this.base[0] + off;
+    out[2] = this.base[2];
     clampR(out, 0);
-    out[1] = i === 0 ? this.base[1] : env.surfaceY(out[0], out[2]) - rn;
-    // 위 끝 — 주 가닥은 손끝, 가는 가닥은 주 가닥 덩이 아래 목(THIN_JOIN_U)에서 갈라져 나온다(닫힌 끝이 주 기둥 안에 묻힌다)
+    out[1] = i === 0 && this.split === 0 ? this.base[1] : env.surfaceY(out[0], out[2]) - rn;
     const top = i === 0 ? this.tip : this.joint;
     out[6] = top[0];
     out[7] = top[1];
     out[8] = top[2];
     clampR(out, 6);
-    const sag = i === 0 ? SAG * this.len * (1 - 0.5 * this.mix.web) : SAG_THIN * this.len;
+    const sag = SAG * this.len * (1 - 0.5 * this.mix.web);
     out[3] = (out[0] + out[6]) / 2;
     out[4] = (out[1] + out[7]) / 2 - sag;
     out[5] = (out[2] + out[8]) / 2;
@@ -602,35 +583,21 @@ export class StrandRig {
     if (!this.att[0]) return;
     if (m.runny > 0.5) {
       // 묽음 — 끊기지 않고 소리 없이 떨어져 합쳐진다(§6-8)
-      if (over >= lb) this.dropAttached(env, m.runny);
+      if (over >= lb) this.dropAttached(env);
       return;
     }
-    // 한 tick에 여럿 끊겨도 소리는 하나. 되직(벌어짐 < STIFF_FAN)은 여섯이 한 기둥이라 가는 가닥을 따로 끊지 않고
-    // 주 가닥 끊김에 합친다 — 지터 ±8%로 몇 tick 먼저 끊겨 쩍이 두 번 났다(검토 C-4)
-    let thin = false;
-    for (let i = 1; i < STRAND_N && this.fan >= STIFF_FAN; i++) {
-      if (!this.att[i]) continue;
-      const frac = (1 + 0.08 * this.jit[i]) * (1 - m.web) + BREAK_FRAC[i] * m.web;
-      if (over >= lb * frac) {
-        this.breakStrand(i, env);
-        thin = true;
-      }
-    }
     if (over >= lb) {
-      // 주 가닥이 끊기면 남은 가닥도 같이 — 마지막(§1-3)
       for (let i = 0; i < STRAND_N; i++) if (this.att[i]) this.breakStrand(i, env);
       this.events.push({ thin: false, last: true });
-    } else if (thin) {
-      this.events.push({ thin: true, last: false });
     }
   }
 
-  /** 가닥 i 끊김 — 윗도막은 손끝에 매달리고, 아랫도막은 그루터기로 내려앉는다(§6-3) */
+  /** 가닥 i 끊김 — 위쪽은 손끝 덩이로 말려 올라가고, 아래쪽은 느리게 접혀 주저앉는다 */
   private breakStrand(i: number, env: StrandEnv): void {
     const g = this.g;
     const rn = this.strandGeom(i, env, g);
     this.att[i] = false;
-    const tb = this.tbs[i];
+    const tb = this.tb;
     const bz = (k: number): number => {
       const a = g[k] + (g[k + 3] - g[k]) * tb;
       const b = g[k + 3] + (g[k + 6] - g[k + 3]) * tb;
@@ -638,35 +605,22 @@ export class StrandRig {
     };
     const q2 = [bz(0), bz(1), bz(2)];
     const lo = this.segs[i * 2];
-    lo.mode = 3;
-    lo.age = 0;
-    lo.dur = STUMP_S;
-    lo.rn = rn;
-    lo.lump = 0;
-    lo.u0 = 0;
-    lo.u1 = tb;
-    lo.ta = 0;
-    lo.tb = STUMP_POINT;
-    lo.vol = rn;
-    lo.piled = false;
     for (let k = 0; k < 3; k++) {
       lo.from[k] = g[k];
       lo.from[3 + k] = g[k] + (g[3 + k] - g[k]) * tb;
       lo.from[6 + k] = q2[k];
     }
-    // 누운 자리 — 밑점에서 손끝의 수평 방향(없으면 카메라 쪽 +z)으로 아랫도막 길이 × 0.5
     const lenLo = Math.hypot(q2[0] - g[0], q2[1] - g[1], q2[2] - g[2]);
-    this.lieTargets(lo, g[0], g[2], lenLo, rn, env, 0);
+    this.slump(lo, rn, 0, tb, SLUMP_POINT, i === 0 ? PILE_H : 0.4 * PILE_H, g[0], g[2], lenLo, env);
     const up = this.segs[i * 2 + 1];
     up.mode = 2;
     up.age = 0;
     up.rn = rn;
     up.absorb = i !== 0;
-    up.lump = i === 0 ? this.lumpR() * (1 - (1 - HANG_LUMP_WEB) * this.mix.web) : 0;
-    const st = this.mix.stiff;
-    up.u0 = tb + (Math.max(tb, HANG_U0_STIFF) - tb) * st;
+    up.lump = i === 0 ? this.lumpR() : 0;
+    up.u0 = tb;
     up.u1 = 1;
-    up.ta = HANG_POINT + (HANG_POINT_STIFF - HANG_POINT) * st;
+    up.ta = HANG_POINT;
     up.tb = 0;
     // 손끝(그 가닥의 끝점)에서 끊긴 끝까지 · 손끝 오프셋
     up.rel[0] = q2[0] - g[6];
@@ -677,42 +631,46 @@ export class StrandRig {
     up.rel[5] = g[8] - this.tip[2];
   }
 
-  /** 붙은 가닥 전부 낙하 — 한 줄로 합쳐(밑점 = 주 밑점) 수평 방향으로 누우며 똬리 한 번(§6-4) */
-  private dropAttached(env: StrandEnv, runny: number): void {
-    const coil = hash(31, this.grabs) > 0.5 ? 1 : -1;
+  /** 붙은 가닥 전부 주저앉음(놓기 · 묽음 끝) — 한 줄로 밑점 쪽에 접혀 내려앉는다(§6-4) */
+  private dropAttached(env: StrandEnv): void {
     for (let i = 0; i < STRAND_N; i++) {
       if (!this.att[i]) continue;
       this.att[i] = false;
       const lo = this.segs[i * 2];
       const rn = this.strandGeom(i, env, lo.from);
-      lo.mode = 3;
-      lo.age = 0;
-      lo.dur = FALL_S;
-      lo.rn = rn;
+      this.slump(lo, rn, 0, 1, 0, i === 0 ? PILE_H : 0.4 * PILE_H, this.base[0], this.base[2], this.len, env);
       lo.lump = i === 0 ? this.lumpR() : 0;
-      lo.u0 = 0;
-      lo.u1 = 1;
-      lo.ta = 0;
-      lo.tb = 0;
-      lo.vol = rn * (1 + (RUNNY_LIE_GAIN - 1) * runny);
-      lo.piled = false;
-      this.lieTargets(lo, this.base[0], this.base[2], this.len, rn, env, coil * COIL);
       this.segs[i * 2 + 1].mode = 0;
     }
   }
 
-  /** 떨어질 자리 — 밑점(bx, bz)에서 수평 방향으로 len × LIE_FRAC. coil = 가운데 점 옆 오프셋 비 */
-  private lieTargets(s: Seg, bx: number, bz: number, len: number, rn: number, env: StrandEnv, coil: number): void {
+  /** 주저앉음 시작 — from은 채워져 있다. 밑점에서 들던 수평 방향으로 len × LIE_FRAC에 S자로 접혀 눕고, 더미가 같이 자란다 */
+  private slump(s: Seg, rn: number, u0: number, u1: number, tb: number, vol: number,
+    bx: number, bz: number, len: number, env: StrandEnv): void {
+    const m = this.mix;
+    s.mode = 3;
+    s.age = 0;
+    s.dur = SLUMP_RUNNY * m.runny + SLUMP_STIFF * m.stiff + SLUMP_WEB * m.web;
+    s.rn = rn;
+    s.lump = 0;
+    s.u0 = u0;
+    s.u1 = u1;
+    s.ta = 0;
+    s.tb = tb;
+    s.vol = vol;
+    s.added = 0;
+    s.slump = true;
     let hx = this.tip[0] - this.base[0];
     let hz = this.tip[2] - this.base[2];
     const hl = Math.hypot(hx, hz);
-    if (hl > 1e-4) {
+    if (hl > 1e-3) {
       hx /= hl;
       hz /= hl;
     } else {
       hx = 0;
       hz = 1;
     }
+    const coil = (hash(31, this.grabs) > 0.5 ? 1 : -1) * COIL;
     const t = s.to;
     t[0] = bx;
     t[2] = bz;
@@ -722,18 +680,24 @@ export class StrandRig {
     t[3] = (t[0] + t[6]) / 2 - hz * len * coil;
     t[5] = (t[2] + t[8]) / 2 + hx * len * coil;
     clampR(t, 3);
-    for (let k = 0; k < 9; k += 3) t[k + 1] = env.surfaceY(t[k], t[k + 2]) + (k === 0 ? -rn : 0.4 * rn);
+    for (let k = 0; k < 9; k += 3) t[k + 1] = env.surfaceY(t[k], t[k + 2]) + (k === 0 ? -rn : 0.3 * rn);
+    // 더미 자리 = 접힌 가운데 — 반들 자국 · 접힘 방위는 지금 새로
+    this.pile[0] = this.pile[2] > 1e-4 ? this.pile[0] : t[3];
+    this.pile[1] = this.pile[2] > 1e-4 ? this.pile[1] : t[5];
+    this.pile[5] = Math.atan2(hz, hx) + coil * 2;
   }
 
-  /** 매달린 윗도막의 지금 점 — 길이 × 0.7까지 줄며 아래로 처진다(가는 가닥은 × 0.35까지 줄며 흡수) */
+  /** 매달린 윗도막의 지금 점 — 0.15s에 길이 × 0.06까지 손끝 덩이로 말려 올라간다(곁가닥은 × 0.35까지 줄며 흡수) */
   private hangPoints(s: Seg, out: number[]): void {
     const tx = this.tip[0] + s.rel[3];
     const ty = this.tip[1] + s.rel[4];
     const tz = this.tip[2] + s.rel[5];
     const l0 = Math.hypot(s.rel[0], s.rel[1], s.rel[2]);
+    // 말려 올라간 덩이도 길이를 덩이 지름 아래로 줄이지 않는다 — 6%까지 줄이면 납작한 원반 · 커피콩으로 떴다(r2 갓 밥준)
+    const kMin = Math.min(1, Math.max(CURL_LEN, (2.2 * (s.lump + s.rn)) / Math.max(l0, 1e-6)));
     const k = s.absorb
       ? 1 - (1 - ABSORB_LEN) * smooth(0, 1, s.age / ABSORB_S)
-      : 1 - (HANG_SHRINK + (HANG_SHRINK_STIFF - HANG_SHRINK) * this.mix.stiff) * smooth(0, 1, s.age / HANG_SHRINK_S);
+      : 1 - (1 - kMin) * smooth(0, 1, s.age / CURL_S);
     const w = 0.85 * smooth(0, 1, s.age / HANG_DROOP_S);
     let dx = (s.rel[0] / Math.max(l0, 1e-6)) * (1 - w);
     let dy = (s.rel[1] / Math.max(l0, 1e-6)) * (1 - w) - w;
@@ -753,14 +717,15 @@ export class StrandRig {
     out[8] = tz;
   }
 
-  private addPile(x: number, z: number, r: number): void {
-    const dh = r * PILE_GAIN;
+  /** 더미에 높이 dh를 보탠다 — 자리는 높이 무게 평균, 반들 자국은 새로 */
+  private addPile(x: number, z: number, dh: number): void {
     if (!(dh > 0)) return;
     const p = this.pile;
     const w = dh / (p[2] + dh);
     p[0] += (x - p[0]) * w;
     p[1] += (z - p[1]) * w;
     p[2] = Math.min(PILE_MAX, p[2] + dh);
+    this.pileAge = 0;
     this.pileTau = PILE_TAU + (PILE_TAU_RUNNY - PILE_TAU) * this.mix.runny;
   }
 
@@ -772,7 +737,7 @@ export class StrandRig {
       s.mode = 1;
       const g = this.g;
       const rn = this.strandGeom(strand, env, g);
-      const tb = this.tbs[strand];
+      const tb = strand === 0 ? this.tb : SPLIT_JOIN_U;
       const lower = (i & 1) === 0;
       // 한 베지어를 tb에서 나눈다(de Casteljau) — 아래 [0, tb] · 위 [tb, 1]
       for (let k = 0; k < 3; k++) {
@@ -800,11 +765,15 @@ export class StrandRig {
     if (s.mode === 1) s.mode = 0;
     if (s.mode === 2 && s.absorb && s.age >= ABSORB_S) s.mode = 0;
     if (s.mode === 2) this.hangPoints(s, s.from);
-    if (s.mode === 3 && s.age >= s.dur && !s.piled) {
-      s.piled = true;
-      this.addPile(s.to[6], s.to[8], s.vol);
+    if (s.mode === 3) {
+      // 주저앉음은 더미가 같이 자란다(가닥이 녹아드는 동안 높이장이 받는다), 덩이 낙하는 닿은 뒤 한 번에
+      const want = s.slump ? s.vol * smooth(0.3, 1, s.age / s.dur) : (s.age >= s.dur ? s.vol : 0);
+      if (want > s.added) {
+        this.addPile(s.to[3], s.to[5], want - s.added);
+        s.added = want;
+      }
+      if (s.age > s.dur + (s.slump ? 0 : VANISH_S)) s.mode = 0;
     }
-    if (s.mode === 3 && s.age > s.dur + VANISH_S) s.mode = 0;
   }
 
   /** 도막 → uniform 배열 */
@@ -813,21 +782,26 @@ export class StrandRig {
     for (let i = 0; i < SEG_N; i++) {
       const s = this.segs[i];
       const o = i * 4;
-      let fade = 1;
+      let fadeR = 1;
+      let fadeL = 1;
       let p = s.from;
       if (s.mode === 3) {
         const g = Math.min(1, s.age / s.dur);
-        const g2 = g * g; // 중력 꼴 t²
+        // 주저앉음 = 느린 접힘(처음 · 끝이 느리다), 덩이 낙하 = 중력 t²
+        const e = s.slump ? g * g * (3 - 2 * g) : g * g;
         const q = this.g;
-        for (let k = 0; k < 9; k++) q[k] = s.from[k] + (s.to[k] - s.from[k]) * g2;
+        for (let k = 0; k < 9; k++) q[k] = s.from[k] + (s.to[k] - s.from[k]) * e;
         p = q;
-        // 그루터기도 같은 사라짐 — 0.12s에 누운 털 끝이 VANISH_S에 걸쳐 옅어진다(시각 고침 2차 A-3, 옛 0.25~0.4s 따로 사라짐은 지움)
-        fade = 1 - smooth(s.dur, s.dur + VANISH_S, s.age);
-      } else if (s.mode === 2 && s.absorb) {
-        fade = 1 - smooth(0, ABSORB_S, s.age);
+        // 주저앉음 끝 45% 동안 가닥은 옅어지고 그 몫은 더미(높이장)가 받는다 · 접히며 조금 굵어진다
+        // 놓은 손끝 덩이는 떨어지며 옅어진다 — 띄운 덩이가 화면 위쪽에서 반죽까지 날아 내리는 원반으로 읽혔다(r1)
+        fadeR = s.slump ? (1 - smooth(0.55 * s.dur, s.dur, s.age)) * (1 + 0.3 * e) : 1 - smooth(0.2 * s.dur, s.dur, s.age);
+        fadeL = fadeR;
+      } else if (s.mode === 2) {
+        fadeR = s.absorb ? 1 - smooth(0, ABSORB_S, s.age) : 1 - 0.7 * smooth(0, CURL_S, s.age);
+        fadeL = s.absorb ? 0 : 1;
       }
-      const rn = s.mode === 0 ? 0 : s.rn * fade;
-      if (rn > HIDE_R) vis = true;
+      const rn = s.mode === 0 ? 0 : s.rn * fadeR;
+      if (rn > HIDE_R || (s.mode !== 0 && s.lump * fadeL > HIDE_R)) vis = true;
       this.A[o] = p[0];
       this.A[o + 1] = p[1];
       this.A[o + 2] = p[2];
@@ -835,7 +809,7 @@ export class StrandRig {
       this.B[o] = p[3];
       this.B[o + 1] = p[4];
       this.B[o + 2] = p[5];
-      this.B[o + 3] = s.mode === 0 ? 0 : s.lump * fade;
+      this.B[o + 3] = s.mode === 0 ? 0 : s.lump * fadeL;
       this.C[o] = p[6];
       this.C[o + 1] = p[7];
       this.C[o + 2] = p[8];
@@ -852,44 +826,24 @@ export class StrandRig {
 /** 단면 깊이/폭 — 납작한 타원, 넓은 면이 카메라를 본다(§1-2). 둥근 고른 관 = 지렁이라 금지 */
 const STRAND_FLAT = 0.6;
 
-// ── 기둥 질감(2026-11-19 블렌더 상세 맵 public/fx/strand_detail.png) — 옛 절차 결(sin 줄 + fbm) · 길쭉한 기포 틈(cellBubble)을 맵 한 번 읽기로 바꿨다.
-//    RGBA8 256 × 512(둘레 × 길이): R·G = 탄젠트 노멀 x(둘레) · y(길이)(0.5 = 0) · B = 틈(1 = 트임, 최저 0.8) · A = 높이(0.5 = 0, 바깥 +).
-//    둘레 한 바퀴 = u 0..1, v 0..1 = 둘레 두 바퀴 길이(종횡 1:2), 이음매 없음. 주 가닥만 · 위 끝 머리는 빼고 ──
-/** 늘어남 0~1 = smoothstep(이 둘, 주 가닥 길이) — 맵 노멀 · 세로 광이 함께 또렷해진다(늘어난 글루텐). 추정 — 실측 없음(UPQ94 8s 붙음 → 9s 결) */
+// ── 기둥 질감(들기 v3) — 블렌더 결 맵(strand_detail.png)을 뺐다. 반죽 표면 알베도를 「늘인 좌표」에서 읽어 세로 결을 낸다:
+//    둘레 = 각의 cos · sin(이음매 없음), 길이 = 거의 안 변함 → 표면 모틀이 기둥 길이 방향으로 늘어난 줄이 된다(UPQ94 9s 세로 결) ──
+/** 늘어남 0~1 = smoothstep(이 둘, 주 가닥 길이) — 결 노멀이 함께 또렷해진다. 추정 — 실측 없음 */
 const STRETCH_LO = 0.1 * D_W;
 const STRETCH_HI = 0.8 * D_W;
-/** 맵 길이 방향 반복 수 — v = vU × V_REPEAT. 고정이라 기둥이 늘어나면 결이 같이 길어진다(늘어난 글루텐).
- *  기준: 주 가닥 길이 L = 0.5D(LIFT_REF) · 목 반지름 = 피크 기둥 0.065D(neckWidth 그물 w0 0.13D ÷ 2)일 때 맵 한 칸이 둘레 1 : 길이 2.
- *  납작 단면 둘레 ≈ 2π · (1 + 0.6)/2 · r = 5.03r → 0.327D, 한 칸 길이 = 둘레 × 2 = 0.654D → V_REPEAT = L ÷ 0.654D = 0.5 ÷ 0.654 = 0.765.
- *  (아치 길이는 L보다 조금 길다 — 무시, 추정) */
-const V_REPEAT = 0.765;
-/** 맵 노멀 세기 — n += circ · nx · N + T · ny · N, nx · ny = (채널 − 0.5) × 2. 늘어날수록(st) 세게(짧을 때 DETAIL_N_LO 배).
- *  맵 그대로면 이 조명에서 대비가 약하다(맵 쪽 담당 보고)라 1.5에서 시작. 추정 — 실측 없음(높이를 못 잰다) */
-const DETAIL_N = 1.8;
-const DETAIL_N_LO = 0.4;
-/** 높은 띠가 밝고 골이 어둡다(실물 UPQ94 9s는 반투명) — col *= 1 + TONE · (A − 0.5) · 2. 추정 — 실측 없음 */
-const DETAIL_TONE = 0.2;
-/** 틈(B)이 어둡다 — col *= mix(1, B, CAV · (0.8 + 0.4 · 바늘구멍 uPin)). 지금까지 SLIT가 uPin을 쓰던 몫. 추정 — 실측 없음 */
-const DETAIL_CAV = 1.0;
-/** 세로 광(비등방 Ward) — 접선 쪽 폭 · 둘레 쪽 폭 · 세기. 반짝 점 · 흰 띠 금지라 약하게. 추정 — 실측 없음(UPQ94 9s 세로로 긴 광만 봤다) */
+/** 결 좌표 — 둘레 원 반경(fbm 도메인) · 길이 방향 변화량. 반경 2.2면 한 바퀴에 굵은 결 3~5줄. 추정 — 실측 없음 */
+const GRAIN_C = 2.2;
+const GRAIN_V = 0.5;
+/** 결 노멀 세기 · 밝기 몫 — 추정 — 실측 없음 */
+const GRAIN_N = 0.22;
+const GRAIN_TONE = 0.05;
+/** 세로 광(비등방 Ward) — 접선 쪽 폭 · 둘레 쪽 폭 · 세기. 반짝 점 · 흰 띠 금지라 약하게. 추정 — 실측 없음 */
 const ANISO_T = 0.8;
 const ANISO_B = 0.15;
 const ANISO_GAIN = 0.5;
-
-/** 상세 맵 경로 — 묶음 안(빵 GLB '/breads/x.glb' 꼴과 같다). 못 받으면 맵 질감 없이 매끈(절차 결 대체 길은 두지 않는다) */
-export const DETAIL_URL = '/fx/strand_detail.png';
-
-/** 상세 맵 로드 — 데이터 텍스처(NoColorSpace) · 반복 · 밉맵 · 이방성 4(렌더러 최대로 three가 깎는다). 받으면 on 1. document 없는 시험(node)은 건너뛴다 */
-function loadDetail(on: THREE.IUniform<number>): THREE.Texture {
-  if (typeof document === 'undefined') return new THREE.Texture();
-  const t = new THREE.TextureLoader().load(DETAIL_URL, () => { on.value = 1; }, undefined, (err) => {
-    console.warn('[StrandMesh] 상세 맵 로드 실패 — 맵 질감 없이 매끈하게', err);
-  });
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.colorSpace = THREE.NoColorSpace;
-  t.anisotropy = 4;
-  return t;
-}
+/** 덩이 윤곽 거칠기 — 되직 0.35(뭉툭한 덩이) ~ 그 밖 0.18. 추정 — 실측 없음(8uAT 52s 되직 덩이) */
+const LUMP_ROUGH_STIFF = 0.35;
+const LUMP_ROUGH = 0.18;
 
 const STRAND_VERT = /* glsl */ `
 attribute float aT;
@@ -899,9 +853,9 @@ uniform vec4 uSA[${SEG_N}];
 uniform vec4 uSB[${SEG_N}];
 uniform vec4 uSC[${SEG_N}];
 uniform vec4 uSD[${SEG_N}];
-uniform float uFan;
 uniform float uNeck;
 uniform float uStiff;
+uniform float uRunny;
 varying vec3 vN;
 varying vec3 vSide;
 varying vec3 vW;
@@ -910,35 +864,22 @@ varying float vAng;
 varying float vThin;
 varying float vMain;
 varying vec3 vT;
-varying float vAO;
+${FBM_GLSL}
 
-// 반지름 윤곽(§6-5) — 가닥 전체 위치 u(0 밑 ~ 1 끝): 밑동 나팔(아래 15%) → 가장 가는 곳(아래 1/4 근처) →
-// 위로 굵어져 손끝 덩이(주 가닥만) → 끝 링 0(닫힌 끝). 위 굵고 아래 가늚(8uAT 옆 0.25 → 0.1 → 0.03D)
-// pinch = 끊기기 직전 목(u 0.2~0.35) 조임 몫(C.w, 주 가닥만 — L1b 끊기기 직전 0.03D, 8uAT 1:26)
+// 반지름 윤곽 — 가닥 전체 위치 u(0 밑 ~ 1 끝): 짧은 밑동 나팔(넓은 밑자락은 반죽 높이장 둔덕 몫) → 끊는 자리 목 → 손끝 덩이 → 닫힌 끝.
+// pinch = 끊기기 직전 목 조임(C.w, 주 가닥만) — 끊는 자리 tb(0.47~0.55) 둘레
 float strandR(float u, float rn, float lump, float pinch) {
-  // L2a 밑동 나팔 — 시각 고침 2차 A-1: 0.8·(1 − 벌어짐) → 0.8 + 0.4·벌어짐. 메모 목표 밑동 0.22~0.28D = 기둥 0.13D × 약 1.9
-  // (u 0에서 (1 + 1.2) × 0.92). 옛 식은 피크(벌어짐 0.9)에서 나팔이 거의 0이라 빨대 꽂힌 꼴. 묽음 · 되직(벌어짐 0)은 1차와 같다
-  float trumpet = 1.0 + (0.8 + 0.4 * uFan) * (1.0 - smoothstep(0.0, 0.15, u));
-  // 위 : 가운데 ≈ 1.4(상한 1.6). 시각 고침 1차 0.55 → 1.25를 0.8 → 1.1로 — 가는 대 위 덩이(핀 머리 · 서양배, 5 : 1)로 읽혔다.
-  // 추정 — 8uAT 옆 비율. 시각 고침 2차 A-1: 가운데(u 0.5)를 1에 맞춤 — rn = 기둥 가운데 반지름(W/2). 옛 식은 가운데가 0.9라
-  // SHARE 0.85 · √ 기준 길이와 겹쳐 기둥이 L1b의 0.57배였다. 위 : 가운데 1.22 → 1.15 — 굵어진 기둥 위 끝이 면봉 머리로 읽혀(fix2_2 측정
-  // 72 : 56px = 1.29) 메모 상한 1.3에서 여유를 둔다
+  float trumpet = 1.0 + 0.8 * (1.0 - smoothstep(0.0, 0.15, u));
   float body = mix(0.92, 1.15, smoothstep(0.22, 0.95, u));
-  // 되직 = 표면에서 끌려 오른 두꺼운 천막(시각 고침 2차 A-2, 8uAT 0:47 · 0:52) — u 0.6 목(1배, 0.09D)에서 아래로 오목하게 넓어진다.
-  // 밑점은 표면 아래 rn에 묻혀 표면은 u ≈ 0.1~0.17에서 끊긴다 — 거기서 3.1~3.8배 = 0.28~0.31D(메모 밑 0.28~0.32D). 2.3은 0.2D였다
-  // (fix2_1 측정 78px). 위는 덩이가 목에서 부드럽게 부푼다(덩이 아래가 꺾여 들어가는 갓 금지)
-  float cu = max(1.0 - u / 0.6, 0.0);
-  float prof = mix(trumpet * body, 1.0 + 4.0 * cu * cu, uStiff);
-  prof *= 1.0 - pinch * smoothstep(0.12, 0.2, u) * (1.0 - smoothstep(0.35, 0.45, u));
-  // 덩이는 위 40%에 걸쳐 부풀고 끝 20%에 걸쳐 원호로 닫힌다 — 짧게 닫으면 마름모 보석 꼴(첫 녹화).
-  // 부풂 구간 0.55~0.9 · 닫힘 0.2는 추정 — 실측 없음(첫 녹화에서 보석 꼴이 사라지는 값). 되직은 0.45~0.85로 넓혀 목에서 이어지게
-  // (추정 — 실측 없음, 갓 밑 꺾임이 사라지는 값)
-  float knob = lump * smoothstep(mix(0.55, 0.45, uStiff), mix(0.9, 0.85, uStiff), u);
-  float c = clamp((1.0 - u) / 0.2, 0.0, 1.0);
+  float prof = trumpet * body;
+  prof *= 1.0 - pinch * smoothstep(0.3, 0.45, u) * (1.0 - smoothstep(0.58, 0.72, u));
+  // 덩이 — 되직은 위 30%에 둥글고 뭉툭하게, 묽음은 위 60%에 걸쳐 아래로 길게 흘러내린 꼴(되기를 덩이로 읽는다, S5)
+  float knob = lump * smoothstep(mix(0.5, 0.15, uRunny), mix(0.88, 0.97, uRunny), u);
+  float c = clamp((1.0 - u) / mix(0.2, 0.1, uRunny), 0.0, 1.0);
   return (rn * prof + knob) * sqrt(c * (2.0 - c));
 }
 
-// 도막 안 위치 t의 반지름 — 윤곽 × 끊긴 끝 뾰족(시작 · 끝 쪽 D.z · D.w 길이에 걸쳐 0으로, 끝에 방울 없음 L5a 8uAT 1:27)
+// 도막 안 위치 t의 반지름 — 윤곽 × 끊긴 끝 뾰족(시작 · 끝 쪽 D.z · D.w 길이에 걸쳐 0으로)
 float segR(float t, vec4 D, float rn, float lump, float pinch) {
   float r = strandR(mix(D.x, D.y, t), rn, lump, pinch);
   if (D.z > 0.0) r *= clamp(t / D.z, 0.0, 1.0);
@@ -965,6 +906,10 @@ void main() {
   vec3 face = cross(side, T);
   float u = mix(D.x, D.y, t);
   float r = segR(t, D, A.w, B.w, C.w);
+  // 덩이 윤곽은 거칠게 — 매끈한 공 · 버섯 갓 금지. 각의 cos · sin으로 읽어 이음매가 없다
+  float lumpK = B.w > 1e-5 ? smoothstep(0.55, 0.85, u) : 0.0;
+  r *= 1.0 + mix(${LUMP_ROUGH}, ${LUMP_ROUGH_STIFF}, uStiff) * (1.0 - 0.7 * uRunny) * lumpK
+    * fbm(vec2(1.7 * cos(aAng) + 5.0 * u + aSeg * 3.1, 1.7 * sin(aAng) + 3.0 * u));
   // 반지름이 길이를 따라 변하는 만큼 노멀을 접선 쪽으로 기울인다. 빼면 닫힌 끝(덩이 꼭대기)이 옆벽처럼 어둡게 칠해졌다
   float t0 = max(t - 0.02, 0.0);
   float t1 = min(t + 0.02, 1.0);
@@ -980,7 +925,6 @@ void main() {
   vAng = aAng;
   vThin = clamp(1.0 - r / max(uNeck, 1e-4), 0.0, 1.0);
   vMain = aSeg < 1.5 ? 1.0 : 0.0;
-  vAO = 1.0; // 정점 색 그늘은 더미 메시 몫(CoilMesh) — 가닥은 그늘 없음
   gl_Position = projectionMatrix * viewMatrix * vec4(pos, 1.0);
 }
 `;
@@ -990,10 +934,7 @@ uniform vec3 uColor;
 uniform float uSpecStr;
 uniform float uWet;
 uniform float uSlopeAspect;
-uniform float uPin;
 uniform float uLen;
-uniform sampler2D uDetail;
-uniform float uDetailOn;
 varying vec3 vN;
 varying vec3 vSide;
 varying vec3 vW;
@@ -1002,43 +943,40 @@ varying float vAng;
 varying float vThin;
 varying float vMain;
 varying vec3 vT;
-varying float vAO;
 ${FBM_GLSL}
 ${DOUGH_ALBEDO}
 ${DOUGH_SHADE}
+// 늘인 결 좌표 — 둘레는 원(이음매 없음), 길이로는 조금만 움직인다
+vec2 grainQ(float ang, float u) {
+  return vec2(${GRAIN_C.toFixed(2)} * cos(ang) + 0.4 * u, ${GRAIN_C.toFixed(2)} * 0.7 * sin(ang) + ${GRAIN_V.toFixed(2)} * u);
+}
 void main() {
-  // 반죽과 같은 알베도(DOUGH_ALBEDO — 모틀 · 젖음) — 오브젝트 xz 도메인(§6-13). 알베도 색은 바꾸지 않는다
-  vec2 xz = vW.xz * uSlopeAspect;
+  // 위 끝 덩이(손끝)는 늘지 않은 반죽 — 월드 xz 알베도. 아래 기둥은 늘인 결 좌표(같은 DOUGH_ALBEDO, 색은 그대로)
+  float lumpM = smoothstep(0.7, 0.9, vU);
+  float tex = vMain * (1.0 - lumpM);
+  float st = smoothstep(${STRETCH_LO}, ${STRETCH_HI}, uLen);
+  vec2 xz = mix(grainQ(vAng, vU), vW.xz * uSlopeAspect, lumpM);
   float mott;
   vec3 base = doughAlbedo(xz, mott);
   vec3 n = normalize(vN);
   vec3 T = normalize(vT);
-  // 기둥 질감은 주 가닥(합친 기둥)만(§6-15) · 위 끝 둥근 머리(손끝 밑)는 빼고 · 늘어날수록 또렷(st)
-  float tex = vMain * (1.0 - smoothstep(0.75, 0.9, vU));
-  float st = smoothstep(${STRETCH_LO}, ${STRETCH_HI}, uLen);
-  // 상세 맵 — 분기 밖에서 한 번만 읽는다(밉 도함수). 로드 전 · 실패(uDetailOn 0)면 중립값(노멀 0 · 틈 없음 · 높이 0)이라 매끈하다.
-  // u = 둘레 각 ÷ 2π, v = 가닥 위치 × 고정 반복 수(늘어나면 결이 같이 길어진다)
-  vec4 dt = mix(vec4(0.5, 0.5, 1.0, 0.5), texture(uDetail, vec2(vAng / 6.2832, vU * ${V_REPEAT.toFixed(3)})), uDetailOn);
   if (tex > 0.0) {
-    // 맵 노멀(둘레 · 길이)로 흔든다 — 둘레 방향 = 각 미분, 길이 방향 = 접선 T. 줄이 한 점에서 깎이는 2π 이음매는 맵이 이음매 없음
+    // 결 노멀 — 둘레로 각을 조금 옮긴 모틀 차(fbm 1회 더). 늘어날수록(st) 또렷
     vec3 side = normalize(vSide);
     vec3 circ = normalize(-side * sin(vAng) + cross(side, T) * (${STRAND_FLAT} * cos(vAng)));
-    vec2 dn = (dt.rg - 0.5) * 2.0;
-    n = normalize(n + (circ * dn.x + T * dn.y) * (${DETAIL_N.toFixed(2)} * mix(${DETAIL_N_LO.toFixed(2)}, 1.0, st) * tex));
+    float m2 = fbm(grainQ(vAng + 0.06, vU) * 1.4 + 11.0);
+    n = normalize(n + circ * ((m2 - mott) / 0.06 * ${GRAIN_N} * mix(0.4, 1.0, st) * tex));
+    base *= 1.0 + ${GRAIN_TONE} * mott * tex;
   }
   // 아래 15%는 표면 노멀로 — 빨대 꽂힌 꼴 금지(§6-13)
   float low = smoothstep(0.0, 0.15, vU);
   n = normalize(mix(n, vec3(0.0, 1.0, 0.0), 1.0 - low));
-  // 가늘수록 조금 밝고 광이 넓다(L8 kib6 연노랑 윤기). 광 +0.35 · 밝기 +0.06은 추정 — 실측 없음(L8은 색만 봤다, 세기는 못 잰다)
+  // 가늘수록 조금 밝고 광이 넓다(L8 kib6 연노랑 윤기). 광 +0.35 · 밝기 +0.06은 추정 — 실측 없음
   float ndl;
   vec3 col = doughShade(n, base, xz, min(1.0, uWet + 0.35 * vThin), 0.0, ndl);
   col *= 1.0 + 0.06 * vThin;
-  col *= vAO; // 정점 색 그늘(접힌 골 AO) — 더미 메시만 1이 아니다
   if (tex * low > 0.0) {
-    // 높은 띠가 밝고 골 · 틈이 어둡다(실물은 반투명). 틈은 바늘구멍 있는 상태(uPin)일수록 조금 더
-    col *= 1.0 + ${DETAIL_TONE.toFixed(3)} * (dt.a - 0.5) * 2.0 * tex * low;
-    col *= mix(1.0, dt.b, ${DETAIL_CAV.toFixed(2)} * (0.8 + 0.4 * smoothstep(0.004, 0.2, uPin)) * tex * low);
-    // 세로 광 — 늘어난 면의 긴 하이라이트(비등방 Ward: 접선 쪽 넓고 둘레 쪽 좁다). 맵으로 흔든 노멀을 따라 휘어 한 줄 흰 띠가 되지 않는다
+    // 세로 광 — 늘어난 면의 긴 하이라이트(비등방 Ward: 접선 쪽 넓고 둘레 쪽 좁다). 결 노멀을 따라 휘어 한 줄 흰 띠가 되지 않는다
     vec3 H = normalize(doughKey() + vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]));
     vec3 B = cross(T, n);
     B *= inversesqrt(max(dot(B, B), 1e-8));
@@ -1051,7 +989,7 @@ void main() {
 }
 `;
 
-/** 가닥 다발 메시 — 한 draw call. 반죽 머티리얼의 uniform 객체(uColor · uSpecStr · uWet · uSlopeAspect)를 같은 객체로 공유한다 */
+/** 가닥 메시 — 한 draw call. 반죽 머티리얼의 uniform 객체(uColor · uSpecStr · uWet · uSlopeAspect)를 같은 객체로 공유한다 */
 export class StrandMesh {
   readonly rig = new StrandRig();
   readonly mesh: THREE.Mesh;
@@ -1086,7 +1024,6 @@ export class StrandMesh {
     geo.setAttribute('aAng', new THREE.BufferAttribute(aAng, 1));
     geo.setAttribute('aSeg', new THREE.BufferAttribute(aSeg, 1));
     geo.setIndex(idx);
-    const detailOn = { value: 0 };
     this.material = new THREE.ShaderMaterial({
       uniforms: {
         uColor: shared.uColor,
@@ -1097,14 +1034,10 @@ export class StrandMesh {
         uSB: { value: this.rig.B },
         uSC: { value: this.rig.C },
         uSD: { value: this.rig.D },
-        uFan: { value: 0 },
         uNeck: { value: 0 },
         uStiff: { value: 0 },
-        // 기둥 질감 — 바늘구멍은 반죽 uniform 객체를 공유, 길이는 sync가 넣는다. 상세 맵은 로드되면 uDetailOn 1(CoilMesh도 이 객체를 공유)
-        uPin: shared.uPin,
+        uRunny: { value: 0 },
         uLen: { value: 0 },
-        uDetail: { value: loadDetail(detailOn) },
-        uDetailOn: detailOn,
       },
       vertexShader: STRAND_VERT,
       fragmentShader: STRAND_FRAG,
@@ -1118,9 +1051,9 @@ export class StrandMesh {
   /** 상태기 출력 → uniform · 보임. show = 반죽이 보이는가(쇼케이스 중엔 숨는다) */
   sync(show = true): void {
     const u = this.material.uniforms;
-    u.uFan.value = this.rig.fan;
     u.uNeck.value = this.rig.neck;
     u.uStiff.value = this.rig.stiff;
+    u.uRunny.value = this.rig.runny();
     u.uLen.value = this.rig.len;
     this.mesh.visible = show && this.rig.visible;
   }

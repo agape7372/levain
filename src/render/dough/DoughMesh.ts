@@ -12,12 +12,11 @@ import vert from './dough.vert.glsl?raw';
 import frag from './dough.frag.glsl?raw';
 import type { RenderParams } from '../renderParams';
 import { BubbleSystem, DYN_SLOTS } from '../bubbles';
-import { createFillGeometry, FILL_RADIUS, HOOCH_COVER, MARBLE_GLSL, SURF_TILT } from '../jar';
+import { createFillGeometry, FILL_RADIUS, HOOCH_COVER, JAR_HEIGHT, MARBLE_GLSL, SURF_TILT } from '../jar';
 import {
-  CELL_BUBBLE, D_W, DOUGH_ALBEDO, DOUGH_SHADE, FBM_GLSL, MOUND_H, StrandMesh, fbm2, strandMix,
+  CELL_BUBBLE, D_W, DOUGH_ALBEDO, DOUGH_SHADE, FBM_GLSL, LIFT_LUMP, LUMP_Y, MOUND_H, MOUND_R, StrandMesh, fbm2, strandMix,
   type StrandBreak, type StrandEnv,
 } from './StrandMesh';
-import { CoilMesh } from './CoilMesh';
 
 export const XZ_SCALE = 1.3; // 월드→오브젝트 XZ 변환에 입력층이 사용 (월드 XZ = 오브젝트 XZ × XZ_SCALE)
 /** 옆벽 반경(오브젝트) — 유리 안쪽 FILL_RADIUS(0.912 월드) */
@@ -278,55 +277,112 @@ const GRAB_DEFAULTS = {
   releaseTau: 1.2,  // 놓은 뒤 밑동 흔들림 잔류(creepGain 몫) 해소 τ(s)
   omega: 5.5,       // 밑동 둔덕 스프링 고유진동수 — 5.5가 무겁게 되돌아오는 반죽 (확정, ζ = grabReturnZeta)
 };
-/** 밑동 둔덕 반경(오브젝트) — L2a UPQ94 9s 반경 0.2~0.25D ×0.65 */
-const GRAB_RB = (0.14 * D_W) / XZ_SCALE;
-/** 끌려 모임 반경(오브젝트) — L2b 결이 들린 점으로 0.4~1D(Sg__ 262-270 · 8uAT 1:13.7) */
-const GRAB_PULL_R = (0.5 * D_W) / XZ_SCALE;
-/** 방사 결 띠 바깥 끝(오브젝트) — L2b. 0.8rb ~ 0.35D */
-const GRAB_BAND = (0.35 * D_W) / XZ_SCALE;
+// ── 들기 v3 반죽 높이장(2026-11-19 손맛 3차) — 폰 1배에서 손가락(0.65D) 옆 · 위 · 뗀 뒤에 보이는 넓은 신호는 여기서 낸다:
+//    밑자락 둔덕(오목 윤곽) · 잡은 점 쪽 무늬 방사 끌림(도메인) · 높이 주름 8~12줄 · 접혀 포개진 더미(겹 고리 2) · 반들 자국 ──
+/** 밑자락 둔덕 반경(오브젝트) — 명세 0.28D(UPQ94 9s 밑 0.4~0.5D) */
+const LIFT_MR = MOUND_R / XZ_SCALE;
+/** 둘레 수위 꺼짐 — 둔덕 높이 × 0.1을 반경 0.45D 가우스로 뺀다(반죽이 기둥으로 빨려 올라간 몫). 추정 — 실측 없음 */
+const LIFT_SAG_K = 0.1;
+const LIFT_SAG_R = (0.45 * D_W) / XZ_SCALE;
+/** 높이 주름 — 10줄(fbm 휨 · 방위마다 길이 · 세기가 달라 보이는 줄은 8~12), 바깥 끝 0.17~0.46D, 안쪽 0.08D부터.
+ *  r2: 0.3D · 0.018이면 폰 1배에서 손가락(0.65D)이 거의 다 덮어 옆으로 안 보였다 → 0.42D · 0.03. 추정 — 실측 없음 */
+const RIB_N = 10;
+const RIB_R = (0.42 * D_W) / XZ_SCALE;
+const RIB_IN = (0.08 * D_W) / XZ_SCALE;
+const RIB_A = 0.03;
+/** 무늬 끌림 — 면적 보존 흡입(r_src² = r² + A·e^(−r²/R²)): 반경 쪽으로 늘고 둘레 쪽으로 줄어 점 · 모틀이 잡은 점을 향한 결이 된다.
+ *  √A = 0.22D · R = 0.4D(r2: 0.18D · 0.3D는 손가락 밑에 다 들어갔다). 추정 — 실측 없음 */
+const PULL_A2 = ((0.22 * D_W) / XZ_SCALE) ** 2;
+const PULL_R2 = ((0.4 * D_W) / XZ_SCALE) ** 2;
+/** 주름 · 끌림 풀림 — 놓거나 끊기면 τ0.8s로 풀리고(1~3s), 최고치의 20%가 τ8s 흔적으로 남는다. 차오름 τ0.12s. 추정 — 실측 없음 */
+const RIB_RISE_TAU = 0.12;
+const RIB_FALL_TAU = 0.8;
+const RIB_KEEP = 0.2;
+const RIB_KEEP_TAU = 8;
+/** 프래그 기울기 차분 간격(오브젝트) — 주름 간격(0.2 반경에서 0.13)의 1/20 */
+const LIFT_FD = 0.006;
 /** 밑동 흔들림 — 끝점 수평 오프셋 × 0.15, 상한 0.1(오브젝트). 추정 — 실측 없음(측면 영상이 없다) */
 const SWAY_GAIN = 0.15;
 const SWAY_MAX = 0.1;
-/** 휴면 · 곰팡이(가닥 없음) 밑동 둔덕 몫 — 추정 — 실측 없음(§6-2 「조금」) */
-const NONE_MOUND = 0.35;
-/** 더미 반들함이 다 차는 높이 = 둔덕 최대의 절반(시각 고침 1차 A-4 — 더미가 짙은 그늘 얼룩이 아니라 밝은 볼록으로 읽히게).
- *  추정 — 실측 없음(UPQ94 13s 접힌 더미가 둘레보다 밝고 매끈한 것만 봤다) */
-const PILE_FULL_H = 0.5 * MOUND_H;
+/** 휴면 · 곰팡이(가닥 없음) 밑자락 몫 — 추정 — 실측 없음(§6-2 「조금」) */
+const NONE_MOUND = 0.2;
+/** 더미 반들함이 다 차는 높이 — 추정 — 실측 없음(UPQ94 13s 접힌 더미가 둘레보다 밝고 매끈한 것만 봤다) */
+const PILE_FULL_H = 0.035 * D_W;
 /** 잡기 확정 때 그 획의 고랑을 지우는 τ(s) — §6-12 */
 const STROKE_CANCEL_TAU = 0.1;
 
 /**
- * 당기기 높이장 — 버텍스(높이 x)와 프래그(기울기 yz)가 이 소스 하나를 쓴다(규칙 8).
- * 밑동 둔덕(uGrab.x · 반경 GRAB_RB, L2a) + 더미(uPile, L6). 둘레 오목 · 더미 접힌 주름은 뺐다(§6-20).
- * STIR_FIELD(riseK) 뒤에 끼운다.
+ * 들기 높이장 — 버텍스(높이)와 프래그(차분 기울기 liftGrad · 무늬 도메인 liftQ · 반들 pileSheen)가 이 소스 하나를 쓴다(규칙 8).
+ * liftH = 밑자락 둔덕(uGrab.x, 오목) − 둘레 꺼짐 + 높이 주름(uGrab.z) + 더미(uPile, 겹 고리). liftQ = 젓기 회전 뒤 끌림 한 번 더 + 더미 꼬임.
+ * STIR_FIELD(riseK · swirlQ) · FBM_GLSL 뒤에 끼운다.
  */
 export const GRAB_FIELD = /* glsl */ `
-const float GRAB_RB = ${GRAB_RB};
-const float GRAB_PULL_R = ${GRAB_PULL_R};
-const float GRAB_BAND = ${GRAB_BAND};
+const float LIFT_MR = ${LIFT_MR};
+const float LIFT_SAG_R = ${LIFT_SAG_R};
+const float RIB_R = ${RIB_R};
+const float RIB_IN = ${RIB_IN};
+const float PULL_A2 = ${PULL_A2};
+const float PULL_R2 = ${PULL_R2};
+const float LIFT_FD = ${LIFT_FD};
 const float PILE_FULL_H = ${PILE_FULL_H};
-uniform float uPileK; // 더미 메시가 보이면 PILE_BASE_K, 아니면 1 — 높이 · 기울기 둘 다 같은 몫(CPU surfaceY도)
-vec3 grabField(vec2 p) {
-  vec3 o = vec3(0.0);
+uniform vec4 uPileB; // 더미 (반들 자국 0~1, 접힘 방위 rad, 무늬 꼬임 rad, —)
+float liftH(vec2 p) {
+  float h = 0.0;
+  vec2 d = p - uGrabPos;
+  float r2 = dot(d, d);
   if (uGrab.x > 1e-5) {
-    vec2 d = p - uGrabPos;
-    float k = 1.0 / (GRAB_RB * GRAB_RB);
-    float e = uGrab.x * exp(-dot(d, d) * k);
-    o += vec3(e, -2.0 * k * e * d);
+    // 오목 윤곽 — 가운데가 가닥으로 뾰족하게 이어지고 바깥으로 넓게 퍼진다(종 모양 가우스 = 1.6.15 고무 천막)
+    float s = min(sqrt(r2) / LIFT_MR, 1.0);
+    h += uGrab.x * (pow(1.0 - s, 2.5) - ${LIFT_SAG_K.toFixed(2)} * exp(-r2 / (LIFT_SAG_R * LIFT_SAG_R)));
+  }
+  if (uGrab.z > 1e-4) {
+    // 높이 주름 — 좁은 마루(c³) · 방위마다 길이 · 세기(fbm) · 위상 휨(fbm). 고른 별 · 방사 띠 금지
+    float r = sqrt(r2);
+    vec2 dir = d / max(r, 1e-5);
+    float f = fbm(dir * 1.7 + uSeed * 9.0);
+    float ext = RIB_R * (0.75 + 0.5 * f);
+    float env = smoothstep(RIB_IN, 2.0 * RIB_IN, r) * (1.0 - smoothstep(0.45 * ext, ext, r));
+    float c = 0.5 + 0.5 * cos(atan(d.y, d.x) * ${RIB_N.toFixed(1)} + 2.4 * fbm(dir * 2.3 + r * 5.0 + 3.0));
+    h += uGrab.z * ${RIB_A} * c * c * c * env * smoothstep(-0.35, 0.15, f);
   }
   if (uPile.z > 1e-5) {
-    vec2 d = p - uPile.xy;
-    float k = 1.0 / (uPile.w * uPile.w);
-    float e = uPile.z * uPileK * exp(-dot(d, d) * k);
-    o += vec3(e, -2.0 * k * e * d);
+    // 더미 — 접혀 포개진 반죽: 비껴 앉은 중심 둘레 겹 고리 2개(fbm 휨). 표면 높이의 일부라 무늬 · 광이 이어진다
+    vec2 e = p - uPile.xy;
+    float w = uPile.w;
+    // 접힌 방향으로 휜 겹(활꼴 2~3마루) — 닫힌 동심 고리는 과녁 · 장미로 읽혔다(r1)
+    vec2 fd = vec2(cos(uPileB.y), sin(uPileB.y));
+    vec2 el = vec2(dot(e, fd), dot(e, vec2(-fd.y, fd.x))) / w;
+    float fold = 0.5 + 0.5 * cos(6.2832 * (1.3 * el.x + 0.6 * el.y * el.y + 0.35 * fbm(e / w * 2.0 + uPileB.y)));
+    h += uPile.z * exp(-dot(e, e) / (w * w)) * (0.75 + 0.5 * fold * fold);
   }
-  return o * riseK(); // 윗물 아래서 덜 솟는다(§6-9, STIR_FIELD riseK)
+  return h * riseK(); // 윗물 아래서 덜 솟는다(§6-9)
 }
-// 더미 몫 0~1 — 갓 떨어진 반죽은 매끈하고 젖어 반들하다(프래그 광 · 바늘구멍 지움만 쓴다). 높이 PILE_FULL_H에서 1
+// 기울기 — 같은 함수의 앞 차분(해석 미분 대신 — 둔덕 · 주름 · 고리를 한 식으로). 잡는 중 · 더미 있을 때만 부른다
+vec2 liftGrad(vec2 p) {
+  float h0 = liftH(p);
+  return vec2(liftH(p + vec2(LIFT_FD, 0.0)) - h0, liftH(p + vec2(0.0, LIFT_FD)) - h0) / LIFT_FD;
+}
+// 무늬 도메인 — 젓기 회전(swirlQ) 뒤에 끌림을 한 번 더: 잡은 점 쪽 면적 보존 흡입(반경으로 늘어난 결) + 더미 둘레 꼬임.
+// 잡은 점 · 더미 가운데도 같은 Θ로 돌려 같은 틀에서 잰다
+vec2 liftQ(vec2 q, float th) {
+  if (uGrab.z > 1e-4) {
+    vec2 d = q - swirlQ(uGrabPos, th);
+    float r2 = max(dot(d, d), 1e-8);
+    q += d * (sqrt(1.0 + uGrab.z * PULL_A2 * exp(-r2 / PULL_R2) / r2) - 1.0);
+  }
+  if (uPileB.z > 1e-4) {
+    vec2 c = swirlQ(uPile.xy, th);
+    vec2 d = q - c;
+    float a = uPileB.z * exp(-dot(d, d) / (uPile.w * uPile.w));
+    q = c + vec2(cos(a) * d.x - sin(a) * d.y, sin(a) * d.x + cos(a) * d.y);
+  }
+  return q;
+}
+// 더미 · 반들 자국 0~1 — 갓 떨어진 반죽은 매끈하고 젖어 반들하다(프래그 광 · 바늘구멍 지움). 반들 자국은 더미가 꺼진 뒤에도 8~15s 남는다
 float pileSheen(vec2 p) {
-  if (uPile.z < 1e-5) return 0.0;
+  if (uPile.z + uPileB.x < 1e-4) return 0.0;
   vec2 d = p - uPile.xy;
-  return min(1.0, uPile.z / PILE_FULL_H) * exp(-dot(d, d) / (uPile.w * uPile.w));
+  return max(min(1.0, uPile.z / PILE_FULL_H), uPileB.x) * exp(-dot(d, d) / (1.6 * uPile.w * uPile.w));
 }
 `;
 export type GrabTuning = Partial<
@@ -398,8 +454,6 @@ export class DoughMesh {
   grabTuning: GrabTuning = {};
   /** 가닥 다발 메시 — SceneHost가 씬 · homeGroup에 넣는다 */
   readonly strands: StrandMesh;
-  /** 끊긴 뒤 더미 블렌더 메시 — SceneHost가 씬 · homeGroup에 넣고 load()를 한 번 부른다. 못 받으면 높이장 더미만 */
-  readonly coil: CoilMesh;
   /** 이번 tick의 가닥 끊김 — SceneHost.onGrabBreak가 읽는다(소리 · 진동) */
   readonly grabBreaks: readonly StrandBreak[];
   private grabbing = false;
@@ -407,6 +461,9 @@ export class DoughMesh {
   private grabAnchor = new THREE.Vector2();
   private moundH = 0;
   private moundV = 0;
+  /** 높이 주름 · 무늬 끌림 세기 — 빨리 풀리는 몫 · 흔적으로 남는 몫(uGrab.z = 둘 중 큰 값) */
+  private ribFast = 0;
+  private ribSlow = 0;
   private sway = new THREE.Vector2();      // 밑동 흔들림(오브젝트) — ω5.5 · ζ 스프링(「무겁게 되돌아온다」)
   private swayV = new THREE.Vector2();
   private swayRest = new THREE.Vector2();  // 놓을 때 남는 몫(creepGain) — releaseTau로 해소
@@ -483,7 +540,7 @@ export class DoughMesh {
         uGrabPos: { value: new THREE.Vector2() },
         uGrab: { value: new THREE.Vector4() },
         uPile: { value: new THREE.Vector4(0, 0, 0, 1) },
-        uPileK: { value: 1 }, // 더미 메시가 보이는 동안 높이장 더미 높이에 곱하는 몫(CoilMesh PILE_BASE_K)
+        uPileB: { value: new THREE.Vector4() }, // 더미 (반들 자국, 접힘 방위, 무늬 꼬임, —) — GRAB_FIELD
       },
       vertexShader: vert
         .replace('// #fbm', FBM_GLSL)
@@ -499,7 +556,6 @@ export class DoughMesh {
         .replace('// #cellBubble', CELL_BUBBLE),
     });
     this.strands = new StrandMesh(this.material.uniforms);
-    this.coil = new CoilMesh(this.strands.material.uniforms);
     this.grabBreaks = this.strands.rig.events;
     const geo = createFillGeometry(SEG, RINGS, ROWS);
     // 셰이더가 높이를 정하므로 자리 기준 구를 손으로 준다 — 병 전체(바닥~피크 상한)를 덮는다
@@ -619,10 +675,11 @@ export class DoughMesh {
       strandMix(p?.elasticity ?? 0.5, p?.fluidity ?? 0.3, this.grabMax()), this.env());
   }
 
-  /** grab 이동 — 손끝 월드 점(입력층이 카메라를 마주 보는 수직 평면에 투영). 가닥 끝이 이 점을 τ0.07로 따른다 */
+  /** grab 이동 — 손끝 월드 점(입력층이 카메라를 마주 보는 수직 평면에 투영). 가닥 끝이 이 점을 τ0.07로 따른다.
+   *  LIFT_LUMP면 끝(손끝 덩이)을 화면 60px 위로 띄운다 — 손가락이 덩이 · 가닥 끝을 덮지 않게 */
   grabMove3(x: number, y: number, z: number): void {
     if (!this.grabbing) return;
-    this.strands.rig.move(x, y, z);
+    this.strands.rig.move(x, y + LIFT_LUMP * LUMP_Y, z);
   }
 
   /** 놓기 — 붙은 가닥은 한 줄로 합쳐 떨어지고 더미가 되며, 밑동 둔덕은 ω5.5 · ζ 스프링으로 돌아간다. tick이 굴린다 */
@@ -699,19 +756,18 @@ export class DoughMesh {
     this.grabbing = false;
     this.strands.rig.reset();
     this.strands.sync();
-    this.coil.mesh.visible = false;
     this.resetMound();
   }
 
   private resetMound(): void {
-    this.moundH = this.moundV = 0;
+    this.moundH = this.moundV = this.ribFast = this.ribSlow = 0;
     this.sway.set(0, 0);
     this.swayV.set(0, 0);
     this.swayRest.set(0, 0);
     const u = this.material.uniforms;
     (u.uGrab.value as THREE.Vector4).set(0, 0, 0, 0);
     (u.uPile.value as THREE.Vector4).set(0, 0, 0, 1);
-    u.uPileK.value = 1;
+    (u.uPileB.value as THREE.Vector4).set(0, 0, 0, 0);
     (u.uGrabPos.value as THREE.Vector2).copy(this.grabAnchor);
   }
 
@@ -788,9 +844,14 @@ export class DoughMesh {
     y += (u.uMenH.value as number) * THREE.MathUtils.smoothstep(Math.sqrt(c2) / rb, 0.78, 1.0);
     const g = u.uGrab.value as THREE.Vector4;
     const gp = u.uGrabPos.value as THREE.Vector2;
-    if (g.x > 1e-5) y += rise * g.x * Math.exp(-((x - gp.x) ** 2 + (z - gp.y) ** 2) / (GRAB_RB * GRAB_RB));
+    // 밑자락 · 더미 — GRAB_FIELD liftH와 같은 둔덕 식. 높이 주름 · 겹 고리는 빼고(작다), 더미는 고리 평균 몫 0.9
+    if (g.x > 1e-5) {
+      const r2 = (x - gp.x) ** 2 + (z - gp.y) ** 2;
+      const s = Math.min(Math.sqrt(r2) / LIFT_MR, 1);
+      y += rise * g.x * ((1 - s) ** 2.5 - LIFT_SAG_K * Math.exp(-r2 / (LIFT_SAG_R * LIFT_SAG_R)));
+    }
     const pl = u.uPile.value as THREE.Vector4;
-    if (pl.z > 1e-5) y += rise * pl.z * (u.uPileK.value as number) * Math.exp(-((x - pl.x) ** 2 + (z - pl.y) ** 2) / (pl.w * pl.w));
+    if (pl.z > 1e-5) y += rise * 0.9 * pl.z * Math.exp(-((x - pl.x) ** 2 + (z - pl.y) ** 2) / (pl.w * pl.w));
     return y * this.mesh.scale.y;
   }
 
@@ -914,8 +975,12 @@ export class DoughMesh {
       rig.tick(dt, this.env());
       this.strands.sync(this.mesh.visible);
       const att = rig.attached();
-      // 밑동 둔덕(L2a) — h = 0.07D × smoothstep(0, 0.5D, L) × 붙은 몫. 가닥 없는 휴면은 조금만
-      const hT = MOUND_H * THREE.MathUtils.smoothstep(rig.len, 0, 0.5 * D_W) * att * (rig.none ? NONE_MOUND : 1);
+      // 든 높이 — 커밋 뒤 끌어 올린 거리(손끝 덩이를 띄우면 누르자마자 0.1D 몫)
+      const pull = rig.pulled() + (rig.active ? 0.1 * D_W * LIFT_LUMP : 0);
+      // 밑자락 둔덕 — h = 0.2D × smoothstep(0, 0.5D, 든 높이) × 붙은 몫. 가닥 없는 휴면은 조금만.
+      // 병 입구(JAR_HEIGHT − 0.1) 위로는 안 솟는다 — 피크(수위 1.64)는 0.2D면 입구를 넘어 0.14D쯤에서 깎인다
+      const hT = Math.min(MOUND_H * THREE.MathUtils.smoothstep(pull, 0, 0.5 * D_W) * att * (rig.none ? NONE_MOUND : 1),
+        Math.max(0, JAR_HEIGHT - 0.1 - this.topY()));
       const w = this.grabParam('omega');
       this.moundV += (-w * w * (this.moundH - hT) - 2 * czeta * w * this.moundV) * dt;
       this.moundH += this.moundV * dt;
@@ -939,15 +1004,21 @@ export class DoughMesh {
         this.sway.set(0, 0);
         this.swayV.set(0, 0);
       }
-      // 끌려 모임 세기(L2b) — 붙은 몫 × smoothstep(0, 0.6D, L). 가닥 없는 휴면은 0(§6-2 둔덕만)
-      const tension = rig.none ? 0 : att * THREE.MathUtils.smoothstep(rig.len, 0, 0.6 * D_W);
-      (u.uGrab.value as THREE.Vector4).set(Math.max(0, this.moundH), tension, 0, 0);
+      // 끌림 세기 — 붙은 몫 × smoothstep(0, 0.6D, 든 높이). 가닥 없는 휴면은 0(§6-2 둔덕만).
+      // 높이 주름 · 무늬 끌림(uGrab.z)은 τ0.12s로 차고, 놓거나 끊기면 τ0.8s로 풀리며 최고치 20%가 τ8s 흔적으로 남는다
+      const tension = rig.none ? 0 : att * THREE.MathUtils.smoothstep(pull, 0, 0.6 * D_W);
+      this.ribFast = tension > this.ribFast
+        ? this.ribFast + (tension - this.ribFast) * (1 - Math.exp(-dt / RIB_RISE_TAU))
+        : tension + (this.ribFast - tension) * Math.exp(-dt / RIB_FALL_TAU);
+      this.ribSlow = Math.max(this.ribSlow * Math.exp(-dt / RIB_KEEP_TAU), RIB_KEEP * this.ribFast);
+      if (this.ribFast < 1e-4) this.ribFast = 0;
+      if (this.ribSlow < 1e-4) this.ribSlow = 0;
+      (u.uGrab.value as THREE.Vector4).set(Math.max(0, this.moundH), this.ribFast, Math.max(this.ribFast, this.ribSlow), 0);
       (u.uGrabPos.value as THREE.Vector2).copy(this.grabAnchor).add(this.sway);
+      // 더미 — 휴면 · 곰팡이(가닥 없음)는 더미도 없다(상태기가 만들지 않는다)
       const pl = rig.pile;
-      // 더미 메시 — 놓을 자리(반죽 윗면)와 높이장 더미 몫. 휴면 · 곰팡이(가닥 없음)는 더미도 없다
-      u.uPileK.value = this.coil.sync(pl, dt, this.mesh.visible && !rig.none, rig.runny(),
-        1 - 0.85 * this.hoochSpread(), this.strandEnv.surfaceY);
       (u.uPile.value as THREE.Vector4).set(pl[0] / XZ_SCALE, pl[1] / XZ_SCALE, pl[2], pl[3] / XZ_SCALE);
+      (u.uPileB.value as THREE.Vector4).set(pl[4], pl[5], pl[6], 0);
     }
 
     // ── 손끝 패임 · 앞 둔덕 — 젓는 동안 손 속도만큼 파이고(τ0.08s), 놓으면 묽으면 τ0.3s · 되직하면 1.6s(피크는 덜) 메워진다 ──
@@ -1198,6 +1269,7 @@ export class DoughMesh {
     if (!Number.isFinite(this.marblePhase)) this.marblePhase = 0;
     if (!Number.isFinite(this.murk)) this.murk = 0;
     if (!Number.isFinite(this.dentH + this.bowH)) this.dentH = this.bowH = 0;
+    if (!Number.isFinite(this.ribFast + this.ribSlow)) this.ribFast = this.ribSlow = 0;
     if (![this.swTheta, this.swOmega, this.mem, this.memSnap].every((a) => a.every(Number.isFinite))) {
       for (const a of [this.swTheta, this.swOmega, this.mem, this.memSnap]) a.fill(0);
     }

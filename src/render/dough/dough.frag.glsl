@@ -49,7 +49,7 @@ uniform vec2 uPokePos;
 uniform float uPokeAmt;
 uniform float uPokeK;
 uniform vec2 uGrabPos;     // 밑동 둔덕 가운데(오브젝트) — vert와 같은 소스
-uniform vec4 uGrab;        // x = 밑동 둔덕 높이, y = 끌려 모임 세기(방사 결 게이트)
+uniform vec4 uGrab;        // x = 밑자락 둔덕 높이, y = 끌려 모임 세기, z = 높이 주름 · 무늬 끌림 세기
 uniform vec4 uPile;        // 더미 (x, z, 높이, 반경)
 uniform float uRXZMax;
 uniform float uSlopeAspect; // 월드 기울기 진값 = 1 / XZ_SCALE (A1-05)
@@ -88,7 +88,7 @@ void main() {
   // 소용돌이(젓기 v3) — 반경마다 Θ만큼 돈 무늬 도메인 q. 모틀 · 바늘구멍 · 잔 광택이 q에서 읽혀 젓는 손을 따라 돈다(S2).
   // 옆벽은 |vXZ| = R이라 Θ = 0(테두리 고정) — 윗면 · 옆벽 이음매가 없다
   vec4 sw = swirlAt(length(vXZ));
-  vec2 q = swirlQ(vXZ, sw.x);
+  vec2 q = liftQ(swirlQ(vXZ, sw.x), sw.x); // 들기 끌림 · 더미 꼬임 — 점 · 모틀이 잡은 점 쪽 결이 된다(GRAB_FIELD)
   // 알베도(모틀 · 젖음) = DOUGH_ALBEDO — 가닥 frag와 같은 함수. 모틀은 젓은 물결의 휨에도 같은 값을 쓴다(추가 FBM 0)
   float mott;
   vec3 base = doughAlbedo(q, mott);
@@ -148,25 +148,12 @@ void main() {
   base = mix(base, vec3(0.99, 0.975, 0.945), stirM * (0.08 + 0.17 * smoothstep(-0.1, 0.35, mott)));
   // 마루는 밝고 골은 그늘(빛 각도와 무관한 틈 그늘) — 낮은 빛만으론 1배에서 주름이 흐렸다(r5). ±9%는 추정 — 실측 없음
   base *= 1.0 + 0.09 * clamp(foldH / 0.03, -1.0, 1.0);
-  // 당기기 밑동 둔덕 · 더미(L2a · L6) — 버텍스와 같은 함수(GRAB_FIELD)의 기울기
-  if (uGrab.x + uPile.z > 1e-5) dBs += grabField(vXZ).yz * vTop;
-  // 더미는 갓 떨어진 매끈한 반죽 — 반들하고(젖은 광) 조금 밝다. 낮은 키 빛(28.6°)에 먼 쪽 비탈만 그늘이면 짙은 얼룩으로 읽혔다(시각 고침 1차 A-4).
+  // 들기 밑자락 · 높이 주름 · 더미 겹 고리(GRAB_FIELD liftH) — 버텍스와 같은 함수의 앞 차분 기울기(잡는 중 · 더미 · 흔적이 있을 때만, 윗면만)
+  if (uGrab.x + uGrab.z + uPile.z > 1e-5 && vTop > 0.5) dBs += liftGrad(vXZ);
+  // 더미 · 반들 자국 — 갓 떨어진 매끈한 반죽은 반들하고(젖은 광) 조금 밝다. 더미가 꺼진 뒤에도 반들 자국(uPileB.x)이 8~15s 남는다.
   // 광 +0.5 · 밝기 +4%는 추정 — 실측 없음(UPQ94 13s 더미가 둘레보다 밝은 것만 봤다)
   float pileM = vTop > 0.5 ? pileSheen(vXZ) : 0.0;
   base *= 1.0 + 0.04 * pileM;
-  // 방사 결(L2b) — 둔덕 바깥 띠에서 잡힌 자리를 향하는 불규칙한 결, 노멀에만(기울기 ≤ 0.02).
-  // fbm(방향·k)라 이음매가 없고 줄이 고르지 않다(§6-16). 모틀(mott)로 군데군데 끊는다 — 원판 + 고른 방사 띠(욱일) 금지
-  if (uGrab.y > 0.01 && vTop > 0.5) {
-    vec2 gd = vXZ - uGrabPos;
-    float gr = length(gd);
-    float ring = smoothstep(0.8 * GRAB_RB, 1.2 * GRAB_RB, gr) * (1.0 - smoothstep(0.6 * GRAB_BAND, GRAB_BAND, gr));
-    if (ring > 0.001) {
-      vec2 gdir = gd / gr;
-      vec2 gperp = vec2(-gdir.y, gdir.x);
-      float rib = clamp(dot(fbmG(gdir * 5.0 + gr * 1.5 + uSeed * 9.0), gperp) * 0.6, -1.0, 1.0);
-      dBs += gperp * (rib * 0.02 * uGrab.y * ring * smoothstep(-0.1, 0.15, mott));
-    }
-  }
   { // 탭 자국 — 조명이 봐야 "자국이 남았다 아문다"가 읽힌다 (§0-B)
     vec2 d = vXZ - uPokePos;
     float k = uPokeK * 1.6;
