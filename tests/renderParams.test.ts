@@ -2,6 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { toRenderParams, smoothParams } from '../src/render/renderParams';
 import type { Snapshot } from '../src/sim';
+import { simSnap } from '../scripts/lib/simSnap';
 
 const base: Snapshot = {
   canSplit: false,
@@ -114,8 +115,10 @@ describe('renderParams — 상태 앵커 (VISUAL §3-3)', () => {
   it('유리 자국은 피크를 찍고 내려온 뒤에만 — 상승기엔 0, 최고 수위는 현재 수위 이상', () => {
     expect(toRenderParams(justfed).residue).toBeCloseTo(0, 5);
     expect(toRenderParams(peak).residue).toBeCloseTo(0, 5);
-    const falling = toRenderParams({ ...base, activity: 0.6, fill: 1.2, riseFill: 1.2, hunger: 0.3, stage: 3 });
-    expect(falling.residue).toBeGreaterThan(0.3);
+    // 2026-11-19 판정 H2: 옛 고정값 {activity 0.6, riseFill 1.2, hunger 0.3}은 sim이 못 만드는 조합이었다
+    // (riseFill 1.2일 때 hunger 0.05). 실제 궤적 1:1:1 밥 +9h(riseFill 1.35 · hunger 0.03)로 본다
+    const falling = toRenderParams(simSnap(9));
+    expect(falling.residue).toBeGreaterThan(0.5);
     expect(falling.markHeight).toBeGreaterThan(falling.height);
   });
 

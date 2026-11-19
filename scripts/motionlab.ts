@@ -2,7 +2,8 @@
 // 프로덕션 SceneHost·DoughMesh·input을 그대로 물려 씬·조명·카메라·제스처 파리티 보장.
 //
 // URL 파라미터가 전체 상태(HMR 리로드 안전, breadlab 패턴):
-//   ?preset=justfed|rising|peak|falling|hungry|sour|dormant|moldy|split|fridge|stage0|stage1|rye   상태 프리셋 (기본 peak)
+//   ?preset=justfed|rising|peak|falling|hungry|sour|dormant|moldy|split|fridge|stage0|fake|stage1|rye   상태 프리셋 (기본 peak)
+//     — 2026-11-19부터 실제 sim 궤적(밥 준 뒤 시간). ?h= 로 시각을 바꾼다
 //   ?grabMax=&creepGain=&zeta=&elasticTau=&creepDelay=&creepTau=&releaseTau=&omega=
 //     — grab 물성 오버라이드 (비우면 프리셋 상태의 RenderParams 매핑값 사용)
 //   ?stage=0..5&fakeRise=1&flour=white|wholewheat|rye&loc=room|window|fridge&massRatio=&hooch=
@@ -11,33 +12,30 @@
 import { SceneHost } from '../src/render/SceneHost';
 import { toRenderParams } from '../src/render/renderParams';
 import type { Snapshot } from '../src/sim';
+import { simSnap, STATE_HOURS, type SimSnapOpts } from './lib/simSnap';
 
 const canvas = document.getElementById('c') as HTMLCanvasElement;
 const stage = document.getElementById('stage') as HTMLElement;
 
-// ── 상태 프리셋 — 타임스탬프 역산 대신 Snapshot을 직접 구성 (renderParams 입력 전부) ──
-const NOW = 1_700_000_000_000;
-const base: Snapshot = {
-  phase: 'active', activity: 0.5, hunger: 0, sourness: 0.1, dormancy: 0, fill: 1.0,
-  riseFill: 1.0, peakFill: 1.6, massRatio: 1, location: 'room',
-  hooch: 0, smell: 'flour', stage: 3, mass: 180, nextFeedAt: NOW, peakAt: NOW, peakEndAt: NOW,
-  effSinceFeedMs: 0, moldStage: 'none', mold01: 0, moldDeadAt: NOW, kahm: false, hasFlake: false,
-};
-// riseFill = sim 실제값(피크 1.6 = 1 + FILL_PEAK_RISE × 단계 계수 1.0). fill = riseFill × massRatio
-const PRESETS: Record<string, { label: string; snap: Snapshot }> = {
-  justfed: { label: '갓 밥준', snap: { ...base, activity: 0.15, fill: 1.0, riseFill: 1.0, sourness: 0.05 } },
-  rising:  { label: '차오르는', snap: { ...base, activity: 0.55, fill: 1.25, riseFill: 1.25 } },
-  peak:    { label: '피크', snap: { ...base, activity: 1.0, fill: 1.6, riseFill: 1.6, smell: 'yogurt' } },
-  falling: { label: '내려앉는', snap: { ...base, activity: 0.6, fill: 1.2, riseFill: 1.2, hunger: 0.3 } },
-  hungry:  { label: '배고픔', snap: { ...base, activity: 0.25, fill: 0.8, riseFill: 0.8, hunger: 1, sourness: 0.35 } },
-  sour:    { label: '시큼', snap: { ...base, activity: 0.15, fill: 0.7, riseFill: 0.7, hunger: 1, sourness: 0.7, phase: 'sour', smell: 'vinegar', hooch: 0.5 } },
-  dormant: { label: '휴면', snap: { ...base, activity: 0.02, fill: 0.65, riseFill: 0.65, hunger: 1, sourness: 0.8, dormancy: 1, phase: 'dormant', smell: 'sharp' } },
-  moldy:   { label: '곰팡이', snap: { ...base, activity: 0, fill: 0.65, riseFill: 0.65, dormancy: 1, phase: 'moldy', moldStage: 'spread', mold01: 0.6, smell: 'acetone' } },
-  split:   { label: '떼어낸 뒤', snap: { ...base, activity: 0.55, fill: 0.6, riseFill: 1.25, massRatio: 0.33 } },
-  fridge:  { label: '냉장', snap: { ...base, activity: 0.1, fill: 1.0, riseFill: 1.0, location: 'fridge' } },
-  stage0:  { label: '0단계 한창', snap: { ...base, stage: 0, activity: 1.0, fill: 1.3, riseFill: 1.3, peakFill: 1.3 } },
-  stage1:  { label: '잠잠기 한창', snap: { ...base, stage: 1, activity: 1.0, fill: 1.18, riseFill: 1.18, peakFill: 1.18 } },
-  rye:     { label: '호밀 피크', snap: { ...base, activity: 1.0, fill: 1.6, riseFill: 1.6, flour: 'rye', smell: 'yogurt' } },
+// ── 상태 프리셋 — 실제 sim 궤적(2026-11-19 판정 H2). 옛 손 고정값(falling = riseFill 1.2 + hunger 0.3 ·
+//    휴면/곰팡이 hooch 0)은 sim이 못 만드는 스냅샷이라 하강 자국 · 꺼짐 공백(H1)과 전면 hooch를 가렸다.
+//    60일 묵은 5단계 르방을 밥 준 뒤 h시간 advance → deriveSnapshot(scripts/lib/simSnap.ts). 시각 표 = STATE_HOURS ──
+type Preset = { label: string; h: number; opts?: SimSnapOpts; massRatio?: number };
+const PRESETS: Record<string, Preset> = {
+  justfed: { label: '갓 밥준', h: STATE_HOURS.justfed },
+  rising:  { label: '차오르는', h: STATE_HOURS.rising },
+  peak:    { label: '피크', h: STATE_HOURS.peak },
+  falling: { label: '내려앉는', h: STATE_HOURS.falling },
+  hungry:  { label: '배고픔', h: STATE_HOURS.hungry },
+  sour:    { label: '시큼', h: STATE_HOURS.sour },
+  dormant: { label: '휴면', h: STATE_HOURS.dormant },
+  moldy:   { label: '곰팡이', h: STATE_HOURS.moldy },
+  split:   { label: '떼어낸 뒤', h: STATE_HOURS.rising, massRatio: 0.33 },
+  fridge:  { label: '냉장', h: STATE_HOURS.rising, opts: { location: 'fridge' } },
+  stage0:  { label: '0단계 한창', h: STATE_HOURS.peak, opts: { stage: 0, ageD: 0.5 } },
+  fake:    { label: '가짜 부풀기', h: STATE_HOURS.peak, opts: { stage: 0, ageD: 1.5 } },
+  stage1:  { label: '잠잠기 한창', h: STATE_HOURS.peak, opts: { stage: 1 } },
+  rye:     { label: '호밀 피크', h: STATE_HOURS.peak, opts: { flour: 'rye' } },
 };
 
 // ── 튜닝 노브 — [key, 라벨, min, max, step] ──
@@ -65,22 +63,25 @@ const params = new URLSearchParams(location.search);
 let preset = params.get('preset') ?? 'peak';
 if (!(preset in PRESETS)) preset = 'peak';
 
-// Snapshot 덮어쓰기 — 단계·가짜 부풀기·밀가루·위치·질량비·hooch를 프리셋 위에 얹는다
-const SNAP_KEYS = ['stage', 'fakeRise', 'flour', 'loc', 'massRatio', 'hooch'] as const;
+// 덮어쓰기 — 단계 · 가짜 부풀기 · 밀가루 · 위치 · 밥 준 뒤 시간(?h=)은 sim 입력으로 넣어 다시 굴린다(가능한 스냅샷만).
+// 질량비 · hooch만 결과 값 덮어쓰기(시각 비교용)
+const SNAP_KEYS = ['stage', 'fakeRise', 'flour', 'loc', 'h', 'massRatio', 'hooch'] as const;
 function snapOf(id: string): Snapshot {
-  const s: Snapshot = { ...PRESETS[id].snap };
+  const pr = PRESETS[id];
   const num = (k: string): number | null => {
     const v = params.get(k);
     return v !== null && Number.isFinite(Number(v)) ? Number(v) : null;
   };
+  const o: SimSnapOpts = { ...pr.opts };
   const stage = num('stage');
-  if (stage !== null) s.stage = Math.max(0, Math.min(5, Math.round(stage)));
-  if (params.get('fakeRise') === '1') s.fakeRise = true;
+  if (stage !== null) o.stage = Math.max(0, Math.min(5, Math.round(stage)));
+  if (params.get('fakeRise') === '1') { o.stage = 0; o.ageD = 1.5; } // sim의 D2 가짜 부풀기 = 0단계 둘째 날
   const flour = params.get('flour');
-  if (flour === 'white' || flour === 'wholewheat' || flour === 'rye') s.flour = flour;
+  if (flour === 'white' || flour === 'wholewheat' || flour === 'rye') o.flour = flour;
   const loc = params.get('loc');
-  if (loc === 'room' || loc === 'window' || loc === 'fridge') s.location = loc;
-  const mr = num('massRatio');
+  if (loc === 'room' || loc === 'window' || loc === 'fridge') o.location = loc;
+  const s = simSnap(num('h') ?? pr.h, o);
+  const mr = num('massRatio') ?? pr.massRatio ?? null;
   if (mr !== null) {
     s.massRatio = mr;
     s.fill = Math.max(0.6, Math.min(1.6, s.riseFill * mr));

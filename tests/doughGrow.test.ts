@@ -7,6 +7,7 @@ import { DoughMesh, XZ_SCALE } from '../src/render/dough/DoughMesh';
 import { JAR_RADIUS } from '../src/render/jar';
 import type { Snapshot } from '../src/sim';
 import { FILL_PEAK_RISE, STAGE_FILL_FACTOR } from '../src/sim/constants';
+import { simSnap } from '../scripts/lib/simSnap';
 
 const base: Snapshot = {
   canSplit: false, splitReadyAt: 0, discardReady: true, nextStage: null, fakeRise: false,
@@ -81,12 +82,88 @@ describe('유리 최고 수위 — Snapshot.peakFill을 같은 매핑으로(A3-0
     const morning = toRenderParams({
       ...base, stage: 0, activity: 0.2, hunger: 0.6, riseFill: 0.9, fill: 0.9, peakFill: 1.72,
     });
-    expect(morning.markHeight).toBeCloseTo(doughHeight(1.72, 1, 0), 5);
+    expect(morning.markHeight).toBeCloseTo(doughHeight(1.72, 1, 0, 1.72), 5);
     expect(morning.markHeight).toBeGreaterThan(doughHeight(1.3, 1, 0) + 0.1);
   });
   it('자국은 현재 수위보다 낮아지지 않는다', () => {
     const rp = toRenderParams(peakOf(4, { peakFill: 1.3 }));
     expect(rp.markHeight).toBeGreaterThanOrEqual(rp.height);
+  });
+});
+
+// ── 실제 sim 궤적(2026-11-19 판정 H1 · M1 · M2 · M3) — 손으로 짠 Snapshot은 sim이 못 만드는 조합이라 화면을 가렸다 ──
+describe('실제 sim 하강 — 상승 · 갓 밥준과 갈린다(판정 H1)', () => {
+  it.each([['1:1:1', 9], ['1:5:5', 18]] as const)('%s 밥 +%ih 하강: 자국 · 꺼짐 켜짐, 거품 · 물결 꺼짐', (ratio, h) => {
+    const rp = toRenderParams(simSnap(h, { ratio }));
+    expect(rp.residue).toBeGreaterThan(0.5);
+    expect(rp.sink).toBeGreaterThan(0.3);
+    expect(rp.foam).toBeLessThan(0.3);
+    expect(rp.stir).toBeLessThan(0.1);
+    // 수면과 자국 사이 빈 유리 — 1:5:5는 질량비 0.41이라 월드 0.3을 못 넘는다. 최고 수위 대비 15%로 같이 본다
+    expect((rp.markHeight - rp.height) / rp.markHeight).toBeGreaterThan(0.15);
+  });
+  it('1:1:1 +9h 빈 유리는 0.3월드 이상', () => {
+    const rp = toRenderParams(simSnap(9));
+    expect(rp.markHeight - rp.height).toBeGreaterThan(0.3);
+  });
+  it('갓 밥준 · 오르는 중 · 피크엔 자국 · 꺼짐이 없다', () => {
+    for (const h of [0, 3, 5]) {
+      const rp = toRenderParams(simSnap(h));
+      expect(rp.residue, `${h}h`).toBeLessThan(0.02);
+      expect(rp.sink, `${h}h`).toBeLessThan(0.02);
+    }
+  });
+  it('하강 끝 · 배고픔 초반(+11h · +14h)엔 갓 밥준 물결이 다시 켜지지 않는다', () => {
+    for (const h of [11, 14]) expect(toRenderParams(simSnap(h)).stir, `${h}h`).toBeLessThan(0.1);
+    expect(toRenderParams(simSnap(0)).stir).toBeGreaterThan(0.9);
+  });
+});
+
+// sRGB 0~1 → [L*, b*] (D65) — 시큼 색은 어두워지지 않고 노래진다(어두운 얼룩 금지)
+const labLb = (c: [number, number, number]): [number, number] => {
+  const [r, g, b] = c.map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  const f = (t: number): number => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116);
+  const fy = f(0.2126 * r + 0.7152 * g + 0.0722 * b);
+  const fz = f((0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883);
+  return [116 * fy - 16, 200 * (fy - fz)];
+};
+
+describe('실제 sim 시큼 초반 — 배고픔과 갈린다(판정 M1)', () => {
+  it('hooch 액체층이 시큼 초반부터 보인다 — +60h ≥ 0.2 · +72h ≥ 0.45', () => {
+    expect(toRenderParams(simSnap(60)).hoochAmt).toBeGreaterThanOrEqual(0.2);
+    expect(toRenderParams(simSnap(72)).hoochAmt).toBeGreaterThanOrEqual(0.45);
+    expect(toRenderParams(simSnap(28)).hoochAmt).toBe(0);
+  });
+  it('+40h 색은 +28h 배고픔보다 노랗고(b* +2.5 이상), 어둡게 가라앉지 않는다(L* −3 이내)', () => {
+    const [lH, bH] = labLb(toRenderParams(simSnap(28)).color);
+    const [lS, bS] = labLb(toRenderParams(simSnap(40)).color);
+    expect(bS - bH).toBeGreaterThanOrEqual(2.5); // 옛 톤 #cbbda2 · 0.3 섞기 = +0.2
+    expect(lH - lS).toBeLessThanOrEqual(3);
+  });
+});
+
+describe('실제 sim 곰팡이 — 군락이 액체 아래 묻히지 않는다(판정 M2)', () => {
+  it('휴면(+144h)은 전면 hooch, 곰팡이 번짐(+260h)은 액체가 거의 걷힌다', () => {
+    expect(toRenderParams(simSnap(144)).hoochAmt).toBeGreaterThan(0.95);
+    const moldy = simSnap(260);
+    expect(moldy.moldStage).not.toBe('none');
+    expect(toRenderParams(moldy).hoochAmt).toBeLessThan(0.3);
+  });
+});
+
+describe('실제 sim 단계 — 같은 피크 시각에 단계가 보인다(판정 M3)', () => {
+  it('2단계 대 5단계 벽 기포 차이 ≥ 0.3', () => {
+    const w2 = toRenderParams(simSnap(5, { stage: 2 })).wallCells;
+    const w5 = toRenderParams(simSnap(5, { stage: 5 })).wallCells;
+    expect(w5 - w2).toBeGreaterThanOrEqual(0.3);
+  });
+  it('D2 가짜 부풀기는 5단계 피크보다 낮고, 자국은 그 가짜 피크 자리에 남는다', () => {
+    const fakeSnap = simSnap(5, { stage: 0 });
+    expect(fakeSnap.fakeRise).toBe(true);
+    const fake = toRenderParams(fakeSnap);
+    const mature = toRenderParams(simSnap(5, { stage: 5 }));
+    expect(fake.height).toBeLessThan(mature.height);
+    expect(fake.markHeight).toBeCloseTo(fake.height, 2);
   });
 });
 

@@ -203,7 +203,7 @@ const hoochFrag = /* glsl */ `
   void main() {
     float rN = length(vP.xz);
     float spread = smoothstep(0.30, 0.80, uAmt);          // 고리 → 전면
-    float show = smoothstep(0.02, 0.12, uAmt);
+    float show = smoothstep(0.0, 0.05, uAmt); // 시큼 초반부터 고리가 보이게(판정 M1 — 옛 0.02~0.12는 늦었다)
     if (vP.y < 0.999) {
       // 옆 띠 — 위는 밝은 액면선, 아래 경계는 짙은 수평선
       vec3 c = mix(vec3(0.525, 0.459, 0.384), vec3(0.600, 0.502, 0.392), smoothstep(0.0, 0.35, vP.y)); // #867562 → #998064
@@ -214,8 +214,11 @@ const hoochFrag = /* glsl */ `
       return;
     }
     // 윗면 — 가장자리 먼저. 안쪽은 맑아 아래 반죽이 비친다
-    float ringW = mix(0.10, 1.25, spread);
-    float cover = smoothstep(1.0 - ringW, 1.0 - ringW + 0.10, rN);
+    // 안쪽 경계는 넓고 불규칙하게 — 또렷한 동심원은 과녁 · 계란프라이로 읽혔다(판정 L3). 각도 저주파 흔들림 +
+    // 번지는 중엔 전이 폭 0.25(고리 단계는 0.10 그대로 — 가장자리 실선이 옅어지지 않게)
+    float ang = atan(vP.z, vP.x);
+    float ringW = mix(0.10, 1.25, spread) + spread * (1.0 - spread) * (0.24 * sin(3.0 * ang + 1.3) + 0.14 * sin(5.0 * ang - 0.7));
+    float cover = smoothstep(1.0 - ringW, 1.0 - ringW + mix(0.10, 0.25, spread), rN);
     vec3 c = mix(vec3(0.64, 0.60, 0.51), vec3(0.624, 0.592, 0.498), smoothstep(0.6, 1.0, rN)); // 가장자리 #9f977f
     float flow = 0.5 + 0.5 * sin(vP.x * 9.0 + uTime * 0.3) * sin(vP.z * 8.0 - uTime * 0.22);
     float a = cover * show * (0.30 + 0.22 * smoothstep(0.55, 1.0, rN) + 0.05 * flow);

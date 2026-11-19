@@ -8,26 +8,12 @@ import { BubbleSystem, SCAR_AMP } from '../src/render/bubbles';
 import frag from '../src/render/dough/dough.frag.glsl?raw';
 import vert from '../src/render/dough/dough.vert.glsl?raw';
 import type { Snapshot } from '../src/sim';
+import { simSnap, STATE_HOURS } from '../scripts/lib/simSnap';
 
-const base: Snapshot = {
-  canSplit: false, splitReadyAt: 0, discardReady: true, nextStage: null, fakeRise: false,
-  phase: 'active', activity: 0.5, hunger: 0, sourness: 0.1, dormancy: 0,
-  fill: 1.0, riseFill: 1.0, peakFill: 1.6, massRatio: 1, location: 'room',
-  hooch: 0, smell: 'flour', stage: 3, mass: 180, flour: 'white',
-  nextFeedAt: 0, peakAt: 0, peakEndAt: 0, effSinceFeedMs: 0,
-  moldStage: 'none', mold01: 0, moldDeadAt: 0, kahm: false, hasFlake: false,
-};
-// motionlab 프리셋과 같은 Snapshot (scripts/motionlab.ts PRESETS)
-const S = {
-  justfed: { ...base, activity: 0.15, riseFill: 1.0, sourness: 0.05 },
-  rising: { ...base, activity: 0.55, riseFill: 1.25, fill: 1.25 },
-  peak: { ...base, activity: 1.0, riseFill: 1.6, fill: 1.6, smell: 'yogurt' as const },
-  falling: { ...base, activity: 0.6, riseFill: 1.2, fill: 1.2, hunger: 0.3 },
-  hungry: { ...base, activity: 0.25, riseFill: 0.8, fill: 0.8, hunger: 1, sourness: 0.35 },
-  sour: { ...base, activity: 0.15, riseFill: 0.7, fill: 0.7, hunger: 1, sourness: 0.7, phase: 'sour' as const, hooch: 0.5 },
-  dormant: { ...base, activity: 0.02, riseFill: 0.65, fill: 0.65, hunger: 1, sourness: 0.8, dormancy: 1, phase: 'dormant' as const },
-  moldy: { ...base, activity: 0, riseFill: 0.65, fill: 0.65, dormancy: 1, phase: 'moldy' as const, moldStage: 'spread' as const, mold01: 0.6 },
-} satisfies Record<string, Snapshot>;
+// 실제 sim 궤적의 상태별 시각(판정 H2, 2026-11-19) — 옛 손 고정값(falling = riseFill 1.2 + hunger 0.3 등)은
+// sim이 못 만드는 조합이라 실제 화면을 가렸다. motionlab 프리셋과 같은 표(scripts/lib/simSnap.ts STATE_HOURS)
+const S = Object.fromEntries(Object.entries(STATE_HOURS).map(([k, h]) => [k, simSnap(h)])) as
+  Record<keyof typeof STATE_HOURS, Snapshot>;
 const R = Object.fromEntries(Object.entries(S).map(([k, s]) => [k, toRenderParams(s)])) as Record<keyof typeof S, ReturnType<typeof toRenderParams>>;
 
 /** sRGB 0~1 → CIE L* (D65) */

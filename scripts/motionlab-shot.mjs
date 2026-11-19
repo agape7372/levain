@@ -15,8 +15,8 @@ import { launchBrowser } from './lib/launch-browser.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PRESETS = [
   'justfed', 'rising', 'peak', 'falling', 'hungry', 'sour', 'dormant', 'moldy',
-  // 반죽 모델 v2(2026-11-19) — 떼어낸 뒤 · 냉장 · 어린 단계 둘 · 호밀
-  'split', 'fridge', 'stage0', 'stage1', 'rye',
+  // 반죽 모델 v2(2026-11-19) — 떼어낸 뒤 · 냉장 · 어린 단계 둘 · D2 가짜 부풀기 · 호밀. 전부 실제 sim 궤적(판정 H2)
+  'split', 'fridge', 'stage0', 'fake', 'stage1', 'rye',
 ];
 
 const [arg1, arg2] = process.argv.slice(2);

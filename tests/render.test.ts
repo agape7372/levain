@@ -4,6 +4,40 @@ import { describe, it, expect } from 'vitest';
 import { fitPixelRatio } from '../src/render/SceneHost';
 import { DoughMesh } from '../src/render/dough/DoughMesh';
 import { ParticlePool, STEAM_FADE_S } from '../src/render/particles';
+import { JAR_HEIGHT } from '../src/render/jar';
+import { toRenderParams } from '../src/render/renderParams';
+import { simSnap } from '../scripts/lib/simSnap';
+import type * as THREE from 'three';
+
+// 판정 M4(2026-11-19) — 피크에서 잡아 당기면 리본 끝이 병 입구 위로 솟아 소프트아이스크림 꼴이 됐다.
+// 리본 끝 y = topY + |변위| × uGrabShape.y × 1.7(dough.vert.glsl 리프트 식의 상수)
+describe('DoughMesh grab — 리본 끝은 병 입구 위로 솟지 않는다(판정 M4)', () => {
+  const tipY = (h: number): { tip: number; rp: ReturnType<typeof toRenderParams> } => {
+    const d = new DoughMesh();
+    const rp = toRenderParams(simSnap(h));
+    d.applyParams(rp);
+    d.tick(0);
+    d.grabStart(0, 0);
+    d.grabMove(5, 0); // grabMax까지 끝까지 당긴다
+    for (let i = 1; i <= 120; i++) d.tick(i / 60);
+    const u = d.material.uniforms;
+    const disp = (u.uGrabDisp.value as THREE.Vector2).length();
+    return { tip: d.topY() + disp * (u.uGrabShape.value as THREE.Vector2).y * 1.7, rp };
+  };
+  it('피크(+5h, 수위 ≈1.6) — 끝까지 당겨도 JAR_HEIGHT + 0.12 이하, 잠금값 grabMax는 그대로', () => {
+    const { tip, rp } = tipY(5);
+    expect(rp.height).toBeGreaterThan(1.55);
+    expect(tip).toBeLessThanOrEqual(JAR_HEIGHT + 0.12 + 1e-6);
+  });
+  it('배고픔(+20h, 수위 ≈0.7)은 여유가 커서 리프트가 거의 줄지 않는다', () => {
+    const d = new DoughMesh();
+    d.applyParams(toRenderParams(simSnap(20)));
+    d.grabStart(0, 0);
+    d.grabMove(5, 0);
+    d.tick(0);
+    expect((d.material.uniforms.uGrabShape.value as THREE.Vector2).y).toBeGreaterThan(1.6 * 0.9);
+  });
+});
 
 describe('fitPixelRatio — DPR 상한 + 버퍼 총량 상한', () => {
   it('360×728 폰은 비율 2 그대로', () => {

@@ -7,6 +7,8 @@
 // `liquidity` 필드는 **부활 금지** — 남기면 두 의미가 다시 섞인다.
 import type { Snapshot } from '../sim/types';
 // 2026-11-19: sim 상수 import(STAGE_FILL_FACTOR 이음새)는 지웠다 — 최고 수위는 Snapshot.peakFill을 그대로 읽는다.
+// FILL_PEAK_RISE는 「정상 피크 상한」을 알아보는 데만 쓴다(가짜 부풀기 사이클 판별, 판정 M3)
+import { FILL_PEAK_RISE } from '../sim/constants';
 
 /** 병 높이(월드) — jar.ts JAR_HEIGHT와 같은 값. 이 파일은 three 무의존이라 숫자로 둔다 */
 const JAR_H = 1.9;
@@ -20,6 +22,8 @@ const RISE_GAIN = 1.1 / 0.6;
 const FALL_GAIN = 0.35;
 /** 렌더 전용 상승 배율 — (높이−1)에 곱한다. 어린 병은 덜 오른다. 0·1단계는 sim 계수가 이미 누른다 */
 const RISE_BY_STAGE = [1, 1, 0.85, 0.93, 1, 1];
+/** D2 가짜 부풀기 사이클(peakFill이 정상 피크 1.6을 넘음)의 상승 배율 — 성숙 피크를 넘지 않게(판정 M3: 2.2배 → 1.99배) */
+const FAKE_RISE_DAMP = 0.75;
 /** 기운 — 단계가 병에 보이게 하는 렌더 축(A3-01). 0단계(갓 섞음) · 1단계(잠잠기) · 2 첫 기포 … 5 */
 const VIGOR_BY_STAGE = [0.35, 0.25, 0.6, 0.8, 0.92, 1.0];
 /** 윗가장자리가 유리에서 물러나는 최대 폭(월드) — 마름·배고픔. 위 10~15% 높이만 */
@@ -28,11 +32,14 @@ const PULL_MAX = 0.028;
 /**
  * riseFill(질량 무관 부풀기 곡선) · massRatio · 단계 → 반죽 수위(월드 y, 병 바닥 0 기준).
  * 순서를 보존하는 단조 재매핑이라 sim 규칙과 무관한 시각 배율이다(R2-03).
+ * peakFill = 이번 사이클 최고치. 정상 피크(1 + FILL_PEAK_RISE)를 넘으면 가짜 부풀기 사이클이라 상승을 누른다 —
+ * 지금 시각의 fakeRise 플래그가 아니라 사이클 값이라 수위와 자국이 같은 매핑을 쓴다(판정 M3)
  */
-export function doughHeight(riseFill: number, massRatio: number, stage: number): number {
+export function doughHeight(riseFill: number, massRatio: number, stage: number, peakFill = 1): number {
   const r = Number.isFinite(riseFill) ? riseFill : 1;
+  const damp = peakFill > 1 + FILL_PEAK_RISE + 1e-6 ? FAKE_RISE_DAMP : 1;
   const ratio = r >= 1
-    ? 1 + RISE_GAIN * (r - 1) * (RISE_BY_STAGE[stage] ?? 1)
+    ? 1 + RISE_GAIN * (r - 1) * (RISE_BY_STAGE[stage] ?? 1) * damp
     : 1 - FALL_GAIN * (1 - r);
   const mass = Math.max(0.25, Math.min(1, Number.isFinite(massRatio) ? massRatio : 1));
   return Math.min(PEAK_CAP, FED_LEVEL * ratio * mass);
@@ -82,7 +89,7 @@ export interface RenderParams {
   pinholes: number;
   /** 유리 닿는 윗가장자리 잔거품 띠 0~1 — 오르는 중 · 피크(R1 rising top_foam) */
   foam: number;
-  /** 하강 꺼짐 0~1 — 가운데가 먼저 꺼지고 부드럽게 주름진다. hunger 0.05~0.5 구간 전용(R2-06) */
+  /** 하강 꺼짐 0~1 — 가운데가 먼저 꺼지고 부드럽게 주름진다. 피크 끝(hunger > 0) ~ 배고픔 초반(hunger 0.5) 전용(R2-06 · 판정 H1) */
   sink: number;
   /** 젓은 물결 0~1 — 갓 밥준 매끈한 페이스트 위 옅은 물결(R1 justfed) */
   stir: number;
@@ -112,7 +119,9 @@ const smooth = (e0: number, e1: number, x: number): number => {
 // 상태 앵커 색 (VISUAL §3-3)
 const CREAM = hex(0xf4ead4);
 const HUNGRY_TONE = hex(0xdcd2c0);
-const SOUR_TONE = hex(0xcbbda2);
+// 시큼 = 어두워지지 않고 노래진다(판정 M1, 2026-11-19). 옛 #cbbda2(L*77)는 반죽을 통째로 어둡게 했다 —
+// 시큼은 hooch가 말하고(R1 pitfalls), 반죽은 배고픔 톤(L*84.5)과 거의 같은 밝기로 b*만 +10(L*82.6 b*20)
+const SOUR_TONE = hex(0xddcca8);
 const DORMANT_TONE = hex(0xe4dccc);
 // 곰팡이 확정 — 잿빛이 도는 바랜 톤. 경고는 다이제틱(반점) 소관, 빨강 시맨틱 없음 (VISUAL §7-1)
 const MOLDY_TONE = hex(0xd8d0be);
@@ -139,8 +148,8 @@ export function toRenderParams(s: Snapshot): RenderParams {
   // 밀가루 톤 — 상태 톤보다 먼저(재료가 바탕색), 상태 변화가 그 위를 지나간다
   if (s.flour === 'wholewheat') color = mix(color, WHOLEWHEAT_TONE, FLOUR_TONE_MIX);
   else if (s.flour === 'rye') color = mix(color, RYE_TONE, FLOUR_TONE_MIX);
-  // 시큼은 hooch 액체층이 말한다(R2-05) — 반죽 전체를 어둡게 하던 혼합은 약하게만 남긴다
-  color = mix(color, SOUR_TONE, 0.3 * smooth(0.25, 0.6, s.sourness));
+  // 시큼은 hooch 액체층이 말한다(R2-05). 반죽은 어둡히지 않고 노랗게만 — 시큼 초반(+40h)이 배고픔과 갈리게(판정 M1)
+  color = mix(color, SOUR_TONE, 0.45 * smooth(0.4, 0.8, s.sourness));
   color = mix(color, DORMANT_TONE, clamp01(s.dormancy));
   if (moldy) color = mix(color, MOLDY_TONE, 0.7);
   color = mix(color, COLD_TONE, 0.12 * chill);
@@ -170,6 +179,12 @@ export function toRenderParams(s: Snapshot): RenderParams {
   const elasticity = moldy ? 0 : clamp01(0.08 + 0.8 * gas - 0.55 * proteo - 0.25 * hun) * (1 - 0.7 * dry);
   // 살아있는 연출과 죽은 연출(crust·kahm·mold)을 상호배타로 — 프래그 게이트 동시 개방 방지(예산 §8)
   const alive = (1 - dry) * (s.kahm ? 0 : 1) * (1 - smooth(0, 0.3, s.moldStage === 'none' ? 0 : clamp01(s.mold01)));
+  // 피크를 지났다 — hunger는 피크 끝에서 0을 떠난다. hunger 자체는 smoothstep(peakEnd, sour)라 하강 끝(1:1:1 +14h)에도
+  // 0.18뿐이라, 하강 신호(자국 · 꺼짐)를 hunger 크기에 걸면 하강 내내 꺼져 있었다(판정 H1). 문턱으로만 쓴다
+  const fallen = smooth(0, 0.025, hun);
+  // 곰팡이 표시값(반점 바닥 0.25 포함) — hooch를 걷어 군락이 액체 아래 묻히지 않게(판정 M2)
+  const moldShow = s.moldStage === 'none' ? 0 : Math.max(0.25, clamp01(s.mold01));
+  const height = doughHeight(s.riseFill, s.massRatio, s.stage, s.peakFill);
 
   return {
     color,
@@ -178,8 +193,9 @@ export function toRenderParams(s: Snapshot): RenderParams {
     breatheAmp: moldy ? 0 : 0.003 + (0.012 - 0.003) * a,
     breathePeriod: 2.6 + (7.0 - 2.6) * Math.pow(1 - a, 1.5),
     noiseSpeed: moldy ? 0 : 0.1 + 1.5 * a,
-    bubbleDensity: moldy ? 0 : clamp01(a * 0.9 * (1 - 0.85 * s.dormancy) * (0.3 + 0.7 * vigor) * (1 - 0.45 * fake)),
-    bubbleScale: Math.min(1.5, (0.5 + 0.8 * a) * (0.75 + 0.25 * vigor) * (1 + 0.45 * fake)),
+    // 가짜 부풀기 = 적고 큰 기포(판정 M3: 밀도 ×0.55 → ×0.4, 크기 ×1.45 → ×1.8 — 상한 1.5 안)
+    bubbleDensity: moldy ? 0 : clamp01(a * 0.9 * (1 - 0.85 * s.dormancy) * (0.3 + 0.7 * vigor) * (1 - 0.6 * fake)),
+    bubbleScale: Math.min(1.5, (0.5 + 0.8 * a) * (0.75 + 0.25 * vigor) * (1 + 0.8 * fake)),
     // 광택 — 2026-11-19 R2-12: R1 실물(사진 03 · 07 · 08 · 17)로 2026-08-25 가설(「갓 밥준 무광 · 피크가 가장 번들」)을
     // 뒤집었다. 그때 근거는 밀가루 먼지가 앉은 병 몇 장이었고, 30장 대조에선 갓 밥준이 넓고 부드러운 젖은 광(sdL 2.3),
     // 피크는 매트 · 새틴 거품에 기포 테두리만 반짝, 배고픔은 얇은 막 광, 휴면은 매트다(VISUAL §3-3).
@@ -187,13 +203,15 @@ export function toRenderParams(s: Snapshot): RenderParams {
     specStr: Math.min(1.0, Math.max(0.1,
       (0.1 + 0.6 * wet + 0.25 * gas + 0.25 * spent - 0.12 * proteo) * (1 - 0.9 * dry))),
     crust: 0.8 * clamp01(Math.max(s.dormancy, moldy ? 1 : 0)),
-    height: doughHeight(s.riseFill, s.massRatio, s.stage),
-    hoochAmt: clamp01(s.hooch),
+    height,
+    // 시각 곡선 √ — sim hooch는 smoothstep(48h, 120h)라 시큼 초반이 얇았다(+60h 0.07 → 0.26, 판정 M1).
+    // 곰팡이가 앉으면 액체가 걷힌다 — 마른 윗면에 매트한 군락(판정 M2, R1 moldy 「액체 hooch와 달리 광이 없다」)
+    hoochAmt: Math.sqrt(clamp01(s.hooch)) * (1 - 0.85 * smooth(0, 0.3, moldShow)),
     wet,
     ripe,
     collapse,
     // spot 진입 직후 mold01≈0이라 반점이 안 보임 — 예고는 보여야 예고다 (바닥값 0.25)
-    mold: s.moldStage === 'none' ? 0 : Math.max(0.25, clamp01(s.mold01)),
+    mold: moldShow,
     kahm: s.kahm ? 1 : 0,
     levelness,
     fluidity,
@@ -205,17 +223,16 @@ export function toRenderParams(s: Snapshot): RenderParams {
     // 굶으면 위쪽이 유리에서 떨어진다(실사진 관찰 f — "can pull fully away from glass near top"),
     // 마르면 더 물러난다. **윗가장자리만** — 아래·바닥은 늘 유리에 붙는다(A1-02)
     pull: PULL_MAX * clamp01(dry + 0.5 * spent * (1 - dry)),
+    // 기운 반영 0.45+0.55v → 0.2+0.8v(판정 M3): 2단계 대 5단계 피크 0.78 대 1.0 → 0.68 대 1.0
     wallCells: clamp01(0.14 + 0.28 * cohesion + 0.72 * gas + 0.35 * collapse + 0.25 * spent) * alive
-      * (0.45 + 0.55 * vigor),
+      * (0.2 + 0.8 * vigor),
     // 아래는 압력에 눌려 잘고 촘촘, 위는 합쳐져 크고 성글 — 실물 병 사진의 문법
     cellFreq: 80 - 46 * clamp01(0.25 + 0.75 * gas + 0.45 * collapse + 0.2 * spent),
     // 최고 수위 = sim의 이번 사이클 peakFill을 같은 높이 매핑으로(A3-06 — 가짜 부풀기 1.72도 그대로 남는다)
-    markHeight: Math.max(
-      doughHeight(s.riseFill, s.massRatio, s.stage),
-      doughHeight(s.peakFill, s.massRatio, s.stage),
-    ),
-    // 자국은 피크를 찍고 내려온 뒤에만 존재한다 — 상승기(hunger 0)엔 0
-    residue: clamp01(Math.max(smooth(0.05, 0.55, hun), 0.9 * dry)) * (1 - 0.35 * hoo),
+    markHeight: Math.max(height, doughHeight(s.peakFill, s.massRatio, s.stage, s.peakFill)),
+    // 자국은 피크를 찍고 내려온 뒤에만 존재한다 — 상승기(hunger 0)엔 0. 내려오기 시작하면 바로 켠다(R1 falling 「핵심」,
+    // 판정 H1). jar 셰이더가 막을 수면과 최고 수위 사이로만 그리므로 일찍 켜도 수면 위 빈 유리에만 남는다
+    residue: clamp01(Math.max(fallen, 0.9 * dry)) * (1 - 0.35 * hoo),
     // grab 물성 — 갓밥준 태피(응집↑ 탄성↓ 잔류↑) / 피크 탱탱 / 시큼 풀림 / 휴면 뻣뻣.
     // 계수는 사용자 실기기 확정치(피크 grabMax 0.600 · ζ 0.956)가 나오도록 역산해 고정했다.
     // 2026-08-25 이전 버그: creepGain이 hunger·sourness만 봐서 **갓 밥준이 전 상태 중 최저(0.310)**
@@ -227,9 +244,10 @@ export function toRenderParams(s: Snapshot): RenderParams {
     grabReturnZeta: 1.07 - 0.13 * elasticity,
     // ── 윗면 질감 신호(2026-11-19 P1b) — 전부 살아있는 분기(alive)라 휴면 · kahm · 곰팡이에선 0 ──
     pinholes: clamp01(0.55 * domed * (0.45 + 0.55 * vigor) + 0.6 * spent) * alive,
-    foam: clamp01(gas * (1 - spent) * (0.5 + 0.5 * vigor)) * alive,
-    sink: smooth(0.05, 0.25, hun) * (1 - smooth(0.5, 0.85, hun)) * alive,
-    stir: clamp01(fresh * (1 - gas)) * alive,
+    // 하강(fallen)부터 피크의 잔거품 띠 · 갓 밥준 물결은 꺼지고 꺼진 주름이 켜진다(판정 H1 — 실제 궤적 +9h에 foam 1 · sink 0이었다)
+    foam: clamp01(gas * (1 - spent) * (0.5 + 0.5 * vigor)) * (1 - fallen) * alive,
+    sink: fallen * (1 - smooth(0.2, 0.5, hun)) * alive,
+    stir: clamp01(fresh * (1 - gas)) * (1 - fallen) * alive,
     vigor,
     chill,
     warm,

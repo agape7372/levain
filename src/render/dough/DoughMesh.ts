@@ -12,7 +12,7 @@ import vert from './dough.vert.glsl?raw';
 import frag from './dough.frag.glsl?raw';
 import type { RenderParams } from '../renderParams';
 import { BubbleSystem, DYN_SLOTS } from '../bubbles';
-import { createFillGeometry, FILL_RADIUS } from '../jar';
+import { createFillGeometry, FILL_RADIUS, JAR_HEIGHT } from '../jar';
 
 export const XZ_SCALE = 1.3; // 월드→오브젝트 XZ 변환에 입력층이 사용 (월드 XZ = 오브젝트 XZ × XZ_SCALE)
 /** 옆벽 반경(오브젝트) — 유리 안쪽 FILL_RADIUS(0.912 월드) */
@@ -413,7 +413,11 @@ export class DoughMesh {
     if (!this.grabbing && Number.isFinite(relAge)) this.grabReleaseAge += dt;
     const k0 = this.grabParam('kernelK');
     const kEff = this.grabbing ? k0 : Math.max(k0 / (1 + relAge / 1.0), k0 / 2.5);
-    const liftEff = this.grabParam('lift') * (this.grabbing ? 1 : Math.exp(-relAge / 0.35));
+    // 헤드룸 클램프(판정 M4, 2026-11-19) — 리본 끝(topY + |변위|·lift·1.7, vert 리프트 식)이 병 입구 + 0.12를 넘지 않게.
+    // 피크 수위 1.6에선 여유가 0.3뿐이라 그대로 두면 병 위로 원뿔이 솟는다. 잠금값 grabMax · ζ는 건드리지 않는다
+    const liftCap = (JAR_HEIGHT + 0.12 - this.topY()) / (Math.max(this.grabMax(), 1e-3) * 1.7);
+    const liftEff = Math.max(0, Math.min(this.grabParam('lift'), liftCap))
+      * (this.grabbing ? 1 : Math.exp(-relAge / 0.35));
     (u.uGrabShape.value as THREE.Vector2).set(kEff, liftEff);
     u.uGrabWrinkle.value = this.grabbing ? 1 : Math.exp(-relAge / 0.25);
     const grabDisp = u.uGrabDisp.value as THREE.Vector2;

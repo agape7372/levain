@@ -101,7 +101,9 @@ vec4 cellBubble(vec2 uv, vec2 cell, float pres, float r0, float r1, float asp, f
   vec2 rad = min(vec2(r * inversesqrt(a), r * sqrt(a)), cell * 0.36);
   vec2 lo = rad / cell;
   vec2 q = (fract(uv) - lo - (1.0 - 2.0 * lo) * h.xy) * cell / rad;
-  q.y += (h4 - 0.5) * 0.6 / a * q.x * q.x; // 휨 — 납작할수록 더 휜다(렌즈가 알약 · 씨앗 꼴로 줄서지 않게)
+  // 휨 — 납작할수록 더 휜다(렌즈가 알약 · 씨앗 꼴로 줄서지 않게). 부호는 크기(h4)와 따로 놀아야 큰 칸이 다 같은 쪽으로
+  // 휘지 않는다 — 위로 볼록한 회색 초승달이 줄지으면 「감은 눈」(판정 L1). 최대치 0.3 → 0.2
+  q.y += (fract(h.x * 7.13 + h.z * 3.71) - 0.5) * 0.4 / a * q.x * q.x;
   float d = length(q);
   float ring = smoothstep(0.5, 0.88, d) * (1.0 - smoothstep(0.88, 1.15, d));
   return vec4(1.0 - smoothstep(0.62, 1.0, d), ring, q.y, h4);
@@ -212,15 +214,19 @@ void main() {
     ut.x += fract(floor(ut.y) * 0.618); // 줄마다 무리수 밀림 — 세로 열이 서지 않는다
     vec4 pin = cellBubble(ut, vec2(0.07), uPin * 0.7,
                           mix(0.007, 0.005, uRipe), mix(0.011, 0.022, uRipe), 1.0, 1.0);
-    float crater = pin.y * pin.w * pin.w * uRipe; // 큰 구멍만 테가 밝다
-    col *= 1.0 - vec3(0.055, 0.068, 0.09) * pin.x; // 따뜻한 그늘(실물 07) — 회색 점은 후추 · 먼지로 읽힌다
-    col += vec3(0.05, 0.042, 0.03) * crater * (0.6 + 0.6 * uSpecStr);
     float rr = length(vXZ) / uRBody;
+    // 유리에 올라붙은 메니스커스 끝(rr 0.94~)은 거의 수직이라 xz 칸이 화면에서 1px 폭 세로 실선으로 늘어난다 —
+    // 테 바로 아래 매달린 실선(판정 L2)의 원인. 벽 기포를 꺼도 남았다(wallCells=0 캡처). 구멍 · 거품 점만 거기서 끊는다
+    float flatTop = 1.0 - smoothstep(0.93, 0.985, rr);
+    float crater = pin.y * pin.w * pin.w * uRipe * flatTop; // 큰 구멍만 테가 밝다
+    // 따뜻한 그늘(실물 07) — 회색 점은 후추 · 먼지로 읽힌다. 피크(uRipe)는 2배로 짙게(판정 M5 — 실물 sdL 6.5~14 대 렌더 1.9)
+    col *= 1.0 - vec3(0.055, 0.068, 0.09) * pin.x * (1.0 + uRipe) * flatTop;
+    col += vec3(0.05, 0.042, 0.03) * crater * (0.6 + 0.6 * uSpecStr);
     float edge = smoothstep(0.80, 0.97, rr) * uFoam;
     if (edge > 0.01) {
       vec4 fb = cellBubble(tw / 0.032, vec2(0.032), 0.85 * edge, 0.003, 0.008, 1.0, 1.0);
       col = mix(col, col * vec3(1.025, 1.03, 1.04), edge * 0.45); // 거품은 살짝 밝고 차갑다(R1 #dedfdc)
-      col *= 1.0 - 0.06 * fb.x;
+      col *= 1.0 - 0.06 * fb.x * flatTop;
     }
   }
   // 터진 기포가 남긴 바늘구멍 — 몇 초에 걸쳐 옅어진다(bubbles.ts SCAR_SEC)
@@ -258,7 +264,7 @@ void main() {
     vec3 warmSh = vec3(0.925, 0.895, 0.845);
     col *= mix(vec3(1.0), warmSh, fa.x * 0.75 * w);
     col *= mix(vec3(1.0), vec3(0.905, 0.87, 0.815), fb.x * w); // 중간 기포는 한 단계 더 짙은 그늘(실물 07 · ΔL* ≈ −10)
-    col = mix(col, col * vec3(0.925, 0.925, 0.95), fc.x * w);
+    col = mix(col, col * vec3(0.93, 0.925, 0.935), fc.x * w); // 거의 중성 — 반죽보다 b* 2 이상 차갑지 않게(판정 L1)
     float rimHi = max(max(fa.y * 0.4 * clamp(fa.z, 0.0, 1.0), fb.y * clamp(fb.z, 0.0, 1.0)), fc.y * 1.3 * clamp(fc.z + 0.3, 0.0, 1.0));
     col += vec3(0.05, 0.044, 0.034) * rimHi * w;
   }
