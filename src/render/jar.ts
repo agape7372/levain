@@ -180,7 +180,7 @@ export interface Jar {
   setClimate(chill: number, warm: number): void;
   /** 젓는 동안 hooch 탁해짐 0~1 · 줄무늬 위상 · 반죽 색(sRGB 0~1) — DoughMesh.murk · marblePhase */
   setMurk(murk: number, phase: number, color: readonly [number, number, number]): void;
-  /** 윗물 윗면 기울기 — 반죽 머티리얼의 uWobble · uLevel · uFluid · uSlopeAspect를 같은 객체로 공유한다(값은 반죽 한 곳에서) */
+  /** 윗물 윗면 기울기 · 들기 비켜 남 — 반죽 머티리얼의 uWobble · uLevel · uFluid · uSlopeAspect · uGrabPos · uPinch · uPinchC · uPinchE를 같은 객체로 공유한다(값은 반죽 한 곳에서) */
   shareSurface(u: Record<string, THREE.IUniform>): void;
 }
 
@@ -263,6 +263,11 @@ const hoochFrag = /* glsl */ `
   uniform float uMurk;      // 젓는 동안 탁해짐 0~1 — 반죽 색 쪽으로 0.6까지 + 나선 띠(sim hooch 값과 무관)
   uniform float uMurkPhase; // 반죽 줄무늬와 같은 소용돌이 위상
   uniform vec3 uDoughCol;
+  uniform float uSlopeAspect; // 월드 → 반죽 오브젝트 xz(반죽과 공유)
+  uniform vec2 uGrabPos;      // 들기 잡은 점(반죽 오브젝트 xz) · 밑동 반폭(uPinch.y, 월드) · 문턱(uPinchC.x) · 그린 길이(uPinchE.w) — 반죽과 공유
+  uniform vec4 uPinch;
+  uniform vec4 uPinchC;
+  uniform vec4 uPinchE;
   varying vec3 vP;
   varying vec3 vWorld;
   ${HOOCH_COVER}
@@ -296,6 +301,12 @@ const hoochFrag = /* glsl */ `
     float sheen = exp(-(q.x * q.x / 0.12 + q.y * q.y / 0.03) * (0.85 + 0.3 * flow));
     c = mix(c, vec3(1.0, 0.99, 0.965), sheen * 0.85);
     a = max(a, sheen * 0.55 * cover);
+    // 들기 — 솟은 혀 둘레에서 윗물 막이 비켜 난다(혹 밑동 반폭 안, 솟은 길이만큼). 혀가 반투명 막을 뚫는 자리가 날카로운 렌즈 테가 되고
+    // 막 아래는 회색 · 위는 크림색이라 노른자 · 콩이었다(v8d 1회전 sour 1.17~2.4). 깔때기 반경 · 문턱만 따르면 솟기 전부터 밝은 동그라미 과녁(2회전 1.07~1.17)
+    if (uPinchC.x > 1e-4) {
+      float gd = length(vP.xz * ${(FILL_RADIUS + 0.002).toFixed(3)} - uGrabPos / uSlopeAspect);
+      a *= 1.0 - 0.9 * uPinchC.x * smoothstep(${(0.02 * 2 * FILL_RADIUS).toFixed(3)}, ${(0.12 * 2 * FILL_RADIUS).toFixed(3)}, uPinchE.w) * (1.0 - smoothstep(0.2 * uPinch.y, 0.8 * uPinch.y, gd));
+    }
     // 유리에 닿은 액면 테 — 얇은 밝은 실선(메니스커스가 빛을 모은다)
     float rim = smoothstep(0.975, 0.997, rN);
     c = mix(c, vec3(0.95, 0.92, 0.85), rim * 0.7);
@@ -405,6 +416,10 @@ export function createJar(): Jar {
       uFluid: { value: 0.3 },
       uSlopeAspect: { value: 1 / 1.3 },
       uThick: { value: 0 },
+      uGrabPos: { value: new THREE.Vector2() },
+      uPinch: { value: new THREE.Vector4() },
+      uPinchC: { value: new THREE.Vector4() },
+      uPinchE: { value: new THREE.Vector4() },
     },
     transparent: true,
     depthWrite: false,
@@ -450,7 +465,7 @@ export function createJar(): Jar {
   };
 
   const shareSurface = (u: Record<string, THREE.IUniform>): void => {
-    for (const k of ['uWobble', 'uLevel', 'uFluid', 'uSlopeAspect']) hoochMat.uniforms[k] = u[k];
+    for (const k of ['uWobble', 'uLevel', 'uFluid', 'uSlopeAspect', 'uGrabPos', 'uPinch', 'uPinchC', 'uPinchE']) hoochMat.uniforms[k] = u[k];
   };
 
   return { group, hooch, setHooch, setLevel, setClimate, setMurk, shareSurface };

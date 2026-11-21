@@ -2,7 +2,7 @@
 //   탭(<8px & <250ms)      → poke 덴트 (damped spring 복귀)
 //   홀드 0.8s(무이동)       → 손가락 쪽 살짝 부풂 (swell)
 //   드래그(≥8px)            → 2채널: 반죽 위에서 천천히 끌면 미확정(젓기처럼) → 경로 32px에서
-//                             곧고 화면 위쪽 ±40° 안이면 grab(가닥 다발 — 끝이 손끝을 따른다), 아니면 stir(F1 · §6-1).
+//                             곧고 화면 위쪽 ±40° 안이면 grab(들기 — 꼬집힌 기둥 꼭대기가 손끝을 따른다), 아니면 stir(F1 · §6-1).
 //                             빠르게 문지르거나 반죽 밖 시작이면 stir(속도 시어장)
 //                             — 소유권은 중간에 안 바뀐다 (§5-5 원칙). 예외 하나: grab 중 원 · 가로 왕복을
 //                             그리면 stir로 넘긴다(StirJudge, 한 방향만 · 되돌아가지 않음). 내렸다 다시 올리기는 grab 유지
@@ -110,7 +110,7 @@ export interface InputHooks {
   onStirEnd?(): void;
   onGrabStart?(): void;
   /** 신장 정도 0~1 — 사운드 훅용. DoughMesh.grabStretch01() 값 그대로(주 가닥 길이 ÷ 주 가닥 끊김 길이, 상한 1). 배선은 SceneHost.onGrab* → app.ts.
-   *  가닥 끊김(소리 · 진동)은 렌더 tick에서 나므로 여기 말고 SceneHost.onGrabBreak */
+   *  항복 · 끊김 · 착지(소리 · 진동)는 렌더 tick에서 나므로 여기 말고 SceneHost.onGrabEvent */
   onGrabMove?(stretch01: number): void;
   onGrabEnd?(): void;
   /** 지금 르방 전환 스와이프를 받아도 되는가 (르방 2마리 이상·모달/연출/쇼케이스 아님) */
@@ -166,6 +166,8 @@ export function attachInput(
   let coveredGesture = false;
   let holdTimer: ReturnType<typeof setTimeout> | null = null;
   let holding = false;
+  /** 이 획에서 들기 후보 덴트를 이미 눌렀나(떼어내기 v5 새 눈 r1 ⑤) */
+  let liftPressed = false;
 
   let lastHitX = 0;
   let lastHitZ = 0;
@@ -260,7 +262,7 @@ export function attachInput(
       hooks.onStirEnd?.();
       mode = 'swipe';
     }
-    // grab · 미확정 → stir 넘김(M1). 리본은 스프링으로 돌아가고, 소리 · 진동 훅은 안 부른다(시작 소리가 그대로 젓기 소리)
+    // grab · 미확정 → stir 넘김(M1). 들린 기둥은 털썩 · 녹음으로 돌아가고, 소리 · 진동 훅은 안 부른다(시작 소리가 그대로 젓기 소리)
     if ((mode === 'grab' || mode === 'pending') && judge?.push(e.clientX, e.clientY)) {
       if (mode === 'grab') dough.grabEnd();
       mode = 'stir';
@@ -299,7 +301,13 @@ export function attachInput(
     const dt = Math.max(1 / 240, t - lastHitT);
     const ox = hit.x / XZ_SCALE;
     const oz = hit.z / XZ_SCALE;
-    if (mode === 'stir' || mode === 'pending' || mode === 'swipeCandidate') {
+    // 미확정이 곧게 위로 끌리는 중(들기 후보)이면 고랑을 끌지 않고 누른 자리만 한 번 오목하게 누른다(탭 덴트, 스프링 복귀) —
+    // 32px 동안 고랑 · 앞 둔덕 접힘 줄이 「할퀸 자국 세 줄」로 남았다(떼어내기 v5 새 눈 r1 ⑤). 원 · 가로 젓기는 첫 걸음이 위가 아니라 그대로다
+    const liftCand = mode === 'pending' && !!judge?.straight() && isUpward(e.clientX - downX, e.clientY - downY);
+    if (liftCand) {
+      if (!liftPressed) dough.pokeAt(downHitX, downHitZ);
+      liftPressed = true;
+    } else if (mode === 'stir' || mode === 'pending' || mode === 'swipeCandidate') {
       const vx = (ox - lastHitX) / dt;
       const vz = (oz - lastHitZ) / dt;
       dough.setStirInput(ox, oz, vx, vz);
@@ -328,6 +336,7 @@ export function attachInput(
       /* 합성 이벤트·이미 끝난 포인터 — 캡처 없이도 동작한다 */
     }
     down = true;
+    liftPressed = false;
     downX = e.clientX;
     downY = e.clientY;
     downAt = performance.now();

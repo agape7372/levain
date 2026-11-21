@@ -2,6 +2,7 @@
 // 컨텍스트 유실 = 전체 재구축(부분 복구 로직의 버그 표면을 사지 않는다).
 import * as THREE from 'three';
 import { DoughMesh } from './dough/DoughMesh';
+import type { StrandBreak } from './dough/StrandMesh';
 import { createJar, type Jar } from './jar';
 import { createGroundShadow } from './background';
 import { attachInput } from './input';
@@ -96,8 +97,8 @@ export class SceneHost {
   onGrabStart: (() => void) | null = null;
   onGrabMove: ((stretch01: number) => void) | null = null;
   onGrabEnd: (() => void) | null = null;
-  /** 가닥 끊김 — 끊길 때마다 한 번(thin = 가는 가닥, last = 붙은 가닥이 더 없다). 묽음 · 휴면은 소리 없이 안 부른다. 배선은 app.ts */
-  onGrabBreak: ((thin: boolean, last: boolean) => void) | null = null;
+  /** 들기 사건 — 항복(yield) · 다리 끊김(break: thin = 가는 다리, last = 마지막) · 착지(land: torn = 뜯고 떨어짐). 묽음 · 휴면은 끊김을 안 부른다. 배선은 app.ts */
+  onGrabEvent: ((e: StrandBreak) => void) | null = null;
   /** 다 섞임 — 손으로 저어 밥 주기 줄무늬를 0.05 아래로 떨어뜨린 순간 한 번(혼자 옅어지면 안 부른다). 배선은 app.ts */
   onMixed: (() => void) | null = null;
   /** 배경 좌우 스와이프 = 르방 전환 (§5-5). 허용 여부·처리 모두 배선은 app.ts.
@@ -173,7 +174,6 @@ export class SceneHost {
 
     this.dough = new DoughMesh();
     this.scene.add(this.dough.mesh);
-    this.scene.add(this.dough.strands.mesh); // 당기기 가닥 다발 — draw call +1, 쓰일 때만 보인다
     jar.shareSurface(this.dough.material.uniforms); // 윗물 윗면이 반죽 수면과 같은 기울기(S7)
 
     this.particles = new ParticlePool();
@@ -186,7 +186,7 @@ export class SceneHost {
     this.showcase = new BreadShowcase(() => (this.roomEnv ??= createRoomEnvironment(renderer)));
     this.scene.add(this.showcase.group);
     // 파티클 풀은 홈·쇼케이스 공용(김) — homeGroup에서 제외
-    this.homeGroup = [jar.group, this.dough.mesh, this.dough.strands.mesh, this.cloth.mesh];
+    this.homeGroup = [jar.group, this.dough.mesh, this.cloth.mesh]; // 들기 기둥은 반죽 메시 자체(떼어내기 v5 꼬집기 — 따로 메시 없음)
 
     this.detachInput = attachInput(this.canvas, this.camera, this.dough, {
       isBlocked: () => this.isShowcasing(), // 쇼케이스 위에서 젓기 소리·햅틱·천 걷기가 나면 안 된다
@@ -206,10 +206,8 @@ export class SceneHost {
     this.resizeObserver.observe(this.stage);
     this.fit();
 
-    // 셰이더를 로딩 때 한 번 컴파일 — 첫 당김 버벅임 방지. compile은 보이는 것만 훑어서 가닥만 잠깐 켠다(반지름 0이라 안 그려진다)
-    this.dough.strands.mesh.visible = true;
+    // 셰이더를 로딩 때 한 번 컴파일 — 첫 당김 버벅임 방지
     renderer.compile(this.scene, this.camera);
-    this.dough.strands.mesh.visible = false;
 
     // 컨텍스트 유실 — 전체 재구축 전략
     this.canvas.addEventListener('webglcontextlost', this.onContextLost);
@@ -608,7 +606,7 @@ export class SceneHost {
       // 쇼케이스 중엔 반죽이 숨어 있다 — 안 보이는 기포 소리를 내지 않는다 (T4-4)
       if (this.dough && this.dough.bubbles.popsThisFrame > 0 && !this.isShowcasing()) this.onBubblePop?.();
       if (this.dough?.mixedThisFrame) this.onMixed?.();
-      if (this.dough && !this.isShowcasing()) for (const b of this.dough.grabBreaks) this.onGrabBreak?.(b.thin, b.last);
+      if (this.dough && !this.isShowcasing()) for (const b of this.dough.grabBreaks) this.onGrabEvent?.(b);
       if (this.dough && this.jar && this.current) {
         // 테두리 높이를 한 번만 뽑아 둘에 공급 — hooch 층과 유리 자국이 같은 수면 좌표계를 쓴다
         const level = this.dough.levelY();

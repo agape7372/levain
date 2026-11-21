@@ -14,7 +14,7 @@ import type { RenderParams } from '../renderParams';
 import { BubbleSystem, DYN_SLOTS } from '../bubbles';
 import { createFillGeometry, FILL_RADIUS, HOOCH_COVER, JAR_HEIGHT, MARBLE_GLSL, SURF_TILT } from '../jar';
 import {
-  CELL_BUBBLE, D_W, DOUGH_ALBEDO, DOUGH_SHADE, FBM_GLSL, LIFT_LUMP, LUMP_Y, MOUND_H, MOUND_R, StrandMesh, fbm2, strandMix,
+  CELL_BUBBLE, D_W, DOUGH_ALBEDO, DOUGH_SHADE, FBM_GLSL, MOUND_D, MOUND_HMAX, SPINE_N, StrandRig, fbm2, strandMix,
   type StrandBreak, type StrandEnv,
 } from './StrandMesh';
 
@@ -267,9 +267,8 @@ vec4 stirField(vec2 p, vec4 sw, vec2 q, float mem) {
 `;
 const POKE_K0 = 30;          // 탭 덴트 첨도 — 액체일수록 아물며 퍼진다 (하한 k0/3)
 
-// ── 당기기(2026-11-19 가닥 다발, .work/feel2/spec.md §1 · §6) — 들리는 몸은 StrandMesh 가닥, 반죽 윗면엔 밑동 둔덕 ·
-//    끌려 모임 · 방사 결 · 더미만 남는다. 옛 넓은 커널 · 리본 리프트(kernelK · lift) · 헤드룸 클램프는 지웠다(대체됨).
-//    상태 물성 3종(grabMax·creepGain·returnZeta)은 RenderParams, 나머지는 grabTuning 오버라이드 ──
+// ── 들기 튜닝 — 상태 물성 3종(grabMax·creepGain·returnZeta)은 RenderParams, 나머지는 grabTuning 오버라이드.
+//    들리는 몸은 아래 GRAB_FIELD 꼬집기(떼어내기 v8)가 그린다 ──
 const GRAB_DEFAULTS = {
   elasticTau: 0.07, // 끝점(손끝) 추종 τ(s) — 사용자 실기기 확정(2026-08-24). 직교 카메라라 끝이 손끝을 1:1로 따른다(L4a)
   creepDelay: 0.7,  // 버티면 짧아짐 — 잡은 지 이 시간 뒤부터 끊김 길이가 줄어든다 (§1-3)
@@ -277,112 +276,427 @@ const GRAB_DEFAULTS = {
   releaseTau: 1.2,  // 놓은 뒤 밑동 흔들림 잔류(creepGain 몫) 해소 τ(s)
   omega: 5.5,       // 밑동 둔덕 스프링 고유진동수 — 5.5가 무겁게 되돌아오는 반죽 (확정, ζ = grabReturnZeta)
 };
-// ── 들기 v3 반죽 높이장(2026-11-19 손맛 3차) — 폰 1배에서 손가락(0.65D) 옆 · 위 · 뗀 뒤에 보이는 넓은 신호는 여기서 낸다:
-//    밑자락 둔덕(오목 윤곽) · 잡은 점 쪽 무늬 방사 끌림(도메인) · 높이 주름 8~12줄 · 접혀 포개진 더미(겹 고리 2) · 반들 자국 ──
-/** 밑자락 둔덕 반경(오브젝트) — 명세 0.28D(UPQ94 9s 밑 0.4~0.5D) */
-const LIFT_MR = MOUND_R / XZ_SCALE;
-/** 둘레 수위 꺼짐 — 둔덕 높이 × 0.1을 반경 0.45D 가우스로 뺀다(반죽이 기둥으로 빨려 올라간 몫). 추정 — 실측 없음 */
-const LIFT_SAG_K = 0.1;
-const LIFT_SAG_R = (0.45 * D_W) / XZ_SCALE;
-/** 높이 주름 — 10줄(fbm 휨 · 방위마다 길이 · 세기가 달라 보이는 줄은 8~12), 바깥 끝 0.17~0.46D, 안쪽 0.08D부터.
- *  r2: 0.3D · 0.018이면 폰 1배에서 손가락(0.65D)이 거의 다 덮어 옆으로 안 보였다 → 0.42D · 0.03. 추정 — 실측 없음 */
-const RIB_N = 10;
-const RIB_R = (0.42 * D_W) / XZ_SCALE;
-const RIB_IN = (0.08 * D_W) / XZ_SCALE;
-const RIB_A = 0.03;
+// ── 떼어내기 v8(2026-11-21, 명세 .work/feel4/spec_v8.md · 바탕 v5 꼬집기) — 반죽 윗면 정점 자체를 잡은 점 쪽으로 오므리며 끌어올려
+//    깔때기 → 섬유 기둥 → 손끝 면으로 잇는다(버텍스 마지막 단계). 무늬 · 기포는 원래 자리(vXZ)에서 읽혀 기둥에서 저절로 세로 결이 된다.
+//    모양 함수는 pinchPos 하나 — 척추 17점(uSpine, v8b) 위에 단면을 감는다. 잡기 → 늘어남 → 그물 → 끊김 → 털썩 → 쌓임 → 녹음 내내 매개변수만 연속으로 바뀐다
+//    (끊김 · 놓기 때 갈아 끼우는 분기 0). 남은 자리는 높이장 밧줄 겹(uPile) · 남은 혹(funnelLobes) ──
+/** 깔때기 · 기둥 경계 — 잡은 점에서 깔때기 반경 S의 70% 안 정점이 기둥이 된다. 높이 몫 f = 1 − (s/sC)^1.5(꼭대기에 링을 몰아준다). 추정 */
+const PINCH_UC = 0.7;
+/** 꼬집기 노멀 앞 차분 간격(월드) — 정점 간격(0.02~0.045)의 절반 아래 */
+const PINCH_FD = 0.008;
+/** 들림 0.02D 넘는 곳만 기둥 재질 · 그물 구멍(frag) */
+const PINCH_HOLE_LIFT = 0.02 * D_W;
+/** 척추 몫 — 아래 몸 0~0.6875(점 0~11) · 그물 0.6875~0.9375(점 11~15, 높이 70~92% — 꼭대기 바로 밑, spec_v8c §1) · 위 몸 0.9375~1. StrandRig SPINE_N 17점과 짝 */
+const PINCH_FA = 11 / 16;
+const PINCH_FB = 15 / 16;
+/** 꼭대기 면 — 높이 몫 f 0.88 위 정점이 손끝에 눌린 납작한 원판(반경 ∝ 원래 거리 — 무늬가 한 점으로 모이지 않는다, §2 꼭대기) */
+const PINCH_TOP = 0.88;
+/** 그물이 다 벌어졌을 때 머리 폭 ÷ 몸통 폭(spec_v8d §2). 추정 */
+const PINCH_HEAD = 0.6;
+/** 둔덕(깔때기) 높이가 손끝보다 τ0.16 늦게 따라온다(무게, 명세 ①) · 항복 뒤 × 0.7(②) — 목표에 한 번만 곱하고 τ로 내려앉는다(v6 §6) */
+const MOUND_LAG_TAU = 0.16;
+const YIELD_SAG = 0.7;
+/** 버팀 동안 둔덕 배율(긴 기둥 몫 0일 때). 추정 */
+const MOUND_HOLD = 0.35;
+/** 착지 순간 반죽 전신 출렁 1회 — 슬로싱 속도항 충격(접힘 방향). 0.9는 추정 — 실측 없음 */
+const LAND_KICK = 0.9;
 /** 무늬 끌림 — 면적 보존 흡입(r_src² = r² + A·e^(−r²/R²)): 반경 쪽으로 늘고 둘레 쪽으로 줄어 점 · 모틀이 잡은 점을 향한 결이 된다.
- *  √A = 0.22D · R = 0.4D(r2: 0.18D · 0.3D는 손가락 밑에 다 들어갔다). 추정 — 실측 없음 */
-const PULL_A2 = ((0.22 * D_W) / XZ_SCALE) ** 2;
-const PULL_R2 = ((0.4 * D_W) / XZ_SCALE) ** 2;
-/** 주름 · 끌림 풀림 — 놓거나 끊기면 τ0.8s로 풀리고(1~3s), 최고치의 20%가 τ8s 흔적으로 남는다. 차오름 τ0.12s. 추정 — 실측 없음 */
-const RIB_RISE_TAU = 0.12;
-const RIB_FALL_TAU = 0.8;
-const RIB_KEEP = 0.2;
-const RIB_KEEP_TAU = 8;
-/** 프래그 기울기 차분 간격(오브젝트) — 주름 간격(0.2 반경에서 0.13)의 1/20 */
+ *  √A = 0.14D · R = 0.3D(v7 2회전 — 0.22D · 0.4D는 바늘구멍이 검은 방사 긁힘 · 벌레 다리로 읽혔다). 추정 — 실측 없음 */
+const PULL_A2 = ((0.14 * D_W) / XZ_SCALE) ** 2;
+const PULL_R2 = ((0.3 * D_W) / XZ_SCALE) ** 2;
+/** 끌림 풀림 — 놓거나 끊기면 τ0.8s로 풀리고(1~3s), 최고치의 20%가 τ8s 흔적으로 남는다. 차오름 τ0.12s. 추정 */
+const PULL_RISE_TAU = 0.12;
+const PULL_FALL_TAU = 0.8;
+const PULL_KEEP = 0.2;
+const PULL_KEEP_TAU = 8;
+/** 프래그 기울기 차분 간격(오브젝트) — 접힘 높이장 */
 const LIFT_FD = 0.006;
 /** 밑동 흔들림 — 끝점 수평 오프셋 × 0.15, 상한 0.1(오브젝트). 추정 — 실측 없음(측면 영상이 없다) */
 const SWAY_GAIN = 0.15;
 const SWAY_MAX = 0.1;
-/** 휴면 · 곰팡이(가닥 없음) 밑자락 몫 — 추정 — 실측 없음(§6-2 「조금」) */
+/** 휴면 · 곰팡이(기둥 없음) 깔때기 몫 — 추정 — 실측 없음(§6-2 「조금」) */
 const NONE_MOUND = 0.2;
-/** 더미 반들함이 다 차는 높이 — 추정 — 실측 없음(UPQ94 13s 접힌 더미가 둘레보다 밝고 매끈한 것만 봤다) */
-const PILE_FULL_H = 0.035 * D_W;
 /** 잡기 확정 때 그 획의 고랑을 지우는 τ(s) — §6-12 */
 const STROKE_CANCEL_TAU = 0.1;
+/** 깔때기 높이 몫 — GRAB_FIELD funnelH의 CPU 짝(같은 식) */
+export function funnelH(u: number): number {
+  const k = (Math.sqrt(u * u + 0.04) - 0.2) / 0.8198;
+  return (1 - k) * (1 - k);
+}
 
 /**
- * 들기 높이장 — 버텍스(높이)와 프래그(차분 기울기 liftGrad · 무늬 도메인 liftQ · 반들 pileSheen)가 이 소스 하나를 쓴다(규칙 8).
- * liftH = 밑자락 둔덕(uGrab.x, 오목) − 둘레 꺼짐 + 높이 주름(uGrab.z) + 더미(uPile, 겹 고리). liftQ = 젓기 회전 뒤 끌림 한 번 더 + 더미 꼬임.
+ * 들기 소스 — 버텍스(꼬집기 pinchApply · 접힘 높이 liftH)와 프래그(그물 구멍 netHole · 접힘 기울기 liftGrad · 무늬 도메인 liftQ)가 이 소스 하나를 쓴다(규칙 8).
  * STIR_FIELD(riseK · swirlQ) · FBM_GLSL 뒤에 끼운다.
  */
 export const GRAB_FIELD = /* glsl */ `
-const float LIFT_MR = ${LIFT_MR};
-const float LIFT_SAG_R = ${LIFT_SAG_R};
-const float RIB_R = ${RIB_R};
-const float RIB_IN = ${RIB_IN};
 const float PULL_A2 = ${PULL_A2};
 const float PULL_R2 = ${PULL_R2};
 const float LIFT_FD = ${LIFT_FD};
-const float PILE_FULL_H = ${PILE_FULL_H};
-uniform vec4 uPileB; // 더미 (반들 자국 0~1, 접힘 방위 rad, 무늬 꼬임 rad, —)
+const float PINCH_XZ = ${XZ_SCALE.toFixed(2)};
+const float PINCH_UC = ${PINCH_UC.toFixed(2)};
+const float PINCH_FD = ${PINCH_FD};
+const float PINCH_HOLE_LIFT = ${PINCH_HOLE_LIFT};
+const float PINCH_FR = ${(0.95 * FILL_RADIUS).toFixed(4)};
+const float PINCH_D = ${D_W.toFixed(4)};
+const float PINCH_FA = ${PINCH_FA.toFixed(4)};
+const float PINCH_FB = ${PINCH_FB.toFixed(4)};
+const float PINCH_TOP = ${PINCH_TOP.toFixed(2)};
+const float PINCH_HEAD = ${PINCH_HEAD.toFixed(2)};
+const float SPINE_N1 = ${(SPINE_N - 1).toFixed(1)};
+uniform vec4 uPileB;  // 접힘 (방위 rad, 거침 0~1(되직), 무늬 이완 0~1(털썩 · 쌓임), 녹음 0~1(혹 → 보조개))
+uniform vec4 uSpine[${SPINE_N}]; // 척추 17점(몫 i/16) — xyz 월드, w 굵기 배율(털썩 때 혹 넓힘)
+uniform vec4 uPinch;  // (몸통 반폭(월드), 밑동 가로 반폭(월드), 꼭대기 넓힘 배율, 혀 몫 0~1(묽음))
+uniform vec4 uPinchB; // (깔때기 반경 S(월드), 그물 벌어짐 0~1, 끊김 움츠림 0~1(기둥이 아래 몸 끝까지 · 끊긴 가닥 다시 붙음), 비움)
+uniform vec4 uPinchC; // (기둥 몫 0~1, 무늬 씨앗, 긴 기둥 몫 0(혹) ~ 1(기둥) — StrandRig가 길이 · 상태 · 털썩으로 잰다, 비움)
+uniform vec4 uPinchD; // 가닥 넷 끊긴 지(s) — 안 끊김 −1
+uniform vec4 uPinchE; // (남은 혹 몫 0~1, 밑동 깊이 배율, 움츠린 끝 몫(끊기면 점 11 · 되직 15 · 아니면 1), 몸 길이(월드))
+uniform vec4 uPinchF; // 가닥 넷 지름(월드)
+// 접힘 높이장 — 털썩 자리에 남는 낮은 보조개 겹(v8c 누운 밧줄은 지웠다 — 이 높이장만 남는다): 누운 방향으로 길쭉한 능선(살짝 휨) + 마루 2~3. 되직은 거칠게. 동심 · 소용돌이 0
 float liftH(vec2 p) {
   float h = 0.0;
-  vec2 d = p - uGrabPos;
-  float r2 = dot(d, d);
-  if (uGrab.x > 1e-5) {
-    // 오목 윤곽 — 가운데가 가닥으로 뾰족하게 이어지고 바깥으로 넓게 퍼진다(종 모양 가우스 = 1.6.15 고무 천막)
-    float s = min(sqrt(r2) / LIFT_MR, 1.0);
-    h += uGrab.x * (pow(1.0 - s, 2.5) - ${LIFT_SAG_K.toFixed(2)} * exp(-r2 / (LIFT_SAG_R * LIFT_SAG_R)));
-  }
-  if (uGrab.z > 1e-4) {
-    // 높이 주름 — 좁은 마루(c³) · 방위마다 길이 · 세기(fbm) · 위상 휨(fbm). 고른 별 · 방사 띠 금지
-    float r = sqrt(r2);
-    vec2 dir = d / max(r, 1e-5);
-    float f = fbm(dir * 1.7 + uSeed * 9.0);
-    float ext = RIB_R * (0.75 + 0.5 * f);
-    float env = smoothstep(RIB_IN, 2.0 * RIB_IN, r) * (1.0 - smoothstep(0.45 * ext, ext, r));
-    float c = 0.5 + 0.5 * cos(atan(d.y, d.x) * ${RIB_N.toFixed(1)} + 2.4 * fbm(dir * 2.3 + r * 5.0 + 3.0));
-    h += uGrab.z * ${RIB_A} * c * c * c * env * smoothstep(-0.35, 0.15, f);
-  }
   if (uPile.z > 1e-5) {
-    // 더미 — 접혀 포개진 반죽: 비껴 앉은 중심 둘레 겹 고리 2개(fbm 휨). 표면 높이의 일부라 무늬 · 광이 이어진다
     vec2 e = p - uPile.xy;
-    float w = uPile.w;
-    // 접힌 방향으로 휜 겹(활꼴 2~3마루) — 닫힌 동심 고리는 과녁 · 장미로 읽혔다(r1)
-    vec2 fd = vec2(cos(uPileB.y), sin(uPileB.y));
-    vec2 el = vec2(dot(e, fd), dot(e, vec2(-fd.y, fd.x))) / w;
-    float fold = 0.5 + 0.5 * cos(6.2832 * (1.3 * el.x + 0.6 * el.y * el.y + 0.35 * fbm(e / w * 2.0 + uPileB.y)));
-    h += uPile.z * exp(-dot(e, e) / (w * w)) * (0.75 + 0.5 * fold * fold);
+    vec2 ad = vec2(cos(uPileB.x), sin(uPileB.x));
+    float al = dot(e, ad) / uPile.w;
+    float j = fbm(e / uPile.w * 2.2 + uPileB.x * 1.7);
+    float ac = (dot(e, vec2(-ad.y, ad.x)) / uPile.w - 0.08 * al * al + 0.12 * j) / (0.75 + 0.1 * uPileB.y); // 둥근 무더기(가는 능선 = 쉼표 · 씨앗 · 벌레, 새 눈 r1)
+    // 밧줄처럼 접힌 혹 2~3(가운데 꼭지 하나 = 뾰루지 금지): 길이 따라 cos² 마루, 크기 제각각
+    float cr = cos(al * 2.3 + 0.6 * j + 0.7);
+    h += uPile.z * exp(-0.6 * al * al - 1.6 * ac * ac) * (0.35 + 0.65 * cr * cr + 0.3 * uPileB.y * j);
   }
   return h * riseK(); // 윗물 아래서 덜 솟는다(§6-9)
 }
-// 기울기 — 같은 함수의 앞 차분(해석 미분 대신 — 둔덕 · 주름 · 고리를 한 식으로). 잡는 중 · 더미 있을 때만 부른다
+// 기울기 — 같은 함수의 앞 차분. 접힘이 있을 때만 부른다
 vec2 liftGrad(vec2 p) {
   float h0 = liftH(p);
   return vec2(liftH(p + vec2(LIFT_FD, 0.0)) - h0, liftH(p + vec2(0.0, LIFT_FD)) - h0) / LIFT_FD;
 }
-// 무늬 도메인 — 젓기 회전(swirlQ) 뒤에 끌림을 한 번 더: 잡은 점 쪽 면적 보존 흡입(반경으로 늘어난 결) + 더미 둘레 꼬임.
-// 잡은 점 · 더미 가운데도 같은 Θ로 돌려 같은 틀에서 잰다
+// 무늬 도메인 — 젓기 회전(swirlQ) 뒤에 끌림을 한 번 더: 잡은 점 쪽 면적 보존 흡입(반경으로 늘어난 결).
+// 잡은 점도 같은 Θ로 돌려 같은 틀에서 잰다
 vec2 liftQ(vec2 q, float th) {
   if (uGrab.z > 1e-4) {
     vec2 d = q - swirlQ(uGrabPos, th);
     float r2 = max(dot(d, d), 1e-8);
     q += d * (sqrt(1.0 + uGrab.z * PULL_A2 * exp(-r2 / PULL_R2) / r2) - 1.0);
   }
-  if (uPileB.z > 1e-4) {
-    vec2 c = swirlQ(uPile.xy, th);
-    vec2 d = q - c;
-    float a = uPileB.z * exp(-dot(d, d) / (uPile.w * uPile.w));
-    q = c + vec2(cos(a) * d.x - sin(a) * d.y, sin(a) * d.x + cos(a) * d.y);
-  }
   return q;
 }
-// 더미 · 반들 자국 0~1 — 갓 떨어진 반죽은 매끈하고 젖어 반들하다(프래그 광 · 바늘구멍 지움). 반들 자국은 더미가 꺼진 뒤에도 8~15s 남는다
-float pileSheen(vec2 p) {
-  if (uPile.z + uPileB.x < 1e-4) return 0.0;
-  vec2 d = p - uPile.xy;
-  return max(min(1.0, uPile.z / PILE_FULL_H), uPileB.x) * exp(-dot(d, d) / (1.6 * uPile.w * uPile.w));
+vec3 pinchXYZ(vec2 xz, float y) { return vec3(xz.x, y, xz.y); }
+// 남은 혹 — 막이 풀린 뒤 깔때기 높이는 접힌 밧줄 혹 2~3개 — 누운 방향(uPileB.x)을 따라 줄지어(크기 · 간격 제각각)
+float lobe(vec2 d, float S, float r, float a) {
+  vec2 e = d - r * S * vec2(cos(a), sin(a));
+  return exp(-dot(e, e) / (0.06 * S * S));
+}
+float funnelLobes(vec2 d, float S) {
+  // 혹 셋(루프 대신 펼침 — 셰이더 루프는 범프 · 고랑 · 곰팡이 배열 전용, tests/doughSurface R-L3)
+  float a = uPileB.x + 0.3 * (fract(uPinchC.y * 0.37) - 0.5);
+  float h = lobe(d, S, 0.08, a + 0.5) + 0.8 * lobe(d, S, 0.36, a - 0.15) + 0.55 * lobe(d, S, 0.6, a + 0.25);
+  float u2 = dot(d, d) / (S * S);
+  return min(h, 1.0) * (1.0 - u2) * (1.0 - u2);
+}
+// 깔때기 높이 몫(반경 몫 u 0~1) — 오목한 (1 − u)²에 가운데만 둥글게(반경 0.2S). 밖(u = 1)에서 C1. CPU 짝 = DoughMesh funnelH
+float funnelH(float u) {
+  float k = (sqrt(u * u + 0.04) - 0.2) / 0.8198;
+  return (1.0 - k) * (1.0 - k);
+}
+// 둔덕 높이 몫(잡은 점에서 d) — 깔때기 funnelH가 풀리며 남은 혹(funnelLobes)으로. 기둥 · 깔때기 고리 · 밖이 같은 식을 써야
+// 기둥 몫이 꺼질 때 혹이 몇 프레임에 솟지 않는다(v8 r2 release 2.90)
+float moundH(vec2 d, float S) {
+  if (dot(d, d) >= S * S) return 0.0;
+  float h = funnelH(length(d) / S);
+  return uPinchE.x > 1e-3 ? mix(h, funnelLobes(d, S), uPinchE.x) : h;
+}
+// 척추 한 점(Catmull-Rom, 몫 fs 0~1) — xyz 월드 · w 굵기 배율, tg = d/dfs. 끊긴 위 몸 점은 아래 몸 굽힘에 이어 붙어 있다(StrandRig bendSpine)
+vec4 spineAt(float fs, out vec3 tg) {
+  float u = clamp(fs, 0.0, 1.0) * SPINE_N1;
+  int i = int(min(floor(u), SPINE_N1 - 1.0));
+  float t = u - float(i);
+  vec4 p1 = uSpine[i];
+  vec4 p2 = uSpine[i + 1];
+  vec4 p0 = i > 0 ? uSpine[max(i - 1, 0)] : 2.0 * p1 - p2;
+  vec4 p3 = i + 2 <= ${SPINE_N - 1} ? uSpine[min(i + 2, ${SPINE_N - 1})] : 2.0 * p2 - p1;
+  vec4 a = 2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3;
+  vec4 b = 3.0 * (p1 - p2) + p3 - p0;
+  vec4 c = p2 - p0;
+  tg = SPINE_N1 * 0.5 * (c.xyz + (2.0 * a.xyz + 3.0 * b.xyz * t) * t);
+  return p1 + 0.5 * t * (c + t * (a + t * b));
+}
+// 가닥 넷(spec_v8b §2 그물) — 방위 ≈ 26° · 92° · 158° · 264°(xz 평면, +z = 화면 앞, 조금씩 틀어짐). 앞에서 보이는 셋이 화면 가로
+// 0.9 · −0.03 · −0.92 — 구멍이 고르게 3px 넘게 열린다(0.88 · −0.18 · −0.97은 왼쪽 구멍이 1~2px 홈이었다, v8c 1회전). 굵은 가닥(1)이 앞 가운데, 뒤 가닥(3)은 숨는다.
+// 15° · 110° · 205° · 290°는 바깥 둘이 대칭으로 서고 가운데가 가는 실이라 「바지 두 다리 + 가운데 실」이었다(v8b r3 2.13~2.43).
+// 원래 방위 dir에서 가장 가까운 가닥 k · 부호 있는 각거리 sa(반시계 +) · 가닥 가운데 방위 ak
+float pick4(vec4 v, float k) { return k < 0.5 ? v.x : k < 1.5 ? v.y : k < 2.5 ? v.z : v.w; }
+float strandNear(vec2 dir, out float sa, out vec2 ak) {
+  vec4 A = vec4(0.45, 1.6, 2.75, 4.6) + 0.2 * (fract(uPinchC.y * vec4(0.37, 0.53, 0.71, 0.89)) - 0.5);
+  vec4 c = cos(A) * dir.x + sin(A) * dir.y;
+  float k = 0.0;
+  float m = c.x;
+  if (c.y > m) { k = 1.0; m = c.y; }
+  if (c.z > m) { k = 2.0; m = c.z; }
+  if (c.w > m) { k = 3.0; m = c.w; }
+  float a = pick4(A, k);
+  ak = vec2(cos(a), sin(a));
+  sa = atan(ak.x * dir.y - ak.y * dir.x, dot(ak, dir));
+  return k;
+}
+// 가닥 k가 끊기는 그물 몫 0.76~0.82(꼭대기 바로 밑) — 끊긴 높이를 고르게(0.72~0.85는 아래 토막이 들쭉날쭉한 왕관 · 삼지창, v8c 1회전 2.47)
+float strandCutG(float k) { return 0.76 + 0.06 * fract(uPinchC.y * 1.37 + k * 0.618); }
+// 가닥 열림 0(통짜 몸) ~ 1(가닥 굵기만 남은 관) — 그물 몫 g. 구멍은 높이 72~88%에서 열리고 93% 위 · 70% 아래에선 닫힌다(spec_v8c §1 70~92%).
+// 끊긴 가닥은 0.08s에 다 열린다(위 · 아래 토막이 둥근 끝 관으로). 아래 몸 끝이 닫히면(uPinchB.z) 다시 통짜로
+float strandOpen(float g, float k) {
+  if (g <= 0.0 || g >= 1.0) return 0.0;
+  float age = pick4(uPinchD, k);
+  float h = fract(uPinchC.y * 2.17 + k * 0.41);
+  // 그물 벌어짐 절반쯤에 다 열린다 — 반쯤 열린 구멍은 가닥 띠가 넓어 1~2px 세로 틈이었다(v8c 1회전 2.17~2.43)
+  float sk = clamp(uPinchB.y * (2.0 + 0.6 * h) - 0.3 * h, 0.0, 1.0);
+  float env = smoothstep(0.0, 0.12, g) * (1.0 - smoothstep(0.78, 0.97, g));
+  float cut = age >= 0.0 ? smoothstep(0.0, 0.08, age) * smoothstep(0.0, 0.1, g) : 0.0;
+  // 끊긴 뒤엔 아래 몸 끝 닫힘(uPinchB.z)을 따라 닫힌다 — 가닥 토막이 따로 서 있으면 삼지창 · 두 갈래 끝이었다(v8c 1회전 2.47~2.57).
+  // 앞 절반(0 → 0.5)에 닫으면 1프레임에 그물 + 머리가 매끈한 총알 기둥으로 바뀌었다(v8d 1회전 2.57 → 2.60) — 움츠림 거의 끝까지 고르게
+  return max(sk * env, cut) * (1.0 - smoothstep(0.0, 0.9, uPinchB.z));
+}
+// 가닥 k의 반각(rad) — 열림 op에서. 1.25 = 통짜(구멍 0 — 가장 넓은 반간격 ≈1.2보다 커야 op가 0을 막 넘는 프레임에 구멍이 툭 나지 않는다),
+// 1 = 가닥 지름만큼. R = 몸 반지름
+float strandHalf(float op, float k, float R) { return mix(1.25, 0.5 * pick4(uPinchF, k) / max(R, 1e-4), op); }
+// 그물 구멍(§2) — 그물 몫 g의 가닥 사이가 비었나(frag discard). 버텍스 pinchPos의 관 사상과 같은 반각
+bool netHole(float g, vec2 dir, float R) {
+  if (g <= 0.0 || g >= 1.0) return false;
+  float sa;
+  vec2 ak;
+  float k = strandNear(dir, sa, ak);
+  float op = strandOpen(g, k);
+  return op > 1e-3 && abs(sa) > strandHalf(op, k, R);
+}
+// 단면 반폭(월드) — 척추 몫 fs(발 0 → 꼭대기 1), 원래 방위 dir → (가로, 깊이).
+// 섬유 기둥(§2): 몸통 uPinch.x에 높이 따라 ±15% 굽이(위상 제각각) · 높이 40~65%가 가장 좁다(덩이 밑을 조이지 않는다).
+// 발 = 밑동 uPinch.y로 오목하게 벌어진 깔때기, 꼭대기 = 몸통 × uPinch.z(처마 0). 짧을 땐(L < 0.45D) 낮고 넓은 혹(밑동 반폭 타원 — 코르크 · 병뚜껑 0, v8 r1 b)
+vec2 pinchRad(float fs, vec2 dir) {
+  float sd = uPinchC.y;
+  // 굽이 ±10% · 가장 좁은 곳 −3% — 꼭대기 쪽(0.7~0.9)은 굽이를 끈다: 머리 ÷ 목 ≤ 1.15(면봉 · 성냥 머리 0, v8 r1 검수 ②)
+  float L = uPinchE.w;
+  // 짧은 기둥(0.6D 아래)은 굽이를 끈다 — 0.25D 기둥에 굽이가 겹쳐 쌓인 고리 · 버섯 대였다(v8c 2회전 a justfed)
+  float wav = ((0.1 * (0.6 * sin(fs * 8.2 + sd * 3.1) + 0.4 * sin(fs * 15.1 + sd * 5.3))) * (1.0 - smoothstep(0.7, 0.9, fs))
+    - 0.03 * exp(-(fs - 0.52) * (fs - 0.52) / 0.02)) * smoothstep(0.3 * PINCH_D, 0.6 * PINCH_D, L);
+  // 몸통은 0.16D(반폭 0.08D) 아래로 안 내려간다(몸통 반폭이 그보다 작게 주어지면 그 값)
+  float W = max(uPinch.x * (1.0 + wav * (1.0 - 0.6 * uPinch.w)), min(uPinch.x, 0.08 * PINCH_D));
+  // 짧은 기둥(되직 · 이른 버팀)은 밑동 → 몸통 이음을 길게(0.5) — 원통 옆면이 코르크 · 문 손잡이 목으로 읽혔다(v8 r1 검수 ⑤)
+  float t = min(fs / mix(0.5, 0.22, smoothstep(0.3 * PINCH_D, 0.6 * PINCH_D, L)), 1.0);
+  vec2 X0 = vec2(uPinch.y, uPinch.y * uPinchE.y);
+  vec2 r = vec2(W) + (X0 - vec2(W)) * (1.0 - t) * (1.0 - t);
+  r *= 1.0 + (uPinch.z - 1.0) * smoothstep(0.82, 1.0, fs);
+  // 머리 미리 줄임(spec_v8d §2) — 그물이 벌어지는 동안 그물 위쪽 반 · 머리가 몸통의 PINCH_HEAD배로 모인다(가닥이 손끝 쪽으로 묶임).
+  // 구멍 위(몫 0.86~)부터 꼭대기까지 연속 — 그물 가운데부터 줄이면 구멍 위쪽이 1~2px로 좁아졌다(v8d a). 머리만 가닥 굵기로 줄이면
+  // 바늘 · 화살촉 첨탑이었다(v8c 1회전). 끊긴 뒤에도 그대로(움츠림 동안 교체 0)
+  r *= 1.0 - (1.0 - PINCH_HEAD) * smoothstep(0.3, 1.0, uPinchB.y) * smoothstep(0.86, 1.0, fs);
+  // 짧을 땐 종 꼴 혹 — 반폭 X0(1 − fn) · 높이는 pinchPos가 smoothstep으로(밑 · 꼭대기 기울기 0). 옛 X0·√(1 − fs²)는 가장자리가
+  // 서서 0.88 → 0.92에 테 두른 판(계란 흰자)이 한 프레임에 솟았다(spec_v8b §5).
+  // fs는 움츠리기 전 몫(pinchPos fsN) — 끊긴 아래 몸이 주저앉아도 같은 혹(spec_v8c §2). 주저앉는 동안(무늬 이완 uPileB.z) 윗부분이
+  // 방위 fbm으로 울퉁불퉁 — 기운 쪽으로 치우친 둥근 언덕에 작은 혹 1~2
+  float fn = fs;
+  // 반폭 X0·√(1 − fn) — 밑은 반폭이 곧게 줄고 높이는 smoothstep이라 기울기 0(테 0), 꼭대기는 둥근 돔(세로 접선).
+  // (1 − fn)(1 + 0.8fn)은 꼭대기가 기둥보다 좁아 섞는 동안 어깨 위 꼭지 — 키세스 · 압정 · 병아리 머리였다(v8c 1회전 1.03 · 3.00 · justfed)
+  // (반폭을 몸통 폭부터 키우면 깔때기가 원래 자리에서 반경으로 2~3배 늘어 둘레 표면 잡음이 햇살 테 · 꽃잎이었다(v8d 2회전 a) — 반폭은 밑동 그대로,
+  //  좁은 꼴은 높이 몫(pinchPos fsN² — 둥근 언덕)이 맡는다)
+  vec2 hump = X0 * sqrt(max(1.0 - fn, 0.0)) * (1.0 + 0.25 * uPileB.z * smoothstep(0.25, 0.8, fn) * fbm(dir * 1.7 + vec2(sd * 2.3, 0.7)));
+  // 혹 → 기둥 사이(꼭대기 원판이 켜지기 전)는 기둥 몫 윗부분을 둥근 머리로 닫는다 — 열린 둘레가 납작한 꼭지혹이었다(spec_v8c §4)
+  float lk = uPinchC.z;
+  float dome = sqrt(max(1.0 - pow(max(fs - 0.7, 0.0) / 0.3, 2.0), 0.0));
+  r = mix(hump, r * mix(dome, 1.0, smoothstep(0.3, 0.8, lk)), lk);
+  // 병 안에 머물 가로 여유 — 벽 가까이 잡아도 0.05D는 남긴다(반폭 뒤집힘 0)
+  vec2 F = uGrabPos * PINCH_XZ;
+  float side = dir.x < 0.0 ? -1.0 : 1.0;
+  float room = max(PINCH_FR * sqrt(max(1.0 - F.y * F.y / (PINCH_FR * PINCH_FR), 0.04)) - side * F.x, 0.05 * PINCH_D);
+  float k0 = 0.8 * room; // 병 벽 앞 0.8까지는 그대로, 그 바깥만 부드럽게 눌린다
+  if (r.x > k0) r.x = k0 + 0.2 * room * tanh(clamp((r.x - k0) / (0.2 * room), -8.0, 8.0));
+  return max(r, vec2(0.0));
+}
+// 윗면 한 점(월드 xz w, 높이 y)의 꼬집힌 자리(월드). 잡은 점(uGrabPos)에서 s < S인 정점만:
+//   깔때기(s ≥ 0.7S) = 높이 Hf·funnelH(실제 반경 몫)(밖에서 C1) · 밑동 단면에서 원래 자리로 풀리는 오므림(밖에서 C1)
+//   기둥(s < 0.7S)   = 높이 몫 f = 1 − (s/0.7S)^1.5 → 척추 몫 fs = min(f/0.88, 1), 둘레 고리 = 단면 타원, 고리는 척추 접선에 수직.
+//                      f > 0.88은 꼭대기 면(원판). 그물 · 가닥 끊김 · 털썩 · 쌓임은 모두 같은 식의 매개변수다.
+// fo = 높이 몫 f(깔때기 · 밖 −1) · cutF = 끊긴 가닥 (아래 조각, 위 조각) 표지 — 프래그가 둘에 걸친 세모를 버린다
+vec3 pinchPos(vec2 w, float y, out float fo, out vec2 cutF) {
+  fo = -1.0;
+  cutF = vec2(0.0);
+  vec2 F = uGrabPos * PINCH_XZ;
+  vec2 d = w - F;
+  float s = length(d);
+  float S = uPinchB.x;
+  if (s >= S) return pinchXYZ(w, y);
+  float u = s / S;
+  float Hf = uGrab.x * riseK();
+  float hp = moundH(d, S);
+  vec3 Xf = pinchXYZ(w, y + Hf * hp);
+  float kc = uPinchC.x;
+  if (kc < 1e-4) return Xf;
+  vec2 dir = s > 1e-6 ? d / s : vec2(1.0, 0.0);
+  float sC = S * PINCH_UC;
+  vec3 P0 = pinchXYZ(F, y + Hf);
+  vec3 X1;
+  float up = 0.0;
+  if (s >= sC) {
+    // 깔때기 = 밑동 단면(축마다 반폭 rad0)에서 원래 자리(반경 S)로. 축마다 단조 사상 r = S − (S − rad0)(1 − v^q), q = (S − sC)/(S − rad0) —
+    // 밖(v = 1)에서 기울기 1(C1), 접힘 · 뒷면 · 어두운 틈 0
+    float v = (s - sC) / (S - sC);
+    vec2 rad0 = min(pinchRad(0.0, dir), vec2(S - 0.04 * PINCH_D));
+    vec2 q = (S - sC) / (S - rad0);
+    vec2 rm = dir * (S - (S - rad0) * (1.0 - pow(vec2(v), q)));
+    X1 = pinchXYZ(F + rm, y + Hf * moundH(rm, S));
+  } else {
+    float f = 1.0 - pow(s / sC, 1.5);
+    fo = f;
+    float sd = uPinchC.y;
+    float L = uPinchE.w;
+    // 짧은 혹은 꼭대기 원판 없이 f를 그대로 척추 몫으로 — 원판(f > 0.88)을 반폭 0인 꼭지 한 점에 모으면 뾰족한 산봉우리였다(v8b r3 0.97~1.13)
+    float lk = uPinchC.z;
+    // 꼭대기 원판 · 모깎기 · 요철은 기둥이 꽤 길어진 뒤에만(lkc) — 반쯤 긴 혹(lk 0.1~0.4)에 얹으면 넓은 혹 위 작은 꼭지혹이었다(spec_v8c §4, v8b r4 1.03~1.13)
+    float lkc = smoothstep(0.3, 0.8, lk);
+    float fs = mix(f, min(f / PINCH_TOP, 1.0), lkc);
+    // 가닥 끊김(spec_v8b §2) — 먼저 끊긴 가는 가닥의 위 토막은 꼭대기 쪽으로 오그라들고, 아래 토막은 그물 밑으로 처진다.
+    // 토막 끝은 가닥 굵기 그대로 둥글고 뭉툭하다(endC — 붓끝 · 휘핑 끝 · 바늘 0)
+    float gO = (fs - PINCH_FA) / (PINCH_FB - PINCH_FA); // 원래 그물 몫(구멍 · 관 사상 — frag와 같은 값)
+    float g0 = gO;
+    float sa;
+    vec2 ak;
+    float k = strandNear(dir, sa, ak);
+    float age = pick4(uPinchD, k);
+    float legR = 0.5 * pick4(uPinchF, k);
+    float endC = 1.0;
+    float cutA = uPinchE.z; // 손에서 떨어진 기둥이 움츠러드는 끝 몫(그물 점 11 · 되직 점 15, 안 끊김 1)
+    float rj = smoothstep(0.0, 0.9, uPinchB.z); // 손에서 떨어지면 끊겼던 가닥 토막이 다시 몸으로 붙는다(구멍이 닫히는 몫과 같다)
+    if (age >= 0.0 && g0 > 0.0 && g0 < 1.0) {
+      float gc = strandCutG(k);
+      float rg = max(legR / max(L * (PINCH_FB - PINCH_FA), 1e-3), 0.02); // 가닥 반지름(그물 몫)
+      if (g0 > gc) {
+        up = 1.0;
+        float gE = mix(gc, 1.0, smoothstep(0.0, 0.12, age));
+        endC = clamp((g0 - gE) / rg, 0.0, 1.0);
+        g0 = max(g0, gE);
+      } else {
+        float gA = (cutA - PINCH_FA) / (PINCH_FB - PINCH_FA);
+        // 0.2s smoothstep으로 처진다 — 0.07s는 그물 몫이 한 프레임에 꺼졌다(v8c 1회전 2.43 → 2.47). 토막은 구멍이 닫히며(strandOpen) 한 끝으로 모인다.
+        // 기둥이 아직 붙어 있어도(먼저 끊긴 가는 가닥) 그물 밑(몫 0.1)까지 처져 몸에 붙는다 — 끊긴 높이에 서 있으면 양옆 뿔 · 삼지창이었다(v8d 2회전 a 2.40~2.53)
+        float gE = mix(gc, min(gA, 0.1), smoothstep(0.0, 0.2, age));
+        endC = clamp((gE - g0) / rg, 0.0, 1.0);
+        g0 = min(g0, gE);
+      }
+      // 손에서 떨어지면(uPinchB.z) 토막이 제자리로 돌아와 붙는다 — 다 붙은 뒤(rj 1)엔 걸친 세모가 제 크기라 표지를 끈다
+      g0 = mix(g0, gO, rj);
+      endC = mix(endC, 1.0, rj);
+      fs = PINCH_FA + g0 * (PINCH_FB - PINCH_FA);
+      cutF = up > 0.5 ? vec2(0.0, 1.0) : vec2(1.0, 0.0);
+    }
+    // 마지막 굵은 가닥이 끊기면(손에서 떨어짐) 기둥 전체가 꼭대기째 아래 몸 끝(cutA)까지 고르게 움츠러든다(uPinchB.z 0.22s).
+    // 꼭대기 원판이 그대로 둥근 끝이 된다 — 끊긴 위 조각을 손끝 자리에서 줄이면 공중에 뜬 알약 · 점이었고(v8b r3), 0.07s에 줄이면
+    // 위 58px이 한 프레임에 사라졌다(v8c 1회전 2.43 → 2.47). 아래 토막 끝을 따로 닫으면 왕관 · 삼지창 · 두 갈래 끝이었다(2.47~2.57)
+    // 모양(단면 · 둥근 머리 · 발 둔덕 이음)은 움츠리기 전 몫 fsN으로 잰다 — 움츠린 몫으로 재면 머리 둥글기(dome) · 넓힘이 꺼지고
+    // 발 둔덕 이음 (1 − fs)²가 꼭대기에 남아 끊긴 뒤 납작 머리 그루터기 → 분화구 · 과녁 고리였다(v8c 2회전 peak 2.80~3.43). 안 끊김 · 놓기는 fsN = fs
+    float fsN = fs;
+    float cutE = mix(1.0, cutA, uPinchB.z); // 지금 아래 몸 끝 몫(움츠림 따라 1 → cutA)
+    fs *= cutE;
+    // 짧을 땐 종 꼴 — 척추 몫을 fsN²로 읽는다: 반폭 √(1 − fsN)과 짝이라 높이 = (1 − ρ²)²(둥근 언덕 — 밑 · 꼭대기 기울기 0, 테 0).
+    // smoothstep으로 읽으면 꼭대기 0.6~1이 거의 같은 높이라 윗면이 평평한 판 · 렌즈였다(v8d 1회전 sour 1.17~2.4 · justfed 0.93). 끊긴 뒤엔 아래 몸 끝(cutA)까지
+    float fsC = mix(cutA * fsN * fsN, fs, lk);
+    vec3 tg;
+    vec4 C = spineAt(fsC, tg);
+    // 발 맞춤 — 척추 발(상태기 밑점)을 이 정점의 발(깔때기 위 P0)로, 꼭대기로 갈수록 0(꼭대기 = 손끝 그대로).
+    // 혹(lk 0)은 통째로 둔덕 위에 얹는다 — 발만 올리면 넓은 둔덕 위 꼭대기만 솟은 꼭지혹이었다(v8c 2회전 peak 1.07~1.13, spec_v8d §5)
+    // 손에서 떨어지면(남은 혹 몫 uPinchE.x, τ0.2) 옛 식으로 — 주저앉는 혹 · 녹음은 그대로(release 2.53~2.87 회귀 0)
+    // 높이 몫은 발 고리 근처(fsN 0.3 아래)만 — 정점마다 다른 표면 잡음 · 고랑 높이가 기둥 몸에 실리면 오므린 자리에서 고리가 위아래로 엇갈려
+    // 밑동 톱니 테 · 치마 주름이었다(v8d 1회전 justfed 0.97~1.17)
+    vec3 dP = P0 - uSpine[0].xyz;
+    C.xz += dP.xz * mix(1.0, 1.0 - fsN, max(lk, uPinchE.x));
+    C.y += dP.y * (1.0 - smoothstep(0.0, 0.3, fsN));
+    float tl = length(tg);
+    tg = tl > 1e-5 ? tg / tl : vec3(0.0, 1.0, 0.0);
+    // 발 고리는 수평(깔때기 안쪽 끝과 같은 자리). 혹(긴 기둥 몫 lk 0)도 고리를 수평으로 — 기운 척추에 수직으로 돌리면 낮은 혹의
+    // 기운 쪽 고리가 표면 밑으로 내려가 밑동에 접힌 금 · 진한 테 · 렌즈 판이었다(v8c 1회전 peak 3.30 · justfed 1.73 · release 2.80)
+    tg = normalize(mix(vec3(0.0, 1.0, 0.0), tg, smoothstep(0.0, 0.15, fsN) * lk));
+    tg.y = max(tg.y, -0.7);
+    tg = normalize(tg);
+    vec2 rad = pinchRad(fsN, dir);
+    // 굵기 배율(척추 w — 주저앉으며 굵어진다, 부피 보존). 혹(lk 0)은 굵히지 않는다 — 혹 반폭은 밑동 반폭이 정한다. 굵히면 위 고리가
+    // 밑동보다 넓어 처마 · 테 두른 납작 판 위 꼭지 · 렌즈 테였다(v8c 2회전 b peak 3.0~3.4 · release 3.0~3.3)
+    rad *= mix(1.0, C.w, smoothstep(0.0, 0.2, fsN) * lk);
+    float gn = clamp(gO, 0.0, 1.0);
+    // 꼭대기 끝(spec_v8b §1) — 손가락 볼에 눌린 뭉툭하고 둥근 반죽 끝: 옆면이 반경 0.042D 모깎기로 굴러 윗면이 되고(옆 노멀과 C1 —
+    // 평평한 원판 + 또렷한 테는 그루터기 · 양초 끝이었다, v8 r2), 윗면은 혹 2~3개 낮은 요철(0.016D). 처마 · 배꼽 0.
+    // 혀(묽음)는 둥근 끝(반폭 × 0.35 — 통나무 끝 원판 0)
+    // 요철은 긴 기둥에서만 — 짧은 혹(버팀 · 되직)의 꼭지에 얹으면 반폭 0인 꼭지가 뾰족한 뿔 · 산봉우리였다(v8b r3 peak 0.97~1.13)
+    float bev = 0.0;
+    // 버팀 동안(기둥 0.6D 아래)도 둥근 끝 — 길이 0.35 → 0.6D에서 납작 끝으로(늘어남 1.6s~는 그대로). 요철(혹 둘)도 둥근 끝에선 끈다
+    // (평평한 윗면 + 혹 둘 = 그루터기 · 양초, v8d 1회전 peak 1.27~1.67). 꼭대기 테 반폭 요철도 같다 — 둥근 끝에 얹으면 꼭지 홈 · 쌍봉(v8d 2회전 b 1.30~1.37)
+    float rnd = max(max(max(uPinch.w, 1.0 - smoothstep(0.6, 1.0, lk)), 1.0 - smoothstep(0.35 * PINCH_D, 0.6 * PINCH_D, L)), max(uPileB.z, uPinchE.x));
+    rad += vec2(1.0, 0.6) * (0.02 * PINCH_D * fbm(dir * 2.3 + vec2(sd, 1.7)) * smoothstep(0.85, 1.0, fsN) * lkc * (1.0 - rnd));
+    if (f > PINCH_TOP && lkc > 0.0) {
+      float disc = pow((1.0 - f) / (1.0 - PINCH_TOP), 0.6667);
+      float rr = rad.x;
+      float rho = min(0.042 * PINCH_D, 0.6 * rr);
+      float dl = rr * (1.0 - disc);
+      float fil = dl < rho ? sqrt(max(rho * rho - (rho - dl) * (rho - dl), 0.0)) : rho;
+      // 손에서 떨어지면(남은 혹 몫 uPinchE.x — 놓는 순간부터 τ0.2로 오른다) 둥근 끝 — 무늬 이완(g 0.15부터)을 기다리면
+      // 납작한 원판이 기울며 화면을 봐 소시지 끝 · 통나무 단면이었다(v8c 1회전 release 2.17~2.37)
+      // 반쯤 긴 기둥(버팀 · 항복 직후, lk < 1)도 둥근 끝 — 평평한 윗면은 그루터기 · 양초였다(v8c 2회전 peak 1.17~1.43, spec_v8d §5). 긴 기둥(늘어남)은 그대로
+      float ell = rr * sqrt(max(1.0 - disc * disc, 0.0)) * mix(0.35, 0.8, rnd);
+      bev = (mix(fil, ell, rnd)
+        + 0.016 * PINCH_D * fbm(dir * disc * 2.2 + vec2(sd * 1.7, 3.1)) * (1.0 - disc * disc) * (1.0 - rnd)) * lkc;
+      rad *= mix(1.0, disc, lkc);
+    }
+    vec2 oe = dir * rad;
+    // 가닥 = 둥근 관(spec_v8b §2) — 가닥 몫의 둘레 띠(반각 strandHalf)를 가닥 반지름 legR의 관 한 바퀴로 감는다(열림 op만큼).
+    // 띠째 두면 옆에서 모로 선 띠가 1~2px 철사였다(v8 r2 2.23~2.47). 구멍(반각 밖)은 관 안쪽 끝에 모이고 frag가 버린다
+    float op = strandOpen(gO, k);
+    if (op > 1e-3) {
+      float psi = clamp(sa / strandHalf(op, k, 0.85 * uPinch.x), -1.0, 1.0) * 3.14159;
+      vec2 nK = normalize(ak * rad + vec2(1e-6, 0.0));
+      vec2 cK = ak * rad - 0.1 * legR * nK; // 둘레 안 0.1 legR — 들일수록 앞 가닥 사이가 좁았다(legR 1~2px 홈 v8c 1회전 · 0.4 legR 2~3px v8d 1회전)
+      float rs = legR * sqrt(endC * (2.0 - endC));
+      oe = mix(oe, cK + rs * (cos(psi) * nK + sin(psi) * vec2(-nK.y, nK.x)), op);
+    }
+    vec3 o = vec3(oe.x, 0.0, oe.y);
+    // 고리를 위(+y) → 접선으로 돌린다(로드리게스, w = up × tg)
+    vec3 wv = vec3(tg.z, 0.0, -tg.x);
+    o = o * tg.y + cross(wv, o) + wv * (dot(wv, o) / (1.0 + tg.y));
+    // 녹는 묽은 혀만 표면으로 납작하게 퍼진다(spec_v8c §5)
+    o.y *= 1.0 - 0.85 * uPinch.w * uPileB.w;
+    // 가닥은 그물 가운데서 살짝 처진다(현수선 — 끊겨 움츠리는 동안 풀린다: 남으면 주저앉은 혹 꼭대기 몫 0.69~0.94 띠가 4px 꺼져
+    // 분화구 · 과녁 고리였다, v8c 2회전 peak 2.97~3.43) · 발 고리 높이를 방위마다 깔때기 높이로(fsN 따라 (1 − fsN)²로 풀린다)
+    X1 = C.xyz + o + tg * bev
+      + vec3(0.0, -0.03 * PINCH_D * uPinchB.y * (1.0 - uPinchB.z) * sin(3.14159 * gn) + Hf * (moundH(dir * rad, S) - 1.0) * (1.0 - fsN) * (1.0 - fsN), 0.0);
+    // (접힘 높이장을 혹에 한 번 더 얹던 몫은 지웠다 — 발 고리(P0)가 이미 높이장을 실어 혹 밑에 턱 · 렌즈 고리였다, v8c 1회전. 꺼질 땐 Xf가 받는다)
+    // 병 벽 안 — 가로만이 아니라 앞뒤 · 사선도 PINCH_FR 안으로 부드럽게 눌린다(규칙 검수 v8 ③)
+    float lx = length(X1.xz);
+    float kf = 0.9 * PINCH_FR;
+    if (lx > kf) X1.xz *= (kf + (PINCH_FR - kf) * tanh(clamp((lx - kf) / (PINCH_FR - kf), 0.0, 8.0))) / lx;
+  }
+  // 끊긴 가닥 표지 — 토막이 다시 붙으면(rj 1) 끈다. 기둥 몫이 꺼질 때도 끈다(걸친 세모 자리가 흰 고리 · 구멍이었다, v8 r1)
+  cutF *= smoothstep(0.05, 0.3, kc) * (1.0 - step(0.999, smoothstep(0.0, 0.9, uPinchB.z)));
+  return mix(Xf, X1, kc);
+}
+// 꼬집기 적용(버텍스, 높이장 변위 뒤 마지막) — p = 오브젝트 자리, pinR = 테두리 고정 몫. 반환 = 꼬집힌 오브젝트 자리.
+// nW = 꼬집기 면 노멀(월드, 앞 차분 두 번 → 접선 외적) · info = (들림(월드), 늘어남 = 두 방향 길이비 중 큰 값, 높이 몫 f, 0) · cutF = 끊긴 가닥 조각 표지
+vec3 pinchApply(vec3 p, float pinR, out vec3 nW, out vec4 info, out vec2 cutF) {
+  vec2 w = p.xz * PINCH_XZ;
+  float f;
+  float fd;
+  vec2 cd;
+  vec3 P0 = pinchXYZ(w, p.y);
+  vec3 X = mix(P0, pinchPos(w, p.y, f, cutF), pinR);
+  // 차분은 잡은 점 기준 극좌표 두 방향(바깥 · 둘레) — 축 방향 바깥 차분은 gd.x = 0 · gd.y = 0 선에서 차분 쪽이 뒤집혀 기둥 한가운데
+  // 어두운 세로 줄 한 가닥이 남았다(v8 r2 b). 가운데를 건너가지 않으니 꼭대기 칼집(v7 r1)도 없다. 평면에서 외적 = +y
+  vec2 gd = w - uGrabPos * PINCH_XZ;
+  float gl = length(gd);
+  vec2 er = gl > 1e-6 ? gd / gl : vec2(1.0, 0.0);
+  vec2 et = vec2(-er.y, er.x);
+  vec3 Xa = mix(P0 + pinchXYZ(er * PINCH_FD, 0.0), pinchPos(w + er * PINCH_FD, p.y, fd, cd), pinR);
+  vec3 Xb = mix(P0 + pinchXYZ(et * PINCH_FD, 0.0), pinchPos(w + et * PINCH_FD, p.y, fd, cd), pinR);
+  vec3 c = cross(Xb - X, Xa - X);
+  float a = length(c);
+  nW = a > 1e-12 ? c / a : vec3(0.0, 1.0, 0.0);
+  // (녹음 몫에 노멀을 둔덕 노멀로 넘기던 몫은 지웠다 — 아직 솟은 혹을 납작하게 비춰 테 두른 렌즈 · 계란 흰자 판이었다, v8c 1회전.
+  //  기둥 몫이 0이면 꼬집힌 자리가 둔덕 면 그대로라 차분 노멀이 곧 둔덕 노멀이다)
+  info = vec4(X.y - p.y, max(length(Xa - X), length(Xb - X)) / PINCH_FD, f, 0.0);
+  return vec3(X.x / PINCH_XZ, X.y, X.z / PINCH_XZ);
 }
 `;
 export type GrabTuning = Partial<
@@ -449,21 +763,23 @@ export class DoughMesh {
   /** 개체별 호흡 위상 — 두 르방이 같은 박자로 숨쉬지 않게 한다 (setSeed) */
   private seedPhase = 0;
 
-  // ── 당기기 상태 — 가닥은 strands.rig(순수 TS), 반죽 윗면은 밑동 둔덕 스프링 · 흔들림만 ──
+  // ── 들기 상태 — 기둥 상태기는 rig(순수 TS), 꼬집기 모양은 반죽 버텍스(GRAB_FIELD pinchPos), 깔때기 높이 · 흔들림 스프링은 여기 ──
   /** Motion Lab 전용 오버라이드 — 프로덕션 경로는 비워 둔다 */
   grabTuning: GrabTuning = {};
-  /** 가닥 다발 메시 — SceneHost가 씬 · homeGroup에 넣는다 */
-  readonly strands: StrandMesh;
-  /** 이번 tick의 가닥 끊김 — SceneHost.onGrabBreak가 읽는다(소리 · 진동) */
-  readonly grabBreaks: readonly StrandBreak[];
+  /** 꼬집기 상태기(떼어내기 v5) — 메시 없음, 반죽 uniform을 몬다 */
+  readonly rig = new StrandRig();
+  /** 이번 tick의 들기 사건 — SceneHost.onGrabEvent가 읽는다(소리 · 진동) */
+  readonly grabBreaks: readonly StrandBreak[] = this.rig.events;
   private grabbing = false;
   private grabReleaseAge = Infinity;
   private grabAnchor = new THREE.Vector2();
   private moundH = 0;
   private moundV = 0;
-  /** 높이 주름 · 무늬 끌림 세기 — 빨리 풀리는 몫 · 흔적으로 남는 몫(uGrab.z = 둘 중 큰 값) */
-  private ribFast = 0;
-  private ribSlow = 0;
+  /** 둔덕 목표 — 손끝보다 τ0.16(MOUND_LAG_TAU) 늦게 따라온다(무게) */
+  private moundTgt = 0;
+  /** 무늬 끌림 세기 — 빨리 풀리는 몫 · 흔적으로 남는 몫(uGrab.z = 둘 중 큰 값) */
+  private pullFast = 0;
+  private pullSlow = 0;
   private sway = new THREE.Vector2();      // 밑동 흔들림(오브젝트) — ω5.5 · ζ 스프링(「무겁게 되돌아온다」)
   private swayV = new THREE.Vector2();
   private swayRest = new THREE.Vector2();  // 놓을 때 남는 몫(creepGain) — releaseTau로 해소
@@ -536,11 +852,19 @@ export class DoughMesh {
         // 기울기 진값 — 하이트필드는 오브젝트 xz(월드 ÷ XZ_SCALE) 위 월드 y 변위라 월드 기울기 = dBs / XZ_SCALE.
         // 높이가 y 스케일이 아니라 uHeight라서 fill과 무관하다. 옛 1.0 고정은 노멀 교란을 1.3배 키워 얼룩을 키웠다(A1-05)
         uSlopeAspect: { value: 1 / XZ_SCALE },
-        // 당기기(2026-11-19 가닥 다발) — 밑동 둔덕 가운데 · (둔덕 높이, 끌려 모임 세기) · 더미 (x, z, 높이, 반경)
+        // 들기(떼어내기 v8 꼬집기) — 잡은 점(기둥 발) · (깔때기 높이, 끌려 모임 세기, 무늬 끌림 세기, 0) ·
+        // 접힘 (x, z, 높이, 반쪽 길이) · (접힘 방위, 거침, 0, 0) · 척추 17점 · 기둥 매개변수 uPinch ~ uPinchF(StrandRig.col, GRAB_FIELD 머리 주석)
         uGrabPos: { value: new THREE.Vector2() },
         uGrab: { value: new THREE.Vector4() },
         uPile: { value: new THREE.Vector4(0, 0, 0, 1) },
-        uPileB: { value: new THREE.Vector4() }, // 더미 (반들 자국, 접힘 방위, 무늬 꼬임, —) — GRAB_FIELD
+        uPileB: { value: new THREE.Vector4() }, // GRAB_FIELD
+        uSpine: { value: Array.from({ length: SPINE_N }, () => new THREE.Vector4()) },
+        uPinch: { value: new THREE.Vector4() },
+        uPinchB: { value: new THREE.Vector4(1, 0, 0, 1) },
+        uPinchC: { value: new THREE.Vector4() },
+        uPinchD: { value: new THREE.Vector4(-1, -1, -1, -1) },
+        uPinchE: { value: new THREE.Vector4(0, 0.72, 1, 0) },
+        uPinchF: { value: new THREE.Vector4() },
       },
       vertexShader: vert
         .replace('// #fbm', FBM_GLSL)
@@ -555,8 +879,6 @@ export class DoughMesh {
         .replace('// #doughShade', DOUGH_ALBEDO + DOUGH_SHADE)
         .replace('// #cellBubble', CELL_BUBBLE),
     });
-    this.strands = new StrandMesh(this.material.uniforms);
-    this.grabBreaks = this.strands.rig.events;
     const geo = createFillGeometry(SEG, RINGS, ROWS);
     // 셰이더가 높이를 정하므로 자리 기준 구를 손으로 준다 — 병 전체(바닥~피크 상한)를 덮는다
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0.9, 0), 1.4);
@@ -671,35 +993,51 @@ export class DoughMesh {
     this.grabReleaseAge = Infinity;
     this.grabAnchor.set(x, z);
     const p = this.params;
-    this.strands.rig.start(x * XZ_SCALE, z * XZ_SCALE,
+    this.rig.start(x * XZ_SCALE, z * XZ_SCALE,
       strandMix(p?.elasticity ?? 0.5, p?.fluidity ?? 0.3, this.grabMax()), this.env());
   }
 
-  /** grab 이동 — 손끝 월드 점(입력층이 카메라를 마주 보는 수직 평면에 투영). 가닥 끝이 이 점을 τ0.07로 따른다.
-   *  LIFT_LUMP면 끝(손끝 덩이)을 화면 60px 위로 띄운다 — 손가락이 덩이 · 가닥 끝을 덮지 않게 */
+  /** grab 이동 — 손끝 월드 점(입력층이 카메라를 마주 보는 수직 평면에 투영). 기둥 꼭대기가 이 점(손끝 바로 밑, ANCHOR 0)을 따른다 —
+   *  버팀 τ0.16 → 항복 τ0.05 → 그 뒤 elasticTau */
   grabMove3(x: number, y: number, z: number): void {
     if (!this.grabbing) return;
-    this.strands.rig.move(x, y + LIFT_LUMP * LUMP_Y, z);
+    this.rig.move(x, y, z);
   }
+
+  /** 들기 소리 — 장력 0~1(버팀: 1 − e^(−d/0.25D), 뻗은 뒤 0.35 + 0.65 × 신장) · 늘어남 잔 틱 횟수/s(뻗은 뒤 늘어나는 빠르기 비례 4~16) */
+  grabFeel(): Readonly<{ tension: number; tickRate: number }> {
+    const rig = this.rig;
+    const o = this.feelOut; // 매 호출 객체 생성 0(규칙 검수 v8b) — 받는 쪽은 바로 읽고 버린다
+    o.tension = 0;
+    o.tickRate = 0;
+    if (!rig.active || rig.none || !rig.attached()) return o;
+    if (!rig.yielded) {
+      o.tension = 1 - Math.exp(-rig.pulled() / MOUND_D);
+      return o;
+    }
+    const v = rig.stretchSpeed / D_W;
+    o.tension = 0.35 + 0.65 * rig.stretch01(this.env());
+    o.tickRate = v > 0.05 ? Math.min(16, 4 + 12 * v) : 0;
+    return o;
+  }
+
+  private readonly feelOut = { tension: 0, tickRate: 0 };
 
   /** 놓기 — 붙은 가닥은 한 줄로 합쳐 떨어지고 더미가 되며, 밑동 둔덕은 ω5.5 · ζ 스프링으로 돌아간다. tick이 굴린다 */
   grabEnd(): void {
     if (!this.grabbing) return;
     this.grabbing = false;
-    this.grabReleaseAge = 0;
-    const cgain = this.grabTuning.grabCreepGain ?? this.params?.grabCreepGain ?? 0.5;
-    this.swayRest.copy(this.sway).multiplyScalar(cgain);
-    this.strands.rig.release(this.env());
+    this.rig.release(); // 밑동 흔들림 남는 몫(swayRest)은 tick이 기둥이 떨어진 첫 틱에 잡는다
   }
 
   /** 신장 0~1 = 주 가닥 길이 ÷ 지금 주 가닥 끊김 길이 — 사운드 훅용(onGrabMove). 주 가닥이 끊겼으면 0 */
   grabStretch01(): number {
-    return this.strands.rig.stretch01(this.env());
+    return this.rig.stretch01(this.env());
   }
 
   /** Motion Lab 계기판 · 녹화 도구용 — held는 rec.mjs가 grab 판정 기록에 쓴다 */
   grabDebug(): { held: boolean; len: number; breakLen: number; attached: number } {
-    const rig = this.strands.rig;
+    const rig = this.rig;
     return { held: this.grabbing, len: rig.len, breakLen: rig.breakLen(this.env()), attached: rig.attached() };
   }
 
@@ -754,13 +1092,12 @@ export class DoughMesh {
     this.writeStir();
     // 당기기 — 가닥 · 더미 · 밑동 둔덕도 넘기지 않는다
     this.grabbing = false;
-    this.strands.rig.reset();
-    this.strands.sync();
+    this.rig.reset();
     this.resetMound();
   }
 
   private resetMound(): void {
-    this.moundH = this.moundV = this.ribFast = this.ribSlow = 0;
+    this.moundH = this.moundV = this.moundTgt = this.pullFast = this.pullSlow = 0;
     this.sway.set(0, 0);
     this.swayV.set(0, 0);
     this.swayRest.set(0, 0);
@@ -768,7 +1105,18 @@ export class DoughMesh {
     (u.uGrab.value as THREE.Vector4).set(0, 0, 0, 0);
     (u.uPile.value as THREE.Vector4).set(0, 0, 0, 1);
     (u.uPileB.value as THREE.Vector4).set(0, 0, 0, 0);
+    this.writePinch();
     (u.uGrabPos.value as THREE.Vector2).copy(this.grabAnchor);
+  }
+
+  /** 기둥 — 척추 17점(v8b) · 매개변수 넷(상태기 값 그대로 — 기둥 몫 · 꺼짐도 상태기가 연속으로 몬다) */
+  private writePinch(): void {
+    const u = this.material.uniforms;
+    const rig = this.rig;
+    const sp = u.uSpine.value as THREE.Vector4[];
+    for (let i = 0; i < SPINE_N; i++) sp[i].fromArray(rig.spine, 4 * i);
+    const names = ['uPinch', 'uPinchB', 'uPinchC', 'uPinchD', 'uPinchE', 'uPinchF'] as const;
+    for (let k = 0; k < names.length; k++) (u[names[k]].value as THREE.Vector4).fromArray(rig.col, 4 * k);
   }
 
   /** 젓기 · 밥 주기 연출이 만드는 출렁 배율 — 되직 0 ~ 묽음 1 */
@@ -844,14 +1192,13 @@ export class DoughMesh {
     y += (u.uMenH.value as number) * THREE.MathUtils.smoothstep(Math.sqrt(c2) / rb, 0.78, 1.0);
     const g = u.uGrab.value as THREE.Vector4;
     const gp = u.uGrabPos.value as THREE.Vector2;
-    // 밑자락 · 더미 — GRAB_FIELD liftH와 같은 둔덕 식. 높이 주름 · 겹 고리는 빼고(작다), 더미는 고리 평균 몫 0.9
+    // 깔때기 · 접힘 — 꼬집기 깔때기 평균(오므림 · 기둥은 빼고 GRAB_FIELD pinchPos의 Hf·funnelH(s/S)만) + 접힘 능선 평균(둥근 가우스 · 몫 0.7)
     if (g.x > 1e-5) {
-      const r2 = (x - gp.x) ** 2 + (z - gp.y) ** 2;
-      const s = Math.min(Math.sqrt(r2) / LIFT_MR, 1);
-      y += rise * g.x * ((1 - s) ** 2.5 - LIFT_SAG_K * Math.exp(-r2 / (LIFT_SAG_R * LIFT_SAG_R)));
+      const s = Math.min(Math.hypot(x - gp.x, z - gp.y) / (this.rig.funnelR / XZ_SCALE), 1);
+      y += rise * g.x * funnelH(s);
     }
     const pl = u.uPile.value as THREE.Vector4;
-    if (pl.z > 1e-5) y += rise * 0.9 * pl.z * Math.exp(-((x - pl.x) ** 2 + (z - pl.y) ** 2) / (pl.w * pl.w));
+    if (pl.z > 1e-5) y += rise * 0.7 * pl.z * Math.exp(-((x - pl.x) ** 2 + (z - pl.y) ** 2) / (pl.w * pl.w));
     return y * this.mesh.scale.y;
   }
 
@@ -966,27 +1313,45 @@ export class DoughMesh {
     this.murk += ((stirring ? 1 : 0) - this.murk) * (1 - Math.exp(-dt / (stirring ? MURK_RISE_TAU : MURK_FALL_TAU)));
     if (this.murk < 1e-4) this.murk = 0;
 
-    // ── 당기기 — 가닥 상태기(끝점 추종 · 끊김 · 낙하 · 더미) → 밑동 둔덕 · 흔들림 스프링(ω5.5 · ζ = grabReturnZeta).
-    //    잠금값 ζ 0.956의 새 자리 = 밑동 둔덕이 「무겁게 되돌아온다」. 모든 감쇠는 1-exp(-k·dt) 주사율 독립 ──
+    // ── 들기 — 꼬집기 상태기(버팀 · 항복 · 찢김 · 끊김 · 털썩 · 접힘) → 깔때기 높이 · 흔들림 스프링(ω5.5 · ζ = grabReturnZeta) · 기둥 uniform.
+    //    잠금값 ζ 0.956의 자리 = 깔때기가 「무겁게 되돌아온다」(그대로). 모든 감쇠는 1-exp(-k·dt) 주사율 독립 ──
     {
       const czeta = this.grabTuning.grabReturnZeta ?? p?.grabReturnZeta ?? 0.95;
-      if (!this.grabbing && Number.isFinite(this.grabReleaseAge)) this.grabReleaseAge += dt;
-      const rig = this.strands.rig;
+      const rig = this.rig;
       rig.tick(dt, this.env());
-      this.strands.sync(this.mesh.visible);
       const att = rig.attached();
-      // 든 높이 — 커밋 뒤 끌어 올린 거리(손끝 덩이를 띄우면 누르자마자 0.1D 몫)
-      const pull = rig.pulled() + (rig.active ? 0.1 * D_W * LIFT_LUMP : 0);
-      // 밑자락 둔덕 — h = 0.2D × smoothstep(0, 0.5D, 든 높이) × 붙은 몫. 가닥 없는 휴면은 조금만.
-      // 병 입구(JAR_HEIGHT − 0.1) 위로는 안 솟는다 — 피크(수위 1.64)는 0.2D면 입구를 넘어 0.14D쯤에서 깎인다
-      const hT = Math.min(MOUND_H * THREE.MathUtils.smoothstep(pull, 0, 0.5 * D_W) * att * (rig.none ? NONE_MOUND : 1),
-        Math.max(0, JAR_HEIGHT - 0.1 - this.topY()));
+      // 밑동 흔들림은 손에서 떨어진 순간부터 풀린다 — 끊긴 뒤 손가락을 든 채면 놓을 때(≈2s 뒤) 녹은 자리의 혹이 옆으로 밀렸다(v8 r2 peak 4.97, spec_v8b §4)
+      const swayHeld = this.grabbing && att > 0;
+      if (!swayHeld) {
+        if (!Number.isFinite(this.grabReleaseAge)) {
+          this.grabReleaseAge = 0;
+          this.swayRest.copy(this.sway).multiplyScalar(this.grabTuning.grabCreepGain ?? p?.grabCreepGain ?? 0.5);
+        } else this.grabReleaseAge += dt;
+      }
+      const pull = rig.pulled();
+      for (const e of rig.events) {
+        // 착지 — 반죽 전신 출렁 1회(접힘 방향, 되직은 덜). ② 항복 내려앉음은 아래 hRaw의 YIELD_SAG 한 번(τ0.16)
+        if (e.kind === 'land') {
+          const k = LAND_KICK * (0.4 + 0.6 * this.sloshGain());
+          this.wobbleVel.x += Math.cos(rig.pile[4]) * k;
+          this.wobbleVel.y += Math.sin(rig.pile[4]) * k;
+        }
+      }
+      // 깔때기 — h = 0.22D × 상태 배율(되직 0.8 · 묽음 0.45) × (1 − e^(−든 높이/0.25D)) × 붙은 몫(끌수록 오르다 포화), 뻗은 뒤 × 0.7,
+      // 손끝보다 τ0.16 늦게. 기둥 없는 휴면은 조금만. 병 입구(JAR_HEIGHT − 0.1) 위로는 안 솟는다(기둥 위쪽은 손끝까지 넘어도 된다)
+      // 버팀(짧은 혹, 긴 기둥 몫 uPinchC.z < 1) 동안은 둔덕을 MOUND_HOLD배로 — 둔덕(0.45D)이 혹(0.3D)보다 넓게 솟아 넓은 둔덕 위
+      // 꼭지혹 2단이었다(v8d b peak 1.0~1.13, spec_v8d §5). 긴 기둥(늘어남)은 1배 그대로
+      const hRaw = MOUND_HMAX * rig.funnelK * (1 - Math.exp(-pull / MOUND_D)) * att * (rig.none ? NONE_MOUND : 1)
+        * (rig.yielded ? YIELD_SAG : 1) * (rig.none ? 1 : MOUND_HOLD + (1 - MOUND_HOLD) * rig.col[10]);
+      this.moundTgt += (hRaw - this.moundTgt) * (1 - Math.exp(-dt / MOUND_LAG_TAU));
+      if (hRaw === 0 && this.moundTgt < 1e-6) this.moundTgt = 0;
+      const hT = Math.min(this.moundTgt, Math.max(0, JAR_HEIGHT - 0.1 - this.topY()));
       const w = this.grabParam('omega');
       this.moundV += (-w * w * (this.moundH - hT) - 2 * czeta * w * this.moundV) * dt;
       this.moundH += this.moundV * dt;
       // 흔들림 목표 — 잡는 동안 끝점 수평 오프셋 × 0.15(상한 0.1), 놓은 뒤엔 creepGain 몫이 releaseTau로 풀린다
       const tgt = this.swayTgt;
-      if (this.grabbing) {
+      if (swayHeld) {
         const off = this.tipOff;
         rig.tipOffset(off);
         tgt.set(off[0] / XZ_SCALE, off[1] / XZ_SCALE).multiplyScalar(SWAY_GAIN);
@@ -1007,18 +1372,19 @@ export class DoughMesh {
       // 끌림 세기 — 붙은 몫 × smoothstep(0, 0.6D, 든 높이). 가닥 없는 휴면은 0(§6-2 둔덕만).
       // 높이 주름 · 무늬 끌림(uGrab.z)은 τ0.12s로 차고, 놓거나 끊기면 τ0.8s로 풀리며 최고치 20%가 τ8s 흔적으로 남는다
       const tension = rig.none ? 0 : att * THREE.MathUtils.smoothstep(pull, 0, 0.6 * D_W);
-      this.ribFast = tension > this.ribFast
-        ? this.ribFast + (tension - this.ribFast) * (1 - Math.exp(-dt / RIB_RISE_TAU))
-        : tension + (this.ribFast - tension) * Math.exp(-dt / RIB_FALL_TAU);
-      this.ribSlow = Math.max(this.ribSlow * Math.exp(-dt / RIB_KEEP_TAU), RIB_KEEP * this.ribFast);
-      if (this.ribFast < 1e-4) this.ribFast = 0;
-      if (this.ribSlow < 1e-4) this.ribSlow = 0;
-      (u.uGrab.value as THREE.Vector4).set(Math.max(0, this.moundH), this.ribFast, Math.max(this.ribFast, this.ribSlow), 0);
-      (u.uGrabPos.value as THREE.Vector2).copy(this.grabAnchor).add(this.sway);
-      // 더미 — 휴면 · 곰팡이(가닥 없음)는 더미도 없다(상태기가 만들지 않는다)
+      this.pullFast = tension > this.pullFast
+        ? this.pullFast + (tension - this.pullFast) * (1 - Math.exp(-dt / PULL_RISE_TAU))
+        : tension + (this.pullFast - tension) * Math.exp(-dt / PULL_FALL_TAU);
+      this.pullSlow = Math.max(this.pullSlow * Math.exp(-dt / PULL_KEEP_TAU), PULL_KEEP * this.pullFast);
+      if (this.pullFast < 1e-4) this.pullFast = 0;
+      if (this.pullSlow < 1e-3) this.pullSlow = 0; // 0.1% 아래는 안 보인다 — 1분 안에 정확히 0(셰이더 분기 끔)
+      // 접힘 — 휴면 · 곰팡이(기둥 없음)는 안 생긴다(상태기가 만들지 않는다)
       const pl = rig.pile;
+      (u.uGrab.value as THREE.Vector4).set(Math.max(0, this.moundH), this.pullFast, Math.max(this.pullFast, this.pullSlow), 0);
+      (u.uGrabPos.value as THREE.Vector2).copy(this.grabAnchor).add(this.sway);
       (u.uPile.value as THREE.Vector4).set(pl[0] / XZ_SCALE, pl[1] / XZ_SCALE, pl[2], pl[3] / XZ_SCALE);
-      (u.uPileB.value as THREE.Vector4).set(pl[4], pl[5], pl[6], 0);
+      (u.uPileB.value as THREE.Vector4).set(pl[4], pl[5], rig.relax, rig.melt);
+      this.writePinch();
     }
 
     // ── 손끝 패임 · 앞 둔덕 — 젓는 동안 손 속도만큼 파이고(τ0.08s), 놓으면 묽으면 τ0.3s · 되직하면 1.6s(피크는 덜) 메워진다 ──
@@ -1252,9 +1618,8 @@ export class DoughMesh {
     if (!ok(this.wobble) || !ok(this.wobbleVel)) zero(this.wobble, this.wobbleVel);
     if (!ok(this.stirVec) || !ok(this.stirVecVel)) zero(this.stirVec, this.stirVecVel);
     // 당기기 — 가닥 상태기에 NaN이 섞이면 가닥 · 더미를 지운다(§6-14), 밑동 스프링은 0으로
-    if (!this.strands.rig.finite()) {
-      this.strands.rig.reset();
-      this.strands.sync();
+    if (!this.rig.finite()) {
+      this.rig.reset();
       this.grabbing = false; // 상태기가 잡기를 놓았으니 grabMove3 · grabEnd도 맞춘다(검토 C-2)
     }
     if (!ok(this.sway) || !ok(this.swayV) || !ok(this.swayRest) || !Number.isFinite(this.moundH + this.moundV)) {
@@ -1269,7 +1634,7 @@ export class DoughMesh {
     if (!Number.isFinite(this.marblePhase)) this.marblePhase = 0;
     if (!Number.isFinite(this.murk)) this.murk = 0;
     if (!Number.isFinite(this.dentH + this.bowH)) this.dentH = this.bowH = 0;
-    if (!Number.isFinite(this.ribFast + this.ribSlow)) this.ribFast = this.ribSlow = 0;
+    if (!Number.isFinite(this.pullFast + this.pullSlow)) this.pullFast = this.pullSlow = 0;
     if (![this.swTheta, this.swOmega, this.mem, this.memSnap].every((a) => a.every(Number.isFinite))) {
       for (const a of [this.swTheta, this.swOmega, this.mem, this.memSnap]) a.fill(0);
     }

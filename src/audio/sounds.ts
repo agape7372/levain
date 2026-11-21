@@ -56,14 +56,14 @@ function tone(freq: number, at: number, dur: number, type: OscillatorType, peak:
 
 let bubbleVoices = 0;
 
-/** 기포 뽀글 — sine 400→700Hz 글라이드, 피치 ±15% 랜덤, 동시 최대 3성 */
-export function sfxBubble(): void {
+/** 기포 뽀글 — sine 400→700Hz 글라이드, 피치 ±15% 랜덤, 동시 최대 3성. gain = 크기 배율(뜯긴 자리 가라앉음은 작게) */
+export function sfxBubble(gain = 1): void {
   if (muted || !ensureCtx() || !ctx) return;
   if (bubbleVoices >= 3) return;
   bubbleVoices++;
   setTimeout(() => bubbleVoices--, 140);
   const r = 1 + (Math.random() * 0.3 - 0.15);
-  tone(400 * r, ctx.currentTime, 0.12, 'sine', 0.5, 700 * r);
+  tone(400 * r, ctx.currentTime, 0.12, 'sine', 0.5 * gain, 700 * r);
 }
 
 /** 다 섞임(M4) — 맑은 사인 한 점 A6 + 옥타브 배음 약하게, 0.22s. sfxFed 2음보다 작다 */
@@ -290,7 +290,41 @@ export function sfxSetDown(): void {
 }
 
 /** 반죽 떼는 쩍 — 끈적한 것이 끊어지는 짧은 내림. 젓기와 같은 대역(밴드패스)이라 한 재료로 들린다.
- *  gain = 크기 배율 — 당기기 가는 가닥 끊김은 0.45 */
-export function sfxPinch(gain = 1): void {
-  noiseBurst({ type: 'bandpass', freq: 560, to: 240, q: 2.2, peak: 0.3 * gain, attack: 0.012, dur: 0.17 });
+ *  gain = 크기 배율 — 들기 가는 다리 끊김은 0.45. f0 → f1 = 내림 음높이(들기 마지막 「툭」은 380 → 170Hz로 낮게) */
+export function sfxPinch(gain = 1, f0 = 560, f1 = 240): void {
+  noiseBurst({ type: 'bandpass', freq: f0, to: f1, q: 2.2, peak: 0.3 * gain, attack: 0.012, dur: 0.17 });
+}
+
+// ── 들기(떼어내기 v4) — 젓기 몸통 루프(sfxStirStart)를 그대로 쓰고 장력 · 잔 틱 · 찢김 · 착지만 얹는다. 전부 젓기 · 밥 소리보다 작게 ──
+let grabTickAt = 0;
+
+/** 들기 몸통 「끄응」 — 장력 0~1을 따라 끈적 몸통의 중심이 250 → 600Hz로 오른다(작게, 게인 ≤ 0.1).
+ *  tickRate > 0(뻗은 뒤 늘어나는 동안)이면 찐득 딱딱 잔 틱을 초당 tickRate번 미리 예약한다(젓기 ③ 끈적 틱 재료) */
+export function sfxGrabUpdate(tension: number, tickRate: number): void {
+  if (!ctx || !stirGain || !stirFilter) return;
+  const t = ctx.currentTime;
+  const k = Math.min(1, Math.max(0, tension));
+  stirGain.gain.setTargetAtTime(0.04 + 0.06 * k, t, 0.06);
+  stirFilter.frequency.setTargetAtTime(250 + 350 * k, t, 0.08);
+  if (!(tickRate > 0)) {
+    grabTickAt = 0;
+    return;
+  }
+  if (grabTickAt < t) grabTickAt = t;
+  while (grabTickAt < t + STIR_LOOKAHEAD_S) {
+    noiseBurst({ type: 'bandpass', freq: 2500 + Math.random() * 3000, q: 3, peak: 0.04, attack: 0.002, dur: 0.018, at: grabTickAt });
+    grabTickAt += (1 / tickRate) * (0.75 + Math.random() * 0.5);
+  }
+}
+
+/** 항복 「찌익」 — 버티던 판이 한 번에 뻗는 짧은 찢김: 대역 잡음 700 → 1800Hz 스윕 0.12s */
+export function sfxTear(): void {
+  noiseBurst({ type: 'bandpass', freq: 700, to: 1800, q: 3, peak: 0.12, attack: 0.01, dur: 0.12 });
+}
+
+/** 착지 「철퍽」 — 아래 조각이 털썩 눕는 낮은 소리: 사인 110 → 70Hz 0.14s + 저역 잡음 */
+export function sfxFlop(): void {
+  if (muted || !ensureCtx() || !ctx) return;
+  tone(110, ctx.currentTime, 0.14, 'sine', 0.22, 70);
+  noiseBurst({ type: 'lowpass', freq: 320, peak: 0.07, attack: 0.006, dur: 0.12 });
 }

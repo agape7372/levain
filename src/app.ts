@@ -11,6 +11,7 @@ import { App as CapApp } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { onLifecycle } from './platform/lifecycle';
 import { haptic, setHapticsEnabled } from './platform/haptics';
+import { grabHaptics } from './grabHaptic';
 import { isNative } from './platform/native';
 import { initOta, markOtaReady } from './platform/ota';
 import { glbUrl, loadRemoteAssets } from './platform/remoteAssets';
@@ -18,6 +19,7 @@ import { exportEnvelope, pickImportFile } from './platform/saveTransfer';
 import {
   setMuted, sfxBubble, sfxFed, sfxRevived, sfxUnlock, suspendAudio, resumeAudio, unlockAudio,
   sfxStirStart, sfxStirUpdate, sfxStirEnd, sfxMixed, sfxCloth, sfxBaked, sfxPour, sfxSetDown, sfxPinch,
+  sfxGrabUpdate, sfxTear, sfxFlop,
 } from './audio/sounds';
 import type { Clock } from './platform/clock';
 import type { StorageAdapter } from './platform/storage';
@@ -157,14 +159,30 @@ export async function startApp(deps: StartAppDeps = {}): Promise<{ store: GameSt
   scene.onStirEnd = () => sfxStirEnd();
   // 다 섞임 — 맑은 한 점 + 가벼운 진동 한 번 (넘김 · 혼자 옅어짐엔 없음)
   scene.onMixed = () => { sfxMixed(); haptic('light'); };
-  // 당기기도 같은 반죽 소리(몸통만, 찰박 없음) — 늘어난 만큼만 작게, 놓을 때 톡 (감사 T4-6)
-  scene.onGrabStart = () => sfxStirStart(stirThick());
-  scene.onGrabMove = (s) => sfxStirUpdate(s * 0.6, false);
-  scene.onGrabEnd = () => { sfxStirEnd(); haptic('light'); };
-  // 가닥 끊김 — 떼는 쩍(가는 가닥은 작게), 주 가닥 · 마지막만 가벼운 진동. 소리는 기존 sfxPinch(실물 소리를 들은 게 아니다)
-  scene.onGrabBreak = (thin, last) => {
-    sfxPinch(thin && !last ? 0.45 : 1);
-    if (!thin || last) haptic('light');
+  // 들기(떼어내기 v4) — 같은 반죽 몸통(찰박 없음)이 장력 따라 「끄응」 오르고, 뻗은 뒤엔 찐득 잔 틱. 전부 작게.
+  // 진동은 들기 한 번에 최대 2회 = 항복 light + 마지막 끊김 light. 끊긴 뒤 놓을 땐 진동 없음, 끊기 전에 놓으면 놓을 때 light 그대로(VISUAL §5 · grabHaptic.ts)
+  const grabHap = grabHaptics(haptic);
+  scene.onGrabStart = () => { grabHap.start(); sfxStirStart(stirThick()); };
+  scene.onGrabMove = (s) => {
+    const f = scene.dough?.grabFeel();
+    sfxGrabUpdate(f?.tension ?? s, f?.tickRate ?? 0);
+  };
+  scene.onGrabEnd = () => { sfxStirEnd(); grabHap.end(); };
+  // 항복 「찌익」 · 다리 끊김 「툭」(가는 다리 작게, 마지막은 음높이 내려 크게) · 착지 「철퍽」 + 뜯긴 자리 가라앉는 기포 2~3번 엇박.
+  // 소리는 합성(실물 소리를 들은 게 아니다)
+  scene.onGrabEvent = (e) => {
+    grabHap.event(e);
+    if (e.kind === 'yield') sfxTear();
+    else if (e.kind === 'break') {
+      if (e.last) sfxPinch(1, 380, 170);
+      else sfxPinch(0.45);
+    } else {
+      sfxFlop();
+      if (e.torn) {
+        const n = Math.random() < 0.5 ? 2 : 3;
+        for (let i = 0; i < n; i++) setTimeout(() => sfxBubble(0.35), 300 + i * 330 + Math.random() * 150);
+      }
+    }
   };
 
   // ── 설정 반영 ──

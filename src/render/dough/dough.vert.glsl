@@ -24,8 +24,8 @@ uniform float uPokeK;
 uniform vec2 uStirPos;
 uniform vec2 uStirVec;
 uniform vec2 uGrabPos;     // 밑동 둔덕 가운데(오브젝트) = 앵커 + 밑동 흔들림
-uniform vec4 uGrab;        // x = 밑자락 둔덕 높이(월드), y = 끌려 모임 세기, z = 높이 주름 · 무늬 끌림 세기 — DoughMesh
-uniform vec4 uPile;        // 더미 (x, z, 높이, 반경) — 떨어진 가닥이 닿은 자리, τ_pile로 가라앉는다
+uniform vec4 uGrab;        // x = 깔때기 높이(월드), y = 끌려 모임 세기, z = 무늬 끌림 세기, w = 0 — DoughMesh
+uniform vec4 uPile;        // 접힘 (x, z, 높이, 반쪽 길이) — 털썩 자리에 남는 보조개 겹(v8c), 상태별 τ로 가라앉는다
 uniform vec4 uTip;         // 손끝 (머리 x, z, 패임 깊이, 앞 둔덕 높이) — 젓기 v3(DoughMesh STIR_FIELD)
 uniform vec4 uTipB;        // (진행 방향 x, z, 꼬리 x, z) — 꼬리 = τ초 전 손끝
 uniform vec2 uSwirl[9];    // 반경 칸 노드 (Θ 누적 각, ω 각속도) — r = i/8 · uRBody
@@ -50,13 +50,17 @@ varying float vTop;        // 윗면 마스크 — 기울기·파동·메니스�
 varying vec3 vBaseN;       // 변형 기준 노멀 — 윗면 +y, 옆벽 바깥
 varying float vY;          // 월드 높이 — 유리 너머 기포 단면 도메인(프래그가 호 길이와 짝짓는다)
 varying float vWallY;      // 옆벽 정규화 높이 0~1(윗면 1) — 기포 크기 구배용
+varying vec3 vPN;          // 꼬집기 면 노멀(월드) — 윗면이 아니거나 꼬집지 않으면 +y(떼어내기 v5)
+varying vec4 vPinch;       // (들림(월드), 늘어남(두 방향 길이비 중 큰 값), 기둥 높이 몫 f(깔때기 · 밖 −1), 0)
+varying vec2 vCut;         // 끊긴 가닥 (아래 조각, 위 조각) 표지 — 둘에 걸친 세모를 프래그가 버린다(떼어내기 v8)
+varying vec2 vPXZ;         // 꼬집힌 지금 자리 xz(오브젝트, 꼬집기 이동분만) — 털썩 · 쌓임 때 무늬를 여기로 옮긴다(무늬 이완 uPileB.z)
 
-// 무리수 회전 3옥타브 트리그 FBM — StrandMesh FBM_GLSL(반죽 frag · 가닥 frag와 같은 소스)를 DoughMesh가 끼운다
+// 무리수 회전 3옥타브 트리그 FBM — StrandMesh FBM_GLSL(반죽 frag와 같은 소스)를 DoughMesh가 끼운다
 // #fbm
 
 // 수면 기울기 · 윗물 덮임(jar.ts SURF_TILT) + 젓기 v3(패임 · 앞 둔덕 · 소용돌이 · 나선) — DoughMesh가 STIR_FIELD(프래그와 같은 소스)를 여기 끼운다
 // #stirField
-// 들기 밑자락 · 주름 · 더미 · 무늬 끌림 — DoughMesh GRAB_FIELD(프래그와 같은 소스)
+// 들기 꼬집기(깔때기 · 기둥) · 접힘 · 무늬 끌림 — DoughMesh GRAB_FIELD(프래그와 같은 소스)
 // #grabField
 
 // 윗면 한 점의 변형 — xz0 = 휴지 자리(오브젝트), layer = 1(윗면) ~ 0(바닥 쪽 층, 슬로싱 강체 배분)
@@ -65,8 +69,8 @@ vec3 topPoint(vec2 xz0, float layer) {
   // 테두리 고정 — 옆면은 유리에 붙어 있다. xz로 미는 변형장(grab · 시어 · 슬로싱 강체)은 r/R 0.8→1.0에서 0
   float pin = 1.0 - smoothstep(0.8, 1.0, length(xz0) / uRBody);
 
-  // ── 당기기 끌려 모임(L2b, 2026-11-19 가닥 다발) — 잡힌 자리로 둘레 표면이 조금 끌려온다. 옛 넓은 Ricker 커널 ·
-  //    리본 리프트 · 주름 · necking은 지웠다(대체됨 — 들리는 몸은 StrandMesh 가닥, 밑동은 아래 grabField 둔덕) ──
+  // ── 당기기 끌려 모임(L2b, 2026-11-19) — 잡힌 자리로 둘레 표면이 조금 끌려온다. 옛 넓은 Ricker 커널 ·
+  //    리본 리프트 · 주름 · necking은 지웠다(대체됨 — 들리는 몸은 GRAB_FIELD pinchApply 꼬집기 기둥(떼어내기 v8b, 척추 17점), 밑동은 그 둔덕 moundH) ──
   if (uGrab.y > 0.001) {
     vec2 gd = p.xz - uGrabPos;
     p.xz -= gd * (0.18 * uGrab.y * exp(-dot(gd, gd) / PULL_R2) * pin);
@@ -88,7 +92,11 @@ vec3 topPoint(vec2 xz0, float layer) {
 
   // 소용돌이 — 반경마다 Θ만큼 돈 무늬 도메인(정지 혹이 젓는 손을 따라 돈다). 프래그와 같은 함수
   vec4 sw = swirlAt(length(p.xz));
-  vec2 q = liftQ(swirlQ(p.xz, sw.x), sw.x); // 들기 끌림 · 더미 꼬임을 회전 뒤에 한 번 더(GRAB_FIELD)
+  vec2 sqz = swirlQ(p.xz, sw.x); // 한 번만 — 아래 섞기에서 다시 쓴다(규칙 검수 v8d)
+  vec2 q = liftQ(sqz, sw.x); // 들기 끌림 · 더미 꼬임을 회전 뒤에 한 번 더(GRAB_FIELD)
+  // 묽은 혀(uPinch.w)는 끌림 흡입 없이 — 반경으로 늘어난 무늬 · 정지 혹이 혀 둘레 방사 주름 · 햇살 테였다(v8c 2회전 sour). 프래그와 같은 식
+  // 되직(uPileB.y)도 — 흡입으로 반경으로 늘어난 정지 혹이 버팀 혹 둘레 방사 톱니 테였다(v8c 2회전 justfed, spec_v8d §4)
+  q = mix(q, sqz, max(uPinch.w, uPileB.y));
   // 정지 혹 — 평평할수록·흐를수록 영구 혹을 못 가진다. 피크에선 눌러 준다(소프트아이스크림 꼭지 방지)
   float silhouette = fbm(q * 1.8 + vec2(3.1, 7.4) + uSeed * 37.0) * 0.045
                    * (1.0 - 0.55 * uLevel - 0.30 * uFluid) * (1.0 - 0.5 * uRipe);
@@ -102,8 +110,8 @@ vec3 topPoint(vec2 xz0, float layer) {
   }
   // 젓기 v3 — 손끝 패임 · 앞 둔덕 · 나선 굴곡의 실제 높이(배율 없음 — 가우스 반경이 칸 5개 넘게 넓어 옛 U자 벽 톱니가 없다)
   disp += stirField(p.xz, sw, q, memAt(length(p.xz), q)).x;
-  // 밑동 둔덕 · 더미(L2a · L6) — 프래그가 같은 함수의 기울기를 쓴다
-  if (uGrab.x + uGrab.z + uPile.z > 1e-5) disp += liftH(p.xz);
+  // 남은 접힘(보조개 겹) — 프래그가 같은 함수의 기울기를 쓴다. 깔때기 · 기둥은 main 끝 꼬집기(pinchApply)
+  if (uPile.z > 1e-5) disp += liftH(p.xz);
 
   // 피크 돔(uRipe) / 과숙 크레이터(uCollapse) — 중심 광폭 가우시안, 윗면 전용(바닥 극 없음).
   // ⚠ frag의 돔/크레이터 짝(계수 4.0 / 3.2)도 같은 kR을 곱해야 한다 (0.3844 = 구 R²)
@@ -175,6 +183,21 @@ void main() {
   vXZ = p.xz;
   // 옛 평면 투영(나선 전단) 도메인은 세로 줄 · 4엽 별을 만들어 폐기(A1-06). 높이만 넘기고 호 길이는 프래그가 atan으로
   vY = p.y * length(modelMatrix[1].xyz);
+
+  // 꼬집기(떼어내기 v5) — 윗면 정점만, 높이장 변위 · 반경 상한 뒤 마지막 단계. 테두리(r/R 0.8→1)는 고정(옆벽 정점 0).
+  // vXZ는 꼬집기 전 자리 그대로 — 무늬 · 기포 · 구멍이 원래 자리에서 읽혀 기둥에서 세로로 늘어난다
+  vPN = vec3(0.0, 1.0, 0.0);
+  vPinch = vec4(0.0, 1.0, -1.0, 0.0);
+  vCut = vec2(0.0);
+  vPXZ = vXZ;
+  if (top && uGrab.x + uPinchC.x > 1e-5) {
+    float pinR = 1.0 - smoothstep(0.8, 1.0, rN);
+    if (pinR > 0.0) {
+      vec2 xz0 = p.xz;
+      p = pinchApply(p, pinR, vPN, vPinch, vCut);
+      vPXZ = vXZ + p.xz - xz0;
+    }
+  }
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
 }

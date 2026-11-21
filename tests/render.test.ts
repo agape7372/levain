@@ -3,8 +3,7 @@
 import { describe, it, expect } from 'vitest';
 import { fitPixelRatio, CAM_ELEV_DEG } from '../src/render/SceneHost';
 import { BreadShowcase } from '../src/render/breadShowcase';
-import { DoughMesh } from '../src/render/dough/DoughMesh';
-import { LIFT_LUMP, LUMP_Y } from '../src/render/dough/StrandMesh';
+import { DoughMesh, GRAB_FIELD, funnelH } from '../src/render/dough/DoughMesh';
 import { ParticlePool, STEAM_FADE_S } from '../src/render/particles';
 import { JAR_HEIGHT } from '../src/render/jar';
 import { toRenderParams } from '../src/render/renderParams';
@@ -36,13 +35,12 @@ describe('DoughMesh grab — 밑동 둔덕은 병 안, 가닥 끝 = 손끝(옛 �
     expect(hMax).toBeGreaterThan(0.05);
     expect(d.topY() + hMax).toBeLessThan(JAR_HEIGHT);
   });
-  it('주 가닥 끝(윗도막 P2)은 손끝(덩이 띄움 몫 위)을 따른다 — τ0.07이라 1초 뒤 1mm 안', () => {
+  it('기둥 꼭대기는 손끝을 따른다(떼어내기 v5 — ANCHOR 0 · 덩이 띄움 없음), 1.5초 뒤 1mm 안', () => {
     const tip: [number, number, number] = [0.1, 2.3, 0.2];
-    const { d } = pull(5, tip, 1);
-    const C = d.strands.rig.C; // 도막 1 = 주 가닥 윗도막
-    // 들기 v3: 손끝 덩이를 띄우면(LIFT_LUMP) 끝은 터치점보다 LUMP_Y 위
-    expect(Math.hypot(C[4] - tip[0], C[5] - tip[1] - LIFT_LUMP * LUMP_Y, C[6] - tip[2])).toBeLessThan(1e-3);
-    expect(d.strands.rig.visible).toBe(true);
+    const { d } = pull(5, tip, 1.5); // 버팀 τ0.16 → 항복 뒤 τ0.07
+    const c = d.rig.spine;
+    expect(Math.hypot(c[64] - tip[0], c[65] - tip[1], c[66] - tip[2])).toBeLessThan(1e-3); // 척추 끝 = 점 16(v8b 17점)
+    expect(d.rig.visible).toBe(true);
   });
 });
 
@@ -103,5 +101,13 @@ describe('쇼케이스 — 빵을 썸네일과 같은 36°에서 본다(R-H1)', 
     const toCam = new THREE.Vector3(0, Math.sin(a), Math.cos(a)); // 직교 카메라 — 방향만 본다
     const elev = 90 - THREE.MathUtils.radToDeg(up.angleTo(toCam));
     expect(Math.abs(elev - 36)).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('깔때기 높이 funnelH — CPU · GLSL 짝(떼어내기 v7 §6)', () => {
+  it('GLSL 소스가 CPU와 같은 식을 쓰고, 가운데 1 · 바깥 0', () => {
+    expect(GRAB_FIELD).toContain('float k = (sqrt(u * u + 0.04) - 0.2) / 0.8198;');
+    expect(funnelH(0)).toBeCloseTo(1, 6);
+    expect(funnelH(1)).toBeCloseTo(0, 3);
   });
 });

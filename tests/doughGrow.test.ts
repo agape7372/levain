@@ -273,9 +273,9 @@ describe('DoughMesh v2 — 시계·NaN 방어(A1-18)', () => {
     const g = u.uGrab.value as THREE.Vector4;
     const gp = u.uGrabPos.value as THREE.Vector2;
     expect([g.x, g.y, gp.x, gp.y].every(Number.isFinite)).toBe(true);
-    // 가닥 uniform도 유한(§6-14 recoverNaN = 가닥 초기화)
-    for (const k of ['uSA', 'uSB', 'uSC'] as const) {
-      expect([...(d.strands.material.uniforms[k].value as Float32Array)].every(Number.isFinite)).toBe(true);
+    // 꼬집기 uniform도 유한(§6-14 recoverNaN = 상태기 초기화)
+    for (const k of ['uPinch', 'uPinchB', 'uPinchC'] as const) {
+      expect((u[k].value as THREE.Vector4).toArray().every(Number.isFinite)).toBe(true);
     }
   });
 });

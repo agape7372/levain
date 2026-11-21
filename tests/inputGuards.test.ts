@@ -333,12 +333,13 @@ describe('F1 · M1 반죽 위 느린 끌기 — 32px까지 미확정(젓기처�
       onStirStart: () => ev.push('stirStart'),
       onStirEnd: () => ev.push('stirEnd'),
     });
-    const spy = (k: 'grabStart' | 'grabMove3' | 'grabEnd' | 'setStirInput') =>
+    const spy = (k: 'grabStart' | 'grabMove3' | 'grabEnd' | 'setStirInput' | 'pokeAt') =>
       vi.spyOn(dough, k).mockImplementation((() => { ev.push(`d.${k}`); }) as never);
     const gs = spy('grabStart');
     spy('grabMove3');
     spy('grabEnd');
     spy('setStirInput');
+    spy('pokeAt');
     /** 처음 d.grabStart가 난 걸음의 누른 점에서 경로 길이(px) */
     let commitPath = -1;
     let path = 0;
@@ -370,11 +371,12 @@ describe('F1 · M1 반죽 위 느린 끌기 — 32px까지 미확정(젓기처�
   };
   const has = (ev: string[], k: string): boolean => ev.includes(k);
 
-  it('곧게 위로 당김 — 32px 전엔 젓기(소리 · 고랑), 32px에서 누른 점으로 grab · 같은 걸음에 grabMove3', () => {
+  it('곧게 위로 당김 — 32px 전엔 젓기 소리 + 누른 자리 덴트 한 번(고랑 없음, v5 새 눈 r1 ⑤), 32px에서 누른 점으로 grab · 같은 걸음에 grabMove3', () => {
     const { ev, commitPath, grabAt } = drag(line(C, C, 0, -3, 20));
     expect(ev[0]).toBe('stirStart');
     const g = ev.indexOf('d.grabStart');
-    expect(ev.slice(0, g)).toContain('d.setStirInput'); // 손끝이 바로 반응
+    expect(ev.slice(0, g).filter((k) => k === 'd.pokeAt')).toHaveLength(1); // 손끝이 바로 반응 — 누른 자리 오목
+    expect(ev.slice(0, g)).not.toContain('d.setStirInput'); // 할퀸 자국(고랑 · 앞 둔덕 접힘) 없음
     expect(ev.slice(g, g + 3)).toEqual(['d.grabStart', 'grabStart', 'd.grabMove3']);
     expect(ev.slice(g)).not.toContain('d.setStirInput');
     expect(commitPath).toBeGreaterThanOrEqual(32);
