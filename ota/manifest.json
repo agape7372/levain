@@ -1,9 +1,9 @@
 {
-  "version": "1.6.17",
-  "url": "https://levain-ota.vercel.app/bundles/1.6.17.zip",
-  "checksum": "92e6d265e4c20cf30b6643a44d52779984d2356fd9033d36a2e59da908777bca",
-  "size": 14872952,
-  "releasedAt": "2026-11-19T15:38:58.568Z",
+  "version": "1.6.18",
+  "url": "https://levain-ota.vercel.app/bundles/1.6.18.zip",
+  "checksum": "311fcb10049b17eecfbc2c08612b64b4d1bcfe31daf7c114fdf37d86469e3106",
+  "size": 14886105,
+  "releasedAt": "2026-11-21T07:13:33.119Z",
   "minNative": "1.0",
-  "sig": "hc9KeIGsaHy8JSGd3hJW+G0Ui30iQrQSd2wxFlnxE85W97BWRizUB3fQStF9Az/H2v5rEmv84mHn8WRY6JFtLw=="
+  "sig": "XQ4J5lePD4p/s9P5Ytaz+wgsB8rSqjDEyJpeaNZy30YCkz26yvoGjA0zXg1RRy9PhqBfpJuXlvwZ1/1BZWD66w=="
 }
