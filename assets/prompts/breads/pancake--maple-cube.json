@@ -1,0 +1,61 @@
+{
+  "id": "pancake--maple-cube",
+  "version": 3,
+  "name_ko": "메이플 팬케이크",
+  "subject": "a tall stack of three thick, fluffy buttermilk pancakes topped with a pat of butter, small cubes of maple sugar half-dissolving in warm maple syrup poured over the top, and a handful of toasted chopped pecans",
+  "hero_ko": "메이플 슈거 큐브 + 버터 + 메이플 시럽 + 다진 피칸",
+  "geometry": {
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The top face of each pancake is griddle-browned in a soft, blotchy, uneven gradient — warm caramel brown (#B9793F) at the centre where it sat longest on the hot pan, fading through toasty golden (#CF9455) into light golden (#D9A76B) toward the rim, with a few slightly darker freckles and one paler patch where a bubble lifted the batter, the way real pancakes never brown evenly. The side wall of every pancake is the pale cream of the risen crumb (#F1DDB0): a soft, spongy band with a fine open crumb texture, tiny irregular air pockets catching the light, meeting the browned top in a soft blurred edge rather than a hard line. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
+  },
+  "toppings": [
+    {
+      "label": "BUTTER",
+      "text": "One square pat of butter, about 2 cm across with slightly uneven cut edges, sits just off-centre on the top pancake — still a solid pale yellow square (#F3DDA0) with softened corners, its bottom edge just beginning to melt into a small glossy golden pool."
+    },
+    {
+      "label": "MAPLE SUGAR CUBES",
+      "text": "About six small cubes of maple sugar (#D9A85C), roughly 1 cm but each a slightly different size with soft, slightly crumbly edges and its own tilt, gathered around the butter: two resting on the browned pancake still dry and sugary-matte, three half-dissolving where the warm syrup reached them — their lower halves gone glossy and translucent amber, their tops still pale and grainy — and one that has slid to the rim leaving a short glossy trail."
+    },
+    {
+      "label": "MAPLE SYRUP",
+      "text": "Warm maple syrup (#A85A1A), translucent amber and slow, poured generously over the stack: it sheets across the top face, gathers around the butter and the cubes, spills over the edge at two places and runs down the pale side walls in several drips of different lengths and widths — one broad drip reaching the bottom pancake and rounding into a soft bead, thinner ones stopping on the middle layer. Where it runs it turns the crumb a darker glossy soaked gold and catches a bright highlight along every drip."
+    },
+    {
+      "label": "PECANS AND FINISHING",
+      "text": "A handful of toasted pecans (#8F5E36), coarsely chopped into pieces of clearly different sizes — a few larger halves-of-halves with their ridged surfaces showing, several small broken bits — sprinkled over the top and the syrup, some stuck in the sugar cubes, a couple caught in a drip on the side. A very light dusting of ground cinnamon over the near rim. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements."
+    }
+  ],
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, a solid butter pat just starting to gleam at its base, grainy matte sugar cubes turning glossy where they dissolve, translucent glossy syrup, and dry ridged toasted pecans. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "a rich North-American diner breakfast, syrup still moving over sugar and nuts, that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy buttermilk pancakes topped with a pat of butter, small cubes of maple sugar half-dissolving in warm maple syrup poured over the top, and a handful of toasted chopped pecans — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The top face of each pancake is griddle-browned in a soft, blotchy, uneven gradient — warm caramel brown (#B9793F) at the centre where it sat longest on the hot pan, fading through toasty golden (#CF9455) into light golden (#D9A76B) toward the rim, with a few slightly darker freckles and one paler patch where a bubble lifted the batter, the way real pancakes never brown evenly. The side wall of every pancake is the pale cream of the risen crumb (#F1DDB0): a soft, spongy band with a fine open crumb texture, tiny irregular air pockets catching the light, meeting the browned top in a soft blurred edge rather than a hard line. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nBUTTER. One square pat of butter, about 2 cm across with slightly uneven cut edges, sits just off-centre on the top pancake — still a solid pale yellow square (#F3DDA0) with softened corners, its bottom edge just beginning to melt into a small glossy golden pool.\n\nMAPLE SUGAR CUBES. About six small cubes of maple sugar (#D9A85C), roughly 1 cm but each a slightly different size with soft, slightly crumbly edges and its own tilt, gathered around the butter: two resting on the browned pancake still dry and sugary-matte, three half-dissolving where the warm syrup reached them — their lower halves gone glossy and translucent amber, their tops still pale and grainy — and one that has slid to the rim leaving a short glossy trail.\n\nMAPLE SYRUP. Warm maple syrup (#A85A1A), translucent amber and slow, poured generously over the stack: it sheets across the top face, gathers around the butter and the cubes, spills over the edge at two places and runs down the pale side walls in several drips of different lengths and widths — one broad drip reaching the bottom pancake and rounding into a soft bead, thinner ones stopping on the middle layer. Where it runs it turns the crumb a darker glossy soaked gold and catches a bright highlight along every drip.\n\nPECANS AND FINISHING. A handful of toasted pecans (#8F5E36), coarsely chopped into pieces of clearly different sizes — a few larger halves-of-halves with their ridged surfaces showing, several small broken bits — sprinkled over the top and the syrup, some stuck in the sugar cubes, a couple caught in a drip on the side. A very light dusting of ground cinnamon over the near rim. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, a solid butter pat just starting to gleam at its base, grainy matte sugar cubes turning glossy where they dissolve, translucent glossy syrup, and dry ridged toasted pecans. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: a rich North-American diner breakfast, syrup still moving over sugar and nuts, that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact maple pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three pale cream side walls, the syrup drips running down the front, and the butter, sugar cubes and pecans piled on top are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact maple pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the butter pat, the half-dissolving maple sugar cubes, the pooled syrup and the chopped pecans on the top pancake are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(med) — 메이플은 버터 조각 + 시럽 부음 + 다진(통이 아닌) 피칸이 서양식 정석. 게임 재료 형태 \"cube\"를 살리려고 메이플 슈거 큐브가 따뜻한 시럽에 반쯤 녹는 장면을 주인공으로. 한국 카페(캐러멜넛)식 캐러멜 소스는 배제."
+}

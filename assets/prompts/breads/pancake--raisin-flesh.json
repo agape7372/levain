@@ -1,0 +1,61 @@
+{
+  "id": "pancake--raisin-flesh",
+  "version": 3,
+  "name_ko": "건포도 팬케이크",
+  "subject": "a tall stack of three thick, fluffy buttermilk pancakes with a few raisins baked into the batter, topped with a dollop of whipped cream and a spoonful of plump rum-soaked raisins in their glossy amber syrup, with a dusting of cinnamon and a thin drizzle of maple syrup",
+  "hero_ko": "럼에 불린 통통한 건포도 스푼 + 시럽 + 생크림 + 시나몬 + 메이플",
+  "geometry": {
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The top face of each pancake is griddle-browned in a soft, blotchy, uneven gradient — warm caramel brown (#B9793F) at the centre fading through toasty golden (#CF9455) into light golden (#D9A76B) toward the rim, with a few darker freckles. The side wall of every pancake is the pale cream of the risen crumb (#F1DDB0), a soft spongy band with a fine open texture, and because the batter had a handful of raisins mixed through it, three or four raisins show on the side walls as flat, dark, wrinkled ovals (#3B2418) flush with the crumb, cut through where the pancake was flipped and pressed, each a different size — not on the top face, only in the walls. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
+  },
+  "toppings": [
+    {
+      "label": "WHIPPED CREAM",
+      "text": "One generous dollop of lightly whipped cream (#FFF8EC), spoon-dropped rather than piped, sits slightly off-centre toward the front-left of the top pancake: soft rounded peaks with gentle folds, a matte velvety surface, its lower edge relaxing into a soft skirt against the warm pancake."
+    },
+    {
+      "label": "RUM RAISINS",
+      "text": "A spoonful of rum-soaked raisins — about twenty, swollen plump and glossy from their soak, a deep red-brown to near-black (#4A2A1E) with their wrinkles softened into loose folds rather than dry creases, each a slightly different size and shape — spooned over the top of the cream and down its side, so a cluster sits nestled in the white, a dozen more tumble across the browned top pancake in a loose drift that thins toward the far rim, and two or three roll to the edge. They come with their soaking syrup: a translucent amber (#B8742C) glaze that coats every raisin, pools in small glossy beads between them, stains the cream a faint gold where it soaks in, and spills over the front edge in two slow drips of different lengths down the pale side walls."
+    },
+    {
+      "label": "MAPLE AND CINNAMON",
+      "text": "A thin drizzle of maple syrup (#A85A1A), translucent and glossy, traced once across the cream and raisins and joining the raisin syrup on its way over the edge. A soft dusting of ground cinnamon (#9A5B34) over the cream and the near rim, heavier in one spot where the shaker paused, with a few grains settling on the raisins."
+    },
+    {
+      "label": "FINISHING",
+      "text": "A barely-there haze of powdered sugar over the far rim of the top pancake. Two halves of a toasted walnut (#A9784A), their ridged surfaces catching the light, tucked against the base of the cream at different angles. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements."
+    }
+  ],
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, soft-matte cream, plump glossy syrup-coated raisins with softened folds, translucent amber syrup, dry ridged walnut halves and dry cinnamon dust. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "a warm, spiced bakery-café plate — boozy plump raisins over cream — that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy buttermilk pancakes with a few raisins baked into the batter, topped with a dollop of whipped cream and a spoonful of plump rum-soaked raisins in their glossy amber syrup, with a dusting of cinnamon and a thin drizzle of maple syrup — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The top face of each pancake is griddle-browned in a soft, blotchy, uneven gradient — warm caramel brown (#B9793F) at the centre fading through toasty golden (#CF9455) into light golden (#D9A76B) toward the rim, with a few darker freckles. The side wall of every pancake is the pale cream of the risen crumb (#F1DDB0), a soft spongy band with a fine open texture, and because the batter had a handful of raisins mixed through it, three or four raisins show on the side walls as flat, dark, wrinkled ovals (#3B2418) flush with the crumb, cut through where the pancake was flipped and pressed, each a different size — not on the top face, only in the walls. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nWHIPPED CREAM. One generous dollop of lightly whipped cream (#FFF8EC), spoon-dropped rather than piped, sits slightly off-centre toward the front-left of the top pancake: soft rounded peaks with gentle folds, a matte velvety surface, its lower edge relaxing into a soft skirt against the warm pancake.\n\nRUM RAISINS. A spoonful of rum-soaked raisins — about twenty, swollen plump and glossy from their soak, a deep red-brown to near-black (#4A2A1E) with their wrinkles softened into loose folds rather than dry creases, each a slightly different size and shape — spooned over the top of the cream and down its side, so a cluster sits nestled in the white, a dozen more tumble across the browned top pancake in a loose drift that thins toward the far rim, and two or three roll to the edge. They come with their soaking syrup: a translucent amber (#B8742C) glaze that coats every raisin, pools in small glossy beads between them, stains the cream a faint gold where it soaks in, and spills over the front edge in two slow drips of different lengths down the pale side walls.\n\nMAPLE AND CINNAMON. A thin drizzle of maple syrup (#A85A1A), translucent and glossy, traced once across the cream and raisins and joining the raisin syrup on its way over the edge. A soft dusting of ground cinnamon (#9A5B34) over the cream and the near rim, heavier in one spot where the shaker paused, with a few grains settling on the raisins.\n\nFINISHING. A barely-there haze of powdered sugar over the far rim of the top pancake. Two halves of a toasted walnut (#A9784A), their ridged surfaces catching the light, tucked against the base of the cream at different angles. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, soft-matte cream, plump glossy syrup-coated raisins with softened folds, translucent amber syrup, dry ridged walnut halves and dry cinnamon dust. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: a warm, spiced bakery-café plate — boozy plump raisins over cream — that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact rum raisin pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three pale cream side walls with a few flat raisin cross-sections in them, the syrup drips running down the front and the cream heaped with glossy raisins on top are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact rum raisin pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the drift of plump rum raisins over the cream and the top pancake, the syrup beads, the cinnamon dusting and the walnut halves are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(low) — 건포도는 원래 반죽에 접어 넣는 게 표준이라 옆벽 단면 3~4개만 남기고(윗면 금지), 주인공은 럼에 불려 통통하고 윤기 나는 럼레이즌 스푼 + 시럽(마른 쭈글 건포도와 구분). 시나몬 동반은 확인된 사실, 요거트 대신 카페식 생크림."
+}

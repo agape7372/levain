@@ -1,0 +1,57 @@
+{
+  "id": "pancake--poppyseed-seed",
+  "version": 3,
+  "name_ko": "포피시드 팬케이크",
+  "subject": "a tall stack of three thick, fluffy lemon poppy seed pancakes speckled with tiny blue-black poppy seeds, poured over with an opaque white lemon glaze that runs down the sides, finished with bright lemon zest, a few blueberries and a twist of lemon peel",
+  "hero_ko": "레몬 포피시드 반죽(검은 씨 스펙클) + 흰 레몬 글레이즈 + 레몬 제스트 + 블루베리",
+  "geometry": {
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter is a lemon poppy seed batter, so every pancake is finely speckled: the side wall of each one is a pale lemon-cream crumb (#F3E4B4) with a fine open texture, and set evenly through it are countless tiny poppy seeds (#2B2A38), each a pin-point blue-black dot far smaller than a grain of rice, the way a real lemon poppy seed bake is speckled all the way through; the top face is griddle-browned in a soft blotchy gradient — warm caramel (#B9793F) at the centre fading to light golden (#DDB070) at the rim — with the seeds showing through the browning as fine dark specks, most visible near the paler rim. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
+  },
+  "toppings": [
+    {
+      "label": "LEMON GLAZE",
+      "text": "An opaque white lemon glaze (#F7F2E6) — powdered sugar and lemon juice, smooth and just thick enough to hold a ribbon — has been poured over the top pancake so it covers about two-thirds of the surface in a soft, uneven pool with a rounded, slightly translucent edge, then spills over the front and one side in slow, thick drips of different lengths and widths down the speckled side walls — one reaching the bottom pancake and rounding into a heavy bead, two stopping on the middle layer, one just starting. The glaze has a soft satin sheen and a few poppy seeds have been carried into it, showing as sharp dark dots against the white."
+    },
+    {
+      "label": "LEMON ZEST",
+      "text": "Fine shreds of fresh lemon zest (#F2D23A), grated into short bright threads of different lengths, sprinkled over the glaze while it was still wet so they sit half-sunk in the white, heavier toward the front-left and thinning out across the top — the brightest colour on the plate."
+    },
+    {
+      "label": "BLUEBERRIES AND FINISHING",
+      "text": "Five blueberries (#3E4A73) with a dusty grey-blue bloom, each a slightly different size, set in a loose cluster on the glaze toward the front-left, one rolled off onto the bare browned rim. One thin twist of lemon peel (#E9C93C), a curled strip about 4 cm long with the pale pith showing on its inner face, balanced on the glaze beside the berries. One small sprig of fresh mint with two leaves (#3E7A45) tucked in beside them. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements."
+    }
+  ],
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, a satin-sheen opaque glaze, dry bright zest threads, bloom-dusted blueberries, a waxy curled peel twist, waxy mint leaves. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "a bright, zesty American-brunch stack — white glaze over speckled gold — that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy lemon poppy seed pancakes speckled with tiny blue-black poppy seeds, poured over with an opaque white lemon glaze that runs down the sides, finished with bright lemon zest, a few blueberries and a twist of lemon peel — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter is a lemon poppy seed batter, so every pancake is finely speckled: the side wall of each one is a pale lemon-cream crumb (#F3E4B4) with a fine open texture, and set evenly through it are countless tiny poppy seeds (#2B2A38), each a pin-point blue-black dot far smaller than a grain of rice, the way a real lemon poppy seed bake is speckled all the way through; the top face is griddle-browned in a soft blotchy gradient — warm caramel (#B9793F) at the centre fading to light golden (#DDB070) at the rim — with the seeds showing through the browning as fine dark specks, most visible near the paler rim. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nLEMON GLAZE. An opaque white lemon glaze (#F7F2E6) — powdered sugar and lemon juice, smooth and just thick enough to hold a ribbon — has been poured over the top pancake so it covers about two-thirds of the surface in a soft, uneven pool with a rounded, slightly translucent edge, then spills over the front and one side in slow, thick drips of different lengths and widths down the speckled side walls — one reaching the bottom pancake and rounding into a heavy bead, two stopping on the middle layer, one just starting. The glaze has a soft satin sheen and a few poppy seeds have been carried into it, showing as sharp dark dots against the white.\n\nLEMON ZEST. Fine shreds of fresh lemon zest (#F2D23A), grated into short bright threads of different lengths, sprinkled over the glaze while it was still wet so they sit half-sunk in the white, heavier toward the front-left and thinning out across the top — the brightest colour on the plate.\n\nBLUEBERRIES AND FINISHING. Five blueberries (#3E4A73) with a dusty grey-blue bloom, each a slightly different size, set in a loose cluster on the glaze toward the front-left, one rolled off onto the bare browned rim. One thin twist of lemon peel (#E9C93C), a curled strip about 4 cm long with the pale pith showing on its inner face, balanced on the glaze beside the berries. One small sprig of fresh mint with two leaves (#3E7A45) tucked in beside them. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, a satin-sheen opaque glaze, dry bright zest threads, bloom-dusted blueberries, a waxy curled peel twist, waxy mint leaves. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: a bright, zesty American-brunch stack — white glaze over speckled gold — that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact lemon poppy seed pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three speckled side walls, the thick white glaze drips running down the front, and the zest, berries and peel twist on top are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact lemon poppy seed pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the pool of white glaze over the speckled top pancake, the bright zest threads, the blueberries and the peel twist are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(high) — 레몬 포피시드는 반죽 전체에 균일하게 박힌 아주 작은 검은 점 + 불투명 흰 글레이즈 + 밝은 제스트가 정체성(글레이즈 위 점이 대비 최대). v3에서 윗면 점 무리가 곰팡이로 읽힌 건 흰 글레이즈·제스트 맥락이 없어서 — 맥락을 주고 점 크기를 \"pin-point, far smaller than a grain of rice\"로 못박음. 한국 카페 사례 없음(서양 포맷)."
+}

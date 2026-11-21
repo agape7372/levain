@@ -245,23 +245,194 @@ export function uvDome(g: THREE.BufferGeometry): void {
   g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
 }
 
+/** check-winding.mjs와 동일 임계 — 뒤집힌 셸은 실측 -0.06 이하, 평면 캡은 -0.001 위다. */
+export const WINDING_FLIP_RATIO = -0.01;
+
+/**
+ * 부호부피 / 최장변³ — 셸이 안팎 뒤집혔는지 보는 무차원 지표(발산정리).
+ * `scripts/check-winding.mjs`의 analyze()와 **같은 식·같은 임계**를 쓴다 — 두 게이트가 어긋나면
+ * 하나가 통과시킨 걸 다른 하나가 잡는 혼란이 생긴다. 식을 고칠 땐 양쪽을 같이 고칠 것.
+ *
+ * ⚠ **닫힌 셸에서만 의미가 있다.** 발산정리가 성립해야 원점 선택과 무관해지는데, 경계가 열린
+ * 조각(리본·평면 캡·한쪽만 돌린 반구)은 원점을 어디 두느냐에 따라 부호가 통째로 뒤집힌다.
+ * 그래서 아래 hasOpenBoundary()로 먼저 거르고, 열린 조각은 이 값으로 판정하지 않는다
+ * (2026-09-02 실측: 소스 풀·드립·절단면이 정상인데도 -0.2대가 나왔다).
+ * 열린 조각의 방향은 만들 때 orientToward()로 못 박는 것이 정답이다.
+ */
+export function signedVolumeRatio(g: THREE.BufferGeometry): number {
+  const pos = g.attributes.position as THREE.BufferAttribute;
+  const idx = g.index;
+  const count = idx ? idx.count : pos.count;
+  const at = (k: number): number => (idx ? idx.getX(k) : k);
+  let vol = 0;
+  for (let k = 0; k + 2 < count; k += 3) {
+    const ia = at(k);
+    const ib = at(k + 1);
+    const ic = at(k + 2);
+    const ax = pos.getX(ia);
+    const ay = pos.getY(ia);
+    const az = pos.getZ(ia);
+    const bx = pos.getX(ib);
+    const by = pos.getY(ib);
+    const bz = pos.getZ(ib);
+    const cx = pos.getX(ic);
+    const cy = pos.getY(ic);
+    const cz = pos.getZ(ic);
+    vol += (ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx)) / 6;
+  }
+  g.computeBoundingBox();
+  const b = g.boundingBox as THREE.Box3;
+  const extent = Math.max(b.max.x - b.min.x, b.max.y - b.min.y, b.max.z - b.min.z, 1e-6);
+  return vol / (extent * extent * extent);
+}
+
+
+/**
+ * 인덱스가 없는 지오메트리에 자명한 인덱스(0,1,2,…)를 붙인다.
+ *
+ * 왜 필요한가: `mergeByMaterial`이 부르는 three `mergeGeometries`는 한 버킷 안에서
+ * **indexed/non-indexed가 섞이면 실패**한다(BufferGeometryUtils.js:156 `isIndexed` 비교).
+ * 삼각형을 직접 뱉는 작은 파트(씨·잎·캡)가 큰 셸과 같은 머티리얼에 섞이는 일이 흔한데,
+ * 반대로 큰 셸을 non-indexed로 만들면 정점이 3배가 되어 GLB가 그만큼 커진다.
+ * 작은 파트에 인덱스를 붙이는 쪽이 싸다.
+ */
+export function ensureIndexed(g: THREE.BufferGeometry): THREE.BufferGeometry {
+  if (g.index) return g;
+  const n = g.attributes.position.count;
+  g.setIndex(Array.from({ length: n }, (_, i) => i));
+  return g;
+}
+
+/**
+ * 경계가 열려 있는가 — 반쪽만 공유되는 엣지가 하나라도 있으면 열린 조각이다.
+ * 부호부피 판정을 쓸 수 있는지 가르는 데 쓴다.
+ */
+export function hasOpenBoundary(g: THREE.BufferGeometry): boolean {
+  const idx = g.index;
+  const pos = g.attributes.position as THREE.BufferAttribute;
+  const count = idx ? idx.count : pos.count;
+  const at = (k: number): number => (idx ? idx.getX(k) : k);
+  const seen = new Map<string, number>();
+  for (let k = 0; k + 2 < count; k += 3) {
+    const tri = [at(k), at(k + 1), at(k + 2)];
+    for (let e = 0; e < 3; e++) {
+      const a = tri[e];
+      const b = tri[(e + 1) % 3];
+      const key = a < b ? a + ':' + b : b + ':' + a;
+      seen.set(key, (seen.get(key) ?? 0) + 1);
+    }
+  }
+  for (const n of seen.values()) if (n !== 2) return true;
+  return false;
+}
+
+/**
+ * 열린 조각의 면 방향을 못 박는다 — 면적 가중 평균 법선이 `dir`의 반대편이면 인덱스를 뒤집는다.
+ *
+ * 왜 필요한가: 런타임 Lambert는 FrontSide라 뒤집힌 조각은 **각도에 따라 통째로 사라진다**.
+ * 닫힌 셸은 check-winding.mjs가 잡지만 리본·캡 같은 열린 조각은 아무 게이트도 못 잡는다
+ * (2026-09-02 실측: 소스 풀과 드립 2줄이 통째로 컬링돼 렌더에서 증발했고, 예산·tri·판독
+ * 게이트가 전부 통과했다). 만들 때 방향을 선언하는 게 유일하게 확실한 방법이다.
+ */
+export function orientToward(
+  g: THREE.BufferGeometry,
+  dir: THREE.Vector3 | ((centroid: THREE.Vector3) => THREE.Vector3),
+): THREE.BufferGeometry {
+  const idx = g.index;
+  const pos = g.attributes.position as THREE.BufferAttribute;
+  const count = idx ? idx.count : pos.count;
+  const at = (k: number): number => (idx ? idx.getX(k) : k);
+  const a = new THREE.Vector3();
+  const b = new THREE.Vector3();
+  const c = new THREE.Vector3();
+  const ab = new THREE.Vector3();
+  const ac = new THREE.Vector3();
+  const cross = new THREE.Vector3();
+  const centroid = new THREE.Vector3();
+  // ⚠ 회전 대칭 셸(원반 옆벽·리본 고리)은 법선 합이 대칭으로 상쇄돼 0이 된다 — 상수 방향으로는
+  //   판정이 안 된다. 그래서 방향을 **위치의 함수**로도 받는다(옆벽이면 반지름 바깥 등).
+  //   삼각형마다 그 자리에서 기대 방향과 견주고 넓이로 가중해 더한다.
+  let score = 0;
+  for (let k = 0; k + 2 < count; k += 3) {
+    a.fromBufferAttribute(pos, at(k));
+    b.fromBufferAttribute(pos, at(k + 1));
+    c.fromBufferAttribute(pos, at(k + 2));
+    ab.subVectors(b, a);
+    ac.subVectors(c, a);
+    cross.crossVectors(ab, ac); // 길이 = 삼각형 넓이 × 2 → 면적 가중이 공짜로 된다
+    if (typeof dir === 'function') {
+      centroid.copy(a).add(b).add(c).multiplyScalar(1 / 3);
+      score += cross.dot(dir(centroid));
+    } else {
+      score += cross.dot(dir);
+    }
+  }
+  if (score >= 0) return g;
+  // ★뒤집기는 **인덱스만** 건드린다. 예전엔 non-indexed면 position 삼각형을 직접 스왑했는데,
+  //   그러면 uv·normal은 제자리에 남아 정점과 속성이 어긋난다 — 실측으로 딸기 절단면의
+  //   연분홍 심이 통째로 다른 색으로 샘플됐다(2026-09-02). 인덱스가 없으면 먼저 붙인다.
+  ensureIndexed(g);
+  const index = g.index as THREE.BufferAttribute;
+  const arr = index.array as unknown as number[];
+  for (let k = 0; k + 2 < arr.length; k += 3) {
+    const t = arr[k + 1];
+    arr[k + 1] = arr[k + 2];
+    arr[k + 2] = t;
+  }
+  index.needsUpdate = true;
+  g.deleteAttribute('normal');
+  g.computeVertexNormals();
+  return g;
+}
+
 /**
  * 머티리얼별 지오메트리 병합 — 빌더가 반환 직전에 호출 (types.ts §1).
  * 월드 변환을 베이크하므로 반환 Group은 변환 없는 평평한 Mesh 목록.
  * ⚠ 같은 버킷의 모든 지오메트리는 동일 attribute 셋(position·normal·uv) 필수.
+ *
+ * ★와인딩 사전 경고 (2026-09-02 신설): 합치기 **전에** 파트별 부호부피를 본다.
+ * `check-winding.mjs`는 export된 GLB 프리미티브 단위라, merge로 파트가 한 덩어리가 되고 나면
+ * 뒤집힌 작은 셸이 큰 양수 부피에 묻혀 **영영 안 잡힌다**. 회전 셸을 여러 벌 새로 짜는 빵
+ * (토핑 얹은 변형 등)에서 실제로 생기는 사각지대라 여기서 한 번 더 본다.
+ * 경고만 낸다 — 지오메트리는 건드리지 않는다.
  */
 export function mergeByMaterial(group: THREE.Group): THREE.Group {
   group.updateMatrixWorld(true);
   const buckets = new Map<THREE.Material, THREE.BufferGeometry[]>();
+  const flipped: string[] = [];
+  let openParts = 0;
+  let partIndex = 0;
   group.traverse((o) => {
     if (o instanceof THREE.Mesh) {
       const g = (o.geometry as THREE.BufferGeometry).clone().applyMatrix4(o.matrixWorld);
+      // 닫힌 셸만 부호부피로 판정한다 — 열린 조각은 원점 의존이라 오탐이 난다(위 주석).
+      if (hasOpenBoundary(g)) {
+        openParts++;
+      } else {
+        const ratio = signedVolumeRatio(g);
+        if (ratio < WINDING_FLIP_RATIO) {
+          flipped.push(`${o.name || 'part#' + partIndex}=${ratio.toFixed(3)}`);
+        }
+      }
+      partIndex++;
       const m = o.material as THREE.Material;
       const list = buckets.get(m) ?? [];
       list.push(g);
       buckets.set(m, list);
     }
   });
+  if (flipped.length > 0) {
+    console.warn(
+      `[winding] 면이 안쪽을 향하는 닫힌 셸 ${flipped.length}개: ${flipped.join(', ')} — ` +
+        '합친 뒤에는 check-winding이 못 잡는다. 링 감기 순서나 좌표계(거울상)를 확인할 것.',
+    );
+  }
+  if (openParts > 0) {
+    console.warn(
+      `[winding] 경계가 열린 파트 ${openParts}개 — 부호부피로 판정 불가. ` +
+        '만들 때 lib.orientToward()로 방향을 못 박았는지 확인할 것(안 하면 각도에 따라 사라진다).',
+    );
+  }
   const out = new THREE.Group();
   for (const [mat, geos] of buckets) {
     const merged = geos.length === 1 ? geos[0] : mergeGeometries(geos, false);

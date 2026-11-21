@@ -1,28 +1,57 @@
 {
   "id": "pancake--choco-chip",
-  "version": 1,
+  "version": 3,
   "name_ko": "초코칩 팬케이크",
-  "subject": "a stack of three fluffy round pancakes studded with chocolate chips",
+  "subject": "a tall stack of three thick, fluffy golden buttermilk pancakes with mini chocolate chips melted into the batter, topped with a dollop of whipped cream, a zigzag of dark chocolate fudge sauce and a sprinkle of extra chocolate chips",
+  "hero_ko": "반죽 속 미니 초코칩(녹은 반점) + 생크림 + 초코 퍼지 소스 + 여분 초코칩",
   "geometry": {
-    "silhouette": "three stacked flat disks, slightly irregular hand-poured edges, each disk slightly offset from the one below, subtle sag at the stack edges",
-    "crust": [
-      "top surface of each disk in soft clay matte medium brown #C68958",
-      "underside and edge rim of each disk in deeper golden brown #A9713F",
-      "small irregular bubbles and tiny burst pore holes scattered across every top surface, rendered as low-poly faceted dimples",
-      "small irregular dark chocolate chip studs #3B2418 embedded across the top surface of each pancake disk, in addition to the existing bubbles and pore holes"
-    ]
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter itself stays light and golden — this is not a cocoa pancake — but it carries mini chocolate chips, and they show the way they really do after griddling: on the browned top face of each pancake, about ten small dark spots (#3B2418) of different sizes where chips sat just under the surface and melted, each a soft, slightly sunken smudge with blurred edges, some still holding the rounded outline of a chip, others spread into a small irregular smear with a faint gloss; on the pale cream side walls (#F1DDB0), a few flat dark cross-sections of chips sit flush with the crumb, and one or two chips near the edge have melted and run a short dark streak down the wall. The top face otherwise browns in the usual soft blotchy gradient from warm caramel (#B9793F) at the centre to light golden (#D9A76B) at the rim, with a few darker freckles. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
   },
-  "style_ref": "shared-style-v2",
-  "camera": "three-quarter top-front view, object centered, 15% margin",
-  "background": "solid pale sage #DFEAE0, no props, no floor texture, no horizon line",
-  "lighting": "single soft key light upper-left + soft ambient, no harsh shadows, no cast shadow on the background",
-  "negative": ["photorealism", "glossy plastic", "text", "watermark", "plate", "board", "props", "hands", "people", "characters", "facial features", "syrup", "butter", "chocolate drizzle", "melted chocolate pool", "chocolate sauce"],
-  "views": ["three-quarter top-front", "front elevation", "top-down"],
-  "output": { "aspect": "1:1", "size": 1024 },
-  "prompt_flat": "A cozy low-poly stylized 3D render of a stack of three fluffy round pancakes studded with chocolate chips, a single game asset object on a plain backdrop. Geometry: three stacked flat disks with slightly irregular hand-poured edges, each disk slightly offset from the one below with a subtle sag at the stack edges. Crust: the top surface of each pancake is a soft clay-like matte medium brown (#C68958), while the underside and edge rim of each disk show a deeper golden brown (#A9713F); small irregular bubbles and tiny burst pore holes are scattered across every top surface as low-poly faceted dimples; small irregular dark chocolate chip studs (#3B2418) are embedded across the top surface of each pancake disk, in addition to the bubbles and pore holes. Overall style: low-poly faceted geometry, soft clay-like matte shading, warm pastel palette, miniature diorama feel, flat color facets, clean simple silhouette, stylized 3D game asset render. Camera: three-quarter top-front view, object centered with a 15% margin. Background: solid pale sage (#DFEAE0), no props, no floor texture, no horizon line. Lighting: single soft key light upper-left plus soft ambient fill, no harsh shadows, no cast shadow or contact shadow on the background. Stylized matte render only — no photorealism, no glossy plastic, no syrup, no butter pat, no chocolate drizzle, no melted chocolate pool, no chocolate sauce, no text, no watermark, no plate, no board, no props, no hands, no people, no characters, no facial features.",
-  "followup_views": [
-    "Same exact chocolate chip pancake stack, identical proportions, colors, and surface details — now shown in a front elevation view (straight-on side view), so the three offset layers and the studded chips at the edges are clearly visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow.",
-    "Same exact chocolate chip pancake stack, identical proportions, colors, and surface details — now shown in a top-down view (directly from above), so the chocolate chips, bubbles, and pore holes on the top disk are fully visible. Same solid pale sage #DFEAE0 background, object centered, no props, no cast shadow."
+  "toppings": [
+    {
+      "label": "WHIPPED CREAM",
+      "text": "One generous dollop of lightly whipped cream (#FFF8EC), spoon-dropped rather than piped, sits slightly off-centre toward the front-left of the top pancake: soft rounded peaks with gentle folds and one curl on top, a matte velvety surface, its lower edge relaxing into a soft skirt against the warm pancake."
+    },
+    {
+      "label": "FUDGE SAUCE",
+      "text": "A warm dark chocolate fudge sauce (#3A2014), thick, glossy and opaque, drizzled from a spoon in three or four loose zigzag lines that cross the cream and the top pancake, the ribbons thick where the spoon slowed and thin where it moved fast, then spilling over the front edge to run down the pale side walls in slow, heavy drips of different lengths — one reaching the bottom pancake and rounding into a soft bead, the others stopping on the middle layer. Where it lies on the cream it sinks slightly into the white; along every ribbon it catches a bright soft highlight."
+    },
+    {
+      "label": "EXTRA CHIPS AND FINISHING",
+      "text": "A small handful of extra mini chocolate chips (#3B2418) — about twelve, a few of them irregular hand-chopped chunks rather than uniform drops — sprinkled over the cream and the sauce, some half-sunk in the cream, a few sliding down onto the browned pancake, one caught in a sauce drip. A barely-there haze of powdered sugar over the far rim of the top pancake, away from the sauce. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements."
+    }
   ],
-  "notes_ko": "베이스 pancake.json의 geometry(3단 오프셋 원반, 기포·구멍 텍스처)를 그대로 계승하고 초코칩 스터드만 추가했다. 시럽·버터는 이미 베이스 negative에 있었고, 초코 재료가 유발하기 쉬운 드리즐·녹은 초콜릿 웅덩이·초콜릿 소스를 추가로 차단했다."
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, soft-matte cream, thick glossy opaque fudge sauce, dry matte chocolate chips with a faint sheen where they melted, and softly glossy melted chip smudges in the crust. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "an indulgent diner-style chocolate-chip breakfast, sauce still running, that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy golden buttermilk pancakes with mini chocolate chips melted into the batter, topped with a dollop of whipped cream, a zigzag of dark chocolate fudge sauce and a sprinkle of extra chocolate chips — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter itself stays light and golden — this is not a cocoa pancake — but it carries mini chocolate chips, and they show the way they really do after griddling: on the browned top face of each pancake, about ten small dark spots (#3B2418) of different sizes where chips sat just under the surface and melted, each a soft, slightly sunken smudge with blurred edges, some still holding the rounded outline of a chip, others spread into a small irregular smear with a faint gloss; on the pale cream side walls (#F1DDB0), a few flat dark cross-sections of chips sit flush with the crumb, and one or two chips near the edge have melted and run a short dark streak down the wall. The top face otherwise browns in the usual soft blotchy gradient from warm caramel (#B9793F) at the centre to light golden (#D9A76B) at the rim, with a few darker freckles. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nWHIPPED CREAM. One generous dollop of lightly whipped cream (#FFF8EC), spoon-dropped rather than piped, sits slightly off-centre toward the front-left of the top pancake: soft rounded peaks with gentle folds and one curl on top, a matte velvety surface, its lower edge relaxing into a soft skirt against the warm pancake.\n\nFUDGE SAUCE. A warm dark chocolate fudge sauce (#3A2014), thick, glossy and opaque, drizzled from a spoon in three or four loose zigzag lines that cross the cream and the top pancake, the ribbons thick where the spoon slowed and thin where it moved fast, then spilling over the front edge to run down the pale side walls in slow, heavy drips of different lengths — one reaching the bottom pancake and rounding into a soft bead, the others stopping on the middle layer. Where it lies on the cream it sinks slightly into the white; along every ribbon it catches a bright soft highlight.\n\nEXTRA CHIPS AND FINISHING. A small handful of extra mini chocolate chips (#3B2418) — about twelve, a few of them irregular hand-chopped chunks rather than uniform drops — sprinkled over the cream and the sauce, some half-sunk in the cream, a few sliding down onto the browned pancake, one caught in a sauce drip. A barely-there haze of powdered sugar over the far rim of the top pancake, away from the sauce. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, soft-matte cream, thick glossy opaque fudge sauce, dry matte chocolate chips with a faint sheen where they melted, and softly glossy melted chip smudges in the crust. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: an indulgent diner-style chocolate-chip breakfast, sauce still running, that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact chocolate chip pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three pale cream side walls with flat chip cross-sections in them, the fudge drips running down the front and the cream with extra chips on top are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact chocolate chip pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the melted chip smudges on the golden top pancake, the cream, the zigzag of fudge sauce and the sprinkled chips are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(med) — 초코칩은 반죽 속에 섞여 굽는 동안 부분적으로 녹아 반점처럼 박히는 것이 정체성(반죽은 밝은 황금색 유지, 코코아형과 구분). v2~v4의 \"상감 보석\"은 칩이 안 녹은 각진 조각이라서 — \"melted into soft sunken smudges with blurred edges\"로 실제 모습 서술. 위에는 생크림 + 퍼지 소스 지그재그 + 여분 칩(서양 레시피 표준)."
 }

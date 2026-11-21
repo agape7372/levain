@@ -1,0 +1,61 @@
+{
+  "id": "pancake--choco-cocoa",
+  "version": 3,
+  "name_ko": "코코아 팬케이크",
+  "subject": "a tall stack of three thick, fluffy dark cocoa pancakes, chocolate-brown through and through, poured over with glossy dark chocolate ganache running down the sides, topped with a dollop of whipped cream, a few fresh raspberries and dark chocolate shavings",
+  "hero_ko": "코코아 반죽(전체 다크브라운) + 광택 가나슈 소스 + 생크림 + 라즈베리 대비 + 초콜릿 셰이빙",
+  "geometry": {
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter is made with cocoa powder, so every pancake is chocolate-brown through and through — no chips, no spots, just an even deep colour: the side wall of each one is a soft cocoa-brown crumb (#6B4A3A) with a fine open texture and tiny air pockets catching the light; the top face is where the cocoa batter met the hot pan, so it is a deeper, richer brown (#3F2A22) at the centre fading to a warmer milk-chocolate brown (#5C4033) at the rim, with a few darker freckles and a matte, slightly velvety surface — the browning is subtle on a dark batter, read more as a shift in depth than in hue. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
+  },
+  "toppings": [
+    {
+      "label": "GANACHE",
+      "text": "Warm dark chocolate ganache (#2E1A12), glossy, thick and opaque, has been poured over the stack from above: it sheets across the top face in an uneven pool that covers about half the surface with a rounded, softly rippled edge, then spills over the front and one side to run down the cocoa side walls in slow, heavy drips of clearly different lengths and widths — one broad drip reaching the bottom pancake and rounding into a heavy bead, two stopping on the middle layer, one just starting. Its mirror-like surface catches the softbox as long, soft highlights that make it look warm and still moving."
+    },
+    {
+      "label": "WHIPPED CREAM",
+      "text": "One generous dollop of lightly whipped cream (#FFF8EC), spoon-dropped slightly off-centre toward the front-left on top of the ganache: soft rounded peaks, gentle folds, a matte velvety surface, its lower edge relaxing into a soft skirt where a little of the dark ganache has been pulled up into the white as a faint marbled streak. The bright white against the dark brown is the strongest contrast on the plate."
+    },
+    {
+      "label": "RASPBERRIES AND SHAVINGS",
+      "text": "Four fresh raspberries (#C8324F), hollow-centred, their tiny drupelets catching soft highlights and each a slightly different size, set in a loose cluster on and beside the cream — one tipped on its side showing the pale hollow, one rolled onto the ganache leaving a small dent. Dark chocolate shavings (#2E1A12) — a small handful of dry, thin curls of different lengths and widths, some tightly rolled, some flat flakes — sprinkled over the cream and the ganache, a couple sliding down the side."
+    },
+    {
+      "label": "FINISHING",
+      "text": "A barely-there haze of powdered sugar over the far rim of the top pancake and the outer folds of the cream, showing as fine pale specks on the dark surfaces. One small sprig of fresh mint with two leaves (#3E7A45) tucked against the cream. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements."
+    }
+  ],
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, soft-matte cream, mirror-glossy opaque ganache, dewy raspberries, dry curled chocolate shavings, waxy mint leaves. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "a rich, dark dessert-café stack — deep chocolate under white cream and red berries — that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy dark cocoa pancakes, chocolate-brown through and through, poured over with glossy dark chocolate ganache running down the sides, topped with a dollop of whipped cream, a few fresh raspberries and dark chocolate shavings — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter is made with cocoa powder, so every pancake is chocolate-brown through and through — no chips, no spots, just an even deep colour: the side wall of each one is a soft cocoa-brown crumb (#6B4A3A) with a fine open texture and tiny air pockets catching the light; the top face is where the cocoa batter met the hot pan, so it is a deeper, richer brown (#3F2A22) at the centre fading to a warmer milk-chocolate brown (#5C4033) at the rim, with a few darker freckles and a matte, slightly velvety surface — the browning is subtle on a dark batter, read more as a shift in depth than in hue. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nGANACHE. Warm dark chocolate ganache (#2E1A12), glossy, thick and opaque, has been poured over the stack from above: it sheets across the top face in an uneven pool that covers about half the surface with a rounded, softly rippled edge, then spills over the front and one side to run down the cocoa side walls in slow, heavy drips of clearly different lengths and widths — one broad drip reaching the bottom pancake and rounding into a heavy bead, two stopping on the middle layer, one just starting. Its mirror-like surface catches the softbox as long, soft highlights that make it look warm and still moving.\n\nWHIPPED CREAM. One generous dollop of lightly whipped cream (#FFF8EC), spoon-dropped slightly off-centre toward the front-left on top of the ganache: soft rounded peaks, gentle folds, a matte velvety surface, its lower edge relaxing into a soft skirt where a little of the dark ganache has been pulled up into the white as a faint marbled streak. The bright white against the dark brown is the strongest contrast on the plate.\n\nRASPBERRIES AND SHAVINGS. Four fresh raspberries (#C8324F), hollow-centred, their tiny drupelets catching soft highlights and each a slightly different size, set in a loose cluster on and beside the cream — one tipped on its side showing the pale hollow, one rolled onto the ganache leaving a small dent. Dark chocolate shavings (#2E1A12) — a small handful of dry, thin curls of different lengths and widths, some tightly rolled, some flat flakes — sprinkled over the cream and the ganache, a couple sliding down the side.\n\nFINISHING. A barely-there haze of powdered sugar over the far rim of the top pancake and the outer folds of the cream, showing as fine pale specks on the dark surfaces. One small sprig of fresh mint with two leaves (#3E7A45) tucked against the cream. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, soft-matte cream, mirror-glossy opaque ganache, dewy raspberries, dry curled chocolate shavings, waxy mint leaves. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: a rich, dark dessert-café stack — deep chocolate under white cream and red berries — that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact cocoa pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three cocoa-brown side walls, the heavy ganache drips running down the front and the cream with raspberries on top are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact cocoa pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the pool of glossy ganache over the dark top pancake, the cream, the raspberries and the chocolate shavings are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(med) — 코코아형은 반죽 전체가 균일한 다크브라운(반점 없음, 초코칩형과 명확히 구분), 위에 광택 가나슈/퍼지 소스 부음 + 생크림 + 붉은 과일 대비 + 슈가파우더. 대비 과일은 딸기 변형과 겹치지 않게 라즈베리. 옆벽·윗면 갈색 2단계로 깊이감."
+}

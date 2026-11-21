@@ -1,0 +1,61 @@
+{
+  "id": "pancake--olive-flesh",
+  "version": 3,
+  "name_ko": "올리브 팬케이크",
+  "subject": "a tall stack of three thick, fluffy savoury pancakes topped with whole and halved Kalamata olives, crumbled feta, halved cherry tomatoes, fresh herbs and a glossy drizzle of extra-virgin olive oil",
+  "hero_ko": "세이버리 — 칼라마타 올리브 통·반 + 페타 크럼블 + 방울토마토 + 허브 + 올리브오일",
+  "geometry": {
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. These are savoury pancakes, so the crumb is a shade denser and the browning a shade deeper than a sweet stack: the side wall of each one is a pale golden-cream crumb (#EDD9A8) with a fine open texture and tiny air pockets, and the top face is griddle-browned in a soft blotchy gradient — deep golden brown (#A96F35) at the centre fading to warm gold (#D2A461) at the rim — with a few darker freckles and a light scatter of cracked black pepper baked into the surface. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
+  },
+  "toppings": [
+    {
+      "label": "OLIVES",
+      "text": "About seven Kalamata olives in glossy deep purple-black (#3E2A33), their skins catching soft highlights, no two the same size: three whole olives, one still with its wrinkled tip, leaning against each other near the front-left; four halves cut lengthwise showing the paler purple-brown flesh inside (#6B4A4F) and the hollow where the pit was, laid at different angles — two cut-face up on top, one tipped against a tomato, one sliding toward the rim. A little of their brine has left a small dark glossy smear on the pancake beneath them."
+    },
+    {
+      "label": "FETA",
+      "text": "A generous crumble of feta (#FAF4E4) — irregular chunks and fine crumbs of clearly different sizes, some as big as a fingertip with sharp broken edges, others powder-fine — sprinkled over and around the olives, a few pieces resting on the olives themselves, a drift of crumbs across the browned top and a couple caught on a side wall. The feta is matte, dense and slightly damp-looking."
+    },
+    {
+      "label": "TOMATOES AND HERBS",
+      "text": "Three cherry tomatoes (#D93A2E) halved, their glossy cut faces showing the seeds and jelly, placed cut-face up at different angles among the olives, one whole small tomato with a bit of green stem beside them. Fresh herbs: a few small oregano leaves (#4E7A3B) and roughly torn flat-leaf parsley (#3E7A45) sprinkled over everything, plus one small sprig of oregano resting on top."
+    },
+    {
+      "label": "OLIVE OIL AND FINISHING",
+      "text": "A drizzle of extra-virgin olive oil (#C9B83A), clear, glossy and faintly green-gold, traced over the toppings so it pools in small glossy beads on the feta and the tomatoes, glazes the olives, and runs over the front edge in two slow, thin drips down the pale side walls, darkening the crumb it touches. A pinch of coarse sea salt flakes and a few grinds of cracked black pepper over the top. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements."
+    }
+  ],
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, glossy taut olive skins, matte crumbly feta, juicy glossy tomato cut faces, clear green-gold oil with bright small highlights, and soft matte herb leaves. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "a bright Mediterranean savoury brunch — briny, herby and golden — that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy savoury pancakes topped with whole and halved Kalamata olives, crumbled feta, halved cherry tomatoes, fresh herbs and a glossy drizzle of extra-virgin olive oil — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. These are savoury pancakes, so the crumb is a shade denser and the browning a shade deeper than a sweet stack: the side wall of each one is a pale golden-cream crumb (#EDD9A8) with a fine open texture and tiny air pockets, and the top face is griddle-browned in a soft blotchy gradient — deep golden brown (#A96F35) at the centre fading to warm gold (#D2A461) at the rim — with a few darker freckles and a light scatter of cracked black pepper baked into the surface. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nOLIVES. About seven Kalamata olives in glossy deep purple-black (#3E2A33), their skins catching soft highlights, no two the same size: three whole olives, one still with its wrinkled tip, leaning against each other near the front-left; four halves cut lengthwise showing the paler purple-brown flesh inside (#6B4A4F) and the hollow where the pit was, laid at different angles — two cut-face up on top, one tipped against a tomato, one sliding toward the rim. A little of their brine has left a small dark glossy smear on the pancake beneath them.\n\nFETA. A generous crumble of feta (#FAF4E4) — irregular chunks and fine crumbs of clearly different sizes, some as big as a fingertip with sharp broken edges, others powder-fine — sprinkled over and around the olives, a few pieces resting on the olives themselves, a drift of crumbs across the browned top and a couple caught on a side wall. The feta is matte, dense and slightly damp-looking.\n\nTOMATOES AND HERBS. Three cherry tomatoes (#D93A2E) halved, their glossy cut faces showing the seeds and jelly, placed cut-face up at different angles among the olives, one whole small tomato with a bit of green stem beside them. Fresh herbs: a few small oregano leaves (#4E7A3B) and roughly torn flat-leaf parsley (#3E7A45) sprinkled over everything, plus one small sprig of oregano resting on top.\n\nOLIVE OIL AND FINISHING. A drizzle of extra-virgin olive oil (#C9B83A), clear, glossy and faintly green-gold, traced over the toppings so it pools in small glossy beads on the feta and the tomatoes, glazes the olives, and runs over the front edge in two slow, thin drips down the pale side walls, darkening the crumb it touches. A pinch of coarse sea salt flakes and a few grinds of cracked black pepper over the top. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, glossy taut olive skins, matte crumbly feta, juicy glossy tomato cut faces, clear green-gold oil with bright small highlights, and soft matte herb leaves. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: a bright Mediterranean savoury brunch — briny, herby and golden — that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact savoury olive pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three pale golden side walls, the olives, feta and tomatoes piled on top and the thin olive oil drips on the front are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact savoury olive pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the whole and halved olives, the feta crumble, the tomato halves, the herbs and the glossy oil pooling on the top pancake are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(low, 인접 자료 종합) — 유일한 세이버리. 시럽·과일·크림 돌롭 관행 금지, 대신 올리브(통+반, 광택)·페타 크럼블·방울토마토·허브·올리브오일. 실제 그리스식은 올리브를 반죽에 섞는 편이나 사용자 지시(위에 얹기)와 게임 재료 식별성 우선. 한국 카페 사례 없음."
+}

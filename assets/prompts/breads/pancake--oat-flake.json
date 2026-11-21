@@ -1,0 +1,61 @@
+{
+  "id": "pancake--oat-flake",
+  "version": 3,
+  "name_ko": "귀리 팬케이크",
+  "subject": "a tall stack of three thick, hearty oatmeal pancakes with visible rolled oats in the batter, topped with a dollop of Greek yogurt, fanned banana slices, a drizzle of honey, chopped walnuts, a few blueberries and a pinch of toasted oats",
+  "hero_ko": "오트 반죽(알갱이 질감) + 바나나 슬라이스 + 그릭요거트 + 꿀 + 다진 호두 + 오트 뿌림",
+  "geometry": {
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter is made with rolled oats, so the pancakes are not smooth: the side wall of each one is a warm oat-cream crumb (#E6CFA3) with a coarser, rustic texture in which flattened oat flakes (#D7C7A3) lie flush with the surface, plainly visible as pale ovals of different sizes among the air pockets; the top face is griddle-browned in a soft blotchy gradient — nutty golden-brown (#B07A42) at the centre fading to warm tan (#D3A66C) at the rim — with the outlines of a few oat flakes showing through the browning as paler flecks and a slightly rougher, more textured surface than a plain pancake. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
+  },
+  "toppings": [
+    {
+      "label": "GREEK YOGURT",
+      "text": "One generous dollop of thick Greek yogurt (#FBF6EC), spooned rather than piped, sits slightly off-centre toward the front-left of the top pancake: a dense, matte, softly peaked mound with a spoon-mark on one side, its lower edge settling into a soft skirt against the warm pancake."
+    },
+    {
+      "label": "BANANA",
+      "text": "Four slices of banana about 7 mm thick, cut a little unevenly, fanned in an overlapping row that leans against the yogurt — pale creamy yellow (#F1E3A6) flesh with the small dark seed-dots in the centre, thin golden skins-edges (#D9B85A) just turning brown at one or two rims, one slice tipped slightly forward showing its edge, a faint moist sheen on the cut faces."
+    },
+    {
+      "label": "HONEY, NUTS AND OATS",
+      "text": "A thin drizzle of clear golden honey (#D9A441), translucent and glossy, traced in one loose zigzag over the yogurt and banana and spilling over the front edge into two slow drips of different lengths down the side walls. A small handful of toasted walnuts (#A9784A), coarsely chopped into pieces of clearly different sizes with their ridged surfaces showing, sprinkled over the yogurt and the banana. About a dozen toasted rolled oat flakes (#C9A46E) pinched over the top of the yogurt, a few sliding down its side."
+    },
+    {
+      "label": "FINISHING",
+      "text": "Five blueberries (#3E4A73) with a dusty grey-blue bloom, each a slightly different size, tucked in a loose cluster between the yogurt and the banana, one alone near the rim. A very light dusting of ground cinnamon over the near rim. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements."
+    }
+  ],
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, dense matte yogurt, moist banana slices with a faint sheen, translucent glossy honey, dry ridged walnut pieces, dry toasted oat flakes and bloom-dusted blueberries. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "a wholesome, hearty morning stack — rustic oats under fruit and honey — that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, hearty oatmeal pancakes with visible rolled oats in the batter, topped with a dollop of Greek yogurt, fanned banana slices, a drizzle of honey, chopped walnuts, a few blueberries and a pinch of toasted oats — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter is made with rolled oats, so the pancakes are not smooth: the side wall of each one is a warm oat-cream crumb (#E6CFA3) with a coarser, rustic texture in which flattened oat flakes (#D7C7A3) lie flush with the surface, plainly visible as pale ovals of different sizes among the air pockets; the top face is griddle-browned in a soft blotchy gradient — nutty golden-brown (#B07A42) at the centre fading to warm tan (#D3A66C) at the rim — with the outlines of a few oat flakes showing through the browning as paler flecks and a slightly rougher, more textured surface than a plain pancake. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nGREEK YOGURT. One generous dollop of thick Greek yogurt (#FBF6EC), spooned rather than piped, sits slightly off-centre toward the front-left of the top pancake: a dense, matte, softly peaked mound with a spoon-mark on one side, its lower edge settling into a soft skirt against the warm pancake.\n\nBANANA. Four slices of banana about 7 mm thick, cut a little unevenly, fanned in an overlapping row that leans against the yogurt — pale creamy yellow (#F1E3A6) flesh with the small dark seed-dots in the centre, thin golden skins-edges (#D9B85A) just turning brown at one or two rims, one slice tipped slightly forward showing its edge, a faint moist sheen on the cut faces.\n\nHONEY, NUTS AND OATS. A thin drizzle of clear golden honey (#D9A441), translucent and glossy, traced in one loose zigzag over the yogurt and banana and spilling over the front edge into two slow drips of different lengths down the side walls. A small handful of toasted walnuts (#A9784A), coarsely chopped into pieces of clearly different sizes with their ridged surfaces showing, sprinkled over the yogurt and the banana. About a dozen toasted rolled oat flakes (#C9A46E) pinched over the top of the yogurt, a few sliding down its side.\n\nFINISHING. Five blueberries (#3E4A73) with a dusty grey-blue bloom, each a slightly different size, tucked in a loose cluster between the yogurt and the banana, one alone near the rim. A very light dusting of ground cinnamon over the near rim. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, dense matte yogurt, moist banana slices with a faint sheen, translucent glossy honey, dry ridged walnut pieces, dry toasted oat flakes and bloom-dusted blueberries. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: a wholesome, hearty morning stack — rustic oats under fruit and honey — that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact oatmeal pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three oat-flecked side walls, the yogurt and fanned banana on top, the walnuts and the honey drips on the front are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact oatmeal pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the yogurt dollop, the fanned banana slices, the walnuts, oats and blueberries and the honey zigzag on the textured top pancake are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(high) — 반죽 표면에 오트 알갱이 질감이 보여야 함(매끈하면 오답). 서양식 토핑 = 바나나 코인 부채꼴 + 그릭요거트 돌롭 + 꿀/메이플 드리즐 + 다진 호두 + 베리 포인트. 오트 뿌림으로 주재료 명시."
+}

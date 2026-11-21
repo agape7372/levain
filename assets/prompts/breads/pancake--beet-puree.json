@@ -1,0 +1,61 @@
+{
+  "id": "pancake--beet-puree",
+  "version": 3,
+  "name_ko": "비트 퓌레 팬케이크",
+  "subject": "a tall stack of three thick, fluffy pink beetroot pancakes topped with a dollop of thick Greek yogurt, a drizzle of white cream cheese glaze, fresh raspberries and blueberries",
+  "hero_ko": "비트 반죽(핑크) + 요거트 돌롭 + 크림치즈 글레이즈 + 베리",
+  "geometry": {
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter was blended with beetroot purée, so every pancake is pink through and through: the side wall of each one is a soft, even rosy-pink crumb (#E08AA8) with a fine open texture and tiny air pockets, a couple of slightly deeper magenta streaks (#C4548A) where the purée was folded in, no beet pieces anywhere; the top face is where the pink met the hot pan, so it has browned over the pink in a soft blotchy gradient — a warm rosy-brown (#A65A58) at the centre fading through dusky rose (#C97F8A) to fresh pink (#E08AA8) at the rim, with a few darker freckles, the way a coloured batter never browns evenly. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
+  },
+  "toppings": [
+    {
+      "label": "YOGURT",
+      "text": "One generous dollop of thick Greek yogurt (#FBF6EC), spooned rather than piped, sits slightly off-centre toward the front-left of the top pancake: a dense, matte, softly peaked mound with a spoon-mark on one side, its lower edge settling into a soft skirt against the warm pancake. Its clean white is the sharpest contrast on the plate against the pink."
+    },
+    {
+      "label": "CREAM CHEESE GLAZE",
+      "text": "A thin, opaque cream cheese glaze (#F6EFE3), loose enough to pour, has been drizzled over the stack in two or three loose zigzag lines that cross the yogurt and the pink top, then spill over the front edge and run down the rosy side walls in slow, uneven drips of different lengths — one reaching the bottom pancake, one stopping halfway. The glaze is smooth and semi-matte with a soft sheen along the thickest ribbons."
+    },
+    {
+      "label": "BERRIES",
+      "text": "Four fresh raspberries (#C8324F) — hollow-centred, their tiny drupelets catching soft highlights, one tipped on its side showing the pale hollow — and about six blueberries (#3E4A73) with a dusty grey-blue bloom, each a slightly different size, arranged in a loose cluster on and around the yogurt: two raspberries on top of the yogurt, the others tumbling down its side onto the pancake, one blueberry alone near the rim."
+    },
+    {
+      "label": "FINISHING",
+      "text": "A light haze of powdered sugar over the far rim of the top pancake, away from the glaze. One small sprig of fresh mint with two crisp leaves (#3E7A45) tucked against the yogurt. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements."
+    }
+  ],
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, dense matte yogurt, a semi-matte pourable glaze with a soft sheen, dewy raspberries and bloom-dusted blueberries, waxy mint leaves. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "a bright, playful brunch plate — vivid pink under clean white and berry colours — that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy pink beetroot pancakes topped with a dollop of thick Greek yogurt, a drizzle of white cream cheese glaze, fresh raspberries and blueberries — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter was blended with beetroot purée, so every pancake is pink through and through: the side wall of each one is a soft, even rosy-pink crumb (#E08AA8) with a fine open texture and tiny air pockets, a couple of slightly deeper magenta streaks (#C4548A) where the purée was folded in, no beet pieces anywhere; the top face is where the pink met the hot pan, so it has browned over the pink in a soft blotchy gradient — a warm rosy-brown (#A65A58) at the centre fading through dusky rose (#C97F8A) to fresh pink (#E08AA8) at the rim, with a few darker freckles, the way a coloured batter never browns evenly. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nYOGURT. One generous dollop of thick Greek yogurt (#FBF6EC), spooned rather than piped, sits slightly off-centre toward the front-left of the top pancake: a dense, matte, softly peaked mound with a spoon-mark on one side, its lower edge settling into a soft skirt against the warm pancake. Its clean white is the sharpest contrast on the plate against the pink.\n\nCREAM CHEESE GLAZE. A thin, opaque cream cheese glaze (#F6EFE3), loose enough to pour, has been drizzled over the stack in two or three loose zigzag lines that cross the yogurt and the pink top, then spill over the front edge and run down the rosy side walls in slow, uneven drips of different lengths — one reaching the bottom pancake, one stopping halfway. The glaze is smooth and semi-matte with a soft sheen along the thickest ribbons.\n\nBERRIES. Four fresh raspberries (#C8324F) — hollow-centred, their tiny drupelets catching soft highlights, one tipped on its side showing the pale hollow — and about six blueberries (#3E4A73) with a dusty grey-blue bloom, each a slightly different size, arranged in a loose cluster on and around the yogurt: two raspberries on top of the yogurt, the others tumbling down its side onto the pancake, one blueberry alone near the rim.\n\nFINISHING. A light haze of powdered sugar over the far rim of the top pancake, away from the glaze. One small sprig of fresh mint with two crisp leaves (#3E7A45) tucked against the yogurt. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, dense matte yogurt, a semi-matte pourable glaze with a soft sheen, dewy raspberries and bloom-dusted blueberries, waxy mint leaves. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: a bright, playful brunch plate — vivid pink under clean white and berry colours — that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact beetroot pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three pink side walls under browned tops, the yogurt and berries piled on top and the white glaze drips running down the front are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact beetroot pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the yogurt dollop, the zigzag of white glaze over the pink top, the raspberries and blueberries and the mint are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(med) — 비트는 반죽 착색(표면에 비트 조각 없음), 위에는 크림치즈 글레이즈 드리즐/요거트·휘핑 돌롭 + 베리·견과. 신선함 지표 = 선명한 핑크(갈변 금지). 윗면은 팬에 닿아 로지 브라운으로 구워진 위로 핑크가 비침. 정본 hex(ingredients/beet.json)는 스트리크에만."
+}

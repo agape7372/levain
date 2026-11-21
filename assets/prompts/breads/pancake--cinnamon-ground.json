@@ -1,0 +1,57 @@
+{
+  "id": "pancake--cinnamon-ground",
+  "version": 3,
+  "name_ko": "계피가루 팬케이크",
+  "subject": "a tall stack of three thick, fluffy cinnamon roll pancakes, each with a dark cinnamon-sugar swirl baked into its top, drizzled with white cream cheese glaze, with a small pat of butter and a sprinkle of cinnamon sugar",
+  "hero_ko": "시나몬 슈거 스월(구워진 무늬) + 크림치즈 글레이즈 + 버터 + 시나몬 슈거",
+  "geometry": {
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter itself carries a little ground cinnamon, so the side wall of each pancake is a warm cinnamon-cream crumb (#E2C193) with a fine open texture and tiny air pockets. The top face of each pancake is griddle-browned in a soft blotchy gradient — warm caramel (#B9793F) at the centre fading to light golden (#D9A76B) at the rim — and baked into that top face is the signature: a loose, hand-piped swirl of cinnamon-brown sugar (#6E3B1E) that starts a little off-centre and coils outward two and a half turns, its line thickening and thinning, breaking once where the piping bag skipped, sunk slightly into the surface as a darker caramelised groove with a soft toasted sheen. The middle and bottom pancakes show only the edge of their swirls where they peek out from under the layer above. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
+  },
+  "toppings": [
+    {
+      "label": "CREAM CHEESE GLAZE",
+      "text": "A loose, opaque cream cheese glaze (#F6EFE3), thin enough to pour but thick enough to hold a ribbon, has been drizzled over the stack in three or four loose zigzag lines that cross the swirl on the top pancake, collect in the grooves of the swirl, and spill over the front edge to run down the cinnamon-cream side walls in slow, uneven drips of different lengths — one reaching the bottom pancake and rounding into a soft bead, the others stopping on the middle layer. The glaze is smooth and semi-matte with a soft sheen along its thickest ribbons, and a little of the dark cinnamon sugar has bled into it where they meet."
+    },
+    {
+      "label": "BUTTER",
+      "text": "One small square pat of butter (#F3DDA0), about 1.5 cm, sits near the centre of the swirl, still holding its shape with softened corners, its bottom edge just beginning to melt into a small glossy pool that mingles with the glaze."
+    },
+    {
+      "label": "FINISHING",
+      "text": "A sprinkle of coarse cinnamon sugar — visible sugar crystals (#F1DEC0) mixed with cinnamon (#9A5B34) — over the glaze and the near rim, heavier in one spot where the fingers opened, and a soft haze of ground cinnamon drifting onto the far rim. Nothing else: swirl, glaze, butter and sugar are the whole story. The drizzle lands toward the front-left so part of the baked swirl stays clearly visible on the far side, and everything reads as one deliberate, appetizing plate — realistic portion size, no duplicate identical elements."
+    }
+  ],
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, a semi-matte pourable glaze with a soft sheen, a caramelised cinnamon-sugar swirl with a toasted gleam, a solid butter pat just starting to melt, and dry sparkling sugar crystals. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "a warm American-diner cinnamon-roll breakfast, glaze still running, that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy cinnamon roll pancakes, each with a dark cinnamon-sugar swirl baked into its top, drizzled with white cream cheese glaze, with a small pat of butter and a sprinkle of cinnamon sugar — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter itself carries a little ground cinnamon, so the side wall of each pancake is a warm cinnamon-cream crumb (#E2C193) with a fine open texture and tiny air pockets. The top face of each pancake is griddle-browned in a soft blotchy gradient — warm caramel (#B9793F) at the centre fading to light golden (#D9A76B) at the rim — and baked into that top face is the signature: a loose, hand-piped swirl of cinnamon-brown sugar (#6E3B1E) that starts a little off-centre and coils outward two and a half turns, its line thickening and thinning, breaking once where the piping bag skipped, sunk slightly into the surface as a darker caramelised groove with a soft toasted sheen. The middle and bottom pancakes show only the edge of their swirls where they peek out from under the layer above. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nCREAM CHEESE GLAZE. A loose, opaque cream cheese glaze (#F6EFE3), thin enough to pour but thick enough to hold a ribbon, has been drizzled over the stack in three or four loose zigzag lines that cross the swirl on the top pancake, collect in the grooves of the swirl, and spill over the front edge to run down the cinnamon-cream side walls in slow, uneven drips of different lengths — one reaching the bottom pancake and rounding into a soft bead, the others stopping on the middle layer. The glaze is smooth and semi-matte with a soft sheen along its thickest ribbons, and a little of the dark cinnamon sugar has bled into it where they meet.\n\nBUTTER. One small square pat of butter (#F3DDA0), about 1.5 cm, sits near the centre of the swirl, still holding its shape with softened corners, its bottom edge just beginning to melt into a small glossy pool that mingles with the glaze.\n\nFINISHING. A sprinkle of coarse cinnamon sugar — visible sugar crystals (#F1DEC0) mixed with cinnamon (#9A5B34) — over the glaze and the near rim, heavier in one spot where the fingers opened, and a soft haze of ground cinnamon drifting onto the far rim. Nothing else: swirl, glaze, butter and sugar are the whole story. The drizzle lands toward the front-left so part of the baked swirl stays clearly visible on the far side, and everything reads as one deliberate, appetizing plate — realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, a semi-matte pourable glaze with a soft sheen, a caramelised cinnamon-sugar swirl with a toasted gleam, a solid butter pat just starting to melt, and dry sparkling sugar crystals. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: a warm American-diner cinnamon-roll breakfast, glaze still running, that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact cinnamon roll pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three cinnamon-cream side walls, the white glaze drips running down the front and the butter pat on top are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact cinnamon roll pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the dark cinnamon-sugar swirl baked into the top pancake, the zigzag of white glaze over it, the butter pat and the cinnamon sugar are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(high) — 시그니처는 위에 뿌린 가루가 아니라 반죽 표면에 구워진 시나몬-설탕 스월 + 흰 크림치즈 글레이즈 2단 구조(시나몬롤 팬케이크). 스월은 \"loose hand-piped, off-centre, thick-thin, breaks once\"로 과녁 회피(food-image 장부). 계피가루는 반죽 틴트 + 마무리 시나몬 슈거로도 살림."
+}

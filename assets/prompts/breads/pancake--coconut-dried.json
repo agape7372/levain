@@ -1,0 +1,61 @@
+{
+  "id": "pancake--coconut-dried",
+  "version": 3,
+  "name_ko": "말린 코코넛 팬케이크",
+  "subject": "a tall stack of three thick, fluffy buttermilk pancakes heaped with golden toasted coconut flakes, cubes of ripe mango, a small dollop of whipped cream and a glossy drizzle of mango sauce, finished with mint",
+  "hero_ko": "토스트 코코넛 플레이크(황금색 컬) 듬뿍 + 망고 큐브 + 크림 + 망고 소스",
+  "geometry": {
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The top face of each pancake is griddle-browned in a soft, blotchy, uneven gradient — warm caramel brown (#B9793F) at the centre where it sat longest on the hot pan, fading through toasty golden (#CF9455) into light golden (#D9A76B) toward the rim, with a few slightly darker freckles and one paler patch where a bubble lifted the batter, the way real pancakes never brown evenly. The side wall of every pancake is the pale cream of the risen crumb (#F1DDB0): a soft, spongy band with a fine open crumb texture, tiny irregular air pockets catching the light, meeting the browned top in a soft blurred edge rather than a hard line. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
+  },
+  "toppings": [
+    {
+      "label": "WHIPPED CREAM",
+      "text": "One modest dollop of lightly whipped cream (#FFF8EC), spoon-dropped, sits slightly off-centre toward the front-left of the top pancake — soft rounded peaks, a matte velvety surface, its lower edge relaxing into a soft skirt — mostly buried under the coconut and fruit rather than the star."
+    },
+    {
+      "label": "TOASTED COCONUT",
+      "text": "A generous heap of toasted coconut flakes — the wide, thin shaved kind, not fine desiccated shreds — piled over the cream and across the top pancake: dozens of irregular curled chips of different sizes, toasted to a range of golden browns from pale gold (#E3C48C) through amber (#C9963F) to a few dark-edged pieces (#9A6A2E), each curled a different way with slightly darker crisp edges, tumbling loosely so some stand on edge, a few sliding off onto the browned rim and one or two caught on a side wall. They read as crisp, dry and fragrant."
+    },
+    {
+      "label": "MANGO",
+      "text": "About six cubes of ripe mango (#F5A623), roughly 1.5 cm but cut a little unevenly and sitting at their own angles, piled against the coconut and the cream — glossy, juicy cut faces with a faint fibrous grain, one cube tipped on its side, one alone near the rim leaving a small wet mark."
+    },
+    {
+      "label": "MANGO SAUCE AND FINISHING",
+      "text": "A thick, glossy mango sauce (#E8901A), a bright orange-yellow purée, drizzled over the fruit and coconut so it pools in glossy patches among the cubes and spills over the front edge in two slow drips of different lengths down the pale side walls, turning the crumb it touches a darker soaked gold. One small sprig of fresh mint with two leaves (#3E7A45) tucked against the cream, and a few tiny torn mint flecks over the mango. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements."
+    }
+  ],
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, soft-matte cream, dry crisp toasted coconut chips with darker crisp edges, juicy glossy mango cubes, a thick glossy mango sauce, waxy mint leaves. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "a sunny tropical-brunch stack — golden coconut and bright mango — that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy buttermilk pancakes heaped with golden toasted coconut flakes, cubes of ripe mango, a small dollop of whipped cream and a glossy drizzle of mango sauce, finished with mint — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The top face of each pancake is griddle-browned in a soft, blotchy, uneven gradient — warm caramel brown (#B9793F) at the centre where it sat longest on the hot pan, fading through toasty golden (#CF9455) into light golden (#D9A76B) toward the rim, with a few slightly darker freckles and one paler patch where a bubble lifted the batter, the way real pancakes never brown evenly. The side wall of every pancake is the pale cream of the risen crumb (#F1DDB0): a soft, spongy band with a fine open crumb texture, tiny irregular air pockets catching the light, meeting the browned top in a soft blurred edge rather than a hard line. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nWHIPPED CREAM. One modest dollop of lightly whipped cream (#FFF8EC), spoon-dropped, sits slightly off-centre toward the front-left of the top pancake — soft rounded peaks, a matte velvety surface, its lower edge relaxing into a soft skirt — mostly buried under the coconut and fruit rather than the star.\n\nTOASTED COCONUT. A generous heap of toasted coconut flakes — the wide, thin shaved kind, not fine desiccated shreds — piled over the cream and across the top pancake: dozens of irregular curled chips of different sizes, toasted to a range of golden browns from pale gold (#E3C48C) through amber (#C9963F) to a few dark-edged pieces (#9A6A2E), each curled a different way with slightly darker crisp edges, tumbling loosely so some stand on edge, a few sliding off onto the browned rim and one or two caught on a side wall. They read as crisp, dry and fragrant.\n\nMANGO. About six cubes of ripe mango (#F5A623), roughly 1.5 cm but cut a little unevenly and sitting at their own angles, piled against the coconut and the cream — glossy, juicy cut faces with a faint fibrous grain, one cube tipped on its side, one alone near the rim leaving a small wet mark.\n\nMANGO SAUCE AND FINISHING. A thick, glossy mango sauce (#E8901A), a bright orange-yellow purée, drizzled over the fruit and coconut so it pools in glossy patches among the cubes and spills over the front edge in two slow drips of different lengths down the pale side walls, turning the crumb it touches a darker soaked gold. One small sprig of fresh mint with two leaves (#3E7A45) tucked against the cream, and a few tiny torn mint flecks over the mango. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, soft-matte cream, dry crisp toasted coconut chips with darker crisp edges, juicy glossy mango cubes, a thick glossy mango sauce, waxy mint leaves. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: a sunny tropical-brunch stack — golden coconut and bright mango — that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact toasted coconut pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three pale cream side walls, the heap of golden coconut flakes and mango cubes on top and the mango sauce drips on the front are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact toasted coconut pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the heap of curled toasted coconut flakes, the mango cubes, the glossy mango sauce and the mint on the top pancake are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(med) — 시그니처는 흰 생코코넛이 아니라 황금갈색으로 토스트되어 가장자리가 말린 플레이크를 듬뿍(흰 반점=곰팡이 오독 회피에도 부합). 망고는 슬라이스보다 큐브, 망고 퓌레 소스 광택. 크림은 보조. 한국 카페 사례 없음(트로피컬 브런치 포맷)."
+}

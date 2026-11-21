@@ -17,6 +17,9 @@ import { createBaguette } from './baguette';
 import { createSconeChocoChip } from './sconeChocoChip';
 import { createCampagneStrawberryJam } from './campagneStrawberryJam';
 import { createFocacciaOliveFlesh } from './focacciaOliveFlesh';
+// [팬케이크 계열 파일럿 — 2026-09-02] 반죽은 공유 모듈 pancakeStack.ts에서 온다(계열 20종 공용).
+// 지금까지의 변형은 반죽에 박힌 인클루전이었고, 위에 얹은 토핑 더미는 이게 처음이다.
+import { createPancakeStrawberryFresh } from './pancakeStrawberryFresh';
 
 export const BREAD_BUILDERS: Record<string, BreadBuilder> = {
   pancake: createPancake,
@@ -32,6 +35,7 @@ export const BREAD_BUILDERS: Record<string, BreadBuilder> = {
   'scone--choco-chip': createSconeChocoChip,
   'campagne--strawberry-jam': createCampagneStrawberryJam,
   'focaccia--olive-flesh': createFocacciaOliveFlesh,
+  'pancake--strawberry-fresh': createPancakeStrawberryFresh,
 };
 
 export const BREAD_ORDER = [
@@ -48,4 +52,5 @@ export const BREAD_ORDER = [
   'scone--choco-chip',
   'campagne--strawberry-jam',
   'focaccia--olive-flesh',
+  'pancake--strawberry-fresh',
 ] as const;

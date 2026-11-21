@@ -1,0 +1,61 @@
+{
+  "id": "pancake--matcha-ground",
+  "version": 3,
+  "name_ko": "말차가루 팬케이크",
+  "subject": "a tall stack of three thick, fluffy matcha green tea pancakes topped with a dollop of whipped cream, a spoonful of sweet red beans, a sifted dusting of matcha powder and a thin drizzle of honey",
+  "hero_ko": "말차 반죽(초록) + 생크림 + 통팥 + 말차 더스팅 + 꿀",
+  "geometry": {
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter is tinted with matcha, so every pancake is green through and through: the side wall of each one is a soft, even matcha-cream crumb (#A9C98A) with a fine open texture and tiny air pockets, no flecks or leaf pieces, just smooth colour; the top face is where the green met the hot pan, so it has browned over the green in a soft blotchy gradient — a warm olive-brown (#8B6F3A) at the centre fading through muted moss (#7F9A58) to fresh matcha green (#8FB86A) at the rim, with a few darker freckles, the way a green batter never browns evenly. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
+  },
+  "toppings": [
+    {
+      "label": "WHIPPED CREAM",
+      "text": "One soft dollop of lightly whipped cream (#FFF8EC), spoon-dropped rather than piped, sits slightly off-centre toward the front-left of the top pancake: rounded peaks, gentle folds, a matte velvety surface, its lower edge relaxing into a soft skirt where it meets the warm pancake. The bright white against the green is the first thing the eye lands on."
+    },
+    {
+      "label": "RED BEANS",
+      "text": "A generous spoonful of sweet red bean paste with whole beans still visible (tsubuan) rests against the side of the cream and spills slightly onto the pancake — a glossy, deep plum-brown mass (#5A2B2B) in which about a dozen individual beans (#7A3F3A) show their rounded, split-skinned shapes at different angles, a few of them tumbling loose across the browned top and one or two stopping at the rim. The paste has a soft moist sheen and an uneven, spooned edge; where it touches the cream, a little of the dark syrup bleeds into the white."
+    },
+    {
+      "label": "MATCHA DUSTING",
+      "text": "A fine sifted dusting of bright matcha powder (#6FA84B) over the cream and the near half of the top pancake — a soft haze of vivid green, heavier on the peaks of the cream and thinning out toward the edge, visibly finer and brighter than the baked green of the batter, settling into every fold and freckle it lands on."
+    },
+    {
+      "label": "HONEY AND FINISHING",
+      "text": "A thin drizzle of clear golden honey (#D9A441) traced over the cream and the beans in one loose zigzag, translucent and glossy, with two slow drips running down the front side wall — one reaching the middle pancake, one short. A very light haze of powdered sugar on the far rim where the matcha did not reach. Three toasted sliced almonds (#D8B27C), each a different size, leaning against the cream. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements."
+    }
+  ],
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, soft-matte cream, glossy moist red bean paste, translucent glossy honey, dry powdery matcha dust. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "a calm Japanese-café afternoon dessert, earthy green and sweet, that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy matcha green tea pancakes topped with a dollop of whipped cream, a spoonful of sweet red beans, a sifted dusting of matcha powder and a thin drizzle of honey — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The batter is tinted with matcha, so every pancake is green through and through: the side wall of each one is a soft, even matcha-cream crumb (#A9C98A) with a fine open texture and tiny air pockets, no flecks or leaf pieces, just smooth colour; the top face is where the green met the hot pan, so it has browned over the green in a soft blotchy gradient — a warm olive-brown (#8B6F3A) at the centre fading through muted moss (#7F9A58) to fresh matcha green (#8FB86A) at the rim, with a few darker freckles, the way a green batter never browns evenly. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nWHIPPED CREAM. One soft dollop of lightly whipped cream (#FFF8EC), spoon-dropped rather than piped, sits slightly off-centre toward the front-left of the top pancake: rounded peaks, gentle folds, a matte velvety surface, its lower edge relaxing into a soft skirt where it meets the warm pancake. The bright white against the green is the first thing the eye lands on.\n\nRED BEANS. A generous spoonful of sweet red bean paste with whole beans still visible (tsubuan) rests against the side of the cream and spills slightly onto the pancake — a glossy, deep plum-brown mass (#5A2B2B) in which about a dozen individual beans (#7A3F3A) show their rounded, split-skinned shapes at different angles, a few of them tumbling loose across the browned top and one or two stopping at the rim. The paste has a soft moist sheen and an uneven, spooned edge; where it touches the cream, a little of the dark syrup bleeds into the white.\n\nMATCHA DUSTING. A fine sifted dusting of bright matcha powder (#6FA84B) over the cream and the near half of the top pancake — a soft haze of vivid green, heavier on the peaks of the cream and thinning out toward the edge, visibly finer and brighter than the baked green of the batter, settling into every fold and freckle it lands on.\n\nHONEY AND FINISHING. A thin drizzle of clear golden honey (#D9A441) traced over the cream and the beans in one loose zigzag, translucent and glossy, with two slow drips running down the front side wall — one reaching the middle pancake, one short. A very light haze of powdered sugar on the far rim where the matcha did not reach. Three toasted sliced almonds (#D8B27C), each a different size, leaning against the cream. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, soft-matte cream, glossy moist red bean paste, translucent glossy honey, dry powdery matcha dust. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: a calm Japanese-café afternoon dessert, earthy green and sweet, that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact matcha pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three green side walls under browned tops, the cream and red beans piled on top and the honey drips running down the front are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact matcha pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the cream, the spoonful of red beans, the bright matcha dusting and the honey zigzag on the top pancake are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(high) — 일본식 카페 정석 = 반죽 착색 + 생크림 + 팥 + 말차 더스팅 + 꿀/구로미츠. 반죽은 균일한 초록(표면에 잎 조각·알갱이 없음), 더스팅 말차는 반죽색보다 선명한 가루 질감으로 구분. 윗면은 초록 위로 갈색이 덮인 올리브브라운이어야 \"구워진 초록\". 통팥(쓰부앙)으로 낱알 보이게. hex 초록은 ingredients/matcha.json 계열, 굽기 혼색은 임의."
+}

@@ -1,0 +1,61 @@
+{
+  "id": "pancake--sweetpotato-roasted",
+  "version": 3,
+  "name_ko": "구운 고구마 팬케이크",
+  "subject": "a tall stack of three thick, fluffy buttermilk pancakes topped with whipped cream, glossy cubes of roasted purple sweet potato, a piped rosette of pale violet sweet potato mousse, a drizzle of honey and a dusting of cinnamon",
+  "hero_ko": "구운 자색고구마 큐브(정과 광택) + 고구마 무스 로제트 + 크림 + 꿀 + 시나몬",
+  "geometry": {
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The top face of each pancake is griddle-browned in a soft, blotchy, uneven gradient — warm caramel brown (#B9793F) at the centre where it sat longest on the hot pan, fading through toasty golden (#CF9455) into light golden (#D9A76B) toward the rim, with a few slightly darker freckles and one paler patch where a bubble lifted the batter, the way real pancakes never brown evenly. The side wall of every pancake is the pale cream of the risen crumb (#F1DDB0): a soft, spongy band with a fine open crumb texture, tiny irregular air pockets catching the light, meeting the browned top in a soft blurred edge rather than a hard line. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
+  },
+  "toppings": [
+    {
+      "label": "WHIPPED CREAM",
+      "text": "One soft dollop of lightly whipped cream (#FFF8EC), spoon-dropped, sits slightly off-centre toward the front-left of the top pancake — rounded peaks, gentle folds, a matte velvety surface, its lower edge relaxing into a soft skirt against the warm pancake."
+    },
+    {
+      "label": "SWEET POTATO CUBES",
+      "text": "About six cubes of roasted purple sweet potato (#7A4E96), each roughly 1.5 cm but cut a little unevenly and sitting at its own angle: two resting on the cream, three piled against its base on the browned pancake, one alone near the rim. Their cut faces show the dense, slightly fibrous violet flesh; their outer faces are darker where they roasted, with caramelised edges turning a warm amber-brown (#B06A2C), and all of them carry a light glossy coat of the honey they were tossed in, so their edges catch the light while their cut faces stay softly matte."
+    },
+    {
+      "label": "SWEET POTATO MOUSSE",
+      "text": "Beside the cream, one small piped rosette of sweet potato mousse — a pale, dusty violet (#B08FC4) with a faint fibrous grain in its ridges rather than a perfectly smooth cream — piped in a loose swirl that leans slightly to one side, the way a hand-held bag leaves it."
+    },
+    {
+      "label": "HONEY AND FINISHING",
+      "text": "A thin drizzle of clear golden honey (#D9A441) traced over the cubes and the cream, translucent and glossy, spilling over the front edge into two slow drips of different lengths down the pale side walls. A soft dusting of ground cinnamon (#9A5B34) over the cream and the near rim, heavier in one spot where the shaker paused. Two halves of a toasted pecan (#9C6B3E) tucked between the cubes at different angles. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements."
+    }
+  ],
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, soft-matte cream, honey-glossed roasted sweet potato cubes with matte violet cut faces, a slightly grainy matte mousse, translucent glossy honey. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "a cosy autumn café dessert, sweet and earthy, that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy buttermilk pancakes topped with whipped cream, glossy cubes of roasted purple sweet potato, a piped rosette of pale violet sweet potato mousse, a drizzle of honey and a dusting of cinnamon — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The top face of each pancake is griddle-browned in a soft, blotchy, uneven gradient — warm caramel brown (#B9793F) at the centre where it sat longest on the hot pan, fading through toasty golden (#CF9455) into light golden (#D9A76B) toward the rim, with a few slightly darker freckles and one paler patch where a bubble lifted the batter, the way real pancakes never brown evenly. The side wall of every pancake is the pale cream of the risen crumb (#F1DDB0): a soft, spongy band with a fine open crumb texture, tiny irregular air pockets catching the light, meeting the browned top in a soft blurred edge rather than a hard line. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nWHIPPED CREAM. One soft dollop of lightly whipped cream (#FFF8EC), spoon-dropped, sits slightly off-centre toward the front-left of the top pancake — rounded peaks, gentle folds, a matte velvety surface, its lower edge relaxing into a soft skirt against the warm pancake.\n\nSWEET POTATO CUBES. About six cubes of roasted purple sweet potato (#7A4E96), each roughly 1.5 cm but cut a little unevenly and sitting at its own angle: two resting on the cream, three piled against its base on the browned pancake, one alone near the rim. Their cut faces show the dense, slightly fibrous violet flesh; their outer faces are darker where they roasted, with caramelised edges turning a warm amber-brown (#B06A2C), and all of them carry a light glossy coat of the honey they were tossed in, so their edges catch the light while their cut faces stay softly matte.\n\nSWEET POTATO MOUSSE. Beside the cream, one small piped rosette of sweet potato mousse — a pale, dusty violet (#B08FC4) with a faint fibrous grain in its ridges rather than a perfectly smooth cream — piped in a loose swirl that leans slightly to one side, the way a hand-held bag leaves it.\n\nHONEY AND FINISHING. A thin drizzle of clear golden honey (#D9A441) traced over the cubes and the cream, translucent and glossy, spilling over the front edge into two slow drips of different lengths down the pale side walls. A soft dusting of ground cinnamon (#9A5B34) over the cream and the near rim, heavier in one spot where the shaker paused. Two halves of a toasted pecan (#9C6B3E) tucked between the cubes at different angles. The toppings gather toward the front-left so the browned pancake surface stays visible on the opposite side, and the composition reads as one deliberate, appetizing arrangement — realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, soft-matte cream, honey-glossed roasted sweet potato cubes with matte violet cut faces, a slightly grainy matte mousse, translucent glossy honey. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: a cosy autumn café dessert, sweet and earthy, that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact sweet potato pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three pale cream side walls, the cubes and cream piled on top with the mousse rosette beside them, and the honey drips on the front are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact sweet potato pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the arrangement of violet sweet potato cubes around the cream, the mousse rosette, the honey line and the cinnamon dusting are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(med) — 한국식은 찐/구운 고구마 큐브·정과(광택)와 고구마 무스 로제트를 위에 얹음, 크림치즈·생크림·시나몬·견과 동반. ★리서치는 한국 일반 고구마 속살이 노랑~주황(자색은 특수 품종)이라 지적 — 그러나 게임 재료 아이콘(ingredients/sweetpotato.json)이 자색이라 시각 일관성 위해 자색 유지, notes에 명기. 단호박(주황)과의 혼동 회피 효과도 있음."
+}

@@ -9,10 +9,10 @@
 | | 빵 | 재료 |
 |---|---|---|
 | 프롬프트 | `breads/<id>.json` | `ingredients/<id>.json` |
-| 스타일 | `style-shared.json` (shared-style-v2) | `ingredients/style-shared-ingredient-v1.json` |
-| 일괄 시트 | `GROK_PASTE.md` | `INGREDIENTS_PASTE.md`(기존 12종) · `INGREDIENTS_PASTE_NEW18.md`(2026-08-26 확장 18종) |
+| 스타일 | `style-shared.json` (shared-style-v3) | `ingredients/style-shared-ingredient-v1.json` |
+| 일괄 시트 | `GROK_PASTE.md`(베이스 10종) · `PANCAKE_PASTE.md`(팬케이크 계열 20종) | `INGREDIENTS_PASTE.md`(기존 12종) · `INGREDIENTS_PASTE_NEW18.md`(2026-08-26 확장 18종) |
 | 이미지 저장 | `assets/breads/src/` | `assets/ingredients/src/` |
-| 개수 | 10종 + 변형 11종 | **30종** = 12(이미지 확보) + 18(2026-08-26 신설, 생성 대기) — 재료당 대표 형태 1개 |
+| 개수 | 10종 + 변형 27종 | **30종** = 12(이미지 확보) + 18(2026-08-26 신설, 생성 대기) — 재료당 대표 형태 1개 |
 
 **시트를 둘로 나눈 이유**: 기존 12종은 이미지가 이미 다 들어와 있다(36장). 한 파일에 합치면
 사용자가 이미 받은 24종을 다시 훑어야 신규분에 닿는다 — 신규분만 던질 수 있게 분리했다.
@@ -55,6 +55,20 @@ AI 생성 음식 특유의 혐오감을 프롬프트 단계에서 차단한다. 
 - 더스팅이 헤이즈 수준인가 — 흰 반점이면 폐기 (곰팡이 오독)
 - 토핑 색이 따뜻한가 — 순검정이면 폐기
 
+**팬케이크 계열 v5 (2026-09-02 오전, v4도 기각 → 방향 전환)**: 맨 스택은 식욕이 없다. v5부터 팬케이크 계열은
+**카페 플레이팅**(크림 돌롭 → 주재료를 **위에 얹음**(박지 않음) → 소스·시럽 한쪽 흘림 → 슈가파우더 → 허브)을
+롱폼(≥600단어)으로 쓴다. 과일·소스는 자연 광택 허용 — 레퍼런스는 img2threejs 절차 모델링의 형태·비율 입력이라
+알베도에 구워지지 않는다(`docs/BREADS.md`). 따라서 아래 3D용 레일(광택·시럽·그림자 금지)은 **팬케이크 계열에
+적용하지 않는다**. 생성기는 Codex(ChatGPT 이미지)에 수동 붙여넣기(사용자 실측: 그록보다 낫다). 정본은
+`breads/pancake*.json`(style_ref `pancake-plated-v5`) + `PANCAKE_PASTE.md`. 3D 빌더가 토핑까지 모델링해야 하는
+비용은 별도 라운드.
+
+**팬케이크 계열 v4 교훈 (2026-09-02 새벽 — v3 실물 20종 기각, 아래는 v4에서 배운 것·몸통 서술은 v5에 계승)**: 평판형 빵에선 스콘의 문법이 역효과였다.
+- "bubble pores … own size and depth" → **드릴 크레이터**. 기포는 림 근처 핀헤드 몇 개로 축소, 정체성은 구멍이 아니라 **2톤(갈색 윗면 + 크림 옆벽)**이 진다.
+- "flat disks" + "clay-like" + 윗면 단색 → **쿠키**. 팬케이크 계열만 clay-like 어휘를 뺐다(스콘·식빵은 유효). 실루엣은 "thick pillowy round, domed top, bulging edge".
+- "pressed snugly … half-sunken" → 평평한 윗면에서 **상감 타일**(스콘의 울퉁불퉁한 면에선 통했던 문구). 대체 = "반죽 속에 접혀 들어가 윗면이 부풀고 서너 개만 뚫고 나옴, 옆벽엔 납작 단면".
+- 씨·플레이크·스월의 주 무대는 **옆벽 크럼**, 윗면은 림에 소수 — 윗면 점 무리는 곰팡이로 읽힌다.
+
 ## v2 변경 요지
 
 - 배경 크림 → 페일 세이지 `#DFEAE0` (식빵·스콘 크림 옆면이 배경에 묻히는 문제)
@@ -71,13 +85,18 @@ AI 생성 음식 특유의 혐오감을 프롬프트 단계에서 차단한다. 
 | `focaccia--olive-flesh` | 올리브 포카치아 | focaccia | 다진 올리브 과육 청크가 딤플 안팎에 박힘 |
 | `campagne--olive-flesh` | 올리브 깜빠뉴 | campagne | 웨지 컷어웨이로 노출된 단면 크럼에 올리브 과육 혼입 |
 | `cracker--olive-oil` | 올리브유 크래커 | cracker | 표면 올리브유 색조(비광택), 씨앗 대신 소금 플레이크 최소 |
-| `pancake--choco-chip` | 초코칩 팬케이크 | pancake | 초코칩 스터드, 시럽·버터 없음 |
+| `pancake--choco-chip` | 초코칩 팬케이크 | pancake | 초코 청크가 반죽 속에 접혀 윗면이 부풀고 서너 개만 뚫고 나옴(v4), 시럽·버터 없음 |
 | `scone--choco-chip` | 초코칩 스콘 | scone | 초코칩 스터드, 세움/콘 실루엣 방지 유지 |
 | `focaccia--choco-cocoa` | 더블초코 포카치아 | focaccia | 코코아 반죽(어두운 크럼 색) + 초코 청크, 로즈마리·올리브·소금 대체 |
 | `loaf--choco-filling` | 초코 바브카 식빵 | loaf | 절단면에 초코 필링 스월(바브카 스타일) |
 | `scone--strawberry-fresh` | 딸기 스콘 | scone | 딸기 과육 청크, 생크림·클로티드 크림 없음 |
 | `campagne--strawberry-jam` | 딸기 스월 깜빠뉴 | campagne | 웨지 컷어웨이 단면에 딸기 잼 스월 |
 | `campagne--chestnut-roasted` | 밤 깜빠뉴 | campagne | 웨지 컷어웨이 단면에 구운 밤 조각 혼입 |
+
+**팬케이크 계열 20종(베이스 1 + 변형 19)은 위 표에 넣지 않는다** — 항목이 표를 압도한다.
+목록·비고·프롬프트는 `PANCAKE_PASTE.md`가 정본이고, 계열의 근거는 `src/sim/ingredients.ts`의
+`baseRecipeId === 'pancake'` 19행이다(게임 노출 14 = verified+conditional, experimental 5는 미노출).
+베이스 지오메트리(3단 오프셋 원반·기포)와 스타일 레일은 동결하고 재료 표현만 갈아끼운다.
 
 ---
 

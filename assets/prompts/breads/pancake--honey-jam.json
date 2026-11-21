@@ -1,0 +1,61 @@
+{
+  "id": "pancake--honey-jam",
+  "version": 3,
+  "name_ko": "꿀 스월 팬케이크",
+  "subject": "a tall stack of three thick, fluffy buttermilk pancakes topped with a chunk of raw honeycomb and a melting disc of honeycomb butter, with golden honey poured generously over the top and running down the sides",
+  "hero_ko": "벌집 조각 + 허니콤 버터 + 꿀 듬뿍",
+  "geometry": {
+    "silhouette": "3단 두툼 스택(약 2.5cm/장), 돔 윗면, 부푼 둥근 가장자리, 손으로 놓은 오프셋, 높이≈폭의 60%, 프레임 폭 65% 점유. 토핑은 전부 윗면에 얹힘(반죽에 박지 않음).",
+    "body": "Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The top face of each pancake is griddle-browned in a soft, blotchy, uneven gradient — warm caramel brown (#B9793F) at the centre where it sat longest on the hot pan, fading through toasty golden (#CF9455) into light golden (#D9A76B) toward the rim, with a few slightly darker freckles and one paler patch where a bubble lifted the batter, the way real pancakes never brown evenly. The side wall of every pancake is the pale cream of the risen crumb (#F1DDB0): a soft, spongy band with a fine open crumb texture, tiny irregular air pockets catching the light, meeting the browned top in a soft blurred edge rather than a hard line. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake."
+  },
+  "toppings": [
+    {
+      "label": "HONEYCOMB",
+      "text": "One chunk of raw honeycomb, about 4 cm across and cut a little unevenly, sits just off-centre on the top pancake: a deep golden-amber block (#C98A2A) whose hexagonal wax cells are clearly visible on its top and cut faces, some cells still capped with pale wax (#E7CFA0), others open and brimming, honey oozing slowly from its lower edge into a small glossy pool."
+    },
+    {
+      "label": "HONEYCOMB BUTTER",
+      "text": "Leaning against the honeycomb, one round disc of honeycomb butter about 3.5 cm across and 1 cm thick — a pale ivory-gold (#F0DDA8) with tiny darker flecks of crushed honeycomb suspended in it — already melting where it touches the warm pancake: its bottom edge has softened into a glossy golden pool spreading under the honeycomb, its top still holds its shape with a soft sheen."
+    },
+    {
+      "label": "HONEY",
+      "text": "Clear golden honey (#D9A441), translucent and slow, has been poured generously — almost too generously — over everything: it glazes the honeycomb, floods the dip around the butter, sheets across the top face and spills over the edge at three places, running down the pale side walls in thick, slow drips of different lengths and widths, the longest reaching the bottom pancake and rounding into a heavy bead, the others stopping on the middle layer. A few tiny air bubbles are trapped in the thickest pool, and every drip catches a bright soft highlight."
+    },
+    {
+      "label": "FINISHING",
+      "text": "A barely-there haze of powdered sugar over the far rim of the top pancake, away from the honey. Nothing else — honey, comb and butter are the whole story. The pour lands toward the front-left so the browned pancake surface stays visible on the far side, and everything reads as one deliberate, appetizing plate: realistic portion size, no duplicate identical elements."
+    }
+  ],
+  "style_ref": "pancake-plated-v5",
+  "materials_lighting": "Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, waxy translucent honeycomb with glossy brimming cells, a semi-soft melting butter disc, and thick translucent honey with bright soft highlights. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.",
+  "camera": "Three-quarter top-front view, the dessert centered with generous margin on all sides.",
+  "background": "Background: seamless solid pale sage (#DFEAE0), flat and even.",
+  "mood": "an Australian-brunch-café indulgence, honey still moving, that makes you want to pick up a fork.",
+  "negative": [
+    "text",
+    "watermark",
+    "plate",
+    "cutlery",
+    "table",
+    "hands",
+    "people",
+    "characters",
+    "facial features",
+    "extra objects"
+  ],
+  "views": [
+    "three-quarter top-front",
+    "front elevation",
+    "top-down"
+  ],
+  "output": {
+    "aspect": "1:1",
+    "size": 1024
+  },
+  "prompt_flat": "A semi-realistic stylized 3D dessert render of a tall stack of three thick, fluffy buttermilk pancakes topped with a chunk of raw honeycomb and a melting disc of honeycomb butter, with golden honey poured generously over the top and running down the sides — a single dessert presented as one object on a plain seamless backdrop, no plate, styled the way a pastry chef would plate it for a café menu.\n\nPANCAKES. Three thick, tender pancakes stacked with a small, casual offset, as if placed by hand rather than aligned by a machine — the middle one shifted a little to the right, the top one a little back. Each pancake is a plump, pillowy round about 2.5 cm thick with a gently domed top and a soft rounded edge that bulges slightly outward where the batter rose in the pan; the stack is about 60% as tall as it is wide and occupies roughly 65% of the frame width, leaving generous empty background around it. The top face of each pancake is griddle-browned in a soft, blotchy, uneven gradient — warm caramel brown (#B9793F) at the centre where it sat longest on the hot pan, fading through toasty golden (#CF9455) into light golden (#D9A76B) toward the rim, with a few slightly darker freckles and one paler patch where a bubble lifted the batter, the way real pancakes never brown evenly. The side wall of every pancake is the pale cream of the risen crumb (#F1DDB0): a soft, spongy band with a fine open crumb texture, tiny irregular air pockets catching the light, meeting the browned top in a soft blurred edge rather than a hard line. A few tiny pinprick pores sit near the rim of the top pancake, barely visible. Where the pancakes touch, the top one presses very slightly into the one below, so the edges kiss softly instead of floating. The whole stack looks warm, tender and freshly flipped — the honest irregularity of a handmade bake.\n\nHONEYCOMB. One chunk of raw honeycomb, about 4 cm across and cut a little unevenly, sits just off-centre on the top pancake: a deep golden-amber block (#C98A2A) whose hexagonal wax cells are clearly visible on its top and cut faces, some cells still capped with pale wax (#E7CFA0), others open and brimming, honey oozing slowly from its lower edge into a small glossy pool.\n\nHONEYCOMB BUTTER. Leaning against the honeycomb, one round disc of honeycomb butter about 3.5 cm across and 1 cm thick — a pale ivory-gold (#F0DDA8) with tiny darker flecks of crushed honeycomb suspended in it — already melting where it touches the warm pancake: its bottom edge has softened into a glossy golden pool spreading under the honeycomb, its top still holds its shape with a soft sheen.\n\nHONEY. Clear golden honey (#D9A441), translucent and slow, has been poured generously — almost too generously — over everything: it glazes the honeycomb, floods the dip around the butter, sheets across the top face and spills over the edge at three places, running down the pale side walls in thick, slow drips of different lengths and widths, the longest reaching the bottom pancake and rounding into a heavy bead, the others stopping on the middle layer. A few tiny air bubbles are trapped in the thickest pool, and every drip catches a bright soft highlight.\n\nFINISHING. A barely-there haze of powdered sugar over the far rim of the top pancake, away from the honey. Nothing else — honey, comb and butter are the whole story. The pour lands toward the front-left so the browned pancake surface stays visible on the far side, and everything reads as one deliberate, appetizing plate: realistic portion size, no duplicate identical elements.\n\nMATERIALS AND LIGHT. Premium food-icon look: slightly simplified, clean forms with believable, appetizing materials — matte tender pancake crumb with a faint velvety sheen only where it browned, waxy translucent honeycomb with glossy brimming cells, a semi-soft melting butter disc, and thick translucent honey with bright soft highlights. Soft studio softbox key light from the upper left with gentle warm ambient fill, a subtle rim of light along the top edges of the stack, and a faint, soft contact shadow directly beneath the stack only. Appetizing food-photography color grading: warm, fresh, clean whites, saturated but natural colours, no colour cast on the background. Shot as if with an 85 mm lens at a comfortable distance, everything in crisp focus.\n\nCAMERA AND BACKGROUND. Three-quarter top-front view, the dessert centered with generous margin on all sides. Background: seamless solid pale sage (#DFEAE0), flat and even. Mood: an Australian-brunch-café indulgence, honey still moving, that makes you want to pick up a fork. No text, no watermark, no plate, no cutlery, no table, no hands, no people, no characters, no facial features, no extra objects.",
+  "followup_views": [
+    "Same exact honeycomb pancake stack, identical pancakes and identical topping arrangement — now seen in a straight-on front elevation view at table height, so the three pale cream side walls, the heavy honey drips running down the front, and the honeycomb chunk and melting butter disc on top are clearly visible. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects.",
+    "Same exact honeycomb pancake stack, identical pancakes and identical topping arrangement — now seen directly from above in a top-down view, so the hexagonal cells of the honeycomb chunk, the butter disc and the pooled honey on the top pancake are fully visible and the lower pancakes peek out where the stack is offset. Keep every element exactly where it was; do not add, remove or move any topping between views, and keep the same colours and materials. Same seamless pale sage #DFEAE0 background, the dessert centered with generous margin, no plate, no extra objects."
+  ],
+  "notes_ko": "v5(2026-09-02): 리서치(med) — 꿀 팬케이크의 시그니처 오브제는 액상 꿀이 아니라 육각 셀이 보이는 벌집 조각 + 허니콤버터 디스크(호주 브런치 포맷), 꿀은 과하다 싶게 흘림. 생크림 없음이 정석. 공유 negative의 no syrup 삭제로 충돌 해소."
+}
