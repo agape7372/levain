@@ -1,4 +1,7 @@
 // OTA 확인·예약(platform/ota.ts) — 플러그인·Preferences 목업. 감사 T3-05 · T2-07 · T2-20 · T2-05 회귀.
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import liveManifest from '../ota/manifest.json';
 import liveHistory from '../ota/history.json';
@@ -31,8 +34,8 @@ vi.mock('@capacitor/preferences', () => ({
 }));
 vi.mock('../src/platform/native', () => ({ isNative: () => true }));
 
-import { initOta, markOtaReady, otaKey } from '../src/platform/ota';
-import { signManifest, type SignedFields } from '../scripts/ota-sign.mjs';
+import { initOta, markOtaReady, OTA_RESERVE_TODO, otaKeys } from '../src/platform/ota';
+import { pairProblem, RESERVE_TODO, signManifest, type SignedFields } from '../scripts/ota-sign.mjs';
 
 // 시험용 키 쌍(웹 crypto → PEM): 게시 스크립트(scripts/ota-sign.mjs)로 서명하고 앱(src/platform/ota.ts)이 확인한다
 // = 두 쪽의 서명 글 형식이 맞는지도 본다. 진짜 개인 키는 레포 밖이라 시험은 키를 갈아 끼운다.
@@ -42,10 +45,12 @@ async function pair(): Promise<{ pem: string; spki: string }> {
   const body = b64(await crypto.subtle.exportKey('pkcs8', k.privateKey)).match(/.{1,64}/g)!.join('\n');
   return { pem: `-----BEGIN PRIVATE KEY-----\n${body}\n-----END PRIVATE KEY-----\n`, spki: b64(await crypto.subtle.exportKey('spki', k.publicKey)) };
 }
-const shipped = otaKey.spki; // 앱에 박힌 진짜 공개 키
-const mine = await pair();
-const theirs = await pair();
-otaKey.spki = mine.spki;
+const shipped = [...otaKeys]; // 앱에 박힌 진짜 공개 키 목록 [평시, 예비]
+const mine = await pair(); // 평시
+const spare = await pair(); // 예비
+const theirs = await pair(); // 목록 밖
+const useKeys = (...k: string[]): void => void otaKeys.splice(0, otaKeys.length, ...k);
+useKeys(mine.spki, spare.spki);
 const sign = <T extends SignedFields>(m: T, pem = mine.pem): T & { sig: string } => signManifest(m, pem);
 
 const SUM = 'a'.repeat(64);
@@ -67,7 +72,9 @@ async function boot(opts?: { deferReady?: boolean }): Promise<void> {
   initOta(opts);
   await vi.advanceTimersByTimeAsync(3500);
   vi.useRealTimers();
-  await new Promise((r) => setTimeout(r, 10));
+  // ponytail: 실시간 대기 — 웹 crypto(키 둘 importKey·verify)는 가짜 타이머 밖이라 전체 실행 부하에서 10ms로는 모자랐다.
+  // 또 깨지면 checkAndStage 끝을 알리는 시험 훅을 둔다.
+  await new Promise((r) => setTimeout(r, 60));
 }
 
 beforeEach(() => {
@@ -166,10 +173,76 @@ describe('판 목록 서명', () => {
     }
   });
 
-  it('앱에 박힌 공개 키는 웹 crypto가 읽는 P-256 SPKI(개인 키와의 짝은 ota-release가 빌드 전에 맞대 본다)', async () => {
-    const raw = Uint8Array.from(atob(shipped), (c) => c.charCodeAt(0));
-    const key = await crypto.subtle.importKey('spki', raw, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
-    expect((key.algorithm as EcKeyAlgorithm).namedCurve).toBe('P-256');
+  it('키 둘: 예비 키로 서명한 판도 받고, 목록에 없는 키로 서명한 판은 거부한다', async () => {
+    h.manifest = { ...plain(), sig: sign(plain() as SignedFields, spare.pem).sig };
+    await boot();
+    expect(downloads()).toEqual([`download ${v()} https://levain-ota.vercel.app/bundles/${v()}.zip`]);
+    h.calls.length = 0;
+    h.manifest = sign(plain() as SignedFields, theirs.pem);
+    await boot();
+    expect(downloads()).toEqual([]);
+  });
+
+  it('예비 자리가 자리표시여도 평시 키 판은 받는다(못 읽는 키는 건너뜀)', async () => {
+    useKeys(mine.spki, OTA_RESERVE_TODO);
+    try {
+      h.manifest = man(v());
+      await boot();
+      expect(downloads().length).toBe(1);
+    } finally {
+      useKeys(mine.spki, spare.spki);
+    }
+  });
+
+  it('앱에 박힌 키: 평시는 웹 crypto가 읽는 P-256 SPKI, 예비는 P-256 SPKI 또는 자리표시(ota-release가 dist에서 막는다)', async () => {
+    expect(shipped.length).toBe(2);
+    expect(OTA_RESERVE_TODO).toBe(RESERVE_TODO); // 앱 · 스크립트 표지 글자가 같아야 dist 검사가 잡는다
+    for (const [i, spki] of shipped.entries()) {
+      if (i === 1 && spki === OTA_RESERVE_TODO) continue;
+      const raw = Uint8Array.from(atob(spki), (c) => c.charCodeAt(0));
+      const key = await crypto.subtle.importKey('spki', raw, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+      expect((key.algorithm as EcKeyAlgorithm).namedCurve).toBe('P-256');
+    }
+    expect(new Set(shipped).size).toBe(2);
+  });
+});
+
+// vc5: ota-release는 빌드된 dist에서 키 목록을 꺼내 짝을 본다 — pairProblem이 사유를 내면 쓰기 전에 멈춘다
+describe('발행 짝 확인(dist 키)', () => {
+  function dist(js: string): string {
+    const d = mkdtempSync(path.join(tmpdir(), 'levain-dist-'));
+    mkdirSync(path.join(d, 'assets'));
+    writeFileSync(path.join(d, 'index.html'), '<script src="assets/index-x.js"></script>');
+    writeFileSync(path.join(d, 'assets', 'index-x.js'), js);
+    return d;
+  }
+  const both = (): string => `const k=["${mine.spki}","${spare.spki}"];`;
+
+  it('평시 · 예비 키 어느 쪽으로 서명해도 dist 키 둘 중 하나와 맞으면 통과', () => {
+    const d = dist(both());
+    try {
+      expect(pairProblem(mine.pem, d)).toBeNull();
+      expect(pairProblem(spare.pem, d)).toBeNull();
+    } finally {
+      rmSync(d, { recursive: true, force: true });
+    }
+  });
+
+  it('dist 키와 어긋난 개인 키 · 키 하나뿐 · 예비 자리표시면 멈춘다', () => {
+    const cases: [string, string, RegExp][] = [
+      [both(), theirs.pem, /짝이 아니다/],
+      [`const k=["${mine.spki}"];`, mine.pem, /1개만/],
+      [`const k=["${mine.spki}","${RESERVE_TODO}"];`, mine.pem, /자리표시/],
+      ['console.log(1)', mine.pem, /0개만/], // 공개 키가 없는 옛 코드(서명 바닥 판 이전)
+    ];
+    for (const [js, pem, why] of cases) {
+      const d = dist(js);
+      try {
+        expect(pairProblem(pem, d)).toMatch(why);
+      } finally {
+        rmSync(d, { recursive: true, force: true });
+      }
+    }
   });
 });
 
@@ -187,5 +260,12 @@ describe('T2-05 준비: 롤백 방지 신호를 부팅 끝으로 옮길 수 있�
     markOtaReady();
     await new Promise((r) => setTimeout(r, 0));
     expect(h.calls).toContain('notifyAppReady');
+  });
+});
+
+describe('처리방침 사본', () => {
+  it('GitHub Pages용 site/privacy.html = Vercel용 ota/privacy.html(한쪽만 고치지 않는다)', () => {
+    const read = (p: string): string => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+    expect(read('site/privacy.html')).toBe(read('ota/privacy.html'));
   });
 });

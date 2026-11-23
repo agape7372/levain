@@ -23,24 +23,32 @@ const BAD_KEY = 'levain:ota:bad';
  * 이 공개 키의 짝(개인 키, 레포 밖 D:\keys\levain\ota-sign.pem)이 없으면 서명을 못 만든다 → 받지 않는다.
  * 묶음 체크섬이 서명 글 안에 있어 zip을 바꾸려면 서명도 다시 만들어야 한다(체크섬 대조는 플러그인 몫).
  * 확인은 지금 돌고 있는(믿는) 번들이 하므로 AAB 없이 OTA로 걸린다. 서명 = scripts/ota-sign.mjs(같은 글 형식).
- * 시험은 spki를 갈아 끼운다.
+ *
+ * 키 둘(vc5, RELEASE.md §8): [평시, 예비] — 어느 하나로 맞으면 받는다. 평시 개인 키를 잃어도 예비 키로 OTA가 이어진다.
+ * 예비 공개 키 = `node scripts/ota-keygen.mjs <레포 밖 경로>` 출력. 자리표시가 남아 있으면 ota-release가 dist에서 보고 멈춘다
+ * (= 예비 키 없이 vc5를 굽지 못한다). 시험은 목록을 갈아 끼운다.
  */
-export const otaKey = {
-  spki: 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1O7G/HV4loV/yjLY1Saho3dD82Qf5n1LOT+jFVMHL7ANgmTGJNKRXrhRE769pqvd4trQVi01jE/y3Rplk7lmFg==',
-};
+export const OTA_RESERVE_TODO = 'OTA_RESERVE_KEY_TODO';
+export const otaKeys: string[] = [
+  'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1O7G/HV4loV/yjLY1Saho3dD82Qf5n1LOT+jFVMHL7ANgmTGJNKRXrhRE769pqvd4trQVi01jE/y3Rplk7lmFg==',
+  OTA_RESERVE_TODO,
+];
 type Signed = { version: string; url: string; checksum: string; sig?: unknown };
 export const otaMessage = (m: Signed): string => `levain-ota\n${m.version}\n${m.url}\n${m.checksum}`;
 const bytes = (b64: string): Uint8Array<ArrayBuffer> => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
 
-/** 서명이 맞나. 없음 · 틀림 · 웹 crypto 없음 = false(받지 않는다) */
+/** 서명이 목록 중 한 키로 맞나. 없음 · 틀림 · 웹 crypto 없음 = false(받지 않는다). 못 읽는 키(자리표시)는 건너뛴다 */
 export async function signedOk(m: Signed): Promise<boolean> {
   if (typeof m.sig !== 'string') return false;
-  try {
-    const key = await crypto.subtle.importKey('spki', bytes(otaKey.spki), { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
-    return await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, bytes(m.sig), new TextEncoder().encode(otaMessage(m)));
-  } catch {
-    return false;
+  for (const spki of otaKeys) {
+    try {
+      const key = await crypto.subtle.importKey('spki', bytes(spki), { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+      if (await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, bytes(m.sig), new TextEncoder().encode(otaMessage(m)))) return true;
+    } catch {
+      /* 다음 키 */
+    }
   }
+  return false;
 }
 
 interface OtaManifest {

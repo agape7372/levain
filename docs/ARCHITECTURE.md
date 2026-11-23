@@ -298,7 +298,7 @@ export default {
   2026-11-12 계약: 부팅은 `initOta({ deferReady: true })`로 시작하고 부팅 끝에 `markOtaReady()`를 부른다. 이 짝이 빠지면 새 번들은 30초 뒤 전부 롤백된다.
   내장 번들 판정은 `APP_VERSION` 기준이다. 실패한 버전은 `levain:ota:bad`에 두고 다시 받지 않는다.
   매니페스트 url이 `${OTA_BASE}/bundles/`로 시작하고 checksum이 64자 hex일 때만 받는다.
-  그리고 박힌 공개 키(`otaKey`)로 판 목록 서명(`sig`)을 확인한 것만 받는다(2026-11-18 · 11-19 OTA 1.6.14로 게시, RELEASE.md §8 「판 목록 서명」).
+  그리고 박힌 공개 키 목록(`otaKeys` = [평시, 예비], vc5) 중 하나로 판 목록 서명(`sig`)이 맞는 것만 받는다(2026-11-18 · 11-19 OTA 1.6.14로 게시, RELEASE.md §8 「판 목록 서명」).
 - **원격 빵 자산(「완전 로컬」의 예외, 2026-11-16)**: 묶음 밖 변형 143종의 GLB·썸네일은 같은 정적 호스트 `/assets/`에서 처음 볼 때 받는다.
   `src/platform/remoteAssets.ts`만 안다(sim·store는 모른다). 부팅 때 묶음 안 `remote-assets.json`(키 → 해시)을 읽고, 못 읽으면 전부 로컬.
   GLB는 Cache Storage `levain-assets` + id당 blob URL 하나(세션 동안 revoke 안 함 — 쇼케이스 url 캐시·컨텍스트 복구가 다시 읽는다).

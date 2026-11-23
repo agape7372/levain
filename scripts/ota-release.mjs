@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { collectFiles, makeZip } from './lib/zip.mjs';
 import { hashedPath } from './lib/families.mjs';
-import { OTA_KEY, signManifest, verifyManifest } from './ota-sign.mjs';
+import { OTA_KEY, OTA_RESERVE, distKeys, pairProblem, signManifest, verifyManifest } from './ota-sign.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DEFAULT_BASE = 'https://levain-ota.vercel.app';
@@ -48,24 +48,24 @@ if (!/^\d+\.\d+\.\d+$/.test(version)) {
 }
 
 // 판 목록 서명(scripts/ota-sign.mjs, 2026-11-18): 키가 없으면 판을 못 낸다 — 서명 없는 판은 서명을 보는 앱이 안 받는다.
-// 앱에 박힌 공개 키(src/platform/ota.ts otaKey)와 짝인지 빌드 전에 맞대 본다. 어긋난 판이 나가면 모든 앱이 OTA를 못 받고
-// 새 AAB로만 고친다. 이 트리의 ota.ts에 공개 키가 없으면(= 서명 확인이 없는 옛 코드) 여기서 멈춘다 → 서명 바닥 판보다
-// 옛 코드를 「더 높은 버전 재발행」으로 되돌려 내보내는 길이 막힌다(냥수제비 FLOOR와 같은 몫, docs/RELEASE.md §8).
+// 짝 확인은 빌드 뒤 · 쓰기 전에 **빌드된 dist에서 꺼낸 키 목록**으로 한다(vc5, 소스 ota.ts가 아니라 폰이 받는 묶음 기준).
+// dist에 공개 키가 둘 없거나 예비 키 자리표시가 남았거나 짝이 안 맞으면 멈춘다. 공개 키가 없는 옛 코드도 여기서 멈춘다
+// → 서명 바닥 판보다 옛 코드를 「더 높은 버전 재발행」으로 되돌려 내보내는 길이 막힌다(냥수제비 FLOOR와 같은 몫, docs/RELEASE.md §8).
 if (!existsSync(OTA_KEY)) {
-  console.error(`OTA 서명 키 없음: ${OTA_KEY} → 백업(D:\\keys\\backup-keys.ps1)에서 되살린다. 잃었으면 새 키 + 새 AAB`);
+  console.error(`OTA 서명 키 없음: ${OTA_KEY} → 백업(D:\\keys\\backup-keys.ps1)에서 되살리거나 예비 키(LEVAIN_OTA_RESERVE_KEY)로 서명한다`);
   process.exit(1);
 }
+if (OTA_RESERVE) console.log(`★예비 키로 서명한다: ${OTA_KEY} (LEVAIN_OTA_RESERVE_KEY)`);
 const otaPem = readFileSync(OTA_KEY, 'utf8');
-const appKey = /spki: '([^']+)'/.exec(readFileSync(path.join(root, 'src', 'platform', 'ota.ts'), 'utf8'))?.[1] ?? '';
+let appKeys = []; // 빌드 뒤 dist에서 채운다
 function signed(m) {
   const s = signManifest(m, otaPem);
-  if (!verifyManifest(s, appKey)) {
-    console.error('OTA 서명이 앱 공개 키(src/platform/ota.ts otaKey)와 짝이 안 맞는다 → 멈춤');
+  if (!appKeys.some((k) => verifyManifest(s, k))) {
+    console.error('OTA 서명이 묶음(dist) 공개 키와 짝이 안 맞는다 → 멈춤');
     process.exit(1);
   }
   return s;
 }
-signed({ version, url: 'pair-check', checksum: '0'.repeat(64) }); // 빌드 전에 짝부터
 
 const historyPath = path.join(root, 'ota', 'history.json');
 let history = [];
@@ -93,9 +93,10 @@ if (latest && compareSemver(version, latest) <= 0) {
 }
 
 // APP_VERSION 단일 출처(2026-09-03) — 수동 계좌 드리프트(1.3.7 vs 1.3.9 실사고) 방지
+const pkgPath = path.join(root, 'package.json');
+const pkgOrig = readFileSync(pkgPath, 'utf8'); // 짝 확인에서 멈추면 되돌린다
 if (!dryRun) {
-  const pkgPath = path.join(root, 'package.json');
-  const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+  const pkg = JSON.parse(pkgOrig);
   pkg.version = version;
   writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
   console.log(`package.json version → ${version}`);
@@ -152,6 +153,18 @@ const distDir = path.join(root, 'dist');
 if (!existsSync(distDir)) {
   console.error('dist/ 없음 — 빌드가 산출물을 만들지 않았습니다.');
   process.exit(1);
+}
+
+// 짝 확인(빌드 뒤 · 쓰기 전) — 어긋난 판이 나가면 모든 앱이 OTA를 못 받고 새 AAB로만 고친다
+{
+  const problem = pairProblem(otaPem, distDir);
+  if (problem) {
+    console.error(`짝 확인 실패: ${problem} → 멈춤`);
+    if (!dryRun) writeFileSync(pkgPath, pkgOrig);
+    process.exit(1);
+  }
+  appKeys = distKeys(distDir).keys;
+  console.log(`짝 확인: 묶음 공개 키 ${appKeys.length}개 중 하나와 맞음`);
 }
 
 // ── 원격 변형 자산 (2026-11-16) — split-remote.mjs가 dist에서 뺀 GLB·썸네일을 호스트 폴더 ota/assets/로 ──
