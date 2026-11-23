@@ -24,9 +24,10 @@ const BAD_KEY = 'levain:ota:bad';
  * 묶음 체크섬이 서명 글 안에 있어 zip을 바꾸려면 서명도 다시 만들어야 한다(체크섬 대조는 플러그인 몫).
  * 확인은 지금 돌고 있는(믿는) 번들이 하므로 AAB 없이 OTA로 걸린다. 서명 = scripts/ota-sign.mjs(같은 글 형식).
  *
- * 키 둘(vc5, RELEASE.md §8): [평시, 예비] — 어느 하나로 맞으면 받는다. 평시 개인 키를 잃어도 예비 키로 OTA가 이어진다.
+ * 키 둘(RELEASE.md §8): [평시, 예비] — 어느 하나로 맞으면 받는다. 평시 개인 키를 잃어도 예비 키로 OTA가 이어진다.
+ * 확인은 이 JS 묶음이 하므로 예비 키가 실린 OTA 판을 받은 폰부터 예비 키를 믿는다(AAB 없이).
  * 예비 공개 키 = `node scripts/ota-keygen.mjs <레포 밖 경로>` 출력. 자리표시가 남아 있으면 ota-release가 dist에서 보고 멈춘다
- * (= 예비 키 없이 vc5를 굽지 못한다). 시험은 목록을 갈아 끼운다.
+ * (= 예비 키 없이 OTA도 AAB도 내지 않는다). 시험은 목록을 갈아 끼운다.
  */
 export const OTA_RESERVE_TODO = 'OTA_RESERVE_KEY_TODO';
 export const otaKeys: string[] = [

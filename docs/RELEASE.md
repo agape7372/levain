@@ -33,8 +33,8 @@ curl -s https://levain-ota.vercel.app/manifest.json   # version 확인
 `versionName`도 `build.gradle`이 package.json에서 읽는다. 매니페스트가 내장 번들보다 높을 때만 받으므로 위 다운그레이드는 더 생기지 않는다.
 아래 문장은 「APK에 넣은 코드를 OTA 사용자에게도 같이 보낸다」는 뜻으로 남긴다.
 
-**vc5부터(키 둘, §8)**: AAB를 굽기 전에 `npm run ota:release -- <version> --dry-run`이 통과해야 한다 — 예비 공개 키 자리가 비어 있으면 거기서 멈춘다.
-AAB와 같이 내는 OTA가 같은 키 목록을 싣고, 그 판이 새 서명 바닥 판이다(§8).
+**키 둘(§8) 이후**: 예비 공개 키 자리가 비어 있으면 `ota-release`(`--dry-run` 포함)가 멈춘다. 그래서 AAB를 굽기 전에도 `--dry-run` 통과를 먼저 본다.
+키 목록은 JS 묶음에 있으므로 AAB를 기다리지 않고 OTA로 걸린다. 예비 키가 실린 첫 OTA 판이 새 서명 바닥 판이다(§8).
 
 `versionName`을 올리는 빌드라면 OTA 버전도 그보다 높게 잡는다. 발행을 건너뛰려면 매니페스트가 네이티브 이하여야 한다(그 경우 OTA 자체가 무효). 적용 트리거는 §8대로 **백그라운드 전환 후 복귀**.
 
@@ -51,7 +51,7 @@ JAVA_HOME="D:/android-toolchain/jdk21" ./gradlew assembleDebug
 - **버전**(2026-11-12): `versionName`은 `build.gradle`이 `package.json` version을 읽는다. 손으로 쓰지 않는다. `versionCode`는 손으로 올린다(현재 5).
 - 서명 없는 디버그 빌드 확인 환경: `JAVA_HOME=D:/android-toolchain/jdk21` · `ANDROID_HOME=D:/android-toolchain/sdk`.
 - `npm run build`는 `dist/`를 비우지 않는다. 깨끗한 dist로 확인하려면 `npm run ota:release -- <version> --dry-run`(dist를 비우고 빌드한다).
-- 릴리스: `./gradlew bundleRelease` → 서명 AAB. 굽기 전에 `npm run ota:release -- <version> --dry-run` 통과(예비 키 자리표시면 멈춤, §8 「키 둘」).
+- 릴리스: `./gradlew bundleRelease` → 서명 AAB. 굽기 전에 `npm run ota:release -- <version> --dry-run` 통과(예비 키 자리표시면 멈춘다, §8 「키 둘」).
 
 ## 3. 에뮬레이터 (D:\android-toolchain — podoal에서 검증된 조합)
 
@@ -194,8 +194,8 @@ node scripts/check-remote-assets.mjs                   # 배포 뒤 — 원격 �
 - **발행 전 필수**: 개인정보처리방침 세 곳(`docs/PRIVACY.md` · `ota/privacy.html` · GitHub Pages용 사본 `site/privacy.html` — 뒤 둘은 시험이 같은지 본다)에 「빵 그림 파일을 같은 곳에서 받는다」 문장이
   들어 있어야 한다(2026-11-16 개정). 이 기능을 처음 내보내는 판부터 해당한다.
 - **처리방침 GitHub Pages(준비만, 2026-11-23)**: Vercel Hobby가 상업 이용 금지라 처리방침을 옮길 자리 `site/`(`privacy.html` + `.nojekyll`).
-  게시 = `git subtree push --prefix site origin gh-pages` → 저장소 Settings → Pages → 가지 `gh-pages` / `(root)`
-  → `https://agape7372.github.io/levain/privacy.html`. 200을 확인한 뒤에 앱(`settingsModal.ts`) · `STORE_LISTING.md` 주소를 바꾼다.
+  게시 = `git subtree push --prefix site origin gh-pages` → Pages 켜기(source `gh-pages` / `(root)`)
+  → `https://agape7372.github.io/levain/privacy.html`. 200을 확인한 뒤에 `STORE_LISTING.md` 주소를 바꾼다. 앱 안 링크(`settingsModal.ts`)는 다음 OTA 판에 싣는다.
   옛 주소 `levain-ota.vercel.app/privacy.html`은 그 판이 다 퍼질 때까지 지우지 않는다.
 
 **판 목록 서명**(2026-11-18 어뷰징 점검 · 11-19 첫 서명 판 1.6.14 게시, 냥수제비 S5 이식): Vercel 계정을 쥔 사람이
@@ -206,26 +206,47 @@ manifest와 zip을 같이 바꾸면 모든 폰이 그 JS를 받던 길을 막는
   묶음 체크섬이 서명 글 안에 있어 zip만 바꾸면 플러그인 체크섬 대조에서, 체크섬까지 바꾸면 서명에서 걸린다.
 - 확인은 돌고 있는 번들이 하므로 AAB 없이 OTA로 걸린다. 지금 폰(1.6.12 이하)은 첫 서명 판을 옛 길로 받고, 그 판부터 확인한다.
   다음 AAB(vc5)를 이 코드로 구우면 내장 번들도 처음부터 확인한다.
-- **짝 확인은 빌드 산출물 기준**(vc5): `ota-release`가 빌드 뒤 · 쓰기 전에 `dist/`의 JS에서 P-256 공개 키 목록을 꺼내(`distKeys`)
+- **짝 확인은 빌드 산출물 기준**(2026-11-23): `ota-release`가 빌드 뒤 · 쓰기 전에 `dist/`의 JS에서 P-256 공개 키 목록을 꺼내(`distKeys`)
   서명을 되검증한다(`pairProblem`). 폰이 갖는 건 소스가 아니라 묶음이기 때문이다. 키 파일이 없으면 빌드 전에, 묶음에 키가 둘이 아니거나
   예비 자리표시가 남았거나 짝이 안 맞으면 빌드 뒤에 멈춘다(`--dry-run`도 같다. 멈추면 올려 둔 package.json 판도 되돌린다).
-- **키 둘**(vc5): 키 하나가 단일 장애점이라 앱에 공개 키 둘을 박는다 — `otaKeys = [평시, 예비]`.
-  평시 키를 잃어도 예비 키로 OTA가 이어지고, 둘 다 잃어야 새 키 + 새 AAB로만 고친다. 예비 키를 믿는 건 그 목록을 실은 묶음뿐이라
-  **예비 키는 vc5와 같이 나가는 첫 OTA 판부터 유효하다**(§1-1대로 AAB와 OTA를 같은 코드로 같이 낸다).
+- **키 둘**(2026-11-23): 키 하나가 단일 장애점이라 앱에 공개 키 둘을 박는다 — `otaKeys = [평시, 예비]`.
+  평시 키를 잃어도 예비 키로 OTA가 이어지고, 둘 다 잃어야 새 키 + 새 AAB로만 고친다.
+  **확인 코드와 키 목록은 JS 묶음(`ota.ts`)에 있다 → 예비 키가 실린 OTA 판을 받은 폰부터 예비 키를 믿는다. AAB를 기다리지 않는다.**
+  다음 AAB는 내장 번들에도 같은 목록을 실을 뿐이다(새로 깐 폰이 첫 OTA를 받기 전에도 키 둘로 확인).
   - **keygen**: `node scripts/ota-keygen.mjs <레포 밖 경로>` — P-256 개인 키 PEM을 그 경로에만 쓰고(git 작업 트리 안 · 이미 있는 파일은 거부)
     화면엔 공개 키(SPKI base64)만 찍는다. 그 공개 키를 `src/platform/ota.ts` `otaKeys` 둘째 자리(`OTA_RESERVE_TODO` 자리)에 넣고 커밋한다.
-    자리표시가 남아 있으면 `ota-release`가 dist에서 보고 멈춘다 = 예비 키 없이 vc5를 굽지 못한다.
-  - **보관**: 예비 개인 키는 `D:\keys`와 다른 매체에 둔다(같은 디스크 · 같은 백업이면 같이 잃는다). 경로는 문서에 적지 않는다.
+    자리표시가 남아 있으면 `ota-release`가 dist에서 보고 멈춘다 = 예비 키 없이 OTA도 AAB도 내지 않는다.
+  - **보관**: 예비 개인 키는 `D:\keys`와 다른 물리 디스크에 둔다(같은 디스크 · 같은 백업이면 같이 잃는다). 경로는 문서에 적지 않는다.
     키 내용은 어디에도 커밋하지 않는다.
   - **예비 키로 서명**(평시 키를 잃었을 때만): `LEVAIN_OTA_RESERVE_KEY=<예비 PEM 경로> npm run ota:release -- <version>`.
     이 환경 변수가 있을 때만 예비 키로 서명하고 시작에 「★예비 키로 서명한다」를 찍는다. 예비 키로 넘어갔으면 새 예비 키를 keygen해
-    목록을 [옛 예비, 새 예비]로 바꾸고 다음 AAB와 그 OTA를 같이 낸다.
+    목록을 [옛 예비, 새 예비]로 바꿔 OTA로 낸다(그 판이 새 바닥 판).
 - 평시 키 백업은 `D:\keys\backup-keys.ps1`(그 스크립트가 `D:\keys` 전체를 담는다).
-- **서명 바닥 판**(냥수제비 FLOOR와 같은 몫): 지금 **1.6.14**(2026-11-19 첫 서명 판). **vc5와 같이 나가는 첫 OTA 판(키 둘)이 새 바닥 판이다** —
-  발행하면 이 줄을 그 판으로 고친다. 그보다 옛 코드로는 되돌리지 않는다(1.6.14 이전은 서명 확인이 없고, 키 둘 이전 코드는 예비 키를 몰라
+- **서명 바닥 판**(냥수제비 FLOOR와 같은 몫): 지금 **1.6.14**(2026-11-19 첫 서명 판). **예비 키가 실린 첫 OTA 판이 새 바닥 판이다** —
+  발행하면 이 줄을 그 판으로 고친다(AAB와 상관없이 OTA 발행 시점). 그보다 옛 코드로는 되돌리지 않는다(1.6.14 이전은 서명 확인이 없고, 키 둘 이전 코드는 예비 키를 몰라
   평시 키를 잃는 날 그 폰의 OTA가 멈춘다). 막힘: 옛 커밋의 `ota-release`는 서명을 못 해 새 앱이 안 받고, 새 `ota-release`는
   묶음(dist)에 공개 키가 둘 없으면 짝 확인에서 멈춘다.
   `ota/bundles`의 옛 zip을 손으로 manifest에 가리키지 않는다.
+
+**OTA 호스트 이전 메모 — Cloudflare Pages로 결정(2026-11-23, 아직 실행 안 함)**: Vercel Hobby가 상업 이용 금지라 옮긴다.
+- **주소가 박힌 곳**: JS뿐이다 — `src/platform/ota.ts` `OTA_BASE`(manifest 주소 · `${OTA_BASE}/bundles/` 접두 검사)와
+  `src/platform/remoteAssets.ts` `ASSET_BASE`. 네이티브(`capacitor.config.ts`는 `updateUrl`·`statsUrl`·`channelUrl` 전부 빈 값, android 리소스)엔 없다.
+  스크립트 기본값: `scripts/ota-release.mjs` `DEFAULT_BASE` · `scripts/check-remote-assets.mjs` `--base`. 앱 안 처리방침 링크는 `settingsModal.ts`.
+- **AAB 몫인 것**: 돌고 있는 묶음은 자기 `OTA_BASE`의 manifest만 읽고 그 아래 zip만 받는다. 그래서 새 주소를 실은 판은 OTA로도 퍼지지만,
+  옛 AAB(vc4 이하)를 새로 깐 폰은 내장 번들이 옛 주소를 보고 첫 OTA를 옛 호스트에서 받는다 → **옛 호스트는 새 주소를 내장한 AAB(vc5)가
+  스토어에 깔리고 옛 판이 빠질 때까지 계속 서빙한다.** 이전 자체는 OTA로 되고, 옛 호스트를 끄는 시점만 AAB에 묶인다.
+- **계정**: Cloudflare 계정(무료) 하나. Pages 무료 = 파일당 25MiB · 사이트당 2만 파일 · 대역폭 무제한. zip은 1.6.18 기준 약 15MB.
+- **wrangler 절차**(레포 devDependency 아님 → `npx wrangler@<고정 버전>`):
+  1. `npx wrangler login`(브라우저 인증) 또는 `CLOUDFLARE_API_TOKEN`(Pages 편집 권한) + `CLOUDFLARE_ACCOUNT_ID` 환경 변수
+  2. `npx wrangler pages project create levain-ota --production-branch main` → 주소 `https://levain-ota.pages.dev`
+  3. `ota/_headers`에 `vercel.json` 헤더를 옮긴다: `/manifest.json` → `Cache-Control: no-store`(지금은 `max-age=0, must-revalidate`) +
+     `Access-Control-Allow-Origin: *`, `/bundles/*` · `/assets/*` → `Cache-Control: public, max-age=31536000, immutable` + CORS `*`
+  4. `npx wrangler pages deploy ota --project-name levain-ota --branch main`(배포 폴더 = 지금 Vercel에 올리는 그 `ota/`)
+  5. 확인: `curl -sI https://levain-ota.pages.dev/manifest.json`(헤더) · `node scripts/check-remote-assets.mjs --base=https://levain-ota.pages.dev/assets`
+- **옮기는 순서**: ① 같은 `ota/`를 두 호스트에 다 올린다 ② `OTA_BASE`·`ASSET_BASE`·스크립트 기본값을 새 주소로 바꾼 판을 낸다 —
+  이때 manifest가 두 벌 필요하다(옛 호스트 것은 url이 옛 주소 아래여야 옛 코드가 받고, 새 호스트 것은 새 주소 아래. url이 서명 글에 들어가므로
+  따로 서명). **지금 `ota-release`는 한 벌만 쓴다 → 이전 때 스크립트를 먼저 보강한다.** ③ 그 뒤 판은 두 호스트에 다 올린다
+  ④ vc5(새 주소 내장)가 퍼진 뒤 옛 호스트를 끈다.
 
 **롤백**(2026-11-12 다시 씀, 감사 T2-06): 옛 항목을 manifest에 덮어쓰는 방법은 **안 먹는다**.
 기기는 지금 버전 이하의 매니페스트를 무시한다(다운그레이드 거부). `ota-release`도 최신 이하 버전 발행을 거부한다.
