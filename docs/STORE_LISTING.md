@@ -16,7 +16,7 @@
 | 카테고리 | 시뮬레이션 |
 | 무료 / 광고 / IAP | 무료 · **보상형 광고만(사용자 선택 시에만 재생)** · 인앱 결제 없음 |
 | 연락처 | zaballgam@gmail.com |
-| 개인정보처리방침 | https://levain-ota.vercel.app/privacy.html |
+| 개인정보처리방침 | https://agape7372.github.io/levain/privacy.html (2026-11-23 GitHub Pages 게시 · 200 확인. 옛 주소 https://levain-ota.vercel.app/privacy.html 도 그대로 열림 — 앱 안 링크는 다음 OTA에서 바꾼다) |
 
 ## 짧은 설명 (80자 이내)
 
@@ -149,7 +149,7 @@ Play Console에 앱을 만들고 폼을 전부 채웠다. 개발자 계정 `감�
 끝난 것:
 
 - 스토어 등록정보 — 짧은 설명·자세한 설명·아이콘 512·피처 그래픽·폰 스크린샷 2장, 저장 완료
-- 개인정보처리방침 URL `https://levain-ota.vercel.app/privacy.html` (200 확인)
+- 개인정보처리방침 URL `https://levain-ota.vercel.app/privacy.html` (200 확인) → 2026-11-23 새 주소 `https://agape7372.github.io/levain/privacy.html`로 옮김. **콘솔 칸은 아직 옛 주소 — 콘솔에서 새 주소로 바꿔 저장한다**
 - 로그인 세부정보 = 제한된 부분 없음 / 광고 = 있음 / 광고 ID = 사용함(광고 또는 마케팅)
 - 콘텐츠 등급 — IARC 설문 14문항 전부 “아니요”, 결과 **전체이용가(G·L·E·3+)**
 - 타겟층 = 만 18세 이상 / 정부 앱·금융 기능·건강 앱 = 해당 없음
