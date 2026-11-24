@@ -32,7 +32,7 @@ const BAD_KEY = 'levain:ota:bad';
 export const OTA_RESERVE_TODO = 'OTA_RESERVE_KEY_TODO';
 export const otaKeys: string[] = [
   'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE1O7G/HV4loV/yjLY1Saho3dD82Qf5n1LOT+jFVMHL7ANgmTGJNKRXrhRE769pqvd4trQVi01jE/y3Rplk7lmFg==',
-  OTA_RESERVE_TODO,
+  'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKuPFR5Xo/Izc/lMlTFyOb3Ftg5LBgC6T0WT/Nm+hpdfQqXI2fmR0d0XYSJFK0U3M/Sv2jaI8a/UOB2kwHhp+fQ==',
 ];
 type Signed = { version: string; url: string; checksum: string; sig?: unknown };
 export const otaMessage = (m: Signed): string => `levain-ota\n${m.version}\n${m.url}\n${m.checksum}`;
