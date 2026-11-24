@@ -41,6 +41,8 @@ describe('묶음 안 / 원격 나눔', () => {
       .split('\n')
       .map((l) => l.match(/^public\/breads\/([^/]+--[^/]+)\.glb$/)?.[1])
       .filter((id): id is string => id !== undefined)
+      // ca7ec6e부터 원격 변형 GLB도 일부 git에 들어 있다 — 묶음 안 것만 맞댄다
+      .filter((id) => !isRemoteBread(id))
       .sort();
     const onDisk = readdirSync(new URL('public/breads/', ROOT)).filter((f) => f.endsWith('.glb')).map((f) => f.slice(0, -4));
     const bundled = onDisk.filter((id) => id.includes('--') && !isRemoteBread(id)).sort();
