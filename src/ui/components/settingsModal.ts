@@ -142,7 +142,7 @@ export function openSettings(api: GameApi): void {
   // 처리방침 링크 — §13 요건(광고 SDK 도입 시 앱 내 링크 필수). window.open('_system')은
   // Capacitor WebView에서 외부 네비게이션을 시스템 브라우저로 위임하는 관례적 트리거.
   const privacyRow = actionRow(copy.settings.privacy, () => {
-    window.open('https://levain-ota.vercel.app/privacy.html', '_system');
+    window.open('https://agape7372.github.io/levain/privacy.html', '_system');
   });
   wrap.appendChild(privacyRow);
   // 광고 동의 다시 고르기 — 동의가 필요한 지역(EEA·UK 등)에서만 행이 생긴다 (Google UMP 요건, 감사 T2-08)
