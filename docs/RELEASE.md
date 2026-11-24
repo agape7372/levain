@@ -231,7 +231,7 @@ manifest와 zip을 같이 바꾸면 모든 폰이 그 JS를 받던 길을 막는
   묶음(dist)에 공개 키가 둘 없으면 짝 확인에서 멈춘다.
   `ota/bundles`의 옛 zip을 손으로 manifest에 가리키지 않는다.
 
-**OTA 호스트 이전 메모 — Cloudflare Pages로 결정(2026-11-23, 아직 실행 안 함)**: Vercel Hobby가 상업 이용 금지라 옮긴다.
+**OTA 호스트 이전 메모 — 취소(2026-11-24)**: 11-23에 Cloudflare Pages로 옮기기로 했으나, 팀 `jiring's projects`가 이미 Vercel **Pro · Active**라(11-24 결제 화면 확인) 옮길 이유가 없다. 아래는 다시 필요할 때를 위한 기록이다.
 - **주소가 박힌 곳**: JS뿐이다 — `src/platform/ota.ts` `OTA_BASE`(manifest 주소 · `${OTA_BASE}/bundles/` 접두 검사)와
   `src/platform/remoteAssets.ts` `ASSET_BASE`. 네이티브(`capacitor.config.ts`는 `updateUrl`·`statsUrl`·`channelUrl` 전부 빈 값, android 리소스)엔 없다.
   스크립트 기본값: `scripts/ota-release.mjs` `DEFAULT_BASE` · `scripts/check-remote-assets.mjs` `--base`. 앱 안 처리방침 링크는 `settingsModal.ts`.
