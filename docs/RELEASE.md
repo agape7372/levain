@@ -188,6 +188,9 @@ node scripts/check-remote-assets.mjs                   # 배포 뒤 — 원격 �
 앱은 처음 볼 때 받고(쇼케이스는 최대 4초 기다린 뒤 베이스 빵으로 물러남) 기기 Cache Storage에 둔다. 묶음 안 변형 규칙은 `scripts/lib/families.mjs`.
 - **순서**: ① `npm run ota:release -- <version>` ② 워크트리에서 릴리스했으면 `ota/assets/`와 새 zip을 배포 폴더(본 레포 `ota/`)로 옮긴다
   ③ `vercel --prod` ④ `node scripts/check-remote-assets.mjs`. ④를 건너뛰면 원격 404가 앱에서 조용히 베이스 빵으로 가려져 아무도 모른다.
+  ⑤ `node <Game-studio>/tools/verify-live/verify-live.mjs <그 도구의 levain.json> --expect <version>`(판 · 서명 · zip 해시 · 자산, 종료 0이어야 게시 완료).
+  `ota-release`는 배포 전에 끝나 거기 붙이면 옛 판을 보므로 손으로 돌린다. 1.6.19부터 묶음 속 키가 배열(`["MFk…","MFk…"]` 꼴)이라 설정의 키 정규식이 옛 `spki:'…'` 꼴이면 서명 단계가 종료 2 — P-256 SPKI 꼴(`ota-sign.mjs` `SPKI_P256`)로 바꾼다.
+  워크트리에서 복사본으로 릴리스했으면 정리로 빠진 파일(옛 zip · 맵 · 썸네일)은 배포 폴더에서 지우지 말고 `D:\levain-ota-archive\<날짜>\`로 옮긴다.
   본 레포엔 node_modules가 없어 릴리스는 워크트리에서 만들고, 배포는 `npx vercel --prod --scope jirings-projects --cwd <본 레포>/ota`로 한다(1.6.9 실측).
 - **배포 용량(1.6.9 실측)**: zip을 최근 4개(1.6.6~1.6.9)만 두고 assets 52MB를 더해 폴더 합 99MB로 Vercel 배포가 통과했다.
   zip은 4개 유지(옛 zip 10개는 지움). 업로드 상한은 이번엔 안 걸렸지만 여유가 1MB 남짓이라 zip을 더 늘리지 않는다.
