@@ -5,6 +5,7 @@
 // SSV(서버 검증)는 백엔드 0이라 미사용 — 클라이언트 보상(§10-1, 정책 위반 아님·리스크 수용).
 // 우리 쪽 초기화(동의 확인 · initialize)는 지연(lazy): 첫 슬롯 사용 때만 한다 — 시작 광고는 없다(§10 금지).
 // 단 SDK 자체는 매니페스트의 MobileAdsInitProvider가 앱 시작 때 올린다. 「시작 비용 0」은 아니다(감사 T3).
+import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import {
   AdMob,
@@ -15,11 +16,23 @@ import {
 import { AD_SESSION_CAP } from '../sim';
 import { isNative } from './native';
 
+/** Google 공식 리워드 테스트 유닛 — 실기기에서도 테스트 광고가 재생된다. 기본값 */
+const TEST_AD_ID = 'ca-app-pub-3940256099942544/5224354917';
 /**
- * Google 공식 리워드 테스트 유닛 — 실기기에서도 테스트 광고가 재생된다.
- * ★실 유닛 ID 발급(AdMob 콘솔)은 사용자 게이트 — 발급되면 이 상수만 교체.
+ * 실 보상형 유닛(11-24 발급). 앱 ID(~1704555098)는 네이티브라 OTA로 안 바뀐다 — 그래서 이 유닛은
+ * 실 앱 ID로 구운 AAB(versionCode ≥ LIVE_MIN_BUILD)에서만 쓴다. 그보다 낮은 빌드(시험 AAB vc≤5 · 설치된 앱)는
+ * OTA로 이 묶음을 받아도 시험 유닛이다. gradle이 두 값을 맞댄다(android/app/build.gradle).
  */
-const REWARDED_AD_ID = 'ca-app-pub-3940256099942544/5224354917';
+const LIVE_AD_ID = 'ca-app-pub-6546297621990185/4139146747';
+const LIVE_MIN_BUILD = 10;
+
+async function rewardedAdId(): Promise<string> {
+  try {
+    return Number((await App.getInfo()).build) >= LIVE_MIN_BUILD ? LIVE_AD_ID : TEST_AD_ID;
+  } catch {
+    return TEST_AD_ID; // 빌드 번호를 못 읽으면 시험 유닛(광고가 안 뜨는 쪽이 아니라 무효 트래픽이 없는 쪽)
+  }
+}
 
 let sessionShown = 0; // 세션 상한(§10 하루 5·세션 2) — 앱 프로세스 수명, 저장 안 함
 let initDone = false;
@@ -83,7 +96,7 @@ export async function showRewarded(): Promise<'rewarded' | 'dismissed' | 'failed
       rewarded = true;
     });
     try {
-      await AdMob.prepareRewardVideoAd({ adId: REWARDED_AD_ID });
+      await AdMob.prepareRewardVideoAd({ adId: await rewardedAdId() });
       await AdMob.showRewardVideoAd();
     } finally {
       void sub.remove();

@@ -48,7 +48,7 @@ JAVA_HOME="D:/android-toolchain/jdk21" ./gradlew assembleDebug
 ```
 
 - `android/local.properties`(sdk.dir)는 기기별 — 커밋 금지. 새 PC에선 `sdk.dir=D:\\android-toolchain\\sdk` 직접 생성.
-- **버전**(2026-11-12): `versionName`은 `build.gradle`이 `package.json` version을 읽는다. 손으로 쓰지 않는다. `versionCode`는 손으로 올린다(현재 5).
+- **버전**(2026-11-12): `versionName`은 `build.gradle`이 `package.json` version을 읽는다. 손으로 쓰지 않는다. `versionCode`는 `build.gradle` 기본 5, `-PversionCode=N`으로 올린다(시험 AAB는 5~9, 실광고 출시 AAB는 10 이상 — §6-2).
 - 서명 없는 디버그 빌드 확인 환경: `JAVA_HOME=D:/android-toolchain/jdk21` · `ANDROID_HOME=D:/android-toolchain/sdk`.
 - `npm run build`는 `dist/`를 비우지 않는다. 깨끗한 dist로 확인하려면 `npm run ota:release -- <version> --dry-run`(dist를 비우고 빌드한다).
 - 릴리스: `./gradlew bundleRelease` → 서명 AAB. 굽기 전에 `npm run ota:release -- <version> --dry-run` 통과(예비 키 자리표시면 멈춘다, §8 「키 둘」).
@@ -119,8 +119,14 @@ npx @capacitor/assets generate --android \
 
 - **`AndroidManifest.xml`에 `com.google.android.gms.ads.APPLICATION_ID` meta-data가 없으면
   앱이 시작 즉시 크래시한다.** 지금은 `@string/admob_app_id`(strings.xml)를 가리키고,
-  값은 **Google 공식 테스트 App ID**다. 실 ID 발급(AdMob 콘솔)은 사용자 게이트 —
-  발급되면 `strings.xml`의 `admob_app_id`와 `src/platform/ads.ts`의 `REWARDED_AD_ID` 둘 다 교체.
+  값은 `build.gradle`의 `manifestPlaceholders`(`admobAppId`)가 채운다. 기본 = **Google 공식 테스트 App ID**.
+- **실 ID (2026-11-24 발급)**: 앱 ID `ca-app-pub-6546297621990185~1704555098` · 보상형 단위 ID `ca-app-pub-6546297621990185/4139146747`.
+  앱 ID는 **출시 굽기 명령에만** 있고(아래), 단위 ID는 `ads.ts` `LIVE_AD_ID`에 있지만 **`versionCode ≥ LIVE_MIN_BUILD`(10)인 앱에서만** 쓴다
+  (`App.getInfo().build`로 런타임에 가른다. 못 읽으면 시험 유닛). 그래서 OTA 묶음이 시험 앱 ID 앱(시험 AAB vc≤5 · 비공개 테스트 앱)에 가도 시험 광고다 —
+  테스터가 실광고를 눌러 무효 트래픽이 되는 일이 없다. gradle 가드(`build.gradle`)가 두 방향을 막는다: 시험 앱 ID로 `versionCode ≥ 10` 릴리스,
+  실 앱 ID로 `versionCode < 10` 릴리스는 둘 다 `bundleRelease`가 멈춘다. 시험 AAB(비공개 테스트)는 지금처럼 `-P` 없이 굽는다(vc5~9).
+  - **출시 굽기 명령**(14일 뒤 프로덕션): `JAVA_HOME="D:/android-toolchain/jdk21" ./gradlew bundleRelease -PadmobAppId=ca-app-pub-6546297621990185~1704555098 -PversionCode=10`
+    (`cd android` 안에서. 같은 코드로 OTA도 같이 발행 — §1-1. 판 코드는 콘솔이 거절하지 않는 값으로, 반드시 10 이상)
 - **`Capacitor.isPluginAvailable('AdMob')` 단독 판정 금지** — 이 플러그인은 웹 스텁을 등록해서
   브라우저에서도 true다(2026-08-30 실측으로 잡음). `isNative() &&` 를 앞에 둔다.
 - 광고를 켠 AAB를 올리기 전에 **Data Safety·앱 콘텐츠 폼을 먼저 갱신**할 것

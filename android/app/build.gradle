@@ -9,6 +9,24 @@ if (keystorePropertiesFile.exists()) {
 // versionName = package.json version (웹 버전 단일 출처 — 손으로 쓰다 어긋난 실사고, 감사 T3-05)
 def webVersion = new groovy.json.JsonSlurper().parse(rootProject.file('../package.json')).version
 
+// AdMob 앱 ID(네이티브)와 JS 보상형 유닛(src/platform/ads.ts)의 짝 — 실 ID는 출시 굽기(-PadmobAppId -PversionCode)에서만.
+// 기본값 = Google 테스트 앱 ID. 실 유닛은 versionCode ≥ ads.ts LIVE_MIN_BUILD 인 앱에서만 쓰이므로(OTA로도 같다)
+// 시험 앱 ID 앱이 실 유닛을 받는 길(광고 안 뜸 · 무효 트래픽)을 두 방향 다 여기서 막는다.
+def TEST_ADMOB_APP = 'ca-app-pub-3940256099942544~3347511713'
+def admobAppId = (findProperty('admobAppId') ?: TEST_ADMOB_APP).toString()
+def appVersionCode = (findProperty('versionCode') ?: '5').toString().toInteger()
+def liveMinBuild = ((rootProject.file('../src/platform/ads.ts').text =~ /LIVE_MIN_BUILD = (\d+)/)[0][1]).toInteger()
+gradle.taskGraph.whenReady { graph ->
+    def wantsRelease = graph.allTasks.any { it.project == project && it.name ==~ /(?i)(assemble|bundle)Release/ }
+    if (wantsRelease) {
+        def isTest = admobAppId == TEST_ADMOB_APP
+        if (isTest && appVersionCode >= liveMinBuild)
+            throw new GradleException("시험 AdMob 앱 ID인데 versionCode ${appVersionCode} ≥ LIVE_MIN_BUILD ${liveMinBuild} — OTA가 이 앱에 실 유닛을 보낸다. 시험 AAB는 versionCode < ${liveMinBuild}")
+        if (!isTest && appVersionCode < liveMinBuild)
+            throw new GradleException("실 AdMob 앱 ID인데 versionCode ${appVersionCode} < LIVE_MIN_BUILD ${liveMinBuild} — 이 앱은 시험 유닛을 쓴다. -PversionCode=${liveMinBuild} 이상")
+    }
+}
+
 android {
     namespace = "com.zaballgam.levain"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,8 +34,9 @@ android {
         applicationId "com.zaballgam.levain"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 5
+        versionCode appVersionCode
         versionName webVersion
+        manifestPlaceholders = [admobAppId: admobAppId]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

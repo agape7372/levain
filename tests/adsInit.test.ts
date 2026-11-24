@@ -6,8 +6,13 @@ const h = vi.hoisted(() => ({
   initFail: 0,
   consentFail: false,
   rewardCb: null as null | (() => void),
+  build: '5' as string | null, // null = App.getInfo 실패
+  adId: '',
 }));
 
+vi.mock('@capacitor/app', () => ({
+  App: { getInfo: async () => { if (h.build === null) throw new Error('not implemented'); return { build: h.build }; } },
+}));
 vi.mock('@capacitor/core', () => ({ Capacitor: { isPluginAvailable: () => true } }));
 vi.mock('@capacitor-community/admob', () => ({
   AdmobConsentStatus: { REQUIRED: 'REQUIRED' },
@@ -29,7 +34,7 @@ vi.mock('@capacitor-community/admob', () => ({
     showConsentForm: async () => { h.log.push('showConsentForm'); },
     showPrivacyOptionsForm: async () => { h.log.push('showPrivacyOptionsForm'); },
     addListener: async (_e: string, cb: () => void) => { h.rewardCb = cb; return { remove: async () => undefined }; },
-    prepareRewardVideoAd: async () => { h.log.push('prepare'); },
+    prepareRewardVideoAd: async (o: { adId: string }) => { h.log.push('prepare'); h.adId = o.adId; },
     showRewardVideoAd: async () => { h.log.push('show'); h.rewardCb?.(); },
   },
 }));
@@ -45,6 +50,8 @@ beforeEach(() => {
   h.log.length = 0;
   h.initFail = 0;
   h.consentFail = false;
+  h.build = '5';
+  h.adId = '';
 });
 
 describe('T2-08 초기화 실패는 다음 시도에서 다시 초기화한다', () => {
@@ -86,5 +93,22 @@ describe('T2-08 ③ 개인정보 선택 진입점(설정 화면 연결은 다른
     const ads = await freshAds();
     h.consentFail = true;
     expect(await ads.adPrivacyOptionsRequired()).toBe(false);
+  });
+});
+
+describe('보상형 유닛은 빌드 번호로 가른다(실 유닛이 시험 앱 ID 앱에 가지 않게)', () => {
+  const TEST = 'ca-app-pub-3940256099942544/5224354917';
+  const LIVE = 'ca-app-pub-6546297621990185/4139146747';
+  it.each(['5', '9', '', 'abc', null])('빌드 %s → 시험 유닛', async (b) => {
+    h.build = b;
+    const ads = await freshAds();
+    expect(await ads.showRewarded()).toBe('rewarded');
+    expect(h.adId).toBe(TEST);
+  });
+  it.each(['10', '11'])('빌드 %s(실 앱 ID AAB) → 실 유닛', async (b) => {
+    h.build = b;
+    const ads = await freshAds();
+    expect(await ads.showRewarded()).toBe('rewarded');
+    expect(h.adId).toBe(LIVE);
   });
 });
