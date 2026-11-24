@@ -27,7 +27,7 @@ function setup(hooks: InputHooks) {
   cam.updateMatrixWorld(true);
   const dough = {
     topY: () => 0, levelY: () => 0, bodyRadius: () => 0.69, grabStart() {}, grabMove3() {}, grabEnd() {},
-    grabStretch01: () => 0, setStirInput() {}, pokeAt() {},
+    grabStretch01: () => 0, setStirInput() {}, pokeAt() {}, holdStart() {}, holdEnd() {},
   } as unknown as DoughMesh;
   const grabEnd = vi.spyOn(dough, 'grabEnd');
   attachInput(canvas, cam, dough, hooks);
