@@ -195,7 +195,7 @@ node scripts/check-remote-assets.mjs                   # 배포 뒤 — 원격 �
   들어 있어야 한다(2026-11-16 개정). 이 기능을 처음 내보내는 판부터 해당한다.
 - **처리방침 GitHub Pages(준비만, 2026-11-23)**: Vercel Hobby가 상업 이용 금지라 처리방침을 옮길 자리 `site/`(`privacy.html` + `.nojekyll`).
   게시 = `git subtree push --prefix site origin gh-pages` → Pages 켜기(source `gh-pages` / `(root)`)
-  → `https://agape7372.github.io/levain/privacy.html`. 200을 확인한 뒤에 `STORE_LISTING.md` 주소를 바꾼다. 앱 안 링크(`settingsModal.ts`)는 다음 OTA 판에 싣는다.
+  → `https://agape7372.github.io/levain/privacy.html`. 200을 확인한 뒤에 `STORE_LISTING.md` 주소를 바꾼다. 앱 안 링크(`settingsModal.ts`)는 1.6.19(2026-11-24)에 실었다.
   옛 주소 `levain-ota.vercel.app/privacy.html`은 그 판이 다 퍼질 때까지 지우지 않는다.
 
 **판 목록 서명**(2026-11-18 어뷰징 점검 · 11-19 첫 서명 판 1.6.14 게시, 냥수제비 S5 이식): Vercel 계정을 쥔 사람이
